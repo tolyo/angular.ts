@@ -11,14 +11,27 @@ describe("Model", () => {
   });
 
   it("can register listeners", () => {
-    var watchFn = function () {
-      return "wat";
-    };
     var listenerFn = jasmine.createSpy();
     const model = createModel();
-    debugger;
-    model.watch(watchFn, listenerFn);
+    model.watch("any", listenerFn);
     model.sync();
     expect(listenerFn).toHaveBeenCalled();
+  });
+
+  it("calls the listener function when the watched value changes", function () {
+    const model = createModel();
+    model.someValue = "a";
+    model.counter = 0;
+
+    model.watch("someValue", function (newValue, oldValue, model) {
+      model.counter++;
+    });
+    expect(model.counter).toBe(0);
+    model.someValue = "b";
+    expect(model.counter).toBe(1);
+    model.someValue = "b";
+    expect(model.counter).toBe(1);
+    model.someValue = "c";
+    expect(model.counter).toBe(2);
   });
 });
