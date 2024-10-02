@@ -16,7 +16,7 @@ export function createModel(target = {}, context) {
     }
     return new Proxy(target, new Handler(target, context));
   }
-  return target; // Return non-object types as is
+  return target;
 }
 
 /**
@@ -112,9 +112,7 @@ class Handler {
    * @param {ListenerFunction} listenerFn - A function to execute when changes are detected.
    */
   watch(watchProp, listenerFn) {
-    const keys = watchProp.split(".");
-    const actual = keys.pop();
-    this.listeners.set(actual, {
+    this.listeners.set(watchProp.split(".").pop(), {
       originalTarget: this.target,
       listenerFn: listenerFn,
     });
