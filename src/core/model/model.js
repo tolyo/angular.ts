@@ -128,7 +128,7 @@ class Handler {
     const listener = this.listeners.get(propertyPath);
     if (listener) {
       const { originalTarget, listenerFn } = listener;
-      listenerFn(newValue, oldValue, originalTarget);
+      listenerFn(newValue, oldValue ? oldValue : newValue, originalTarget);
     }
   }
 }
