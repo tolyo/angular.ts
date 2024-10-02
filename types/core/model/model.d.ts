@@ -9,15 +9,6 @@
  */
 export function createModel(target?: any, context?: HandlerContext): any | ProxyConstructor;
 /**
- * A context object for passing information between handlers.
- */
-export type HandlerContext = {
-    /**
-     * - A map of listeners for property changes.
-     */
-    listeners: Map<string, Listener>;
-};
-/**
  * Listener function definition.
  */
 export type Listener = {

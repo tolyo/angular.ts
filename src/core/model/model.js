@@ -20,12 +20,6 @@ export function createModel(target = {}, context) {
 }
 
 /**
- * A context object for passing information between handlers.
- * @typedef {Object} HandlerContext
- * @property {Map<string, Listener>} listeners - A map of listeners for property changes.
- */
-
-/**
  * Listener function definition.
  * @typedef {Object} Listener
  * @property {Object} originalTarget - The original target object.
@@ -50,18 +44,13 @@ class Handler {
    * Initializes the handler with the target object and a context.
    *
    * @param {Object} target - The target object being proxied.
-   * @param {HandlerContext} [context] - The context containing listeners.
+   * @param {Handler} [context] - The context containing listeners.
    */
   constructor(target, context) {
-    /**
-     * @type {Object}
-     */
+    /** @type {Object} */
     this.target = target;
 
-    /**
-     * A map that stores listeners for property changes.
-     * @type {Map<string, Listener>}
-     */
+    /** @type {Map<string, Listener>} */
     this.listeners = context ? context.listeners : new Map();
   }
 
@@ -139,7 +128,7 @@ class Handler {
     const listener = this.listeners.get(propertyPath);
     if (listener) {
       const { originalTarget, listenerFn } = listener;
-      listenerFn(newValue, oldValue, originalTarget); // Call the listener function
+      listenerFn(newValue, oldValue, originalTarget);
     }
   }
 }
