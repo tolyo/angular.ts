@@ -3,32 +3,66 @@
  * and recursively applying proxies to nested objects.
  *
  * @param {Object} target - The object to be wrapped in a proxy.
- * @returns {Proxy|Object} - A proxy that intercepts operations on the target object,
- *                           or the original value if the target is not an object.
+ * @param {HandlerContext} [context] - The context for the handler, used to track listeners.
+ * @returns {Object | Proxy<Object>} - A proxy that intercepts operations on the target object,
+ *                                     or the original value if the target is not an object.
  */
-export function createModel(target = {}) {
+export function createModel(target = {}, context) {
   if (typeof target === "object" && target !== null) {
-    for (let key in target) {
+    for (const key in target) {
       if (Object.prototype.hasOwnProperty.call(target, key)) {
-        target[key] = createModel(target[key], new Handler());
+        target[key] = createModel(target[key], new Handler(target, context));
       }
     }
-    return new Proxy(target, new Handler());
+    return new Proxy(target, new Handler(target, context));
   }
   return target; // Return non-object types as is
 }
 
 /**
+ * A context object for passing information between handlers.
+ * @typedef {Object} HandlerContext
+ * @property {Map<string, Listener>} listeners - A map of listeners for property changes.
+ */
+
+/**
+ * Listener function definition.
+ * @typedef {Object} Listener
+ * @property {Object} originalTarget - The original target object.
+ * @property {ListenerFunction} listenerFn - The function invoked when changes are detected.
+ */
+
+/**
+ * Listener function type.
+ * @callback ListenerFunction
+ * @param {*} newValue - The new value of the changed property.
+ * @param {*} oldValue - The old value of the changed property.
+ * @param {Object} originalTarget - The original target object.
+ */
+
+/**
  * Handler class for the Proxy. It intercepts operations like property access (get)
- * and property setting (set) and adds support for deep change tracking and
+ * and property setting (set), and adds support for deep change tracking and
  * observer-like behavior.
  */
 class Handler {
   /**
-   * Initializes the handler with an empty Map for storing listener functions.
+   * Initializes the handler with the target object and a context.
+   *
+   * @param {Object} target - The target object being proxied.
+   * @param {HandlerContext} [context] - The context containing listeners.
    */
-  constructor() {
-    this.listeners = new Map();
+  constructor(target, context) {
+    /**
+     * @type {Object}
+     */
+    this.target = target;
+
+    /**
+     * A map that stores listeners for property changes.
+     * @type {Map<string, Listener>}
+     */
+    this.listeners = context ? context.listeners : new Map();
   }
 
   /**
@@ -43,7 +77,6 @@ class Handler {
   set(target, property, value) {
     const oldValue = target[property];
     target[property] = createModel(value, this);
-    // Notify listeners only if the value has changed
     if (oldValue !== value) {
       this.notifyListeners(target, property, oldValue, value);
     }
@@ -72,35 +105,43 @@ class Handler {
   }
 
   /**
-   * Registers a watcher for property along with a listener function. The listener
-   * function is invoked when changes are detected.
+   * Registers a watcher for a property along with a listener function. The listener
+   * function is invoked when changes to that property are detected.
    *
-   * @param {string} watchProp - A proper to observe specific changes in the target.
-   * @param {Function} listenerFn - A function to execute when changes are detected.
+   * @param {string} watchProp - A property path (dot notation) to observe specific changes in the target.
+   * @param {ListenerFunction} listenerFn - A function to execute when changes are detected.
    */
   watch(watchProp, listenerFn) {
-    this.listeners.set(watchProp, listenerFn);
+    const keys = watchProp.split(".");
+    const actual = keys.pop();
+    this.listeners.set(actual, {
+      originalTarget: this.target,
+      listenerFn: listenerFn,
+    });
   }
 
   /**
-   * Invokes all registered listener functions.
+   * Invokes all registered listener functions for any watched properties.
    */
   sync() {
-    Array.from(this.listeners.values()).forEach((fn) => fn());
+    Array.from(this.listeners.values()).forEach(({ listenerFn }) =>
+      listenerFn(),
+    );
   }
 
   /**
-   * Invokes the registered listener function when a watched value changes.
+   * Invokes the registered listener function when a watched property changes.
    *
-   * @param {string} target - The target object being modified
+   * @param {Object} _target - The target object being modified.
    * @param {string} propertyPath - The property path that was changed.
    * @param {*} oldValue - The old value of the property.
    * @param {*} newValue - The new value of the property.
    */
-  notifyListeners(target, propertyPath, oldValue, newValue) {
-    const listenerFn = this.listeners.get(propertyPath);
-    if (listenerFn) {
-      listenerFn(newValue, oldValue, target); // Call the listener function
+  notifyListeners(_target, propertyPath, oldValue, newValue) {
+    const listener = this.listeners.get(propertyPath);
+    if (listener) {
+      const { originalTarget, listenerFn } = listener;
+      listenerFn(newValue, oldValue, originalTarget); // Call the listener function
     }
   }
 }
