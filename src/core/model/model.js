@@ -3,7 +3,7 @@
  * and recursively applying proxies to nested objects.
  *
  * @param {Object} target - The object to be wrapped in a proxy.
- * @param {HandlerContext} [context] - The context for the handler, used to track listeners.
+ * @param {Handler} [context] - The context for the handler, used to track listeners.
  * @returns {Object | Proxy<Object>} - A proxy that intercepts operations on the target object,
  *                                     or the original value if the target is not an object.
  */
@@ -67,7 +67,7 @@ class Handler {
     const oldValue = target[property];
     target[property] = createModel(value, this);
     if (oldValue !== value) {
-      this.notifyListeners(target, property, oldValue, value);
+      this.notifyListeners(property, oldValue, value);
     }
     return true;
   }
@@ -124,7 +124,7 @@ class Handler {
    * @param {*} oldValue - The old value of the property.
    * @param {*} newValue - The new value of the property.
    */
-  notifyListeners(_target, propertyPath, oldValue, newValue) {
+  notifyListeners(propertyPath, oldValue, newValue) {
     const listener = this.listeners.get(propertyPath);
     if (listener) {
       const { originalTarget, listenerFn } = listener;
