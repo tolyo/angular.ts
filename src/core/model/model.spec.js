@@ -121,4 +121,37 @@ describe("Model", () => {
     model.name = "Bob";
     expect(model.initial).toBe("B.");
   });
+
+  it("calls the listener function only on the designated property even when value name is shared", function () {
+    let counter = 0;
+    let previousValue;
+    model.watch("someValue.b.c.d", function (newValue, oldValue) {
+      counter++;
+      previousValue = oldValue;
+    });
+
+    expect(counter).toBe(0);
+
+    model.someValue = {
+      b: { c: { d: 1 } },
+      d: 2,
+    };
+    expect(counter).toBe(0);
+
+    model.someValue.b.c.d = 3;
+    expect(previousValue).toBe(1);
+    expect(counter).toBe(1);
+
+    model.someValue.d = 4;
+    expect(previousValue).toBe(2);
+    expect(counter).toBe(2);
+
+    model.someValue.b.c.d = 1;
+    expect(previousValue).toBe(3);
+    expect(counter).toBe(3);
+
+    model.someValue.d = 2;
+    expect(previousValue).toBe(4);
+    expect(counter).toBe(4);
+  });
 });
