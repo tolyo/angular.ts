@@ -86,11 +86,6 @@ declare class Handler {
      */
     $watch(watchProp: string, listenerFn: ListenerFunction): void;
     /**
-     * @private
-     * @returns {number}
-     */
-    private getListenerCount;
-    /**
      * Invokes all registered listener functions for any watched properties.
      */
     sync(): void;

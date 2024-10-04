@@ -68,13 +68,8 @@ class Handler {
   set(target, property, value) {
     const oldValue = target[property];
     target[property] = createModel(value, this);
-    const listenerCount = this.getListenerCount();
-    debugger;
     if (oldValue !== value) {
       this.notifyListeners(property, oldValue, value);
-      if (this.getListenerCount() !== listenerCount) {
-        this.notifyListeners(property, oldValue, value);
-      }
     }
     return true;
   }
@@ -119,20 +114,7 @@ class Handler {
       this.listeners.set(key, [listener]);
     }
   }
-
-  /**
-   * @private
-   * @returns {number}
-   */
-  getListenerCount() {
-    // if (this.listenerCache !== null) {
-    //   return this.listenerCache;
-    // }
-    // let count = this.listeners.entries().reduce((acc, x) => acc + x.length, 0)
-    // this.listenerCache = count;
-    return this.listeners.entries().reduce((acc, x) => acc + x.length, 0);
-  }
-
+  
   /**
    * Invokes all registered listener functions for any watched properties.
    */
