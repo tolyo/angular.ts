@@ -50,8 +50,10 @@ class Handler {
     /** @type {Object} */
     this.target = target;
 
-    /** @type {Map<string, Listener>} */
+    /** @type {Map<string, Array<Listener>>} */
     this.listeners = context ? context.listeners : new Map();
+    /** @type {?number} */
+    this.listenerCache = null;
   }
 
   /**
@@ -66,8 +68,13 @@ class Handler {
   set(target, property, value) {
     const oldValue = target[property];
     target[property] = createModel(value, this);
+    const listenerCount = this.getListenerCount();
+    debugger;
     if (oldValue !== value) {
       this.notifyListeners(property, oldValue, value);
+      if (this.getListenerCount() !== listenerCount) {
+        this.notifyListeners(property, oldValue, value);
+      }
     }
     return true;
   }
@@ -82,8 +89,8 @@ class Handler {
    * @returns {*} - The value of the property or a method if accessing `watch` or `sync`.
    */
   get(target, property) {
-    if (property === "watch") {
-      return this.watch.bind(this);
+    if (property === "$watch") {
+      return this.$watch.bind(this);
     }
 
     if (property === "sync") {
@@ -100,19 +107,38 @@ class Handler {
    * @param {string} watchProp - A property path (dot notation) to observe specific changes in the target.
    * @param {ListenerFunction} listenerFn - A function to execute when changes are detected.
    */
-  watch(watchProp, listenerFn) {
-    this.listeners.set(watchProp.split(".").pop(), {
+  $watch(watchProp, listenerFn) {
+    const listener = {
       originalTarget: this.target,
       listenerFn: listenerFn,
-    });
+    };
+    const key = watchProp.split(".").pop();
+    if (this.listeners.has(key)) {
+      this.listeners.get(key).push(listener);
+    } else {
+      this.listeners.set(key, [listener]);
+    }
+  }
+
+  /**
+   * @private
+   * @returns {number}
+   */
+  getListenerCount() {
+    // if (this.listenerCache !== null) {
+    //   return this.listenerCache;
+    // }
+    // let count = this.listeners.entries().reduce((acc, x) => acc + x.length, 0)
+    // this.listenerCache = count;
+    return this.listeners.entries().reduce((acc, x) => acc + x.length, 0);
   }
 
   /**
    * Invokes all registered listener functions for any watched properties.
    */
   sync() {
-    Array.from(this.listeners.values()).forEach(({ listenerFn }) =>
-      listenerFn(),
+    Array.from(this.listeners.values()).forEach((list) =>
+      list.forEach(({ listenerFn }) => listenerFn()),
     );
   }
 
@@ -125,10 +151,15 @@ class Handler {
    * @param {*} newValue - The new value of the property.
    */
   notifyListeners(propertyPath, oldValue, newValue) {
-    const listener = this.listeners.get(propertyPath);
-    if (listener) {
-      const { originalTarget, listenerFn } = listener;
-      listenerFn(newValue, oldValue ? oldValue : newValue, originalTarget);
+    const listeners = this.listeners.get(propertyPath);
+
+    if (listeners) {
+      let index = 0;
+      while (index < listeners.length) {
+        const { originalTarget, listenerFn } = listeners[index];
+        listenerFn(newValue, oldValue ? oldValue : newValue, originalTarget);
+        index++;
+      }
     }
   }
 }

@@ -53,8 +53,10 @@ declare class Handler {
     constructor(target: any, context?: Handler);
     /** @type {Object} */
     target: any;
-    /** @type {Map<string, Listener>} */
-    listeners: Map<string, Listener>;
+    /** @type {Map<string, Array<Listener>>} */
+    listeners: Map<string, Array<Listener>>;
+    /** @type {?number} */
+    listenerCache: number | null;
     /**
      * Intercepts and handles property assignments on the target object. If a new value is
      * an object, it will be recursively proxied.
@@ -82,7 +84,12 @@ declare class Handler {
      * @param {string} watchProp - A property path (dot notation) to observe specific changes in the target.
      * @param {ListenerFunction} listenerFn - A function to execute when changes are detected.
      */
-    watch(watchProp: string, listenerFn: ListenerFunction): void;
+    $watch(watchProp: string, listenerFn: ListenerFunction): void;
+    /**
+     * @private
+     * @returns {number}
+     */
+    private getListenerCount;
     /**
      * Invokes all registered listener functions for any watched properties.
      */

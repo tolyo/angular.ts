@@ -18,7 +18,7 @@ describe("Model", () => {
   it("can register listeners", () => {
     var listenerFn = jasmine.createSpy();
 
-    model.watch("any", listenerFn);
+    model.$watch("any", listenerFn);
     model.sync();
     expect(listenerFn).toHaveBeenCalled();
   });
@@ -27,7 +27,7 @@ describe("Model", () => {
     model.someValue = "a";
     model.counter = 0;
 
-    model.watch("someValue", function (newValue, oldValue, model) {
+    model.$watch("someValue", function (newValue, oldValue, model) {
       model.counter++;
     });
 
@@ -47,7 +47,7 @@ describe("Model", () => {
     model.someValue = { b: 1 };
     model.counter = 0;
 
-    model.watch("someValue.b", function (newValue, oldValue, model) {
+    model.$watch("someValue.b", function (newValue, oldValue, model) {
       model.counter++;
     });
 
@@ -71,7 +71,7 @@ describe("Model", () => {
 
   it("calls the listener function when a deeply nested watched value changes", function () {
     model.counter = 0;
-    model.watch("someValue.b.c.d", function (newValue, oldValue, model) {
+    model.$watch("someValue.b.c.d", function (newValue, oldValue, model) {
       model.counter++;
     });
 
@@ -92,7 +92,7 @@ describe("Model", () => {
 
   it("calls listener with new value as old value the first time", function () {
     let oldValueGiven;
-    model.watch("someValue", function (newValue, oldValue, model) {
+    model.$watch("someValue", function (newValue, oldValue, model) {
       oldValueGiven = oldValue;
     });
     model.someValue = 123;
@@ -105,13 +105,25 @@ describe("Model", () => {
     expect(oldValueGiven).toBe(124);
   });
 
+  it("calls multiple listeners when registered on same property", function () {
+    model.counter = 0;
+    model.$watch("someValue", function () {
+      model.counter++;
+    });
+    model.$watch("someValue", function () {
+      model.counter++;
+    });
+    model.someValue = 123;
+    expect(model.counter).toBe(2);
+  });
+
   it("triggers chained watchers in the same digest", function () {
-    model.watch("nameUpper", function (newValue) {
+    model.$watch("nameUpper", function (newValue) {
       if (newValue) {
         model.initial = newValue.substring(0, 1) + ".";
       }
     });
-    model.watch("name", function (newValue) {
+    model.$watch("name", function (newValue) {
       if (newValue) {
         model.nameUpper = newValue.toUpperCase();
       }
@@ -125,7 +137,7 @@ describe("Model", () => {
   it("calls the listener function only on the designated property even when value name is shared", function () {
     let counter = 0;
     let previousValue;
-    model.watch("someValue.b.c.d", function (newValue, oldValue) {
+    model.$watch("someValue.b.c.d", function (newValue, oldValue) {
       counter++;
       previousValue = oldValue;
     });
@@ -153,5 +165,32 @@ describe("Model", () => {
     model.someValue.d = 2;
     expect(previousValue).toBe(4);
     expect(counter).toBe(4);
+  });
+
+  it("throws a RangeError on cyclical model updates", function () {
+    model.counterA = 0;
+    model.counterB = 0;
+    model.$watch("counterA", function (newValue, oldValue) {
+      model.counterB++;
+    });
+    model.$watch("counterB", function (newValue, oldValue) {
+      model.counterA++;
+    });
+    expect(() => {
+      model.counterA = 1;
+    }).toThrowError(RangeError);
+  });
+
+  it("does not end digest so that new watches are not run", function () {
+    model.counter = 0;
+    model.$watch("aValue", function (newValue, oldValue) {
+      debugger;
+      model.$watch("aValue", function (newValue, oldValue) {
+        debugger;
+        model.counter++;
+      });
+    });
+    model.aValue = "abc";
+    expect(model.counter).toBe(1);
   });
 });
