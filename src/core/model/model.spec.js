@@ -191,4 +191,16 @@ describe("Model", () => {
     model.aValue = "abc";
     expect(model.counter).toBe(1);
   });
+
+  it("can set watch functions that return properties", () => {
+    model.counter = 0;
+    model.$watch(
+      (obj) => obj.someValue,
+      () => {
+        model.counter++;
+      },
+    );
+    model.someValue = 1;
+    expect(model.counter).toBe(1);
+  });
 });

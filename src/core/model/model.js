@@ -1,3 +1,5 @@
+import { isFunction, isString } from "../../shared/utils.js";
+
 /**
  * Creates a deep proxy for the target object, intercepting property changes
  * and recursively applying proxies to nested objects.
@@ -54,6 +56,12 @@ class Handler {
     this.listeners = context ? context.listeners : new Map();
     /** @type {?number} */
     this.listenerCache = null;
+
+    /** @type {Proxy} */
+    this.proxy = null;
+
+    /** @type {boolean} */
+    this.getWatchFunction = false;
   }
 
   /**
@@ -81,10 +89,17 @@ class Handler {
    *
    * @param {Object} target - The target object.
    * @param {string} property - The name of the property being accessed.
+   * @param {Proxy} proxy - The proxy object being invoked
    * @returns {*} - The value of the property or a method if accessing `watch` or `sync`.
    */
-  get(target, property) {
+  get(target, property, proxy) {
+    if (this.getWatchFunction && isString(property)) {
+      this.getWatchFunction = false;
+      return property;
+    }
+
     if (property === "$watch") {
+      this.proxy = proxy;
       return this.$watch.bind(this);
     }
 
@@ -99,7 +114,7 @@ class Handler {
    * Registers a watcher for a property along with a listener function. The listener
    * function is invoked when changes to that property are detected.
    *
-   * @param {string} watchProp - A property path (dot notation) to observe specific changes in the target.
+   * @param {string|Function} watchProp - A property path (dot notation) to observe specific changes in the target.
    * @param {ListenerFunction} listenerFn - A function to execute when changes are detected.
    */
   $watch(watchProp, listenerFn) {
@@ -107,14 +122,20 @@ class Handler {
       originalTarget: this.target,
       listenerFn: listenerFn,
     };
-    const key = watchProp.split(".").pop();
+    let key;
+    if (isFunction(watchProp)) {
+      this.getWatchFunction = true;
+      key = watchProp(this.proxy);
+    } else {
+      key = watchProp.split(".").pop();
+    }
     if (this.listeners.has(key)) {
       this.listeners.get(key).push(listener);
     } else {
       this.listeners.set(key, [listener]);
     }
   }
-  
+
   /**
    * Invokes all registered listener functions for any watched properties.
    */
