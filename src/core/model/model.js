@@ -36,6 +36,8 @@ export function createModel(target = {}, context) {
  * @param {Object} originalTarget - The original target object.
  */
 
+const isProxySymbol = Symbol("isProxy");
+
 /**
  * Handler class for the Proxy. It intercepts operations like property access (get)
  * and property setting (set), and adds support for deep change tracking and
@@ -59,9 +61,6 @@ class Handler {
 
     /** @type {Proxy} */
     this.proxy = null;
-
-    /** @type {boolean} */
-    this.getWatchFunction = false;
   }
 
   /**
@@ -74,12 +73,25 @@ class Handler {
    * @returns {boolean} - Returns true to indicate success of the operation.
    */
   set(target, property, value) {
-    const oldValue = target[property];
-    target[property] = createModel(value, this);
-    if (oldValue !== value) {
-      this.notifyListeners(property, oldValue, value);
+    if (property === "getWatchFunction") {
+      return true;
     }
-    return true;
+
+    const oldValue = target[property];
+    if (oldValue && oldValue[isProxySymbol]) {
+      if (value) {
+        Object.keys(value).forEach((key) => {
+          oldValue[key] = value[key];
+        });
+      }
+      return true;
+    } else {
+      target[property] = createModel(value, this);
+      if (oldValue !== value) {
+        this.notifyListeners(property, oldValue, value);
+      }
+      return true;
+    }
   }
 
   /**
@@ -93,10 +105,7 @@ class Handler {
    * @returns {*} - The value of the property or a method if accessing `watch` or `sync`.
    */
   get(target, property, proxy) {
-    if (this.getWatchFunction && isString(property)) {
-      this.getWatchFunction = false;
-      return property;
-    }
+    if (property === isProxySymbol) return true;
 
     if (property === "$watch") {
       this.proxy = proxy;
@@ -124,11 +133,16 @@ class Handler {
     };
     let key;
     if (isFunction(watchProp)) {
-      this.getWatchFunction = true;
-      key = watchProp(this.proxy);
+      key = getProperty(watchProp);
+      this.registerKey(key, listener);
     } else {
-      key = watchProp.split(".").pop();
+      let keys = watchProp.split(".");
+      key = keys.pop();
+      this.registerKey(key, listener);
     }
+  }
+
+  registerKey(key, listener) {
     if (this.listeners.has(key)) {
       this.listeners.get(key).push(listener);
     } else {
@@ -165,4 +179,25 @@ class Handler {
       }
     }
   }
+}
+
+function getProperty(fn) {
+  // Initialize an empty array to track the property access path
+  let path = [];
+
+  // Create a Proxy to intercept property access
+  const handler = {
+    get: function (target, prop) {
+      // Add the accessed property to the path array
+      path.push(prop);
+      // Return the proxy again to continue chaining for nested properties
+      return new Proxy({}, handler);
+    },
+  };
+
+  // Execute the function with the Proxy object
+  fn(new Proxy({}, handler));
+
+  // Return the path as a string, joined by dots
+  return path.pop();
 }

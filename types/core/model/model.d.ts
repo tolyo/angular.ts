@@ -26,19 +26,6 @@ export type Listener = {
  */
 export type ListenerFunction = (newValue: any, oldValue: any, originalTarget: any) => any;
 /**
- * Listener function definition.
- * @typedef {Object} Listener
- * @property {Object} originalTarget - The original target object.
- * @property {ListenerFunction} listenerFn - The function invoked when changes are detected.
- */
-/**
- * Listener function type.
- * @callback ListenerFunction
- * @param {*} newValue - The new value of the changed property.
- * @param {*} oldValue - The old value of the changed property.
- * @param {Object} originalTarget - The original target object.
- */
-/**
  * Handler class for the Proxy. It intercepts operations like property access (get)
  * and property setting (set), and adds support for deep change tracking and
  * observer-like behavior.
@@ -57,6 +44,8 @@ declare class Handler {
     listeners: Map<string, Array<Listener>>;
     /** @type {?number} */
     listenerCache: number | null;
+    /** @type {Proxy} */
+    proxy: ProxyConstructor;
     /**
      * Intercepts and handles property assignments on the target object. If a new value is
      * an object, it will be recursively proxied.
@@ -74,17 +63,19 @@ declare class Handler {
      *
      * @param {Object} target - The target object.
      * @param {string} property - The name of the property being accessed.
+     * @param {Proxy} proxy - The proxy object being invoked
      * @returns {*} - The value of the property or a method if accessing `watch` or `sync`.
      */
-    get(target: any, property: string): any;
+    get(target: any, property: string, proxy: ProxyConstructor): any;
     /**
      * Registers a watcher for a property along with a listener function. The listener
      * function is invoked when changes to that property are detected.
      *
-     * @param {string} watchProp - A property path (dot notation) to observe specific changes in the target.
+     * @param {string|Function} watchProp - A property path (dot notation) to observe specific changes in the target.
      * @param {ListenerFunction} listenerFn - A function to execute when changes are detected.
      */
-    $watch(watchProp: string, listenerFn: ListenerFunction): void;
+    $watch(watchProp: string | Function, listenerFn: ListenerFunction): void;
+    registerKey(key: any, listener: any): void;
     /**
      * Invokes all registered listener functions for any watched properties.
      */

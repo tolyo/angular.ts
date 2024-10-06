@@ -69,6 +69,19 @@ describe("Model", () => {
     expect(model.counter).toBe(2);
   });
 
+  it("calls the listener function when a nested value is created from a wrapper object", () => {
+    model.someValue = { b: 1 };
+    model.counter = 0;
+
+    model.$watch("someValue.b", () => {
+      model.counter++;
+    });
+
+    expect(model.counter).toBe(0);
+    model.someValue = { b: 2 };
+    expect(model.counter).toBe(1);
+  });
+
   it("calls the listener function when a deeply nested watched value changes", () => {
     model.counter = 0;
     model.$watch("someValue.b.c.d", function (newValue, oldValue, model) {
@@ -202,5 +215,22 @@ describe("Model", () => {
     );
     model.someValue = 1;
     expect(model.counter).toBe(1);
+  });
+
+  it("can set watch functions that return nested properties", () => {
+    model.counter = 0;
+    model.a = { someValue: 1 };
+    model.$watch(
+      (obj) => obj.a.someValue,
+      () => {
+        model.counter++;
+      },
+    );
+
+    model.a.someValue = 2;
+    expect(model.counter).toBe(1);
+
+    model.a.someValue = 3;
+    expect(model.counter).toBe(2);
   });
 });
