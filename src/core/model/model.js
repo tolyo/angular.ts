@@ -1,4 +1,4 @@
-import { isFunction, isString } from "../../shared/utils.js";
+import { isFunction } from "../../shared/utils.js";
 
 /**
  * Creates a deep proxy for the target object, intercepting property changes
@@ -17,8 +17,9 @@ export function createModel(target = {}, context) {
       }
     }
     return new Proxy(target, new Handler(target, context));
+  } else {
+    return target;
   }
-  return target;
 }
 
 /**
@@ -131,15 +132,8 @@ class Handler {
       originalTarget: this.target,
       listenerFn: listenerFn,
     };
-    let key;
-    if (isFunction(watchProp)) {
-      key = getProperty(watchProp);
-      this.registerKey(key, listener);
-    } else {
-      let keys = watchProp.split(".");
-      key = keys.pop();
-      this.registerKey(key, listener);
-    }
+    let key = getProperty(watchProp);
+    this.registerKey(key, listener);
   }
 
   registerKey(key, listener) {
