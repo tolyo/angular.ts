@@ -75,7 +75,7 @@ import { LocationProvider } from "./core/location/location";
 import { LogProvider } from "./services/log";
 import { ParseProvider } from "./core/parser/parse";
 import { RootScopeProvider } from "./core/scope/scope";
-import { $QProvider, $$QProvider } from "./core/q/q";
+import { $QProvider } from "./core/q/q";
 import { SceProvider, SceDelegateProvider } from "./core/sce/sce";
 import { TaskTrackerFactoryProvider } from "./core/task-tracker-factory";
 import { TemplateRequestProvider } from "./services/template-request";
@@ -261,7 +261,6 @@ export function publishExternalAPI(angular) {
             $rootScope: RootScopeProvider,
             $routerGlobals: UIRouterGlobals,
             $q: $QProvider,
-            $$q: $$QProvider,
             $sce: SceProvider,
             $sceDelegate: SceDelegateProvider,
             $$taskTrackerFactory: TaskTrackerFactoryProvider,

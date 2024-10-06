@@ -626,50 +626,6 @@ describe("all", function () {
     });
   });
 
-  describe("$qq", function () {
-    let $q, $$q, $rootScope, $injector;
-
-    beforeEach(() => {
-      window.angular = new Angular();
-      $injector = createInjector(["ng"]);
-      $q = $injector.get("$q");
-      $$q = $injector.get("$$q");
-      $rootScope = $injector.get("$rootScope");
-    });
-
-    afterEach(function () {});
-
-    it("uses deferreds that do not resolve at digest", function () {
-      var d = $$q.defer();
-      var fulfilledSpy = jasmine.createSpy();
-      d.promise.then(fulfilledSpy);
-      d.resolve("ok");
-      $rootScope.$apply();
-      expect(fulfilledSpy).not.toHaveBeenCalled();
-    });
-
-    it("uses deferreds that resolve later", (done) => {
-      var d = $$q.defer();
-      d.promise.then((val) => {
-        expect(val).toBe("ok");
-        done();
-      });
-      d.resolve("ok");
-    });
-
-    it("does not invoke digest", (done) => {
-      var d = $$q.defer();
-      var watchSpy = jasmine.createSpy();
-      d.promise.then(() => {
-        watchSpy();
-        done();
-      });
-      d.resolve("ok");
-      $rootScope.$watch(watchSpy);
-      expect(watchSpy).not.toHaveBeenCalled();
-    });
-  });
-
   describe("$Q", () => {
     let resolve;
     let reject;

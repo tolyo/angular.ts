@@ -2,26 +2,20 @@ import { isDefined, sliceArgs } from "../../shared/utils";
 
 export function $IntervalFactoryProvider() {
   this.$get = [
-    "$browser",
     "$q",
-    "$$q",
     "$rootScope",
     /**
-     *
-     * @param {import('../../services/browser').Browser} $browser
      * @param {*} $q
-     * @param {*} $$q
      * @param {import('../scope/scope').Scope} $rootScope
      * @returns
      */
-    function ($browser, $q, $$q, $rootScope) {
+    function ($q, $rootScope) {
       return function intervalFactory(setIntervalFn, clearIntervalFn) {
-        return function intervalFn(fn, delay, count, invokeApply) {
+        return function intervalFn(fn, delay, count) {
           const hasParams = arguments.length > 4;
           const args = hasParams ? sliceArgs(arguments, 4) : [];
           let iteration = 0;
-          const skipApply = isDefined(invokeApply) && !invokeApply;
-          const deferred = (skipApply ? $$q : $q).defer();
+          const deferred = $q.defer();
           const { promise } = deferred;
 
           count = isDefined(count) ? count : 0;
@@ -35,11 +29,7 @@ export function $IntervalFactoryProvider() {
           }
 
           function tick() {
-            if (skipApply) {
-              $browser.defer(callback);
-            } else {
-              $rootScope.$evalAsync(callback);
-            }
+            $rootScope.$evalAsync(callback);
 
             iteration++;
 
@@ -47,16 +37,10 @@ export function $IntervalFactoryProvider() {
               deferred.resolve(iteration);
               clearIntervalFn(promise.$$intervalId);
             }
-
-            if (!skipApply) $rootScope.$apply();
+            $rootScope.$apply();
           }
 
-          promise.$$intervalId = setIntervalFn(
-            tick,
-            delay,
-            deferred,
-            skipApply,
-          );
+          promise.$$intervalId = setIntervalFn(tick, delay, deferred);
 
           return promise;
         };

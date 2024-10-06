@@ -8,18 +8,16 @@ export class TimeoutProvider {
     "$rootScope",
     "$browser",
     "$q",
-    "$$q",
     "$exceptionHandler",
     /**
      *
      * @param {import('../scope/scope').Scope} $rootScope
      * @param {import('../../services/browser').Browser} $browser
      * @param {*} $q
-     * @param {*} $$q
      * @param {import('../exception-handler').ErrorHandler} $exceptionHandler
      * @returns
      */
-    ($rootScope, $browser, $q, $$q, $exceptionHandler) => {
+    ($rootScope, $browser, $q, $exceptionHandler) => {
       const deferreds = {};
 
       /**
@@ -38,8 +36,6 @@ export class TimeoutProvider {
        *
        * @param {function()=} fn A function, whose execution should be delayed.
        * @param {number=} [delay=0] Delay in milliseconds.
-       * @param {boolean=} [invokeApply=true] If set to `false` skips model dirty checking, otherwise
-       *   will invoke `fn` within the {@link ng.$rootScope.Scope#$apply $apply} block.
        * @returns {import("../q/q").QPromise<any>} Promise that will be resolved when the timeout is reached. The promise
        *   will be resolved with the return value of the `fn` function.
        *
@@ -47,7 +43,7 @@ export class TimeoutProvider {
       function timeout(fn, delay, invokeApply = true) {
         const args = sliceArgs(arguments, 3);
         const skipApply = isDefined(invokeApply) && !invokeApply;
-        const deferred = (skipApply ? $$q : $q).defer();
+        const deferred = $q.defer();
         const { promise } = deferred;
         let timeoutId;
 

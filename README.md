@@ -1,7 +1,7 @@
 AngularTS 
 --------------------
 
-![Build status](https://github.com/Angular-Wave/angular.ts/actions/workflows/playwright.yml/badge.svg)
+![Build status](https://github.com/Angular-Wave/angular.ts/actions/workflows/ci.yml/badge.svg)
 [![stats](https://data.jsdelivr.com/v1/package/npm/@angular-wave/angular.ts/badge?style=rounded)](https://www.jsdelivr.com/package/npm/@angular-wave/angular.ts) 
 
 This project preserves, modernises and expands the original [AngularJS](https://github.com/angular/angular.js) 

@@ -55,31 +55,6 @@ describe("$interval", () => {
     }, 1);
   });
 
-  it("should NOT call $apply if invokeApply is set to false", (done) => {
-    const applySpy = spyOn($rootScope, "$apply").and.callThrough();
-
-    $interval(() => {}, 1, 0, false);
-    expect(applySpy).not.toHaveBeenCalled();
-
-    setTimeout(() => {
-      expect(applySpy).not.toHaveBeenCalled();
-      done();
-    }, 2);
-  });
-
-  it("should NOT call $evalAsync or $digest if invokeApply is set to false", async () => {
-    const evalAsyncSpy = spyOn($rootScope, "$evalAsync").and.callThrough();
-    const digestSpy = spyOn($rootScope, "$digest").and.callThrough();
-    const notifySpy = jasmine.createSpy("notify");
-
-    $interval(notifySpy, 1, 1, false);
-
-    await wait(100);
-    expect(notifySpy).toHaveBeenCalled();
-    expect(evalAsyncSpy).not.toHaveBeenCalled();
-    expect(digestSpy).not.toHaveBeenCalled();
-  });
-
   it("should allow you to specify a number of iterations", async () => {
     let counter = 0;
     $interval(

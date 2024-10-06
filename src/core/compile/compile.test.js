@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-const TEST_URL = "src/core/compile/compile.html";
+const TEST_URL = "src/core/compile/compile.html?random=false";
 
 test("unit tests contain no errors", async ({ page }) => {
   await page.goto(TEST_URL);

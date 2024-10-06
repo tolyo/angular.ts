@@ -98,33 +98,6 @@ export class $QProvider {
   }
 }
 
-export class $$QProvider {
-  constructor() {
-    this.errorOn = true;
-  }
-
-  $get = [
-    "$exceptionHandler",
-    ($exceptionHandler) => {
-      return qFactory(
-        (callback) => {
-          window.setTimeout(callback);
-        },
-        $exceptionHandler,
-        this.errorOn,
-      );
-    },
-  ];
-
-  errorOnUnhandledRejections(value) {
-    if (isDefined(value)) {
-      this.errorOn = value;
-      return this;
-    }
-    return this.errorOn;
-  }
-}
-
 /**
  * Constructs a promise manager.
  *

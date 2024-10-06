@@ -52,11 +52,6 @@ export class $QProvider {
      */
     errorOnUnhandledRejections(value?: boolean | undefined): boolean | $QProvider;
 }
-export class $$QProvider {
-    errorOn: boolean;
-    $get: (string | (($exceptionHandler: any) => any))[];
-    errorOnUnhandledRejections(value: any): boolean | this;
-}
 export type QService = {
     defer: () => Deferred<any>;
     all: (arg0: any | null) => QPromise<any>;
