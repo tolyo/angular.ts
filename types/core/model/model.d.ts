@@ -42,6 +42,8 @@ declare class Handler {
     target: any;
     /** @type {Map<string, Array<Listener>>} */
     listeners: Map<string, Array<Listener>>;
+    /** @type {WeakMap<Object, Array<string>>} */
+    objectListeners: WeakMap<any, Array<string>>;
     /** @type {?number} */
     listenerCache: number | null;
     /** @type {Proxy} */
@@ -67,6 +69,12 @@ declare class Handler {
      * @returns {*} - The value of the property or a method if accessing `watch` or `sync`.
      */
     get(target: any, property: string, proxy: ProxyConstructor): any;
+    deleteProperty(target: any, property: any): boolean;
+    /**
+     * Returns the underlying object being wrapped by the Proxy
+     * @returns {any}
+     */
+    $target(): any;
     /**
      * Registers a watcher for a property along with a listener function. The listener
      * function is invoked when changes to that property are detected.
@@ -83,7 +91,6 @@ declare class Handler {
     /**
      * Invokes the registered listener function when a watched property changes.
      *
-     * @param {Object} _target - The target object being modified.
      * @param {string} propertyPath - The property path that was changed.
      * @param {*} oldValue - The old value of the property.
      * @param {*} newValue - The new value of the property.

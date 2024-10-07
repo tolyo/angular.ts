@@ -55,6 +55,10 @@ class Handler {
 
     /** @type {Map<string, Array<Listener>>} */
     this.listeners = context ? context.listeners : new Map();
+
+    /** @type {WeakMap<Object, Array<string>>} */
+    this.objectListeners = context ? context.objectListeners : new WeakMap();
+
     /** @type {?number} */
     this.listenerCache = null;
 
@@ -72,6 +76,7 @@ class Handler {
    * @returns {boolean} - Returns true to indicate success of the operation.
    */
   set(target, property, value) {
+    console.log(`target ${target} property ${property} value ${value}`);
     if (property === "getWatchFunction") {
       return true;
     }
@@ -88,6 +93,14 @@ class Handler {
       target[property] = createModel(value, this);
       if (oldValue !== value) {
         this.notifyListeners(property, oldValue, value);
+      }
+      // Right now this is only for Arrays
+      if (this.objectListeners.has(target) && property !== "length") {
+        let keys = this.objectListeners.get(target);
+        keys.forEach((key) => {
+          // For arrays we notify index and value
+          this.notifyListeners(key, property, value);
+        });
       }
       return true;
     }
@@ -111,11 +124,37 @@ class Handler {
       return this.$watch.bind(this);
     }
 
+    if (property === "$target") {
+      return this.$target();
+    }
+
     if (property === "$digest") {
       return this.$digest.bind(this);
     }
 
     return target[property];
+  }
+
+  deleteProperty(target, property) {
+    console.log(`Deleted element at index ${property}`);
+    delete target[property];
+    // Right now this is only for Arrays
+    if (this.objectListeners.has(target)) {
+      let keys = this.objectListeners.get(target);
+      keys.forEach((key) => {
+        // For arrays we notify index and value
+        this.notifyListeners(key, property, null);
+      });
+    }
+    return true;
+  }
+
+  /**
+   * Returns the underlying object being wrapped by the Proxy
+   * @returns {any}
+   */
+  $target() {
+    return this.target;
   }
 
   /**
@@ -131,7 +170,21 @@ class Handler {
       listenerFn: listenerFn,
     };
     let key = getProperty(watchProp);
+
     this.registerKey(key, listener);
+    let watchedValue = watchProp(this.target);
+    const value =
+      watchedValue && watchedValue[isProxySymbol]
+        ? watchedValue.$target
+        : watchedValue;
+    const isArray = Array.isArray(value);
+    if (isArray) {
+      if (this.objectListeners.has(value)) {
+        this.objectListeners.get(value).push(key);
+      } else {
+        this.objectListeners.set(value, [key]);
+      }
+    }
   }
 
   registerKey(key, listener) {
@@ -154,7 +207,6 @@ class Handler {
   /**
    * Invokes the registered listener function when a watched property changes.
    *
-   * @param {Object} _target - The target object being modified.
    * @param {string} propertyPath - The property path that was changed.
    * @param {*} oldValue - The old value of the property.
    * @param {*} newValue - The new value of the property.

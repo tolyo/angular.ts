@@ -111,6 +111,82 @@ describe("Model", () => {
     expect(modelInstance).toEqual(model);
   });
 
+  it("triggers chained watchers in the same model change", () => {
+    model.$watch(
+      (model) => model.nameUpper,
+      function (newValue) {
+        if (newValue) {
+          model.initial = newValue.substring(0, 1) + ".";
+        }
+      },
+    );
+    model.$watch(
+      (model) => model.name,
+      function (newValue) {
+        if (newValue) {
+          model.nameUpper = newValue.toUpperCase();
+        }
+      },
+    );
+    model.name = "Jane";
+    expect(model.initial).toBe("J.");
+    model.name = "Bob";
+    expect(model.initial).toBe("B.");
+  });
+
+  it("throws a RangeError on cyclical model updates", () => {
+    model.counterA = 0;
+    model.counterB = 0;
+    model.$watch(
+      (model) => model.counterA,
+      () => {
+        model.counterB++;
+      },
+    );
+    model.$watch(
+      (model) => model.counterB,
+      () => {
+        model.counterA++;
+      },
+    );
+    expect(() => {
+      model.counterA = 1;
+    }).toThrowError(RangeError);
+  });
+
+  it("does not end digest so that new watches are not run", () => {
+    model.counter = 0;
+    model.$watch(
+      (model) => model.aValue,
+      () => {
+        model.$watch(
+          (model) => model.aValue,
+          () => {
+            model.counter++;
+          },
+        );
+      },
+    );
+    model.aValue = "abc";
+    expect(model.counter).toBe(1);
+  });
+
+  it("can watch arrays", function () {
+    model.aValue = [1, 2, 3];
+    model.counter = 0;
+    model.$watch(
+      (model) => model.aValue,
+      function (newValue, oldValue, m) {
+        m.counter++;
+      },
+    );
+    expect(model.counter).toBe(0);
+    model.aValue.push(4);
+    expect(model.counter).toBe(1);
+    model.aValue.pop();
+    expect(model.counter).toBe(2);
+  });
+
   // it("can set watch functions that return properties", () => {
   //   model.counter = 0;
   //   model.$watch(
@@ -284,23 +360,6 @@ describe("Model", () => {
   //   expect(model.counter).toBe(2);
   // });
 
-  // it("triggers chained watchers in the same digest", () => {
-  //   model.$watch("nameUpper", function (newValue) {
-  //     if (newValue) {
-  //       model.initial = newValue.substring(0, 1) + ".";
-  //     }
-  //   });
-  //   model.$watch("name", function (newValue) {
-  //     if (newValue) {
-  //       model.nameUpper = newValue.toUpperCase();
-  //     }
-  //   });
-  //   model.name = "Jane";
-  //   expect(model.initial).toBe("J.");
-  //   model.name = "Bob";
-  //   expect(model.initial).toBe("B.");
-  // });
-
   // it("calls the listener function only on the designated property even when value name is shared", () => {
   //   let counter = 0;
   //   let previousValue;
@@ -332,30 +391,5 @@ describe("Model", () => {
   //   model.someValue.d = 2;
   //   expect(previousValue).toBe(4);
   //   expect(counter).toBe(4);
-  // });
-
-  // it("throws a RangeError on cyclical model updates", () => {
-  //   model.counterA = 0;
-  //   model.counterB = 0;
-  //   model.$watch("counterA", () => {
-  //     model.counterB++;
-  //   });
-  //   model.$watch("counterB", () => {
-  //     model.counterA++;
-  //   });
-  //   expect(() => {
-  //     model.counterA = 1;
-  //   }).toThrowError(RangeError);
-  // });
-
-  // it("does not end digest so that new watches are not run", () => {
-  //   model.counter = 0;
-  //   model.$watch("aValue", () => {
-  //     model.$watch("aValue", () => {
-  //       model.counter++;
-  //     });
-  //   });
-  //   model.aValue = "abc";
-  //   expect(model.counter).toBe(1);
   // });
 });
