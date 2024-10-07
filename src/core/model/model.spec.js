@@ -9,6 +9,8 @@ describe("Model", () => {
   it("can be instantiated with plain object", () => {
     model = createModel({ a: 1, b: { c: 2 } });
     expect(model).toBeDefined();
+    expect(model.a).toEqual(1);
+    expect(model.b.c).toEqual(2);
     model.a = 2;
     expect(model.a).toEqual(2);
     model.d = 3;
@@ -18,21 +20,108 @@ describe("Model", () => {
   it("can register listeners", () => {
     var listenerFn = jasmine.createSpy();
     model.$watch(() => {}, listenerFn);
-    model.sync();
+    model.$digest();
     expect(listenerFn).toHaveBeenCalled();
   });
 
-  it("can set watch functions that return properties", () => {
+  it("calls the watch function with the model as the argument", () => {
+    var watchFn = jasmine.createSpy();
+    var listenerFn = () => {};
+    model.$watch(watchFn, listenerFn);
+    model.$digest();
+    expect(watchFn).toHaveBeenCalledWith(model);
+  });
+
+  it("calls the listener function when the watched value changes", () => {
+    model.someValue = "a";
     model.counter = 0;
+
     model.$watch(
-      (obj) => obj.someValue,
+      (m) => m.someValue,
       () => {
         model.counter++;
       },
     );
-    model.someValue = 1;
+
+    expect(model.counter).toBe(0);
+
+    model.someValue = "b";
     expect(model.counter).toBe(1);
+
+    model.someValue = "b";
+    expect(model.counter).toBe(1);
+
+    model.someValue = "c";
+    expect(model.counter).toBe(2);
   });
+
+  it("calls listener with new value as old value the first time", () => {
+    var oldValueGiven;
+    var newValueGiven;
+    model.$watch(
+      function (model) {
+        return model.someValue;
+      },
+      function (newValue, oldValue, model) {
+        newValueGiven = newValue;
+        oldValueGiven = oldValue;
+      },
+    );
+    model.someValue = 123;
+
+    expect(oldValueGiven).toBe(123);
+    expect(newValueGiven).toBe(123);
+  });
+
+  it("calls listener with new value and old value the first time if defined", () => {
+    var oldValueGiven;
+    var newValueGiven;
+    model.someValue = 123;
+
+    model.$watch(
+      function (model) {
+        return model.someValue;
+      },
+      function (newValue, oldValue, model) {
+        newValueGiven = newValue;
+        oldValueGiven = oldValue;
+      },
+    );
+    model.someValue = 321;
+
+    expect(oldValueGiven).toBe(123);
+    expect(newValueGiven).toBe(321);
+  });
+
+  it("calls listener with with the instance of a model as 3rd argument", () => {
+    var modelInstance;
+    model.someValue = 123;
+
+    model.$watch(
+      function (model) {
+        return model.someValue;
+      },
+      function (_1, _2, m) {
+        modelInstance = m;
+      },
+    );
+    model.someValue = 321;
+
+    expect(modelInstance).toBeDefined();
+    expect(modelInstance).toEqual(model);
+  });
+
+  // it("can set watch functions that return properties", () => {
+  //   model.counter = 0;
+  //   model.$watch(
+  //     (obj) => obj.someValue,
+  //     () => {
+  //       model.counter++;
+  //     },
+  //   );
+  //   model.someValue = 1;
+  //   expect(model.counter).toBe(1);
+  // });
 
   // it("can set watch functions that return nested properties", () => {
   //   model.counter = 0;

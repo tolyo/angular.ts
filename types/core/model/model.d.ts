@@ -79,7 +79,7 @@ declare class Handler {
     /**
      * Invokes all registered listener functions for any watched properties.
      */
-    sync(): void;
+    $digest(): void;
     /**
      * Invokes the registered listener function when a watched property changes.
      *

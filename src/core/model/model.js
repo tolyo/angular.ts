@@ -1,5 +1,3 @@
-import { isFunction } from "../../shared/utils.js";
-
 /**
  * Creates a deep proxy for the target object, intercepting property changes
  * and recursively applying proxies to nested objects.
@@ -113,8 +111,8 @@ class Handler {
       return this.$watch.bind(this);
     }
 
-    if (property === "sync") {
-      return this.sync.bind(this);
+    if (property === "$digest") {
+      return this.$digest.bind(this);
     }
 
     return target[property];
@@ -147,7 +145,7 @@ class Handler {
   /**
    * Invokes all registered listener functions for any watched properties.
    */
-  sync() {
+  $digest() {
     Array.from(this.listeners.values()).forEach((list) =>
       list.forEach(({ listenerFn }) => listenerFn()),
     );
