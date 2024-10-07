@@ -82,6 +82,7 @@ class Handler {
     }
 
     const oldValue = target[property];
+
     if (oldValue && oldValue[isProxySymbol]) {
       if (value) {
         Object.keys(value).forEach((key) => {
@@ -90,6 +91,15 @@ class Handler {
       }
       return true;
     } else {
+      // Handle NaNs
+      if (
+        oldValue !== undefined &&
+        Number.isNaN(oldValue) &&
+        Number.isNaN(value)
+      ) {
+        return true;
+      }
+
       target[property] = createModel(value, this);
       if (oldValue !== value) {
         this.notifyListeners(property, oldValue, value);

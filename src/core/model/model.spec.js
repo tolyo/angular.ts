@@ -171,7 +171,7 @@ describe("Model", () => {
     expect(model.counter).toBe(1);
   });
 
-  it("can watch arrays", function () {
+  it("can watch arrays", () => {
     model.aValue = [1, 2, 3];
     model.counter = 0;
     model.$watch(
@@ -185,6 +185,25 @@ describe("Model", () => {
     expect(model.counter).toBe(1);
     model.aValue.pop();
     expect(model.counter).toBe(2);
+  });
+
+  it("correctly handles NaNs", () => {
+    model.counter = 0;
+    model.$watch(
+      function (model) {
+        return model.number;
+      },
+      function (newValue, oldValue, model) {
+        model.counter++;
+      },
+    );
+    model.number = 0 / 0;
+    expect(model.number).toBeNaN();
+    expect(model.counter).toBe(1);
+
+    model.number = NaN;
+    expect(model.number).toBeNaN();
+    expect(model.counter).toBe(1);
   });
 
   // it("can set watch functions that return properties", () => {
