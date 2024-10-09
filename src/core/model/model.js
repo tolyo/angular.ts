@@ -1,3 +1,5 @@
+import { isUndefined } from "../../shared/utils";
+
 /**
  * Creates a deep proxy for the target object, intercepting property changes
  * and recursively applying proxies to nested objects.
@@ -76,7 +78,6 @@ class Handler {
    * @returns {boolean} - Returns true to indicate success of the operation.
    */
   set(target, property, value) {
-    console.log(`target ${target} property ${property} value ${value}`);
     if (property === "getWatchFunction") {
       return true;
     }
@@ -85,13 +86,26 @@ class Handler {
 
     if (oldValue && oldValue[isProxySymbol]) {
       if (value) {
-        Object.keys(value).forEach((key) => {
+        const keys = Object.keys(value);
+        Object.keys(oldValue.$target).forEach((k) => {
+          if (!keys.includes(k)) {
+            delete oldValue[k];
+          }
+        });
+
+        keys.forEach((key) => {
           oldValue[key] = value[key];
         });
       }
+
+      if (isUndefined(value)) {
+        Object.keys(oldValue.$target).forEach((k) => {
+          delete oldValue[k];
+        });
+      }
+
       return true;
     } else {
-      // Handle NaNs
       if (
         oldValue !== undefined &&
         Number.isNaN(oldValue) &&
@@ -102,14 +116,28 @@ class Handler {
 
       target[property] = createModel(value, this);
       if (oldValue !== value) {
-        this.notifyListeners(property, oldValue, value);
+        const listeners = this.listeners.get(property);
+
+        if (listeners) {
+          listeners.forEach((listener) =>
+            Promise.resolve().then(() =>
+              this.notifyListeners(listener, oldValue, value),
+            ),
+          );
+        }
       }
       // Right now this is only for Arrays
       if (this.objectListeners.has(target) && property !== "length") {
         let keys = this.objectListeners.get(target);
         keys.forEach((key) => {
-          // For arrays we notify index and value
-          this.notifyListeners(key, property, value);
+          const listeners = this.listeners.get(key);
+          if (listeners) {
+            listeners.forEach((listener) =>
+              Promise.resolve().then(() =>
+                this.notifyListeners(listener, oldValue, value),
+              ),
+            );
+          }
         });
       }
       return true;
@@ -146,15 +174,30 @@ class Handler {
   }
 
   deleteProperty(target, property) {
-    console.log(`Deleted element at index ${property}`);
     delete target[property];
     // Right now this is only for Arrays
     if (this.objectListeners.has(target)) {
       let keys = this.objectListeners.get(target);
       keys.forEach((key) => {
-        // For arrays we notify index and value
-        this.notifyListeners(key, property, null);
+        const listeners = this.listeners.get(key);
+        if (listeners) {
+          listeners.forEach((listener) =>
+            Promise.resolve().then(() =>
+              this.notifyListeners(listener, oldValue, undefined),
+            ),
+          );
+        }
       });
+    }
+
+    const listeners = this.listeners.get(property);
+    const oldValue = target[property];
+    if (listeners) {
+      listeners.forEach((listener) =>
+        Promise.resolve().then(() =>
+          this.notifyListeners(listener, oldValue, undefined),
+        ),
+      );
     }
     return true;
   }
@@ -217,41 +260,25 @@ class Handler {
   /**
    * Invokes the registered listener function when a watched property changes.
    *
-   * @param {string} propertyPath - The property path that was changed.
+   * @param {Listener} listener - The property path that was changed.
    * @param {*} oldValue - The old value of the property.
    * @param {*} newValue - The new value of the property.
    */
-  notifyListeners(propertyPath, oldValue, newValue) {
-    const listeners = this.listeners.get(propertyPath);
-
-    if (listeners) {
-      let index = 0;
-      while (index < listeners.length) {
-        const { originalTarget, listenerFn } = listeners[index];
-        listenerFn(newValue, oldValue ? oldValue : newValue, originalTarget);
-        index++;
-      }
-    }
+  notifyListeners(listener, oldValue, newValue) {
+    const { originalTarget, listenerFn } = listener;
+    listenerFn(newValue, oldValue ? oldValue : newValue, originalTarget);
   }
 }
 
 function getProperty(fn) {
-  // Initialize an empty array to track the property access path
-  let path = [];
-
-  // Create a Proxy to intercept property access
+  const path = [];
   const handler = {
-    get: function (target, prop) {
-      // Add the accessed property to the path array
+    get(_, prop) {
       path.push(prop);
-      // Return the proxy again to continue chaining for nested properties
       return new Proxy({}, handler);
     },
   };
 
-  // Execute the function with the Proxy object
   fn(new Proxy({}, handler));
-
-  // Return the path as a string, joined by dots
   return path.pop();
 }

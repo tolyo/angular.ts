@@ -1,3 +1,4 @@
+import { wait } from "../../shared/test-utils";
 import { createModel } from "./model";
 
 describe("Model", () => {
@@ -6,7 +7,7 @@ describe("Model", () => {
     model = createModel();
   });
 
-  it("can be instantiated with plain object", () => {
+  it("can be instantiated with plain object", async () => {
     model = createModel({ a: 1, b: { c: 2 } });
     expect(model).toBeDefined();
     expect(model.a).toEqual(1);
@@ -17,14 +18,14 @@ describe("Model", () => {
     expect(model.d).toEqual(3);
   });
 
-  it("can register listeners", () => {
+  it("can register listeners via watch", async () => {
     var listenerFn = jasmine.createSpy();
     model.$watch(() => {}, listenerFn);
     model.$digest();
     expect(listenerFn).toHaveBeenCalled();
   });
 
-  it("calls the watch function with the model as the argument", () => {
+  it("calls the watch function with the model as the argument", async () => {
     var watchFn = jasmine.createSpy();
     var listenerFn = () => {};
     model.$watch(watchFn, listenerFn);
@@ -32,7 +33,72 @@ describe("Model", () => {
     expect(watchFn).toHaveBeenCalledWith(model);
   });
 
-  it("calls the listener function when the watched value changes", () => {
+  it("calls the listener function when the watched value changes", async () => {
+    model.someValue = "a";
+    model.counter = 0;
+
+    model.$watch(
+      (m) => m.someValue,
+      () => {
+        model.counter++;
+      },
+    );
+    expect(model.counter).toBe(0);
+
+    model.someValue = "b";
+    await wait();
+    expect(model.counter).toBe(1);
+
+    model.someValue = "b";
+    await wait();
+    expect(model.counter).toBe(1);
+
+    model.someValue = "c";
+    await wait();
+    expect(model.counter).toBe(2);
+  });
+
+  it("calls the listener function when the watched value is iniatized", async () => {
+    model.counter = 0;
+
+    model.$watch(
+      (m) => m.someValue,
+      () => model.counter++,
+    );
+    expect(model.counter).toBe(0);
+
+    model.someValue = "b";
+    await wait();
+    expect(model.counter).toBe(1);
+
+    model.someValue = "b";
+    await wait();
+    expect(model.counter).toBe(1);
+
+    model.someValue = "c";
+    await wait();
+    expect(model.counter).toBe(2);
+  });
+
+  it("calls the listener function when the watched value is destroyed", async () => {
+    model.counter = 0;
+
+    model.$watch(
+      (m) => m.someValue,
+      () => model.counter++,
+    );
+    expect(model.counter).toBe(0);
+
+    model.someValue = "b";
+    await wait();
+    expect(model.counter).toBe(1);
+
+    delete model.someValue;
+    await wait();
+    expect(model.counter).toBe(2);
+  });
+
+  it("can call multiple the listener functions when the watched value changes", async () => {
     model.someValue = "a";
     model.counter = 0;
 
@@ -43,19 +109,66 @@ describe("Model", () => {
       },
     );
 
+    model.$watch(
+      (m) => m.someValue,
+      () => model.counter++,
+    );
+
     expect(model.counter).toBe(0);
 
     model.someValue = "b";
-    expect(model.counter).toBe(1);
-
-    model.someValue = "b";
-    expect(model.counter).toBe(1);
-
-    model.someValue = "c";
+    await wait();
     expect(model.counter).toBe(2);
   });
 
-  it("calls listener with new value as old value the first time", () => {
+  it("calls only the listeners registerred at the moment the watched value changes", async () => {
+    model.someValue = "a";
+    model.counter = 0;
+
+    model.$watch(
+      (m) => m.someValue,
+      () => model.counter++,
+    );
+    expect(model.counter).toBe(0);
+
+    model.someValue = "b";
+    await wait();
+    expect(model.counter).toBe(1);
+
+    model.someValue = "b";
+    model.$watch(
+      (m) => m.someValue,
+      () => {
+        model.counter++;
+      },
+    );
+    await wait();
+
+    expect(model.counter).toBe(1);
+  });
+
+  it("correctly handles NaNs", async () => {
+    model.counter = 0;
+    model.$watch(
+      function (model) {
+        return model.number;
+      },
+      function (newValue, oldValue, model) {
+        model.counter++;
+      },
+    );
+    model.number = 0 / 0;
+    await wait();
+    expect(model.number).toBeNaN();
+    expect(model.counter).toBe(1);
+
+    model.number = NaN;
+    await wait();
+    expect(model.number).toBeNaN();
+    expect(model.counter).toBe(1);
+  });
+
+  it("calls listener with new value as old value the first time", async () => {
     var oldValueGiven;
     var newValueGiven;
     model.$watch(
@@ -68,12 +181,13 @@ describe("Model", () => {
       },
     );
     model.someValue = 123;
+    await wait();
 
     expect(oldValueGiven).toBe(123);
     expect(newValueGiven).toBe(123);
   });
 
-  it("calls listener with new value and old value the first time if defined", () => {
+  it("calls listener with new value and old value the first time if defined", async () => {
     var oldValueGiven;
     var newValueGiven;
     model.someValue = 123;
@@ -88,12 +202,13 @@ describe("Model", () => {
       },
     );
     model.someValue = 321;
+    await wait();
 
     expect(oldValueGiven).toBe(123);
     expect(newValueGiven).toBe(321);
   });
 
-  it("calls listener with with the instance of a model as 3rd argument", () => {
+  it("calls listener with with the instance of a model as 3rd argument", async () => {
     var modelInstance;
     model.someValue = 123;
 
@@ -106,12 +221,13 @@ describe("Model", () => {
       },
     );
     model.someValue = 321;
+    await wait();
 
     expect(modelInstance).toBeDefined();
     expect(modelInstance).toEqual(model);
   });
 
-  it("triggers chained watchers in the same model change", () => {
+  it("triggers chained watchers in the same model change", async () => {
     model.$watch(
       (model) => model.nameUpper,
       function (newValue) {
@@ -129,33 +245,17 @@ describe("Model", () => {
       },
     );
     model.name = "Jane";
+    await wait(1);
     expect(model.initial).toBe("J.");
+
     model.name = "Bob";
+    await wait(1);
     expect(model.initial).toBe("B.");
   });
 
-  it("throws a RangeError on cyclical model updates", () => {
-    model.counterA = 0;
-    model.counterB = 0;
-    model.$watch(
-      (model) => model.counterA,
-      () => {
-        model.counterB++;
-      },
-    );
-    model.$watch(
-      (model) => model.counterB,
-      () => {
-        model.counterA++;
-      },
-    );
-    expect(() => {
-      model.counterA = 1;
-    }).toThrowError(RangeError);
-  });
-
-  it("does not end digest so that new watches are not run", () => {
+  it("can register nested watches", async () => {
     model.counter = 0;
+    model.aValue = "abc";
     model.$watch(
       (model) => model.aValue,
       () => {
@@ -167,248 +267,175 @@ describe("Model", () => {
         );
       },
     );
-    model.aValue = "abc";
-    expect(model.counter).toBe(1);
-  });
-
-  it("can watch arrays", () => {
-    model.aValue = [1, 2, 3];
-    model.counter = 0;
-    model.$watch(
-      (model) => model.aValue,
-      function (newValue, oldValue, m) {
-        m.counter++;
-      },
-    );
+    model.aValue = "2";
+    await wait(100);
     expect(model.counter).toBe(0);
-    model.aValue.push(4);
-    expect(model.counter).toBe(1);
-    model.aValue.pop();
-    expect(model.counter).toBe(2);
-  });
-
-  it("correctly handles NaNs", () => {
-    model.counter = 0;
-    model.$watch(
-      function (model) {
-        return model.number;
-      },
-      function (newValue, oldValue, model) {
-        model.counter++;
-      },
-    );
-    model.number = 0 / 0;
-    expect(model.number).toBeNaN();
-    expect(model.counter).toBe(1);
-
-    model.number = NaN;
-    expect(model.number).toBeNaN();
+    model.aValue = "3";
+    await wait(100);
     expect(model.counter).toBe(1);
   });
 
-  // it("can set watch functions that return properties", () => {
-  //   model.counter = 0;
-  //   model.$watch(
-  //     (obj) => obj.someValue,
-  //     () => {
-  //       model.counter++;
-  //     },
-  //   );
-  //   model.someValue = 1;
-  //   expect(model.counter).toBe(1);
-  // });
+  describe("watching objects", () => {
+    it("can set watch functions that return nested properties", async () => {
+      model.counter = 0;
+      model.a = { someValue: 1 };
+      model.$watch(
+        (obj) => obj.a.someValue,
+        () => {
+          model.counter++;
+        },
+      );
 
-  // it("can set watch functions that return nested properties", () => {
-  //   model.counter = 0;
-  //   model.a = { someValue: 1 };
-  //   model.$watch(
-  //     (obj) => obj.a.someValue,
-  //     () => {
-  //       model.counter++;
-  //     },
-  //   );
+      model.a.someValue = 2;
+      await wait();
+      expect(model.counter).toBe(1);
 
-  //   model.a.someValue = 2;
-  //   expect(model.counter).toBe(1);
+      model.a.someValue = 3;
+      await wait();
+      expect(model.counter).toBe(2);
+    });
 
-  //   model.a.someValue = 3;
-  //   expect(model.counter).toBe(2);
-  // });
+    it("calls the listener function when a nested value is created on an empty wrapper object", async () => {
+      model.counter = 0;
+      model.someValue = {};
 
-  // it("calls the listener function when the watched value changes", () => {
-  //   model.someValue = "a";
-  //   model.counter = 0;
+      model.$watch(
+        (obj) => obj.someValue.b,
+        async () => {
+          model.counter++;
+        },
+      );
+      await wait();
 
-  //   model.$watch("someValue", () => {
-  //     model.counter++;
-  //   });
+      expect(model.counter).toBe(0);
 
-  //   expect(model.counter).toBe(0);
+      model.someValue = { b: 2 };
+      await wait();
 
-  //   model.someValue = "b";
-  //   expect(model.counter).toBe(1);
+      expect(model.counter).toBe(1);
+    });
 
-  //   model.someValue = "b";
-  //   expect(model.counter).toBe(1);
+    it("calls the listener function when a nested value is created on an undefined wrapper object", async () => {
+      model.counter = 0;
+      model.someValue = undefined;
 
-  //   model.someValue = "c";
-  //   expect(model.counter).toBe(2);
-  // });
+      model.$watch(
+        (obj) => obj.someValue.b,
+        async () => {
+          model.counter++;
+        },
+      );
+      await wait();
 
-  // it("calls the listener function when the watched value is initialized", () => {
-  //   model.counter = 0;
+      expect(model.counter).toBe(0);
 
-  //   model.$watch("someValue", () => {
-  //     model.counter++;
-  //   });
+      model.someValue = { b: 2 };
+      await wait();
 
-  //   expect(model.counter).toBe(0);
+      expect(model.counter).toBe(1);
+    });
 
-  //   model.someValue = "b";
-  //   expect(model.counter).toBe(1);
-  // });
+    it("calls the listener function when a nested value is created from a wrapper object", async () => {
+      model.someValue = { b: 1 };
+      model.counter = 0;
 
-  // it("calls the listener function when a nested watched value changes", () => {
-  //   model.someValue = { b: 1 };
-  //   model.counter = 0;
+      model.$watch(
+        (obj) => obj.someValue.b,
+        () => model.counter++,
+      );
+      await wait();
 
-  //   model.$watch("someValue.b", () => {
-  //     model.counter++;
-  //   });
+      expect(model.counter).toBe(0);
 
-  //   expect(model.counter).toBe(0);
+      model.someValue = { b: 2 };
+      await wait();
 
-  //   model.someValue.b = 2;
-  //   expect(model.counter).toBe(1);
+      expect(model.counter).toBe(1);
+      model.someValue = { c: 2 };
+      await wait();
 
-  //   model.someValue.b = 2;
-  //   expect(model.counter).toBe(1);
+      expect(model.counter).toBe(2);
 
-  //   model.someValue.b = 3;
-  //   expect(model.counter).toBe(2);
+      model.someValue = { b: 2 };
+      await wait();
 
-  //   model.someValue = null;
-  //   expect(model.counter).toBe(2);
+      expect(model.counter).toBe(3);
 
-  //   model.someValue = { b: 3 };
-  //   expect(model.counter).toBe(2);
-  // });
+      model.someValue = undefined;
+      await wait();
 
-  // it("calls the listener function when a nested value is created from a wrapper object", () => {
-  //   model.someValue = { b: 1 };
-  //   model.counter = 0;
+      expect(model.counter).toBe(4);
+    });
 
-  //   model.$watch("someValue.b", () => {
-  //     model.counter++;
-  //   });
+    it("calls the listener function when a deeply nested watched value changes", async () => {
+      model.counter = 0;
+      model.someValue = { b: { c: { d: 1 } } };
 
-  //   expect(model.counter).toBe(0);
-  //   model.someValue = { b: 2 };
-  //   expect(model.counter).toBe(1);
-  // });
+      model.$watch(
+        (obj) => obj.someValue.b.c.d,
+        function (newValue, oldValue, model) {
+          model.counter++;
+        },
+      );
+      await wait();
 
-  // it("calls the listener function when a nested value is created on an empty wrapper object", () => {
-  //   model.counter = 0;
-  //   model.someValue = {};
+      expect(model.counter).toBe(0);
 
-  //   model.$watch("someValue.b", () => {
-  //     model.counter++;
-  //   });
+      model.someValue = { b: { c: { d: 2 } } };
+      await wait();
 
-  //   expect(model.counter).toBe(0);
-  //   model.someValue = { b: 2 };
-  //   expect(model.counter).toBe(1);
-  // });
+      expect(model.counter).toBe(1);
 
-  // it("calls the listener function when a nested value is created on an undefined wrapper object", () => {
-  //   model.counter = 0;
-  //   model.$watch("someValue.b", () => {
-  //     model.counter++;
-  //   });
+      model.someValue.b.c.d = 3;
+      await wait();
 
-  //   expect(model.counter).toBe(0);
-  //   model.someValue = { b: 2 };
-  //   expect(model.counter).toBe(1);
-  // });
+      expect(model.counter).toBe(2);
+    });
 
-  // it("calls the listener function when a deeply nested watched value changes", () => {
-  //   model.counter = 0;
-  //   model.$watch("someValue.b.c.d", function (newValue, oldValue, model) {
-  //     model.counter++;
-  //   });
+    it("calls the listener function when a deeply nested watched value is initially undefined", async () => {
+      model.counter = 0;
+      model.someValue = { b: { c: undefined } };
 
-  //   expect(model.counter).toBe(0);
+      model.$watch(
+        (obj) => obj.someValue.b.c.d,
+        function (newValue, oldValue, model) {
+          model.counter++;
+        },
+      );
+      await wait();
 
-  //   model.someValue = { b: { c: { d: 1 } } };
-  //   expect(model.counter).toBe(1);
+      expect(model.counter).toBe(0);
 
-  //   model.someValue.b.c.d = 2;
-  //   expect(model.counter).toBe(2);
+      model.someValue = { b: { c: { d: 2 } } };
+      await wait();
 
-  //   model.someValue.b.c.d = 2;
-  //   expect(model.counter).toBe(2);
+      expect(model.counter).toBe(1);
 
-  //   model.someValue.b.c.d = 3;
-  //   expect(model.counter).toBe(3);
-  // });
+      model.someValue.b.c.d = 3;
+      await wait();
 
-  // it("calls listener with new value as old value the first time", () => {
-  //   let oldValueGiven;
-  //   model.$watch("someValue", function (newValue, oldValue, model) {
-  //     oldValueGiven = oldValue;
-  //   });
-  //   model.someValue = 123;
-  //   expect(oldValueGiven).toBe(123);
+      expect(model.counter).toBe(2);
+    });
+  });
 
-  //   model.someValue = 124;
-  //   expect(oldValueGiven).toBe(123);
+  describe("watching arrays", () => {
+    it("can watch arrays", async () => {
+      model.aValue = [1, 2, 3];
+      model.counter = 0;
+      model.$watch(
+        (model) => model.aValue,
+        function (newValue, oldValue, m) {
+          m.counter++;
+        },
+      );
+      expect(model.counter).toBe(0);
+      model.aValue.push(4);
+      await wait(100);
+      expect(model.counter).toBe(1);
 
-  //   model.someValue = 125;
-  //   expect(oldValueGiven).toBe(124);
-  // });
-
-  // it("calls multiple listeners when registered on same property", () => {
-  //   model.counter = 0;
-  //   model.$watch("someValue", () => {
-  //     model.counter++;
-  //   });
-  //   model.$watch("someValue", () => {
-  //     model.counter++;
-  //   });
-  //   model.someValue = 123;
-  //   expect(model.counter).toBe(2);
-  // });
-
-  // it("calls the listener function only on the designated property even when value name is shared", () => {
-  //   let counter = 0;
-  //   let previousValue;
-  //   model.$watch("someValue.b.c.d", function (_, oldValue) {
-  //     counter++;
-  //     previousValue = oldValue;
-  //   });
-
-  //   expect(counter).toBe(0);
-
-  //   model.someValue = {
-  //     b: { c: { d: 1 } },
-  //     d: 2,
-  //   };
-  //   expect(counter).toBe(1);
-
-  //   model.someValue.b.c.d = 3;
-  //   expect(previousValue).toBe(1);
-  //   expect(counter).toBe(1);
-
-  //   model.someValue.d = 4;
-  //   expect(previousValue).toBe(2);
-  //   expect(counter).toBe(2);
-
-  //   model.someValue.b.c.d = 1;
-  //   expect(previousValue).toBe(3);
-  //   expect(counter).toBe(3);
-
-  //   model.someValue.d = 2;
-  //   expect(previousValue).toBe(4);
-  //   expect(counter).toBe(4);
-  // });
+      model.aValue.pop();
+      await wait(100);
+      expect(model.counter).toBe(2);
+    });
+  });
 });

@@ -91,10 +91,10 @@ declare class Handler {
     /**
      * Invokes the registered listener function when a watched property changes.
      *
-     * @param {string} propertyPath - The property path that was changed.
+     * @param {Listener} listener - The property path that was changed.
      * @param {*} oldValue - The old value of the property.
      * @param {*} newValue - The new value of the property.
      */
-    notifyListeners(propertyPath: string, oldValue: any, newValue: any): void;
+    notifyListeners(listener: Listener, oldValue: any, newValue: any): void;
 }
 export {};
