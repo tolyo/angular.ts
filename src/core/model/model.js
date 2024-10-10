@@ -255,8 +255,19 @@ class Handler {
     }
   }
 
-  $new() {
-    let child = Object.create(this.target);
+  $new(isIsolated = false, parent) {
+    let child;
+    if (isIsolated) {
+      // Create a child object that does not inherit from the parent (isolated scope)
+      child = Object.create(null);
+    } else {
+      // Create a child that inherits from the parent (normal scope)
+      child = Object.create(this.target);
+    }
+
+    // Add references to the parent and root
+    child.$parent = parent || this.target;
+    child.$root = this.$root ? this.$root : this.target;
     return new Proxy(child, new Handler(child, this));
   }
 

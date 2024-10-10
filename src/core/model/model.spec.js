@@ -562,4 +562,31 @@ describe("Model", () => {
       expect(model.$id < model.$new().$id).toBeTruthy();
     });
   });
+
+  describe("$new()", () => {
+    it("should create a child scope", () => {
+      const child = model.$new();
+      model.a = 123;
+      expect(child.a).toEqual(123);
+    });
+
+    it("should create a non prototypically inherited child scope", () => {
+      const child = model.$new(true);
+      model.a = 123;
+      expect(child.a).toBeUndefined();
+      expect(child.$parent).toEqual(model);
+      expect(child.$new).toBeDefined();
+      expect(child.$root).toEqual(model);
+    });
+
+    it("should attach the child scope to a specified parent", () => {
+      const isolated = model.$new(true);
+      const trans = model.$new(false, isolated);
+      model.a = 123;
+      expect(isolated.a).toBeUndefined();
+      expect(trans.a).toEqual(123);
+      expect(trans.$root).toEqual(model);
+      expect(trans.$parent).toBe(isolated);
+    });
+  });
 });
