@@ -53,6 +53,10 @@ declare class Handler {
      */
     $id: number;
     /**
+     * @type {Handler}
+     */
+    $root: Handler;
+    /**
      * Intercepts and handles property assignments on the target object. If a new value is
      * an object, it will be recursively proxied.
      *

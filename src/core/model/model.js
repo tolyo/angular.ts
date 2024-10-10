@@ -16,8 +16,7 @@ export function createModel(target = {}, context) {
         target[key] = createModel(target[key], new Handler(target, context));
       }
     }
-    const proxy = new Proxy(target, new Handler(target, context));
-    return proxy;
+    return new Proxy(target, new Handler(target, context));
   } else {
     return target;
   }
@@ -72,6 +71,13 @@ class Handler {
      * @type {number} Unique model ID (monotonically increasing) useful for debugging.
      */
     this.$id = nextUid();
+
+    /**
+     * @type {Handler}
+     */
+    this.$root = context || this;
+
+    this.$parent = this.$root;
   }
 
   /**
@@ -182,6 +188,10 @@ class Handler {
       return this.$id;
     }
 
+    if (property === "$root") {
+      return this.$root;
+    }
+
     return target[property];
   }
 
@@ -258,16 +268,12 @@ class Handler {
   $new(isIsolated = false, parent) {
     let child;
     if (isIsolated) {
-      // Create a child object that does not inherit from the parent (isolated scope)
       child = Object.create(null);
     } else {
-      // Create a child that inherits from the parent (normal scope)
       child = Object.create(this.target);
     }
-
-    // Add references to the parent and root
-    child.$parent = parent || this.target;
-    child.$root = this.$root ? this.$root : this.target;
+    child.$parent = parent || this.$parent;
+    child.$root = this.$root;
     return new Proxy(child, new Handler(child, this));
   }
 

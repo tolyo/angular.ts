@@ -245,11 +245,11 @@ describe("Model", () => {
       },
     );
     model.name = "Jane";
-    await wait(1);
+    await wait();
     expect(model.initial).toBe("J.");
 
     model.name = "Bob";
-    await wait(1);
+    await wait();
     expect(model.initial).toBe("B.");
   });
 
@@ -268,10 +268,10 @@ describe("Model", () => {
       },
     );
     model.aValue = "2";
-    await wait(100);
+    await wait();
     expect(model.counter).toBe(0);
     model.aValue = "3";
-    await wait(100);
+    await wait();
     expect(model.counter).toBe(1);
   });
 
@@ -430,11 +430,11 @@ describe("Model", () => {
       );
       expect(model.counter).toBe(0);
       model.aValue.push(4);
-      await wait(100);
+      await wait();
       expect(model.counter).toBe(1);
 
       model.aValue.pop();
-      await wait(100);
+      await wait();
       expect(model.counter).toBe(2);
     });
 
@@ -453,17 +453,17 @@ describe("Model", () => {
       );
 
       model.aValue.push(4);
-      await wait(100);
+      await wait();
       expect(newValueGiven).toEqual([4]);
       expect(oldValueGiven).toBe(undefined);
 
       model.aValue.push(5);
-      await wait(100);
+      await wait();
       expect(newValueGiven).toEqual([4, 5]);
       expect(oldValueGiven).toBe(undefined);
 
       model.aValue[1] = 2;
-      await wait(100);
+      await wait();
       expect(newValueGiven).toEqual([4, 2]);
       expect(oldValueGiven).toBe(5);
     });
@@ -483,7 +483,7 @@ describe("Model", () => {
       );
 
       model.aValue.pop();
-      await wait(100);
+      await wait();
       expect(newValueGiven).toEqual([2]);
       expect(oldValueGiven).toEqual([2, 3]);
     });
@@ -574,9 +574,9 @@ describe("Model", () => {
       const child = model.$new(true);
       model.a = 123;
       expect(child.a).toBeUndefined();
-      expect(child.$parent).toEqual(model);
+      expect(child.$parent).toBe(model.$root);
       expect(child.$new).toBeDefined();
-      expect(child.$root).toEqual(model);
+      expect(child.$root).toEqual(model.$root);
     });
 
     it("should attach the child scope to a specified parent", () => {
@@ -585,8 +585,48 @@ describe("Model", () => {
       model.a = 123;
       expect(isolated.a).toBeUndefined();
       expect(trans.a).toEqual(123);
-      expect(trans.$root).toEqual(model);
+      expect(trans.$root).toEqual(model.$root);
       expect(trans.$parent).toBe(isolated);
     });
   });
+
+  // describe("$root", () => {
+  //   it("should point to itself", () => {
+  //     expect(model.$root).toEqual(model);
+  //     expect(model.hasOwnProperty("$root")).toBeTruthy();
+  //   });
+
+  //   it("should expose the constructor", () => {
+  //     expect(Object.getPrototypeOf(model)).toBe(model.constructor.prototype);
+  //   });
+
+  //   it("should not have $root on children, but should inherit", () => {
+  //     const child = model.$new();
+  //     expect(child.$root).toEqual(model);
+  //     expect(child.hasOwnProperty("$root")).toBeFalsy();
+  //   });
+  // });
+
+  // describe("this", () => {
+  //   it("should evaluate 'this' to be the scope", () => {
+  //     const child = model.$new();
+  //     expect(model.$eval("this")).toEqual(model);
+  //     expect(child.$eval("this")).toEqual(child);
+  //   });
+
+  //   it("'this' should not be recursive", () => {
+  //     expect(model.$eval("this.this")).toBeUndefined();
+  //     expect(model.$eval("$parent.this")).toBeUndefined();
+  //   });
+
+  //   it("should not be able to overwrite the 'this' keyword", () => {
+  //     model.this = 123;
+  //     expect(model.$eval("this")).toEqual(model);
+  //   });
+
+  //   it("should be able to access a constant variable named 'this'", () => {
+  //     model.this = 42;
+  //     expect(model.$eval("this['this']")).toBe(42);
+  //   });
+  // });
 });
