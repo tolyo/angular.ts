@@ -245,7 +245,7 @@ export class Scope {
     let child = isolate ? new Scope() : Object.create(this);
 
     if (isolate) {
-      child.$root = this.isRoot ? this : this.$root;
+      child.$root = this.$root;
     } else {
       // Initialize properties for a non-isolated child scope
       child.$id = nextUid();
