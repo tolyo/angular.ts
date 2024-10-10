@@ -16,7 +16,8 @@ export function createModel(target = {}, context) {
         target[key] = createModel(target[key], new Handler(target, context));
       }
     }
-    return new Proxy(target, new Handler(target, context));
+    const proxy = new Proxy(target, new Handler(target, context));
+    return proxy;
   } else {
     return target;
   }
@@ -160,6 +161,10 @@ class Handler {
       return this.$watch.bind(this);
     }
 
+    if (property === "$new") {
+      return this.$new.bind(this);
+    }
+
     if (property === "$target") {
       return this.$target();
     }
@@ -178,10 +183,14 @@ class Handler {
       let keys = this.objectListeners.get(target);
       keys.forEach((key) => {
         const listeners = this.listeners.get(key);
-        if (listeners) {          
+        if (listeners) {
           listeners.forEach((listener) =>
             Promise.resolve().then(() => {
-              this.notifyListeners(listener, oldValue, Array.isArray(this.target) ? this.target : undefined)
+              this.notifyListeners(
+                listener,
+                oldValue,
+                Array.isArray(this.target) ? this.target : undefined,
+              );
             }),
           );
         }
@@ -235,6 +244,11 @@ class Handler {
         this.objectListeners.set(value, [key]);
       }
     }
+  }
+
+  $new() {
+    let child = Object.create(this.target);
+    return new Proxy(child, new Handler(child, this));
   }
 
   registerKey(key, listener) {

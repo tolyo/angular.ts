@@ -469,7 +469,7 @@ describe("Model", () => {
     });
 
     it("can detect removal of items", async () => {
-      model.aValue = [2,3];
+      model.aValue = [2, 3];
       var oldValueGiven;
       var newValueGiven;
       model.$watch(
@@ -486,6 +486,74 @@ describe("Model", () => {
       await wait(100);
       expect(newValueGiven).toEqual([2]);
       expect(oldValueGiven).toEqual([2, 3]);
+    });
+  });
+
+  describe("inheritance", () => {
+    it("can be constructed and used as an object", () => {
+      const model = createModel();
+      model.aProperty = 1;
+
+      expect(model.aProperty).toBe(1);
+    });
+
+    it("inherits the parents properties", () => {
+      model.aValue = [1, 2, 3];
+
+      const child = model.$new();
+      expect(child.aValue).toEqual([1, 2, 3]);
+
+      model.bValue = 2;
+      expect(child.bValue).toEqual(2);
+    });
+
+    it("does not cause a parent to inherit its properties", () => {
+      const child = model.$new();
+      child.aValue = [1, 2, 3];
+
+      expect(model.aValue).toBeUndefined();
+    });
+
+    it("inherits the parents properties whenever they are defined", () => {
+      const child = model.$new();
+
+      model.aValue = [1, 2, 3];
+
+      expect(child.aValue).toEqual([1, 2, 3]);
+    });
+
+    it("can be nested at any depth", () => {
+      const a = model;
+      const aa = a.$new();
+      const aaa = aa.$new();
+      const aab = aa.$new();
+      const ab = a.$new();
+      const abb = ab.$new();
+
+      a.value = 1;
+
+      expect(aa.value).toBe(1);
+      expect(aaa.value).toBe(1);
+      expect(aab.value).toBe(1);
+      expect(ab.value).toBe(1);
+      expect(abb.value).toBe(1);
+
+      ab.anotherValue = 2;
+
+      expect(abb.anotherValue).toBe(2);
+      expect(aa.anotherValue).toBeUndefined();
+      expect(aaa.anotherValue).toBeUndefined();
+    });
+
+    it("can manipulate a parent models property", () => {
+      const child = model.$new();
+
+      model.aValue = [1, 2, 3];
+      child.aValue.push(4);
+
+      expect(child.aValue).toEqual([1, 2, 3, 4]);
+      expect(model.aValue).toEqual([1, 2, 3, 4]);
+      expect(child.aValue).toEqual(model.aValue);
     });
   });
 });

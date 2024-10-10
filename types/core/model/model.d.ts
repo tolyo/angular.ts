@@ -83,6 +83,7 @@ declare class Handler {
      * @param {ListenerFunction} listenerFn - A function to execute when changes are detected.
      */
     $watch(watchProp: string | Function, listenerFn: ListenerFunction): void;
+    $new(): any;
     registerKey(key: any, listener: any): void;
     /**
      * Invokes all registered listener functions for any watched properties.
