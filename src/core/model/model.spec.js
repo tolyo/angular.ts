@@ -168,7 +168,7 @@ describe("Model", () => {
     expect(model.counter).toBe(1);
   });
 
-  it("calls listener with new value as old value the first time", async () => {
+  it("calls listener with undefined old value the first time", async () => {
     var oldValueGiven;
     var newValueGiven;
     model.$watch(
@@ -183,7 +183,7 @@ describe("Model", () => {
     model.someValue = 123;
     await wait();
 
-    expect(oldValueGiven).toBe(123);
+    expect(oldValueGiven).toBe(undefined);
     expect(newValueGiven).toBe(123);
   });
 
@@ -436,6 +436,56 @@ describe("Model", () => {
       model.aValue.pop();
       await wait(100);
       expect(model.counter).toBe(2);
+    });
+
+    it("can pass the new value of the array as well as the previous value of the dropped item", async () => {
+      model.aValue = [];
+      var oldValueGiven;
+      var newValueGiven;
+      model.$watch(
+        function (model) {
+          return model.aValue;
+        },
+        function (newValue, oldValue) {
+          newValueGiven = newValue;
+          oldValueGiven = oldValue;
+        },
+      );
+
+      model.aValue.push(4);
+      await wait(100);
+      expect(newValueGiven).toEqual([4]);
+      expect(oldValueGiven).toBe(undefined);
+
+      model.aValue.push(5);
+      await wait(100);
+      expect(newValueGiven).toEqual([4, 5]);
+      expect(oldValueGiven).toBe(undefined);
+
+      model.aValue[1] = 2;
+      await wait(100);
+      expect(newValueGiven).toEqual([4, 2]);
+      expect(oldValueGiven).toBe(5);
+    });
+
+    it("can detect removal of items", async () => {
+      model.aValue = [2,3];
+      var oldValueGiven;
+      var newValueGiven;
+      model.$watch(
+        function (model) {
+          return model.aValue;
+        },
+        function (newValue, oldValue) {
+          newValueGiven = newValue;
+          oldValueGiven = oldValue;
+        },
+      );
+
+      model.aValue.pop();
+      await wait(100);
+      expect(newValueGiven).toEqual([2]);
+      expect(oldValueGiven).toEqual([2, 3]);
     });
   });
 });

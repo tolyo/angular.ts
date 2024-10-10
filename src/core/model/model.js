@@ -83,7 +83,7 @@ class Handler {
     }
 
     const oldValue = target[property];
-
+    debugger;
     if (oldValue && oldValue[isProxySymbol]) {
       if (value) {
         const keys = Object.keys(value);
@@ -132,11 +132,11 @@ class Handler {
         keys.forEach((key) => {
           const listeners = this.listeners.get(key);
           if (listeners) {
-            listeners.forEach((listener) =>
+            listeners.forEach((listener) => {
               Promise.resolve().then(() =>
-                this.notifyListeners(listener, oldValue, value),
-              ),
-            );
+                this.notifyListeners(listener, oldValue, this.target),
+              );
+            });
           }
         });
       }
@@ -174,28 +174,27 @@ class Handler {
   }
 
   deleteProperty(target, property) {
+    var oldValue = structuredClone(target);
     delete target[property];
-    // Right now this is only for Arrays
     if (this.objectListeners.has(target)) {
       let keys = this.objectListeners.get(target);
       keys.forEach((key) => {
         const listeners = this.listeners.get(key);
-        if (listeners) {
+        if (listeners) {          
           listeners.forEach((listener) =>
-            Promise.resolve().then(() =>
-              this.notifyListeners(listener, oldValue, undefined),
-            ),
+            Promise.resolve().then(() => {
+              this.notifyListeners(listener, oldValue, Array.isArray(this.target) ? this.target : undefined)
+            }),
           );
         }
       });
     }
 
     const listeners = this.listeners.get(property);
-    const oldValue = target[property];
     if (listeners) {
       listeners.forEach((listener) =>
         Promise.resolve().then(() =>
-          this.notifyListeners(listener, oldValue, undefined),
+          this.notifyListeners(listener, target[property], this),
         ),
       );
     }
@@ -266,7 +265,7 @@ class Handler {
    */
   notifyListeners(listener, oldValue, newValue) {
     const { originalTarget, listenerFn } = listener;
-    listenerFn(newValue, oldValue ? oldValue : newValue, originalTarget);
+    listenerFn(newValue, oldValue, originalTarget);
   }
 }
 
