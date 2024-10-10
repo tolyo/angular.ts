@@ -49,6 +49,10 @@ declare class Handler {
     /** @type {Proxy} */
     proxy: ProxyConstructor;
     /**
+     * @type {number} Unique model ID (monotonically increasing) useful for debugging.
+     */
+    $id: number;
+    /**
      * Intercepts and handles property assignments on the target object. If a new value is
      * an object, it will be recursively proxied.
      *

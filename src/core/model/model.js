@@ -1,4 +1,4 @@
-import { isUndefined } from "../../shared/utils";
+import { isUndefined, nextUid } from "../../shared/utils";
 
 /**
  * Creates a deep proxy for the target object, intercepting property changes
@@ -67,6 +67,11 @@ class Handler {
 
     /** @type {Proxy} */
     this.proxy = null;
+
+    /**
+     * @type {number} Unique model ID (monotonically increasing) useful for debugging.
+     */
+    this.$id = nextUid();
   }
 
   /**
@@ -171,6 +176,10 @@ class Handler {
 
     if (property === "$digest") {
       return this.$digest.bind(this);
+    }
+
+    if (property === "$id") {
+      return this.$id;
     }
 
     return target[property];

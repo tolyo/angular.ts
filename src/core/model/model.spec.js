@@ -556,4 +556,10 @@ describe("Model", () => {
       expect(child.aValue).toEqual(model.aValue);
     });
   });
+
+  describe("$id", () => {
+    it("should have a unique id", () => {
+      expect(model.$id < model.$new().$id).toBeTruthy();
+    });
+  });
 });
