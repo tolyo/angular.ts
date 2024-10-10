@@ -81,9 +81,7 @@ class Handler {
     if (property === "getWatchFunction") {
       return true;
     }
-
     const oldValue = target[property];
-    debugger;
     if (oldValue && oldValue[isProxySymbol]) {
       if (value) {
         const keys = Object.keys(value);
@@ -252,7 +250,7 @@ class Handler {
    */
   $digest() {
     Array.from(this.listeners.values()).forEach((list) =>
-      list.forEach(({ listenerFn }) => listenerFn()),
+      list.forEach(({ listenerFn }) => listenerFn(this.$target)),
     );
   }
 
