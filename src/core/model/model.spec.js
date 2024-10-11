@@ -590,22 +590,22 @@ describe("Model", () => {
     });
   });
 
-  // describe("$root", () => {
-  //   it("should point to itself", () => {
-  //     expect(model.$root).toEqual(model);
-  //     expect(model.hasOwnProperty("$root")).toBeTruthy();
-  //   });
+  describe("$root", () => {
+    it("should point to itself", () => {
+      expect(model.$root.$id).toEqual(model.$id);
+      expect(model.$root).toEqual(model.$root.$root);
+    });
 
-  //   it("should expose the constructor", () => {
-  //     expect(Object.getPrototypeOf(model)).toBe(model.constructor.prototype);
-  //   });
+    it("should expose the constructor", () => {
+      expect(Object.getPrototypeOf(model)).toBe(model.constructor.prototype);
+    });
 
-  //   it("should not have $root on children, but should inherit", () => {
-  //     const child = model.$new();
-  //     expect(child.$root).toEqual(model);
-  //     expect(child.hasOwnProperty("$root")).toBeFalsy();
-  //   });
-  // });
+    it("should not have $root on children, but should inherit", () => {
+      const child = model.$new();
+      expect(child.$root).toEqual(model.$root);
+      expect(child.$target.hasOwnProperty("$root")).toBeFalsy();
+    });
+  });
 
   // describe("this", () => {
   //   it("should evaluate 'this' to be the scope", () => {

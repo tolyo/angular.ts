@@ -273,7 +273,7 @@ class Handler {
       child = Object.create(this.target);
     }
     child.$parent = parent || this.$parent;
-    child.$root = this.$root;
+
     return new Proxy(child, new Handler(child, this));
   }
 
