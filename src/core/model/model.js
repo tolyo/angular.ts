@@ -5,18 +5,40 @@ import { isUndefined, nextUid } from "../../shared/utils";
  */
 let $parse;
 
+/** @type {import('../../services/browser').Browser} */
+let $browser;
+
+/**@type {import('../exception-handler').ErrorHandler} */
+let $exceptionHandler;
+
+/**
+ * @typedef {Object} AsyncQueueTask
+ * @property {Handler} handler
+ * @property {Function} fn
+ * @property {Object} locals
+ */
+
+/** @type {AsyncQueueTask[]} */
+export const $$asyncQueue = [];
+
 export class RootModelProvider {
   constructor() {
     this.rootModel = createModel();
   }
 
   $get = [
+    "$exceptionHandler",
     "$parse",
+    "$browser",
     /**
+     * @param {import('../exception-handler').ErrorHandler} exceptionHandler
      * @param {import('../parser/parse').ParseService} parse
+     * @param {import('../../services/browser').Browser} browser
      */
-    (parse) => {
+    (exceptionHandler, parse, browser) => {
+      $exceptionHandler = exceptionHandler;
       $parse = parse;
+      $browser = browser;
       return this.rootModel;
     },
   ];
@@ -202,6 +224,10 @@ class Handler {
       return this.$eval.bind(this);
     }
 
+    if (property === "$evalAsync") {
+      return this.$evalAsync.bind(this);
+    }
+
     if (property === "$target") {
       return this.$target();
     }
@@ -277,14 +303,16 @@ class Handler {
    * @param {ListenerFunction} listenerFn - A function to execute when changes are detected.
    */
   $watch(watchProp, listenerFn) {
+    const get = $parse(watchProp);
+
     const listener = {
       originalTarget: this.target,
       listenerFn: listenerFn,
     };
-    let key = getProperty(watchProp);
+    let key = getProperty(get);
 
     this.registerKey(key, listener);
-    let watchedValue = watchProp(this.target);
+    let watchedValue = get(this.target);
     const value =
       watchedValue && watchedValue[isProxySymbol]
         ? watchedValue.$target
@@ -330,6 +358,31 @@ class Handler {
 
   $eval(expr, locals) {
     return $parse(expr)(this.target, locals);
+  }
+
+  $evalAsync(expr, locals) {
+    // if we are outside of an $digest loop and this is the first time we are scheduling async
+    // task also schedule async auto-flush
+    // let id;
+    // if (!$$asyncQueue.length) {
+    //   id = $browser.defer(
+    //     () => {
+    //       if ($$asyncQueue.length) {
+    //         this.$root.$digest();
+    //       }
+    //     },
+    //     null,
+    //     "$evalAsync",
+    //   );
+    // }
+
+    $$asyncQueue.push({
+      handler: this,
+      fn: $parse(expr),
+      locals,
+    });
+
+    //return id;
   }
 
   /**

@@ -8,10 +8,23 @@
  *                                     or the original value if the target is not an object.
  */
 export function createModel(target?: any, context?: Handler): any | ProxyConstructor;
+/**
+ * @typedef {Object} AsyncQueueTask
+ * @property {Handler} handler
+ * @property {Function} fn
+ * @property {Object} locals
+ */
+/** @type {AsyncQueueTask[]} */
+export const $$asyncQueue: AsyncQueueTask[];
 export class RootModelProvider {
     rootModel: any;
-    $get: (string | ((parse: import("../parser/parse").ParseService) => any))[];
+    $get: (string | ((exceptionHandler: import("../exception-handler").ErrorHandler, parse: import("../parser/parse").ParseService, browser: import("../../services/browser").Browser) => any))[];
 }
+export type AsyncQueueTask = {
+    handler: Handler;
+    fn: Function;
+    locals: any;
+};
 /**
  * Listener function definition.
  */
@@ -103,6 +116,7 @@ declare class Handler {
      */
     $digest(): void;
     $eval(expr: any, locals: any): any;
+    $evalAsync(expr: any, locals: any): void;
     /**
      * Invokes the registered listener function when a watched property changes.
      *
