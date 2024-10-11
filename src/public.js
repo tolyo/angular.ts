@@ -74,6 +74,7 @@ import { HttpBackendProvider } from "./services/http-backend/http-backend";
 import { LocationProvider } from "./core/location/location";
 import { LogProvider } from "./services/log";
 import { ParseProvider } from "./core/parser/parse";
+import { RootModelProvider } from "./core/model/model.js";
 import { RootScopeProvider } from "./core/scope/scope";
 import { $QProvider } from "./core/q/q";
 import { SceProvider, SceDelegateProvider } from "./core/sce/sce";
@@ -258,6 +259,7 @@ export function publishExternalAPI(angular) {
             $log: LogProvider,
             $parse: ParseProvider,
             $$rAFScheduler: RafSchedulerProvider,
+            $rootModel: RootModelProvider,
             $rootScope: RootScopeProvider,
             $routerGlobals: UIRouterGlobals,
             $q: $QProvider,

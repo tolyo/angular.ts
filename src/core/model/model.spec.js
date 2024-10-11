@@ -1,10 +1,31 @@
 import { wait } from "../../shared/test-utils";
 import { createModel } from "./model";
+import { Angular } from "../../loader";
+import { createInjector } from "../di/injector";
 
 describe("Model", () => {
   let model;
+  let $parse;
+  let logs;
+  let $rootModel;
+
   beforeEach(() => {
-    model = createModel();
+    logs = [];
+    delete window.angular;
+    window.angular = new Angular();
+    window.angular
+      .module("myModule", ["ng"])
+      .decorator("$exceptionHandler", function () {
+        return (exception, cause) => {
+          logs.push(exception);
+          console.error(exception, cause);
+        };
+      });
+
+    let injector = createInjector(["myModule"]);
+    $parse = injector.get("$parse");
+    $rootModel = injector.get("$rootModel");
+    model = $rootModel;
   });
 
   it("can be instantiated with plain object", async () => {
@@ -607,26 +628,50 @@ describe("Model", () => {
     });
   });
 
-  // describe("this", () => {
-  //   it("should evaluate 'this' to be the scope", () => {
-  //     const child = model.$new();
-  //     expect(model.$eval("this")).toEqual(model);
-  //     expect(child.$eval("this")).toEqual(child);
-  //   });
+  describe("this", () => {
+    it("should evaluate 'this' to be the scope", () => {
+      const child = model.$new();
+      expect(model.$eval("this")).toEqual(model);
+      expect(child.$eval("this")).toEqual(child);
+    });
 
-  //   it("'this' should not be recursive", () => {
-  //     expect(model.$eval("this.this")).toBeUndefined();
-  //     expect(model.$eval("$parent.this")).toBeUndefined();
-  //   });
+    it("'this' should not be recursive", () => {
+      expect(model.$eval("this.this")).toBeUndefined();
+      expect(model.$eval("$parent.this")).toBeUndefined();
+    });
 
-  //   it("should not be able to overwrite the 'this' keyword", () => {
-  //     model.this = 123;
-  //     expect(model.$eval("this")).toEqual(model);
-  //   });
+    it("should not be able to overwrite the 'this' keyword", () => {
+      model.this = 123;
+      expect(model.$eval("this")).toEqual(model);
+    });
 
-  //   it("should be able to access a constant variable named 'this'", () => {
-  //     model.this = 42;
-  //     expect(model.$eval("this['this']")).toBe(42);
-  //   });
-  // });
+    it("should be able to access a constant variable named 'this'", () => {
+      model.this = 42;
+      expect(model.$eval("this['this']")).toBe(42);
+    });
+  });
+
+  describe("$eval", () => {
+    it("should eval an expression", () => {
+      expect(model.$eval("a=1")).toEqual(1);
+      expect(model.a).toEqual(1);
+
+      model.$eval((self) => {
+        self.b = 2;
+      });
+      expect(model.b).toEqual(2);
+    });
+
+    it("should allow passing locals to the expression", () => {
+      expect(model.$eval("a+1", { a: 2 })).toBe(3);
+
+      model.$eval(
+        (scope, locals) => {
+          scope.c = locals.b + 4;
+        },
+        { b: 3 },
+      );
+      expect(model.c).toBe(7);
+    });
+  });
 });

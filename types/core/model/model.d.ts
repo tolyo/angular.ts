@@ -8,6 +8,10 @@
  *                                     or the original value if the target is not an object.
  */
 export function createModel(target?: any, context?: Handler): any | ProxyConstructor;
+export class RootModelProvider {
+    rootModel: any;
+    $get: (string | ((parse: import("../parser/parse").ParseService) => any))[];
+}
 /**
  * Listener function definition.
  */
@@ -73,11 +77,11 @@ declare class Handler {
      * it returns the value directly.
      *
      * @param {Object} target - The target object.
-     * @param {string} property - The name of the property being accessed.
+     * @param {string|number|symbol} property - The name of the property being accessed.
      * @param {Proxy} proxy - The proxy object being invoked
      * @returns {*} - The value of the property or a method if accessing `watch` or `sync`.
      */
-    get(target: any, property: string, proxy: ProxyConstructor): any;
+    get(target: any, property: string | number | symbol, proxy: ProxyConstructor): any;
     deleteProperty(target: any, property: any): boolean;
     /**
      * Returns the underlying object being wrapped by the Proxy
@@ -88,16 +92,17 @@ declare class Handler {
      * Registers a watcher for a property along with a listener function. The listener
      * function is invoked when changes to that property are detected.
      *
-     * @param {string|Function} watchProp - A property path (dot notation) to observe specific changes in the target.
+     * @param {((any) => any)} watchProp - A property path (dot notation) to observe specific changes in the target.
      * @param {ListenerFunction} listenerFn - A function to execute when changes are detected.
      */
-    $watch(watchProp: string | Function, listenerFn: ListenerFunction): void;
+    $watch(watchProp: ((any: any) => any), listenerFn: ListenerFunction): void;
     $new(isIsolated: boolean, parent: any): any;
     registerKey(key: any, listener: any): void;
     /**
      * Invokes all registered listener functions for any watched properties.
      */
     $digest(): void;
+    $eval(expr: any, locals: any): any;
     /**
      * Invokes the registered listener function when a watched property changes.
      *
