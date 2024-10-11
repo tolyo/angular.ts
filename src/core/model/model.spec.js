@@ -602,12 +602,13 @@ describe("Model", () => {
 
     it("should attach the child scope to a specified parent", () => {
       const isolated = model.$new(true);
+
       const trans = model.$new(false, isolated);
       model.a = 123;
       expect(isolated.a).toBeUndefined();
       expect(trans.a).toEqual(123);
-      expect(trans.$root).toEqual(model.$root);
-      expect(trans.$parent).toBe(isolated);
+      expect(trans.$root.$id).toEqual(model.$root.$id);
+      expect(trans.$parent.$id).toEqual(isolated.$id);
     });
   });
 
@@ -628,11 +629,21 @@ describe("Model", () => {
     });
   });
 
+  describe("$parent", () => {
+    it("should point to parent", () => {
+      const child = model.$new();
+
+      expect(model.$parent).toEqual(null);
+      expect(child.$parent.$id).toEqual(model.$id);
+      expect(child.$new().$parent).toEqual(child.$handler);
+    });
+  });
+
   describe("this", () => {
     it("should evaluate 'this' to be the scope", () => {
       const child = model.$new();
-      expect(model.$eval("this")).toEqual(model);
-      expect(child.$eval("this")).toEqual(child);
+      expect(model.$eval("this")).toEqual(model.$target);
+      expect(child.$eval("this")).toEqual(child.$target);
     });
 
     it("'this' should not be recursive", () => {

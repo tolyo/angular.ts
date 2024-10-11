@@ -97,9 +97,9 @@ class Handler {
     /**
      * @type {Handler}
      */
-    this.$root = context || this;
+    this.$root = context ? context.$root : this;
 
-    this.$parent = this.$root;
+    this.$parent = this.$root === this ? null : context;
   }
 
   /**
@@ -210,8 +210,16 @@ class Handler {
       return this.$digest.bind(this);
     }
 
+    if (property === "$handler") {
+      return this;
+    }
+
     if (property === "$id") {
       return this.$id;
+    }
+
+    if (property === "$parent") {
+      return this.$parent;
     }
 
     if (property === "$root") {
@@ -297,10 +305,10 @@ class Handler {
       child = Object.create(null);
     } else {
       child = Object.create(this.target);
+      child.$parent = parent ? parent.$handler : this.$parent;
     }
-    child.$parent = parent || this.$parent;
-
-    return new Proxy(child, new Handler(child, this));
+    const proxy = new Proxy(child, new Handler(child, parent || this));
+    return proxy;
   }
 
   registerKey(key, listener) {
