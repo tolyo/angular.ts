@@ -935,59 +935,57 @@ describe("Model", () => {
       // });
     });
 
-    // it("should delegate exceptions", () => {
-    //   model.$watch("a", () => {
-    //     throw new Error("abc");
-    //   });
-    //   model.a = 1;
-    //   model.$digest();
-    //   expect(logs[0]).toMatch(/abc/);
-    // });
+    it("should delegate exceptions", async () => {
+      model.$watch("a", () => {
+        throw new Error("abc");
+      });
+      model.a = 1;
+      await wait();
+      expect(logs[0]).toMatch(/abc/);
+    });
 
-    // it("should fire watches in order of addition", () => {
-    //   // this is not an external guarantee, just our own sanity
-    //   logs = "";
-    //   model.$watch("a", () => {
-    //     logs += "a";
-    //   });
-    //   model.$watch("b", () => {
-    //     logs += "b";
-    //   });
-    //   // constant expressions have slightly different handling,
-    //   // let's ensure they are kept in the same list as others
-    //   model.$watch("1", () => {
-    //     logs += "1";
-    //   });
-    //   model.$watch("c", () => {
-    //     logs += "c";
-    //   });
-    //   model.$watch("2", () => {
-    //     logs += "2";
-    //   });
-    //   model.a = model.b = model.c = 1;
-    //   model.$digest();
-    //   expect(logs).toEqual("ab1c2");
-    // });
+    it("should fire watches in order of addition", async () => {
+      // this is not an external guarantee, just our own sanity
+      logs = "";
+      model.$watch("a", () => {
+        logs += "a";
+      });
+      model.$watch("b", () => {
+        logs += "b";
+      });
+      // constant expressions have slightly different handling as they are executed in priority
+      model.$watch("1", () => {
+        logs += "1";
+      });
+      model.$watch("c", () => {
+        logs += "c";
+      });
+      model.$watch("2", () => {
+        logs += "2";
+      });
+      model.a = 1;
+      model.b = 1;
+      model.c = 1;
+      await wait();
+      expect(logs).toEqual("12abc");
+    });
 
-    // it("should call child $watchers in addition order", () => {
-    //   // this is not an external guarantee, just our own sanity
-    //   logs = "";
-    //   const childA = model.$new();
-    //   const childB = model.$new();
-    //   const childC = model.$new();
-    //   childA.$watch("a", () => {
-    //     logs += "a";
-    //   });
-    //   childB.$watch("b", () => {
-    //     logs += "b";
-    //   });
-    //   childC.$watch("c", () => {
-    //     logs += "c";
-    //   });
-    //   childA.a = childB.b = childC.c = 1;
-    //   model.$digest();
-    //   expect(logs).toEqual("abc");
-    // });
+    it("should call child $watchers in addition order", async () => {
+      logs = "";
+      const childA = model.$new();
+      childA.$watch("a", () => {
+        logs += "a";
+      });
+      childA.$watch("a", () => {
+        logs += "b";
+      });
+      childA.$watch("a", () => {
+        logs += "c";
+      });
+      childA.a = 1;
+      await wait();
+      expect(logs).toEqual("abc");
+    });
 
     // it("should allow $digest on a child scope with and without a right sibling", () => {
     //   // tests a traversal edge case which we originally missed

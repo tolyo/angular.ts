@@ -322,6 +322,7 @@ class Handler {
   $watch(watchProp, listenerFn) {
     const get = $parse(watchProp);
     if (get.constant) {
+      Promise.resolve().then(listenerFn(this.target));
       return () => {};
     }
 
@@ -456,7 +457,11 @@ class Handler {
    */
   notifyListeners(listener, oldValue, newValue) {
     const { originalTarget, listenerFn } = listener;
-    listenerFn(newValue, oldValue, originalTarget);
+    try {
+      listenerFn(newValue, oldValue, originalTarget);
+    } catch (e) {
+      $exceptionHandler(e);
+    }
   }
 }
 
