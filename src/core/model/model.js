@@ -220,56 +220,28 @@ class Handler {
   get(target, property, proxy) {
     if (property === isProxySymbol) return true;
 
-    if (property === "$watch") {
-      this.proxy = proxy;
-      return this.$watch.bind(this);
-    }
+    const propertyMap = {
+      $watch: this.$watch.bind(this),
+      $new: this.$new.bind(this),
+      $destroy: this.$destroy.bind(this),
+      $eval: this.$eval.bind(this),
+      $evalAsync: this.$evalAsync.bind(this),
+      $target: this.$target(),
+      $digest: this.$digest.bind(this),
+      $handler: this,
+      $id: this.$id,
+      $parent: this.$parent,
+      $root: this.$root,
+      $$watchersCount: this.$$watchersCount,
+    };
 
-    if (property === "$new") {
-      return this.$new.bind(this);
-    }
+    // Store the proxy reference when the property is "$watch"
+    if (property === "$watch") this.proxy = proxy;
 
-    if (property === "$destroy") {
-      return this.$destroy.bind(this);
-    }
-
-    if (property === "$eval") {
-      return this.$eval.bind(this);
-    }
-
-    if (property === "$evalAsync") {
-      return this.$evalAsync.bind(this);
-    }
-
-    if (property === "$target") {
-      return this.$target();
-    }
-
-    if (property === "$digest") {
-      return this.$digest.bind(this);
-    }
-
-    if (property === "$handler") {
-      return this;
-    }
-
-    if (property === "$id") {
-      return this.$id;
-    }
-
-    if (property === "$parent") {
-      return this.$parent;
-    }
-
-    if (property === "$root") {
-      return this.$root;
-    }
-
-    if (property === "$$watchersCount") {
-      return this.$$watchersCount;
-    }
-
-    return target[property];
+    // Return from the property map if found, else return the original property from target
+    return Object.prototype.hasOwnProperty.call(propertyMap, property)
+      ? propertyMap[property]
+      : target[property];
   }
 
   deleteProperty(target, property) {

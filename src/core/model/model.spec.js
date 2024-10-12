@@ -363,6 +363,11 @@ describe("Model", () => {
       await wait();
 
       expect(model.counter).toBe(1);
+
+      model.someValue.b = 3;
+      await wait();
+
+      expect(model.counter).toBe(2);
     });
 
     it("calls the listener function when a nested value is created from a wrapper object", async () => {
@@ -987,71 +992,76 @@ describe("Model", () => {
       expect(logs).toEqual("abc");
     });
 
-    // it("should allow $digest on a child scope with and without a right sibling", () => {
-    //   // tests a traversal edge case which we originally missed
-    //   logs = "";
-    //   const childA = model.$new();
-    //   const childB = model.$new();
+    it("should share listeners with parent", async () => {
+      logs = "";
+      const childA = model.$new();
+      const childB = model.$new();
 
-    //   model.$watch(() => {
-    //     logs += "r";
-    //   });
-    //   childA.$watch(() => {
-    //     logs += "a";
-    //   });
-    //   childB.$watch(() => {
-    //     logs += "b";
-    //   });
+      model.$watch("a", () => {
+        logs += "r";
+      });
 
-    //   // init
-    //   model.$digest();
-    //   expect(logs).toBe("rabrab");
+      childA.$watch("a", () => {
+        logs += "a";
+      });
+      childB.$watch("a", () => {
+        logs += "b";
+      });
 
-    //   logs = "";
-    //   childA.$digest();
-    //   expect(logs).toBe("a");
+      // init
+      model.a = 1;
+      await wait();
+      expect(logs).toBe("rab");
 
-    //   logs = "";
-    //   childB.$digest();
-    //   expect(logs).toBe("b");
-    // });
+      logs = "";
+      childA.a = 3;
+      await wait();
+      expect(logs).toBe("rab");
 
-    // it("should repeat watch cycle while model changes are identified", () => {
-    //   logs = "";
-    //   model.$watch("c", (v) => {
-    //     model.d = v;
-    //     logs += "c";
-    //   });
-    //   model.$watch("b", (v) => {
-    //     model.c = v;
-    //     logs += "b";
-    //   });
-    //   model.$watch("a", (v) => {
-    //     model.b = v;
-    //     logs += "a";
-    //   });
-    //   model.$digest();
-    //   logs = "";
-    //   model.a = 1;
-    //   model.$digest();
-    //   expect(model.b).toEqual(1);
-    //   expect(model.c).toEqual(1);
-    //   expect(model.d).toEqual(1);
-    //   expect(logs).toEqual("abc");
-    // });
+      logs = "";
+      childA.a = 4;
+      await wait();
+      expect(logs).toBe("rab");
+    });
 
-    // it("should repeat watch cycle from the root element", () => {
-    //   logs = "";
-    //   const child = model.$new();
-    //   model.$watch(() => {
-    //     logs += "a";
-    //   });
-    //   child.$watch(() => {
-    //     logs += "b";
-    //   });
-    //   model.$digest();
-    //   expect(logs).toEqual("abab");
-    // });
+    it("should repeat watch cycle while model changes are identified", async () => {
+      logs = "";
+      model.$watch("c", (v) => {
+        model.d = v;
+        logs += "c";
+      });
+      model.$watch("b", (v) => {
+        model.c = v;
+        logs += "b";
+      });
+      model.$watch("a", (v) => {
+        model.b = v;
+        logs += "a";
+      });
+      await wait();
+      logs = "";
+      model.a = 1;
+      await wait();
+      expect(model.b).toEqual(1);
+      expect(model.c).toEqual(1);
+      expect(model.d).toEqual(1);
+      expect(logs).toEqual("abc");
+    });
+
+    it("should repeat watch cycle from the root element", async () => {
+      logs = "";
+      const child = model.$new();
+      model.$watch("c", () => {
+        logs += "a";
+      });
+      child.$watch("c", () => {
+        logs += "b";
+      });
+      model.c = 1;
+      child.c = 2;
+      await wait();
+      expect(logs).toEqual("abab");
+    });
 
     // it("should prevent infinite recursion and print watcher expression", () => {
     //   model.$watch("a", function () {
@@ -1139,33 +1149,28 @@ describe("Model", () => {
     //   expect(logs).toEqual("");
     // });
 
-    // it("should watch objects", () => {
+    // fit("should watch objects", async () => {
     //   logs = "";
     //   model.a = [];
     //   model.b = {};
-    //   model.$watch(
-    //     "a",
+    //   model.$watch("a",
     //     (value) => {
     //       logs += ".";
-    //       expect(value).toBe(model.a);
-    //     },
-    //     true,
+    //       expect(value).toEqual(model.a);
+    //     }
     //   );
-    //   model.$watch(
-    //     "b",
+
+    //   model.$watch((obj) => obj.b,
     //     (value) => {
     //       logs += "!";
-    //       expect(value).toBe(model.b);
-    //     },
-    //     true,
+    //       expect(value).toEqual(model.b);
+    //     }
     //   );
-    //   model.$digest();
-    //   logs = "";
 
     //   model.a.push({});
-    //   model.b.name = "";
+    //   model.b.name = "1";
 
-    //   model.$digest();
+    //   await wait();
     //   expect(logs).toEqual(".!");
     // });
 
