@@ -46,6 +46,15 @@ describe("Model", () => {
     expect(listenerFn).toHaveBeenCalled();
   });
 
+  it("should return a deregistration function watch", async () => {
+    let fn = model.$watch(
+      () => {},
+      () => {},
+    );
+    expect(fn).toBeDefined();
+    expect(typeof fn).toEqual("function");
+  });
+
   it("calls the watch function with the model as the argument", async () => {
     var watchFn = jasmine.createSpy();
     var listenerFn = () => {};
@@ -745,60 +754,57 @@ describe("Model", () => {
       expect(spy).toHaveBeenCalled();
     });
 
-    // it("should decrement the watcherCount when destroying a child scope", () => {
-    //   const child1 = model.$new();
-    //   const child2 = model.$new();
-    //   const grandChild1 = child1.$new();
-    //   const grandChild2 = child2.$new();
-    //   child1.$watch("a", () => {});
-    //   child2.$watch("a", () => {});
-    //   grandChild1.$watch("a", () => {});
-    //   grandChild2.$watch("a", () => {});
+    it("should decrement the watcherCount when destroying a child scope", () => {
+      const child1 = model.$new();
+      const child2 = model.$new();
+      const grandChild1 = child1.$new();
+      const grandChild2 = child2.$new();
+      child1.$watch("a", () => {});
+      child2.$watch("a", () => {});
+      grandChild1.$watch("a", () => {});
+      grandChild2.$watch("a", () => {});
 
-    //   expect(model.$$watchersCount).toBe(4);
-    //   expect(child1.$$watchersCount).toBe(2);
-    //   expect(child2.$$watchersCount).toBe(2);
-    //   expect(grandChild1.$$watchersCount).toBe(1);
-    //   expect(grandChild2.$$watchersCount).toBe(1);
+      expect(model.$$watchersCount).toBe(4);
+      expect(child1.$$watchersCount).toBe(2);
+      expect(child2.$$watchersCount).toBe(2);
+      expect(grandChild1.$$watchersCount).toBe(1);
+      expect(grandChild2.$$watchersCount).toBe(1);
 
-    //   grandChild2.$destroy();
-    //   expect(child2.$$watchersCount).toBe(1);
-    //   expect(model.$$watchersCount).toBe(3);
-    //   child1.$destroy();
-    //   expect(model.$$watchersCount).toBe(1);
-    // });
+      grandChild2.$destroy();
+      expect(child2.$$watchersCount).toBe(1);
+      expect(model.$$watchersCount).toBe(3);
+      child1.$destroy();
+      expect(model.$$watchersCount).toBe(1);
+    });
 
-    // it("should decrement the watcherCount when calling the remove function", () => {
-    //   const child1 = model.$new();
-    //   const child2 = model.$new();
-    //   const grandChild1 = child1.$new();
-    //   const grandChild2 = child2.$new();
-    //   let remove1;
-    //   let remove2;
+    it("should decrement the watcherCount when calling the remove function", () => {
+      const child1 = model.$new();
+      const child2 = model.$new();
+      const grandChild1 = child1.$new();
+      const grandChild2 = child2.$new();
+      let remove1 = child1.$watch("a", () => {});
+      child2.$watch("a", () => {});
+      grandChild1.$watch("a", () => {});
+      let remove2 = grandChild2.$watch("a", () => {});
 
-    //   remove1 = child1.$watch("a", () => {});
-    //   child2.$watch("a", () => {});
-    //   grandChild1.$watch("a", () => {});
-    //   remove2 = grandChild2.$watch("a", () => {});
+      remove2();
+      expect(grandChild2.$$watchersCount).toBe(0);
+      expect(child2.$$watchersCount).toBe(1);
+      expect(model.$$watchersCount).toBe(3);
+      remove1();
+      expect(grandChild1.$$watchersCount).toBe(1);
+      expect(child1.$$watchersCount).toBe(1);
+      expect(model.$$watchersCount).toBe(2);
 
-    //   remove2();
-    //   expect(grandChild2.$$watchersCount).toBe(0);
-    //   expect(child2.$$watchersCount).toBe(1);
-    //   expect(model.$$watchersCount).toBe(3);
-    //   remove1();
-    //   expect(grandChild1.$$watchersCount).toBe(1);
-    //   expect(child1.$$watchersCount).toBe(1);
-    //   expect(model.$$watchersCount).toBe(2);
-
-    //   // Execute everything a second time to be sure that calling the remove function
-    //   // several times, it only decrements the counter once
-    //   remove2();
-    //   expect(child2.$$watchersCount).toBe(1);
-    //   expect(model.$$watchersCount).toBe(2);
-    //   remove1();
-    //   expect(child1.$$watchersCount).toBe(1);
-    //   expect(model.$$watchersCount).toBe(2);
-    // });
+      // Execute everything a second time to be sure that calling the remove function
+      // several times, it only decrements the counter once
+      remove2();
+      expect(child2.$$watchersCount).toBe(1);
+      expect(model.$$watchersCount).toBe(2);
+      remove1();
+      expect(child1.$$watchersCount).toBe(1);
+      expect(model.$$watchersCount).toBe(2);
+    });
 
     // describe("constants cleanup", () => {
     //   beforeEach(() => (logs = []));

@@ -71,6 +71,7 @@ export function createModel(target = {}, context) {
  * @typedef {Object} Listener
  * @property {Object} originalTarget - The original target object.
  * @property {ListenerFunction} listenerFn - The function invoked when changes are detected.
+ * @property {number} id
  */
 
 /**
@@ -122,6 +123,9 @@ class Handler {
     this.$root = context ? context.$root : this;
 
     this.$parent = this.$root === this ? null : context;
+
+    /** @type {number} */
+    this.$$watchersCount = 0;
   }
 
   /**
@@ -220,6 +224,10 @@ class Handler {
       return this.$new.bind(this);
     }
 
+    if (property === "$destroy") {
+      return this.$destroy.bind(this);
+    }
+
     if (property === "$eval") {
       return this.$eval.bind(this);
     }
@@ -250,6 +258,10 @@ class Handler {
 
     if (property === "$root") {
       return this.$root;
+    }
+
+    if (property === "$$watchersCount") {
+      return this.$$watchersCount;
     }
 
     return target[property];
@@ -308,6 +320,7 @@ class Handler {
     const listener = {
       originalTarget: this.target,
       listenerFn: listenerFn,
+      id: nextUid(),
     };
     let key = getProperty(get);
 
@@ -325,6 +338,15 @@ class Handler {
         this.objectListeners.set(value, [key]);
       }
     }
+
+    this.incrementWatchersCount(1);
+
+    return () => {
+      const res = this.deregisterKey(key, listener.id);
+      if (res) {
+        this.incrementWatchersCount(-1);
+      }
+    };
   }
 
   $new(isIsolated = false, parent) {
@@ -333,6 +355,7 @@ class Handler {
       child = Object.create(null);
     } else {
       child = Object.create(this.target);
+      child.$$watchersCount = 0;
       child.$parent = parent ? parent.$handler : this.$parent;
     }
     const proxy = new Proxy(child, new Handler(child, parent || this));
@@ -345,6 +368,22 @@ class Handler {
     } else {
       this.listeners.set(key, [listener]);
     }
+  }
+
+  deregisterKey(key, id) {
+    const listenerList = this.listeners.get(key);
+    if (!listenerList) return false;
+
+    const index = listenerList.findIndex((x) => x.id === id);
+    if (index === -1) return false;
+
+    listenerList.splice(index, 1);
+    if (listenerList.length) {
+      this.listeners.set(key, listenerList);
+    } else {
+      this.listeners.delete(key);
+    }
+    return true;
   }
 
   /**
@@ -383,6 +422,20 @@ class Handler {
     });
 
     //return id;
+  }
+
+  $destroy() {
+    this.incrementWatchersCount(-this.$$watchersCount);
+  }
+
+  /**
+   * @param {number} count
+   */
+  incrementWatchersCount(count) {
+    this.$$watchersCount += count;
+    if (this.$parent) {
+      this.$parent.incrementWatchersCount(count);
+    }
   }
 
   /**
