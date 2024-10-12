@@ -72,6 +72,7 @@ export function createModel(target = {}, context) {
  * @property {Object} originalTarget - The original target object.
  * @property {ListenerFunction} listenerFn - The function invoked when changes are detected.
  * @property {number} id
+ * @property {boolean} oneTime
  */
 
 /**
@@ -178,9 +179,13 @@ class Handler {
 
         if (listeners) {
           listeners.forEach((listener) =>
-            Promise.resolve().then(() =>
-              this.notifyListeners(listener, oldValue, value),
-            ),
+            Promise.resolve().then(() => {
+              this.notifyListeners(listener, oldValue, value);
+              if (listener.oneTime) {
+                this.deregisterKey(property, listener.id);
+                this.incrementWatchersCount(-1);
+              }
+            }),
           );
         }
       }
@@ -316,11 +321,15 @@ class Handler {
    */
   $watch(watchProp, listenerFn) {
     const get = $parse(watchProp);
+    if (get.constant) {
+      return () => {};
+    }
 
     const listener = {
       originalTarget: this.target,
       listenerFn: listenerFn,
       id: nextUid(),
+      oneTime: get.oneTime,
     };
     let key = getProperty(get);
 

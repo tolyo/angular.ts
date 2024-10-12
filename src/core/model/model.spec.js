@@ -806,136 +806,134 @@ describe("Model", () => {
       expect(model.$$watchersCount).toBe(2);
     });
 
-    // describe("constants cleanup", () => {
-    //   beforeEach(() => (logs = []));
-    //   it("should remove $watch of constant literals after initial digest", () => {
-    //     model.$watch("[]", () => {});
-    //     model.$watch("{}", () => {});
-    //     model.$watch("1", () => {});
-    //     model.$watch('"foo"', () => {});
-    //     expect(model.$$watchers.length).not.toEqual(0);
-    //     model.$digest();
+    describe("constants ignore", () => {
+      beforeEach(() => (logs = []));
+      it("should not $watch constant literals ", () => {
+        model.$watch("[]", () => {});
+        model.$watch("{}", () => {});
+        model.$watch("1", () => {});
+        model.$watch('"foo"', () => {});
+        expect(model.$$watchersCount).toEqual(0);
+      });
 
-    //     expect(model.$$watchers.length).toEqual(0);
-    //   });
+      //   it("should remove $watchCollection of constant literals after initial digest", () => {
+      //     model.$watchCollection("[]", () => {});
+      //     model.$watchCollection("{}", () => {});
+      //     model.$watchCollection("1", () => {});
+      //     model.$watchCollection('"foo"', () => {});
+      //     expect(model.$$watchersCount).not.toEqual(0);
+      //     model.$digest();
 
-    //   it("should remove $watchCollection of constant literals after initial digest", () => {
-    //     model.$watchCollection("[]", () => {});
-    //     model.$watchCollection("{}", () => {});
-    //     model.$watchCollection("1", () => {});
-    //     model.$watchCollection('"foo"', () => {});
-    //     expect(model.$$watchers.length).not.toEqual(0);
-    //     model.$digest();
+      //     expect(model.$$watchersCount).toEqual(0);
+      //   });
 
-    //     expect(model.$$watchers.length).toEqual(0);
-    //   });
+      //   it("should remove $watchGroup of constant literals after initial digest", () => {
+      //     model.$watchGroup(["[]", "{}", "1", '"foo"'], () => {});
+      //     expect(model.$$watchersCount).not.toEqual(0);
+      //     model.$digest();
 
-    //   it("should remove $watchGroup of constant literals after initial digest", () => {
-    //     model.$watchGroup(["[]", "{}", "1", '"foo"'], () => {});
-    //     expect(model.$$watchers.length).not.toEqual(0);
-    //     model.$digest();
+      //     expect(model.$$watchersCount).toEqual(0);
+      //   });
 
-    //     expect(model.$$watchers.length).toEqual(0);
-    //   });
+      //   it("should remove $watch of filtered constant literals after initial digest", () => {
+      //     model.$watch('[1] | filter:"x"', () => {});
+      //     model.$watch("1 | limitTo:2", () => {});
+      //     expect(model.$$watchersCount).not.toEqual(0);
+      //     model.$digest();
 
-    //   it("should remove $watch of filtered constant literals after initial digest", () => {
-    //     model.$watch('[1] | filter:"x"', () => {});
-    //     model.$watch("1 | limitTo:2", () => {});
-    //     expect(model.$$watchers.length).not.toEqual(0);
-    //     model.$digest();
+      //     expect(model.$$watchersCount).toEqual(0);
+      //   });
 
-    //     expect(model.$$watchers.length).toEqual(0);
-    //   });
+      //   it("should remove $watchCollection of filtered constant literals after initial digest", () => {
+      //     model.$watchCollection('[1] | filter:"x"', () => {});
+      //     expect(model.$$watchersCount).not.toEqual(0);
+      //     model.$digest();
 
-    //   it("should remove $watchCollection of filtered constant literals after initial digest", () => {
-    //     model.$watchCollection('[1] | filter:"x"', () => {});
-    //     expect(model.$$watchers.length).not.toEqual(0);
-    //     model.$digest();
+      //     expect(model.$$watchersCount).toEqual(0);
+      //   });
 
-    //     expect(model.$$watchers.length).toEqual(0);
-    //   });
+      //   it("should remove $watchGroup of filtered constant literals after initial digest", () => {
+      //     model.$watchGroup(['[1] | filter:"x"', "1 | limitTo:2"], () => {});
+      //     expect(model.$$watchersCount).not.toEqual(0);
+      //     model.$digest();
 
-    //   it("should remove $watchGroup of filtered constant literals after initial digest", () => {
-    //     model.$watchGroup(['[1] | filter:"x"', "1 | limitTo:2"], () => {});
-    //     expect(model.$$watchers.length).not.toEqual(0);
-    //     model.$digest();
+      //     expect(model.$$watchersCount).toEqual(0);
+      //   });
 
-    //     expect(model.$$watchers.length).toEqual(0);
-    //   });
+      it("should ignore $watch of constant expressions", () => {
+        model.$watch("1 + 1", () => {});
+        model.$watch('"a" + "b"', () => {});
+        model.$watch('"ab".length', () => {});
+        model.$watch("[].length", () => {});
+        model.$watch("(1 + 1) | limitTo:2", () => {});
+        expect(model.$$watchersCount).toEqual(0);
+      });
+    });
 
-    //   it("should remove $watch of constant expressions after initial digest", () => {
-    //     model.$watch("1 + 1", () => {});
-    //     model.$watch('"a" + "b"', () => {});
-    //     model.$watch('"ab".length', () => {});
-    //     model.$watch("[].length", () => {});
-    //     model.$watch("(1 + 1) | limitTo:2", () => {});
-    //     expect(model.$$watchers.length).not.toEqual(0);
-    //     model.$digest();
+    describe("onetime cleanup", () => {
+      it("should clean up stable watches on the watch queue", async () => {
+        let count = 0;
 
-    //     expect(model.$$watchers.length).toEqual(0);
-    //   });
-    // });
+        model.$watch("::foo", () => {
+          count++;
+        });
+        expect(model.$$watchersCount).toEqual(1);
+        expect(count).toEqual(0);
 
-    // describe("onetime cleanup", () => {
-    //   it("should clean up stable watches on the watch queue", () => {
-    //     model.$watch("::foo", () => {});
-    //     expect(model.$$watchers.length).toEqual(1);
-    //     model.$digest();
-    //     expect(model.$$watchers.length).toEqual(1);
+        model.foo = "foo";
+        await wait();
+        expect(model.$$watchersCount).toEqual(0);
+        expect(count).toEqual(1);
+      });
 
-    //     model.foo = "foo";
-    //     model.$digest();
-    //     expect(model.$$watchers.length).toEqual(0);
-    //   });
+      // it("should clean up stable watches from $watchCollection", () => {
+      //   model.$watchCollection("::foo", () => {});
+      //   expect(model.$$watchersCount).toEqual(1);
 
-    //   it("should clean up stable watches from $watchCollection", () => {
-    //     model.$watchCollection("::foo", () => {});
-    //     expect(model.$$watchers.length).toEqual(1);
+      //   model.$digest();
+      //   expect(model.$$watchersCount).toEqual(1);
 
-    //     model.$digest();
-    //     expect(model.$$watchers.length).toEqual(1);
+      //   model.foo = [];
+      //   model.$digest();
+      //   expect(model.$$watchersCount).toEqual(0);
+      // });
 
-    //     model.foo = [];
-    //     model.$digest();
-    //     expect(model.$$watchers.length).toEqual(0);
-    //   });
+      // it("should clean up stable watches from $watchCollection literals", () => {
+      //   model.$watchCollection("::[foo, bar]", () => {});
+      //   expect(model.$$watchersCount).toEqual(1);
 
-    //   it("should clean up stable watches from $watchCollection literals", () => {
-    //     model.$watchCollection("::[foo, bar]", () => {});
-    //     expect(model.$$watchers.length).toEqual(1);
+      //   model.$digest();
+      //   expect(model.$$watchersCount).toEqual(1);
 
-    //     model.$digest();
-    //     expect(model.$$watchers.length).toEqual(1);
+      //   model.foo = 1;
+      //   model.$digest();
+      //   expect(model.$$watchersCount).toEqual(1);
 
-    //     model.foo = 1;
-    //     model.$digest();
-    //     expect(model.$$watchers.length).toEqual(1);
+      //   model.foo = 2;
+      //   model.$digest();
+      //   expect(model.$$watchersCount).toEqual(1);
 
-    //     model.foo = 2;
-    //     model.$digest();
-    //     expect(model.$$watchers.length).toEqual(1);
+      //   model.bar = 3;
+      //   model.$digest();
+      //   expect(model.$$watchersCount).toEqual(0);
+      // });
 
-    //     model.bar = 3;
-    //     model.$digest();
-    //     expect(model.$$watchers.length).toEqual(0);
-    //   });
+      // it("should clean up stable watches from $watchGroup", () => {
+      //   model.$watchGroup(["::foo", "::bar"], () => {});
+      //   expect(model.$$watchersCount).toEqual(2);
 
-    //   it("should clean up stable watches from $watchGroup", () => {
-    //     model.$watchGroup(["::foo", "::bar"], () => {});
-    //     expect(model.$$watchers.length).toEqual(2);
+      //   model.$digest();
+      //   expect(model.$$watchersCount).toEqual(2);
 
-    //     model.$digest();
-    //     expect(model.$$watchers.length).toEqual(2);
+      //   model.foo = "foo";
+      //   model.$digest();
+      //   expect(model.$$watchersCount).toEqual(1);
 
-    //     model.foo = "foo";
-    //     model.$digest();
-    //     expect(model.$$watchers.length).toEqual(1);
-
-    //     model.bar = "bar";
-    //     model.$digest();
-    //     expect(model.$$watchers.length).toEqual(0);
-    //   });
-    // });
+      //   model.bar = "bar";
+      //   model.$digest();
+      //   expect(model.$$watchersCount).toEqual(0);
+      // });
+    });
 
     // it("should delegate exceptions", () => {
     //   model.$watch("a", () => {

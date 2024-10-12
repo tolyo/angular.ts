@@ -37,6 +37,8 @@ export type Listener = {
      * - The function invoked when changes are detected.
      */
     listenerFn: ListenerFunction;
+    id: number;
+    oneTime: boolean;
 };
 /**
  * Listener function type.
@@ -74,6 +76,8 @@ declare class Handler {
      */
     $root: Handler;
     $parent: Handler;
+    /** @type {number} */
+    $$watchersCount: number;
     /**
      * Intercepts and handles property assignments on the target object. If a new value is
      * an object, it will be recursively proxied.
@@ -108,15 +112,21 @@ declare class Handler {
      * @param {((any) => any)} watchProp - A property path (dot notation) to observe specific changes in the target.
      * @param {ListenerFunction} listenerFn - A function to execute when changes are detected.
      */
-    $watch(watchProp: ((any: any) => any), listenerFn: ListenerFunction): void;
+    $watch(watchProp: ((any: any) => any), listenerFn: ListenerFunction): () => void;
     $new(isIsolated: boolean, parent: any): any;
     registerKey(key: any, listener: any): void;
+    deregisterKey(key: any, id: any): boolean;
     /**
      * Invokes all registered listener functions for any watched properties.
      */
     $digest(): void;
     $eval(expr: any, locals: any): any;
     $evalAsync(expr: any, locals: any): void;
+    $destroy(): void;
+    /**
+     * @param {number} count
+     */
+    incrementWatchersCount(count: number): void;
     /**
      * Invokes the registered listener function when a watched property changes.
      *
