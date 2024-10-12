@@ -102,7 +102,7 @@ export class RootScopeProvider {
      * @param {import('../../services/browser').Browser} browser
      * @returns {Scope} root scope
      */
-    function (exceptionHandler, parse, browser) {
+    (exceptionHandler, parse, browser) => {
       $exceptionHandler = exceptionHandler;
       $parse = parse;
       $browser = browser;
@@ -200,7 +200,6 @@ export class Scope {
     /** @type {boolean} */
     this.$$suspended = false;
 
-    // TODO use maps
     /** @type {Map<String, Function[]>} */
     this.$$listeners = new Map();
 
