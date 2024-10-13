@@ -2268,7 +2268,7 @@ describe("Model", () => {
 
     it("executes $eval'ed function and returns result", function () {
       model.aValue = 42;
-      var result = model.$eval(function (scope) {
+      var result = model.$eval(function (model) {
         return model.aValue;
       });
       expect(result).toBe(42);
@@ -2276,7 +2276,7 @@ describe("Model", () => {
 
     it("passes the second $eval argument straight through", function () {
       model.aValue = 42;
-      var result = model.$eval(function (scope, arg) {
+      var result = model.$eval(function (model, arg) {
         return model.aValue + arg;
       }, 2);
       expect(result).toBe(44);
@@ -2295,347 +2295,388 @@ describe("Model", () => {
     });
   });
 
-  // describe("$evalAsync", () => {
-  //   // it("should run callback before $watch", () => {
-  //   //   let log = "";
-  //   //   const child = model.$new();
-  //   //   model.$evalAsync(() => {
-  //   //     log += "parent.async;";
-  //   //   });
-  //   //   model.$watch("value", () => {
-  //   //     log += "parent.$digest;";
-  //   //   });
-  //   //   child.$evalAsync(() => {
-  //   //     log += "child.async;";
-  //   //   });
-  //   //   child.$watch("value", () => {
-  //   //     log += "child.$digest;";
-  //   //   });
-  //   //   model.value = 1;
-  //   //   expect(log).toEqual(
-  //   //     "parent.async;child.async;parent.$digest;child.$digest;",
-  //   //   );
-  //   // });
+  describe("$evalAsync", () => {
+    it("executes $evalAsync'ed function later in the same cycle", function () {
+      model.aValue = [1, 2, 3];
+      model.asyncEvaluated = false;
+      model.asyncEvaluatedImmediately = false;
+      model.$watch(
+        function () {
+          return model.aValue;
+        },
+        function (newValue, oldValue) {
+          model.$evalAsync(function () {
+            model.asyncEvaluated = true;
+          });
+          model.asyncEvaluatedImmediately = model.asyncEvaluated;
+        },
+      );
+      model.$digest();
+      expect(model.asyncEvaluated).toBe(true);
+      expect(model.asyncEvaluatedImmediately).toBe(false);
+    });
 
-  //   // it("should not run another digest for an $$postDigest call", () => {
-  //   //   let internalWatchCount = 0;
-  //   //   let externalWatchCount = 0;
+    // it("should run callback before $watch", async () => {
+    //   let log = "";
+    //   const child = model.$new();
+    //   model.$evalAsync(() => {
+    //     log += "parent.async;";
+    //   });
+    //   model.$watch("value", () => {
+    //     log += "parent.$digest;";
+    //   });
+    //   child.$evalAsync(() => {
+    //     log += "child.async;";
+    //   });
+    //   child.$watch("value", () => {
+    //     log += "child.$digest;";
+    //   });
+    //   model.value = 1;
 
-  //   //   model.internalCount = 0;
-  //   //   model.externalCount = 0;
+    //   await wait();
+    //   expect(log).toEqual(
+    //     "parent.async;child.async;parent.$digest;child.$digest;",
+    //   );
+    // });
 
-  //   //   model.$evalAsync((scope) => {
-  //   //     model.internalCount++;
-  //   //   });
+    //   // it("should not run another digest for an $$postDigest call", () => {
+    //   //   let internalWatchCount = 0;
+    //   //   let externalWatchCount = 0;
 
-  //   //   model.$$postDigest((scope) => {
-  //   //     model.externalCount++;
-  //   //   });
+    //   //   model.internalCount = 0;
+    //   //   model.externalCount = 0;
 
-  //   //   model.$watch("internalCount", (value) => {
-  //   //     internalWatchCount = value;
-  //   //   });
-  //   //   model.$watch("externalCount", (value) => {
-  //   //     externalWatchCount = value;
-  //   //   });
+    //   //   model.$evalAsync((scope) => {
+    //   //     model.internalCount++;
+    //   //   });
 
-  //   //   model.$digest();
+    //   //   model.$$postDigest((scope) => {
+    //   //     model.externalCount++;
+    //   //   });
 
-  //   //   expect(internalWatchCount).toEqual(1);
-  //   //   expect(externalWatchCount).toEqual(0);
-  //   // });
+    //   //   model.$watch("internalCount", (value) => {
+    //   //     internalWatchCount = value;
+    //   //   });
+    //   //   model.$watch("externalCount", (value) => {
+    //   //     externalWatchCount = value;
+    //   //   });
 
-  //   // it("should cause a $digest rerun", () => {
-  //   //   model.log = "";
-  //   //   model.value = 0;
-  //   //   model.$watch("value", () => {
-  //   //     model.log += ".";
-  //   //   });
-  //   //   model.$watch("init", () => {
-  //   //     model.$evalAsync('value = 123; log = log + "=" ');
-  //   //     expect(model.value).toEqual(0);
-  //   //   });
-  //   //   model.$digest();
-  //   //   expect(model.log).toEqual(".=.");
-  //   // });
+    //   //   model.$digest();
 
-  //   // it("should run async in the same order as added", () => {
-  //   //   model.log = "";
-  //   //   model.$evalAsync("log = log + 1");
-  //   //   model.$evalAsync("log = log + 2");
-  //   //   model.$digest();
-  //   //   expect(model.log).toBe("12");
-  //   // });
+    //   //   expect(internalWatchCount).toEqual(1);
+    //   //   expect(externalWatchCount).toEqual(0);
+    //   // });
 
-  //   // it("should allow passing locals to the expression", () => {
-  //   //   model.log = "";
-  //   //   model.$evalAsync("log = log + a", { a: 1 });
-  //   //   model.$digest();
-  //   //   expect(model.log).toBe("1");
-  //   // });
+    //   // it("should cause a $digest rerun", () => {
+    //   //   model.log = "";
+    //   //   model.value = 0;
+    //   //   model.$watch("value", () => {
+    //   //     model.log += ".";
+    //   //   });
+    //   //   model.$watch("init", () => {
+    //   //     model.$evalAsync('value = 123; log = log + "=" ');
+    //   //     expect(model.value).toEqual(0);
+    //   //   });
+    //   //   model.$digest();
+    //   //   expect(model.log).toEqual(".=.");
+    //   // });
 
-  //   // it("should run async expressions in their proper context", () => {
-  //   //   const child = model.$new();
-  //   //   model.ctx = "root context";
-  //   //   model.log = "";
-  //   //   child.ctx = "child context";
-  //   //   child.log = "";
-  //   //   child.$evalAsync("log=ctx");
-  //   //   model.$digest();
-  //   //   expect(model.log).toBe("");
-  //   //   expect(child.log).toBe("child context");
-  //   // });
+    //   // it("should run async in the same order as added", () => {
+    //   //   model.log = "";
+    //   //   model.$evalAsync("log = log + 1");
+    //   //   model.$evalAsync("log = log + 2");
+    //   //   model.$digest();
+    //   //   expect(model.log).toBe("12");
+    //   // });
 
-  //   // it("should operate only with a single queue across all child and isolate scopes", () => {
-  //   //   const childScope = model.$new();
-  //   //   const isolateScope = model.$new(true);
+    //   // it("should allow passing locals to the expression", () => {
+    //   //   model.log = "";
+    //   //   model.$evalAsync("log = log + a", { a: 1 });
+    //   //   model.$digest();
+    //   //   expect(model.log).toBe("1");
+    //   // });
 
-  //   //   model.$evalAsync("rootExpression");
-  //   //   childScope.$evalAsync("childExpression");
-  //   //   isolateScope.$evalAsync("isolateExpression");
-  //   //   expect($$asyncQueue).toEqual([
-  //   //     {
-  //   //       scope: model,
-  //   //       fn: $parse("rootExpression"),
-  //   //       locals: undefined,
-  //   //     },
-  //   //     {
-  //   //       scope: childScope,
-  //   //       fn: $parse("childExpression"),
-  //   //       locals: undefined,
-  //   //     },
-  //   //     {
-  //   //       scope: isolateScope,
-  //   //       fn: $parse("isolateExpression"),
-  //   //       locals: undefined,
-  //   //     },
-  //   //   ]);
-  //   // });
+    //   // it("should run async expressions in their proper context", () => {
+    //   //   const child = model.$new();
+    //   //   model.ctx = "root context";
+    //   //   model.log = "";
+    //   //   child.ctx = "child context";
+    //   //   child.log = "";
+    //   //   child.$evalAsync("log=ctx");
+    //   //   model.$digest();
+    //   //   expect(model.log).toBe("");
+    //   //   expect(child.log).toBe("child context");
+    //   // });
 
-  //   // describe("auto-flushing when queueing outside of an $apply", () => {
-  //   //   it("should auto-flush the queue asynchronously and trigger digest", () => {
-  //   //     logs = [];
-  //   //     model.$evalAsync(() => {
-  //   //       logs.push("eval-ed!");
-  //   //       return "eval-ed!";
-  //   //     });
-  //   //     model.$watch(() => {
-  //   //       logs.push("digesting");
-  //   //       return "digesting";
-  //   //     });
-  //   //     expect(logs).toEqual([]);
-  //   //     setTimeout(() => {
-  //   //       expect(logs).toEqual(["eval-ed!", "digesting", "digesting"]);
-  //   //     });
-  //   //   });
+    //   // it("should operate only with a single queue across all child and isolate scopes", () => {
+    //   //   const childScope = model.$new();
+    //   //   const isolateScope = model.$new(true);
 
-  //   //   it("should not trigger digest asynchronously if the queue is empty in the next tick", () => {
-  //   //     logs = [];
-  //   //     model.$evalAsync(() => {
-  //   //       logs.push("eval-ed!");
-  //   //       return "eval-ed!";
-  //   //     });
-  //   //     model.$watch(() => {
-  //   //       logs.push("digesting");
-  //   //       return "digesting";
-  //   //     });
-  //   //     expect(logs).toEqual([]);
+    //   //   model.$evalAsync("rootExpression");
+    //   //   childScope.$evalAsync("childExpression");
+    //   //   isolateScope.$evalAsync("isolateExpression");
+    //   //   expect($$asyncQueue).toEqual([
+    //   //     {
+    //   //       scope: model,
+    //   //       fn: $parse("rootExpression"),
+    //   //       locals: undefined,
+    //   //     },
+    //   //     {
+    //   //       scope: childScope,
+    //   //       fn: $parse("childExpression"),
+    //   //       locals: undefined,
+    //   //     },
+    //   //     {
+    //   //       scope: isolateScope,
+    //   //       fn: $parse("isolateExpression"),
+    //   //       locals: undefined,
+    //   //     },
+    //   //   ]);
+    //   // });
 
-  //   //     model.$digest();
+    //   // describe("auto-flushing when queueing outside of an $apply", () => {
+    //   //   it("should auto-flush the queue asynchronously and trigger digest", () => {
+    //   //     logs = [];
+    //   //     model.$evalAsync(() => {
+    //   //       logs.push("eval-ed!");
+    //   //       return "eval-ed!";
+    //   //     });
+    //   //     model.$watch(() => {
+    //   //       logs.push("digesting");
+    //   //       return "digesting";
+    //   //     });
+    //   //     expect(logs).toEqual([]);
+    //   //     setTimeout(() => {
+    //   //       expect(logs).toEqual(["eval-ed!", "digesting", "digesting"]);
+    //   //     });
+    //   //   });
 
-  //   //     expect(logs).toEqual(["eval-ed!", "digesting", "digesting"]);
-  //   //     logs = [];
+    //   //   it("should not trigger digest asynchronously if the queue is empty in the next tick", () => {
+    //   //     logs = [];
+    //   //     model.$evalAsync(() => {
+    //   //       logs.push("eval-ed!");
+    //   //       return "eval-ed!";
+    //   //     });
+    //   //     model.$watch(() => {
+    //   //       logs.push("digesting");
+    //   //       return "digesting";
+    //   //     });
+    //   //     expect(logs).toEqual([]);
 
-  //   //     setTimeout(() => {
-  //   //       expect(logs).toEqual([]);
-  //   //     });
-  //   //   });
+    //   //     model.$digest();
 
-  //   //   it("should not schedule more than one auto-flush task", () => {
-  //   //     logs = [];
-  //   //     model.$evalAsync(() => {
-  //   //       logs.push("eval-ed 1!");
-  //   //       return "eval-ed 1!";
-  //   //     });
-  //   //     model.$evalAsync(() => {
-  //   //       logs.push("eval-ed 2!");
-  //   //       return "eval-ed 2!";
-  //   //     });
-  //   //     expect(logs).toEqual([]);
-  //   //     setTimeout(() => {
-  //   //       expect(logs).toEqual(["eval-ed 1!", "eval-ed 2!"]);
-  //   //     });
+    //   //     expect(logs).toEqual(["eval-ed!", "digesting", "digesting"]);
+    //   //     logs = [];
 
-  //   //     setTimeout(() => {
-  //   //       expect(logs).toEqual(["eval-ed 1!", "eval-ed 2!"]);
-  //   //     });
-  //   //   });
+    //   //     setTimeout(() => {
+    //   //       expect(logs).toEqual([]);
+    //   //     });
+    //   //   });
 
-  //   //   it("should not have execution affected by an explicit $digest call", () => {
-  //   //     const scope1 = model.$new();
-  //   //     const scope2 = model.$new();
+    //   //   it("should not schedule more than one auto-flush task", () => {
+    //   //     logs = [];
+    //   //     model.$evalAsync(() => {
+    //   //       logs.push("eval-ed 1!");
+    //   //       return "eval-ed 1!";
+    //   //     });
+    //   //     model.$evalAsync(() => {
+    //   //       logs.push("eval-ed 2!");
+    //   //       return "eval-ed 2!";
+    //   //     });
+    //   //     expect(logs).toEqual([]);
+    //   //     setTimeout(() => {
+    //   //       expect(logs).toEqual(["eval-ed 1!", "eval-ed 2!"]);
+    //   //     });
 
-  //   //     scope1.$watch("value", (value) => {
-  //   //       scope1.result = value;
-  //   //     });
+    //   //     setTimeout(() => {
+    //   //       expect(logs).toEqual(["eval-ed 1!", "eval-ed 2!"]);
+    //   //     });
+    //   //   });
 
-  //   //     scope1.$evalAsync(() => {
-  //   //       scope1.value = "bar";
-  //   //     });
+    //   //   it("should not have execution affected by an explicit $digest call", () => {
+    //   //     const scope1 = model.$new();
+    //   //     const scope2 = model.$new();
 
-  //   //     expect(scope1.result).toBe(undefined);
-  //   //     scope2.$digest();
+    //   //     scope1.$watch("value", (value) => {
+    //   //       scope1.result = value;
+    //   //     });
 
-  //   //     setTimeout(() => expect(scope1.result).toBe("bar"));
-  //   //   });
-  //   // });
+    //   //     scope1.$evalAsync(() => {
+    //   //       scope1.value = "bar";
+    //   //     });
 
-  //   // it("should not pass anything as `this` to scheduled functions", () => {
-  //   //   let this1 = {};
-  //   //   const this2 = (function () {
-  //   //     return this;
-  //   //   })();
-  //   //   model.$evalAsync(function () {
-  //   //     this1 = this;
-  //   //   });
-  //   //   model.$digest();
-  //   //   expect(this1).toEqual(this2);
-  //   // });
-  // });
+    //   //     expect(scope1.result).toBe(undefined);
+    //   //     scope2.$digest();
 
-  // describe("$apply", () => {
-  //   beforeEach(() => (logs = []));
+    //   //     setTimeout(() => expect(scope1.result).toBe("bar"));
+    //   //   });
+    //   // });
 
-  //   it("should apply expression with full lifecycle", () => {
-  //     let log = "";
-  //     const child = model.$new();
-  //     model.$watch("a", (a) => {
-  //       log += "1";
-  //     });
-  //     child.$apply("$parent.a=0");
-  //     expect(log).toEqual("1");
-  //   });
+    //   // it("should not pass anything as `this` to scheduled functions", () => {
+    //   //   let this1 = {};
+    //   //   const this2 = (function () {
+    //   //     return this;
+    //   //   })();
+    //   //   model.$evalAsync(function () {
+    //   //     this1 = this;
+    //   //   });
+    //   //   model.$digest();
+    //   //   expect(this1).toEqual(this2);
+    //   // });
+  });
 
-  //   it("should catch exceptions", () => {
-  //     let log = "";
-  //     const child = model.$new();
-  //     model.$watch("a", (a) => {
-  //       log += "1";
-  //     });
-  //     model.a = 0;
-  //     child.$apply(() => {
-  //       throw new Error("MyError");
-  //     });
-  //     expect(log).toEqual("1");
-  //     expect(logs[0].message).toEqual("MyError");
-  //   });
+  describe("$apply", () => {
+    beforeEach(() => (logs = []));
 
-  //   it("should log exceptions from $digest", () => {
-  //     model.$watch("a", () => {
-  //       model.b++;
-  //     });
-  //     model.$watch("b", () => {
-  //       model.a++;
-  //     });
-  //     model.a = model.b = 0;
+    it("executes $apply'ed function and starts the digest", function () {
+      model.aValue = "someValue";
+      model.counter = 0;
+      model.$watch(
+        function (scope) {
+          return scope.aValue;
+        },
+        function () {
+          model.counter++;
+        },
+      );
+      model.$digest();
+      expect(model.counter).toBe(1);
+      model.$apply(function (model) {
+        model.aValue = "someOtherValue";
+      });
+      expect(model.counter).toBe(2);
+    });
 
-  //     expect(() => {
-  //       model.$apply();
-  //     }).toThrow();
+    //   it("should apply expression with full lifecycle", () => {
+    //     let log = "";
+    //     const child = model.$new();
+    //     model.$watch("a", (a) => {
+    //       log += "1";
+    //     });
+    //     child.$apply("$parent.a=0");
+    //     expect(log).toEqual("1");
+    //   });
 
-  //     expect(logs[0]).toBeDefined();
+    //   it("should catch exceptions", () => {
+    //     let log = "";
+    //     const child = model.$new();
+    //     model.$watch("a", (a) => {
+    //       log += "1";
+    //     });
+    //     model.a = 0;
+    //     child.$apply(() => {
+    //       throw new Error("MyError");
+    //     });
+    //     expect(log).toEqual("1");
+    //     expect(logs[0].message).toEqual("MyError");
+    //   });
 
-  //     expect(model.$$phase).toBe(0);
-  //   });
+    //   it("should log exceptions from $digest", () => {
+    //     model.$watch("a", () => {
+    //       model.b++;
+    //     });
+    //     model.$watch("b", () => {
+    //       model.a++;
+    //     });
+    //     model.a = model.b = 0;
 
-  //   describe("exceptions", () => {
-  //     let log;
+    //     expect(() => {
+    //       model.$apply();
+    //     }).toThrow();
 
-  //     beforeEach(() => {
-  //       logs = [];
-  //       log = "";
-  //       model.$watch(() => {
-  //         log += "$digest;";
-  //       });
-  //       model.$digest();
-  //       log = "";
-  //     });
+    //     expect(logs[0]).toBeDefined();
 
-  //     it("should execute and return value and update", () => {
-  //       model.name = "abc";
-  //       expect(model.$apply((scope) => scope.name)).toEqual("abc");
-  //       expect(log).toEqual("$digest;");
-  //       expect(logs).toEqual([]);
-  //     });
+    //     expect(model.$$phase).toBe(0);
+    //   });
 
-  //     it("should catch exception and update", () => {
-  //       const error = new Error("MyError");
-  //       model.$apply(() => {
-  //         throw error;
-  //       });
-  //       expect(log).toEqual("$digest;");
-  //       expect(logs).toEqual([error]);
-  //     });
-  //   });
+    //   describe("exceptions", () => {
+    //     let log;
 
-  //   describe("recursive $apply protection", () => {
-  //     beforeEach(() => (logs = []));
+    //     beforeEach(() => {
+    //       logs = [];
+    //       log = "";
+    //       model.$watch(() => {
+    //         log += "$digest;";
+    //       });
+    //       model.$digest();
+    //       log = "";
+    //     });
 
-  //     it("should throw an exception if $apply is called while an $apply is in progress", () => {
-  //       model.$apply(() => {
-  //         model.$apply();
-  //       });
-  //       expect(logs[0].message.match(/progress/g).length).toBeTruthy();
-  //     });
+    //     it("should execute and return value and update", () => {
+    //       model.name = "abc";
+    //       expect(model.$apply((scope) => scope.name)).toEqual("abc");
+    //       expect(log).toEqual("$digest;");
+    //       expect(logs).toEqual([]);
+    //     });
 
-  //     it("should not clear the state when calling $apply during an $apply", () => {
-  //       model.$apply(() => {
-  //         model.$apply();
-  //         expect(logs[0].message.match(/progress/g).length).toBeTruthy();
-  //         logs = [];
-  //         model.$apply();
-  //         expect(logs[0].message.match(/progress/g).length).toBeTruthy();
-  //       });
-  //       logs = [];
-  //       model.$apply();
-  //       expect(logs).toEqual([]);
-  //     });
+    //     it("should catch exception and update", () => {
+    //       const error = new Error("MyError");
+    //       model.$apply(() => {
+    //         throw error;
+    //       });
+    //       expect(log).toEqual("$digest;");
+    //       expect(logs).toEqual([error]);
+    //     });
+    //   });
 
-  //     it("should throw an exception if $apply is called while flushing evalAsync queue", () => {
-  //       model.$apply(() => {
-  //         model.$evalAsync(() => {
-  //           model.$apply();
-  //         });
-  //       });
-  //       expect(logs[0].message.match(/progress/g).length).toBeTruthy();
-  //     });
+    //   describe("recursive $apply protection", () => {
+    //     beforeEach(() => (logs = []));
 
-  //     it("should throw an exception if $apply is called while a watch is being initialized", () => {
-  //       const childScope1 = model.$new();
-  //       childScope1.$watch("x", () => {
-  //         childScope1.$apply();
-  //       });
-  //       childScope1.$apply();
-  //       expect(logs[0].message.match(/progress/g).length).toBeTruthy();
-  //     });
+    //     it("should throw an exception if $apply is called while an $apply is in progress", () => {
+    //       model.$apply(() => {
+    //         model.$apply();
+    //       });
+    //       expect(logs[0].message.match(/progress/g).length).toBeTruthy();
+    //     });
 
-  //     it("should thrown an exception if $apply in called from a watch fn (after init)", () => {
-  //       const childScope2 = model.$new();
-  //       childScope2.$apply(() => {
-  //         childScope2.$watch("x", (newVal, oldVal) => {
-  //           if (newVal !== oldVal) {
-  //             childScope2.$apply();
-  //           }
-  //         });
-  //       });
-  //       childScope2.$apply(() => {
-  //         childScope2.x = "something";
-  //       });
+    //     it("should not clear the state when calling $apply during an $apply", () => {
+    //       model.$apply(() => {
+    //         model.$apply();
+    //         expect(logs[0].message.match(/progress/g).length).toBeTruthy();
+    //         logs = [];
+    //         model.$apply();
+    //         expect(logs[0].message.match(/progress/g).length).toBeTruthy();
+    //       });
+    //       logs = [];
+    //       model.$apply();
+    //       expect(logs).toEqual([]);
+    //     });
 
-  //       expect(logs[0].message.match(/progress/g).length).toBeTruthy();
-  //     });
-  //   });
-  // });
+    //     it("should throw an exception if $apply is called while flushing evalAsync queue", () => {
+    //       model.$apply(() => {
+    //         model.$evalAsync(() => {
+    //           model.$apply();
+    //         });
+    //       });
+    //       expect(logs[0].message.match(/progress/g).length).toBeTruthy();
+    //     });
+
+    //     it("should throw an exception if $apply is called while a watch is being initialized", () => {
+    //       const childScope1 = model.$new();
+    //       childScope1.$watch("x", () => {
+    //         childScope1.$apply();
+    //       });
+    //       childScope1.$apply();
+    //       expect(logs[0].message.match(/progress/g).length).toBeTruthy();
+    //     });
+
+    //     it("should thrown an exception if $apply in called from a watch fn (after init)", () => {
+    //       const childScope2 = model.$new();
+    //       childScope2.$apply(() => {
+    //         childScope2.$watch("x", (newVal, oldVal) => {
+    //           if (newVal !== oldVal) {
+    //             childScope2.$apply();
+    //           }
+    //         });
+    //       });
+    //       childScope2.$apply(() => {
+    //         childScope2.x = "something";
+    //       });
+
+    //       expect(logs[0].message.match(/progress/g).length).toBeTruthy();
+    //     });
+    //   });
+  });
 
   // describe("$applyAsync", () => {
   //   beforeEach(() => (logs = []));

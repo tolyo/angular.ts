@@ -2311,30 +2311,6 @@ describe("Scope", function () {
     });
   });
 
-  describe("$eval", () => {
-    it("should eval an expression", () => {
-      expect($rootScope.$eval("a=1")).toEqual(1);
-      expect($rootScope.a).toEqual(1);
-
-      $rootScope.$eval((self) => {
-        self.b = 2;
-      });
-      expect($rootScope.b).toEqual(2);
-    });
-
-    it("should allow passing locals to the expression", () => {
-      expect($rootScope.$eval("a+1", { a: 2 })).toBe(3);
-
-      $rootScope.$eval(
-        (scope, locals) => {
-          scope.c = locals.b + 4;
-        },
-        { b: 3 },
-      );
-      expect($rootScope.c).toBe(7);
-    });
-  });
-
   describe("$evalAsync", () => {
     it("should run callback before $watch", () => {
       let log = "";

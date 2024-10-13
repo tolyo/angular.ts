@@ -16,6 +16,11 @@ export function createModel(target?: any, context?: Handler): any | ProxyConstru
  */
 /** @type {AsyncQueueTask[]} */
 export const $$asyncQueue: AsyncQueueTask[];
+export const $$postDigestQueue: any[];
+/**
+ * @type {Function[]}
+ */
+export const $$applyAsyncQueue: Function[];
 export class RootModelProvider {
     rootModel: any;
     $get: (string | ((exceptionHandler: import("../exception-handler").ErrorHandler, parse: import("../parser/parse").ParseService, browser: import("../../services/browser").Browser) => any))[];
@@ -123,10 +128,12 @@ declare class Handler {
     $eval(expr: any, locals: any): any;
     $evalAsync(expr: any, locals: any): void;
     $apply(expr: any): any;
+    $applyAsync(expr: any): void;
     /**
      * @private
      */
     private retry;
+    $$postDigest(fn: any): void;
     $destroy(): void;
     /**
      * @param {number} count

@@ -24,6 +24,12 @@ const $rootModelErr = minErr("$rootModel");
 export const $$asyncQueue = [];
 export const $$postDigestQueue = [];
 
+/**
+ * @type {Function[]}
+ */
+export const $$applyAsyncQueue = [];
+let applyAsyncId = null;
+
 export class RootModelProvider {
   constructor() {
     this.rootModel = createModel();
@@ -385,6 +391,10 @@ class Handler {
         index++;
       }
     });
+
+    $$asyncQueue.forEach((x) => {
+      x.fn(x.handler, x.locals);
+    });
   }
 
   $eval(expr, locals) {
@@ -426,6 +436,18 @@ class Handler {
     }
   }
 
+  $applyAsync(expr) {
+    const scope = this;
+    if (expr) {
+      $$applyAsyncQueue.push(() => scope.$eval(expr));
+    }
+    // TODO: investigate
+    //expr = $parse(expr);
+
+    if (applyAsyncId === null) {
+      applyAsyncId = $browser.defer(flushApplyAsync, null, "$applyAsync");
+    }
+  }
   /**
    * @private
    */
@@ -467,6 +489,11 @@ class Handler {
     const { originalTarget, listenerFn } = listener;
     try {
       listenerFn(newValue, oldValue, originalTarget);
+      $$asyncQueue.forEach((x) => {
+        if (x.handler.$id == this.$id) {
+          x.fn(x.handler, x.locals);
+        }
+      });
     } catch (e) {
       $exceptionHandler(e);
     }
@@ -484,4 +511,15 @@ function getProperty(fn) {
 
   fn(new Proxy({}, handler));
   return path.pop();
+}
+
+function flushApplyAsync() {
+  while ($$applyAsyncQueue.length) {
+    try {
+      $$applyAsyncQueue.shift()();
+    } catch (e) {
+      $exceptionHandler(e);
+    }
+  }
+  applyAsyncId = null;
 }
