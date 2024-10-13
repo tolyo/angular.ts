@@ -1,4 +1,4 @@
-import { $$asyncQueue, Scope } from "./scope";
+import { $$asyncQueue, Scope, ScopePhase } from "./scope";
 import { extend, sliceArgs } from "../../shared/utils";
 import { Angular } from "../../loader";
 import { createInjector } from "../di/injector";
@@ -9,6 +9,7 @@ describe("Scope", function () {
   let $browser;
   let logs;
   let scope;
+  let injector;
 
   beforeEach(() => {
     logs = [];
@@ -23,7 +24,7 @@ describe("Scope", function () {
         };
       });
 
-    let injector = createInjector(["myModule"]);
+    injector = createInjector(["myModule"]);
     $parse = injector.get("$parse");
     $browser = injector.get("$browser");
 
@@ -624,36 +625,27 @@ describe("Scope", function () {
       }
     });
 
-    // it("should prevent infinite loop when creating and resolving a promise in a watched expression", () => {
-    //   module(($rootScopeProvider) => {
-    //     $rootScopeProvider.digestTtl(10);
-    //   });
-    //   () => {
-    //     const d = $q.defer();
+    it("should prevent infinite loop when creating and resolving a promise in a watched expression", () => {
+      let $q = injector.get("$q");
+      const d = $q.defer();
 
-    //     d.resolve("Hello, world.");
-    //     $rootScope.$watch(
-    //       () => {
-    //         const $d2 = $q.defer();
-    //         $d2.resolve("Goodbye.");
-    //         $d2.promise.then(() => {});
-    //         return d.promise;
-    //       },
-    //       () => 0,
-    //     );
+      d.resolve("Hello, world.");
+      $rootScope.$watch(
+        () => {
+          const $d2 = $q.defer();
+          $d2.resolve("Goodbye.");
+          $d2.promise.then(() => {});
+          return d.promise;
+        },
+        () => 0,
+      );
 
-    //     expect(() => {
-    //       $rootScope.$digest();
-    //     }).toThrow(
-    //       "$rootScope",
-    //       "infdig",
-    //       "10 $digest() iterations reached. Aborting!\n" +
-    //         "Watchers fired in the last 5 iterations: []",
-    //     );
+      expect(() => {
+        $rootScope.$digest();
+      }).toThrowError();
 
-    //     expect($rootScope.$$phase).toBeNull();
-    //   });
-    // });
+      expect($rootScope.$$phase).toBe(ScopePhase.NONE);
+    });
 
     it("should not fire upon $watch registration on initial $digest", () => {
       logs = "";

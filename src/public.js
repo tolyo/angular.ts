@@ -260,7 +260,7 @@ export function publishExternalAPI(angular) {
             $parse: ParseProvider,
             $$rAFScheduler: RafSchedulerProvider,
             $rootModel: RootModelProvider,
-            $rootScope: RootScopeProvider,
+            $rootScope: RootModelProvider,
             $routerGlobals: UIRouterGlobals,
             $q: $QProvider,
             $sce: SceProvider,

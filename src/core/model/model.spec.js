@@ -1063,157 +1063,114 @@ describe("Model", () => {
       expect(logs).toEqual("abab");
     });
 
-    // it("should prevent infinite recursion and print watcher expression", () => {
-    //   model.$watch("a", function () {
-    //     model.b++;
+    // it("should prevent infinite loop when creating and resolving a promise in a watched expression", () => {
+    //   module((modelProvider) => {
+    //     modelProvider.digestTtl(10);
     //   });
-    //   model.$watch("b", function () {
-    //     model.a++;
-    //   });
-    //   model.a = model.b = 0;
-    //   expect(function () {
-    //     model.$digest();
-    //   }).toThrow();
+    //   () => {
+    //     const d = $q.defer();
 
-    //   expect(model.$$phase).toBe(0);
-    // });
+    //     d.resolve("Hello, world.");
+    //     model.$watch(
+    //       () => {
+    //         const $d2 = $q.defer();
+    //         $d2.resolve("Goodbye.");
+    //         $d2.promise.then(() => {});
+    //         return d.promise;
+    //       },
+    //       () => 0,
+    //     );
 
-    // it("should prevent infinite recursion and print watcher function name or body", () => {
-    //   model.$watch(
-    //     () => model.a,
-    //     () => {
-    //       model.b++;
-    //     },
-    //   );
-    //   model.$watch(
-    //     () => model.b,
-    //     () => {
-    //       model.a++;
-    //     },
-    //   );
-    //   model.a = model.b = 0;
-
-    //   try {
-    //     model.$digest();
-    //     throw new Error("Should have thrown exception");
-    //   } catch (e) {
-    //     console.error(e);
-    //     expect(e.message.match(/rootScope.a/g).length).toBeTruthy();
-    //     expect(e.message.match(/rootScope.b/g).length).toBeTruthy();
-    //   }
-    // });
-
-    // // it("should prevent infinite loop when creating and resolving a promise in a watched expression", () => {
-    // //   module((modelProvider) => {
-    // //     modelProvider.digestTtl(10);
-    // //   });
-    // //   () => {
-    // //     const d = $q.defer();
-
-    // //     d.resolve("Hello, world.");
-    // //     model.$watch(
-    // //       () => {
-    // //         const $d2 = $q.defer();
-    // //         $d2.resolve("Goodbye.");
-    // //         $d2.promise.then(() => {});
-    // //         return d.promise;
-    // //       },
-    // //       () => 0,
-    // //     );
-
-    // //     expect(() => {
-    // //       model.$digest();
-    // //     }).toThrow(
-    // //       "model",
-    // //       "infdig",
-    // //       "10 $digest() iterations reached. Aborting!\n" +
-    // //         "Watchers fired in the last 5 iterations: []",
-    // //     );
-
-    // //     expect(model.$$phase).toBeNull();
-    // //   });
-    // // });
-
-    // it("should not fire upon $watch registration on initial $digest", () => {
-    //   logs = "";
-    //   model.a = 1;
-    //   model.$watch("a", () => {
-    //     logs += "a";
-    //   });
-    //   model.$watch("b", () => {
-    //     logs += "b";
-    //   });
-    //   model.$digest();
-    //   logs = "";
-    //   model.$digest();
-    //   expect(logs).toEqual("");
-    // });
-
-    // fit("should watch objects", async () => {
-    //   logs = "";
-    //   model.a = [];
-    //   model.b = {};
-    //   model.$watch("a",
-    //     (value) => {
-    //       logs += ".";
-    //       expect(value).toEqual(model.a);
-    //     }
-    //   );
-
-    //   model.$watch((obj) => obj.b,
-    //     (value) => {
-    //       logs += "!";
-    //       expect(value).toEqual(model.b);
-    //     }
-    //   );
-
-    //   model.a.push({});
-    //   model.b.name = "1";
-
-    //   await wait();
-    //   expect(logs).toEqual(".!");
-    // });
-
-    // it("should watch functions", () => {
-    //   model.fn = function () {
-    //     return "a";
-    //   };
-    //   model.$watch("fn", (fn) => {
-    //     logs.push(fn());
-    //   });
-    //   model.$digest();
-    //   expect(logs).toEqual(["a"]);
-    //   model.fn = function () {
-    //     return "b";
-    //   };
-    //   model.$digest();
-    //   expect(logs).toEqual(["a", "b"]);
-    // });
-
-    // it("should prevent $digest recursion", () => {
-    //   let callCount = 0;
-    //   model.$watch("name", () => {
     //     expect(() => {
     //       model.$digest();
-    //     }).toThrowError(/digest already in progress/);
-    //     callCount++;
+    //     }).toThrow(
+    //       "model",
+    //       "infdig",
+    //       "10 $digest() iterations reached. Aborting!\n" +
+    //         "Watchers fired in the last 5 iterations: []",
+    //     );
+
+    //     expect(model.$$phase).toBeNull();
     //   });
-    //   model.name = "a";
-    //   model.$digest();
-    //   expect(callCount).toEqual(1);
     // });
 
-    // it("should allow a watch to be added while in a digest", () => {
-    //   const watch1 = jasmine.createSpy("watch1");
-    //   const watch2 = jasmine.createSpy("watch2");
-    //   model.$watch("foo", () => {
-    //     model.$watch("foo", watch1);
-    //     model.$watch("foo", watch2);
-    //   });
-    //   model.$apply("foo = true");
-    //   expect(watch1).toHaveBeenCalled();
-    //   expect(watch2).toHaveBeenCalled();
-    // });
+    it("should not fire upon $watch registration on initial $digest", async () => {
+      logs = "";
+      model.a = 1;
+      model.$watch("a", () => {
+        logs += "a";
+      });
+      model.$watch("b", () => {
+        logs += "b";
+      });
+      await wait();
+      expect(logs).toEqual("");
+    });
+
+    it("should watch objects", async () => {
+      logs = "";
+      model.a = [];
+      model.b = { c: 2 };
+      model.$watch("a", (value) => {
+        logs += ".";
+        expect(value).toEqual(model.a);
+      });
+      model.$watch("b", (value) => {
+        logs += "!";
+        expect(value).toEqual(model.b);
+      });
+
+      model.a.push({});
+
+      model.b.name = "1";
+
+      await wait();
+      expect(logs).toEqual(".!");
+    });
+
+    it("should watch functions", async () => {
+      model.$watch("fn", (fn) => {
+        logs.push(fn());
+      });
+
+      model.fn = function () {
+        return "a";
+      };
+      await wait();
+      expect(logs).toEqual(["a"]);
+      model.fn = function () {
+        return "b";
+      };
+      await wait();
+      expect(logs).toEqual(["a", "b"]);
+    });
+
+    it("should prevent $digest recursion", async () => {
+      let callCount = 0;
+      model.$watch("name", () => {
+        callCount++;
+        expect(() => {
+          model.$digest();
+        }).toThrowMatching(/Maximum call stack size exceeded/);
+      });
+      model.name = "a";
+      await wait();
+      expect(callCount).toEqual(1);
+    });
+
+    it("should allow a watch to be added while in a digest", async () => {
+      const watch1 = jasmine.createSpy("watch1");
+      const watch2 = jasmine.createSpy("watch2");
+      model.$watch("foo", () => {
+        debugger;
+        model.$watch("foo", watch1);
+        model.$watch("foo", watch2);
+      });
+      model.$apply("foo = true");
+      await wait();
+      expect(watch1).toHaveBeenCalled();
+      expect(watch2).toHaveBeenCalled();
+    });
 
     // it("should not skip watchers when adding new watchers during digest", () => {
     //   const watchFn1 = function () {

@@ -122,6 +122,11 @@ declare class Handler {
     $digest(): void;
     $eval(expr: any, locals: any): any;
     $evalAsync(expr: any, locals: any): void;
+    $apply(expr: any): any;
+    /**
+     * @private
+     */
+    private retry;
     $destroy(): void;
     /**
      * @param {number} count

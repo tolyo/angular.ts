@@ -4,8 +4,58 @@
       <meta charset="utf-8">
       <title>AngularTS</title>
       <link rel="shortcut icon" type="image/png" href="images/favicon.ico">
+      <script src="./dist/angular-ts.umd.js"></script>
+      <script>
+        class Todo {
+          constructor(task) {
+            this.task = task;
+            this.done = false;
+          }
+        }
+        class TodoController {
+          constructor() {
+            this.tasks = [
+              new Todo("Learn AngularTS"),
+              new Todo("Build an AngularTS app"),
+            ];
+          }
+
+          /**
+           * @param {String} task
+           * @return {void}
+           */
+          add(task) {
+            this.tasks.push(new Todo(task));
+          }
+
+          /**
+           * Delete all finished tasks
+           * @return {void}
+           */
+          archive() {
+            this.tasks = this.tasks.filter((task) => !task.done);
+          }
+        }
+        window.angular.module("todo", []).controller("TodoCtrl", TodoController);
+      </script>
     </head>
-    <body>
-      TODO
-    </body>    
+    <body ng-app="todo" ng-cloak>
+      <div ng-controller="TodoCtrl as $ctrl">
+        <h3>Todos</h3>
+        <button ng-click="$ctrl.archive()">Archive</button>
+        <ul>
+          <li ng-repeat="todo in $ctrl.tasks" class="done-{{todo.done}}">
+            {{ todo.task }}
+            <input type="checkbox" ng-click="todo.done = !todo.done" />
+          </li>
+        </ul>
+  
+        <form ng-submit="$ctrl.add(newTodo)">
+          <input type="text" ng-model="newTodo" ng-required="true" />
+          <button type="submit">Add</button>
+        </form>
+      </div>
+      
+      <script type="module" src="./todo-app.js"></script>
+    </body>
 </html>

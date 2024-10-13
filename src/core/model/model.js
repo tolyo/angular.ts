@@ -1,4 +1,4 @@
-import { isUndefined, nextUid } from "../../shared/utils";
+import { isUndefined, nextUid, minErr } from "../../shared/utils";
 
 /**
  * @type {import('../parser/parse').ParseService}
@@ -10,6 +10,8 @@ let $browser;
 
 /**@type {import('../exception-handler').ErrorHandler} */
 let $exceptionHandler;
+
+const $rootModelErr = minErr("$rootModel");
 
 /**
  * @typedef {Object} AsyncQueueTask
@@ -225,6 +227,7 @@ class Handler {
       $new: this.$new.bind(this),
       $destroy: this.$destroy.bind(this),
       $eval: this.$eval.bind(this),
+      $apply: this.$apply.bind(this),
       $evalAsync: this.$evalAsync.bind(this),
       $target: this.$target(),
       $digest: this.$digest.bind(this),
@@ -312,8 +315,11 @@ class Handler {
       watchedValue && watchedValue[isProxySymbol]
         ? watchedValue.$target
         : watchedValue;
+
     const isArray = Array.isArray(value);
-    if (isArray) {
+    const isObject =
+      Object.prototype.toString.call(value) === "[object Object]";
+    if (isArray || isObject) {
       if (this.objectListeners.has(value)) {
         this.objectListeners.get(value).push(key);
       } else {
@@ -372,9 +378,14 @@ class Handler {
    * Invokes all registered listener functions for any watched properties.
    */
   $digest() {
-    Array.from(this.listeners.values()).forEach((list) =>
-      list.forEach(({ listenerFn }) => listenerFn(this.$target)),
-    );
+    this.listeners.forEach((listenerList) => {
+      let index = 0;
+      while (index < listenerList.length) {
+        const { listenerFn } = listenerList[index];
+        listenerFn(this.$target);
+        index++;
+      }
+    });
   }
 
   $eval(expr, locals) {
@@ -404,6 +415,28 @@ class Handler {
     });
 
     //return id;
+  }
+
+  $apply(expr) {
+    try {
+      return this.$eval(expr);
+    } catch (e) {
+      $exceptionHandler(e);
+    } finally {
+      this.retry();
+    }
+  }
+
+  /**
+   * @private
+   */
+  retry() {
+    try {
+      this.$root.$digest();
+    } catch (e) {
+      $exceptionHandler(e);
+      throw e;
+    }
   }
 
   $destroy() {
