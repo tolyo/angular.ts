@@ -1162,7 +1162,6 @@ describe("Model", () => {
       const watch1 = jasmine.createSpy("watch1");
       const watch2 = jasmine.createSpy("watch2");
       model.$watch("foo", () => {
-        debugger;
         model.$watch("foo", watch1);
         model.$watch("foo", watch2);
       });
@@ -1172,7 +1171,7 @@ describe("Model", () => {
       expect(watch2).toHaveBeenCalled();
     });
 
-    // it("should not skip watchers when adding new watchers during digest", () => {
+    // it("should not skip watchers when adding new watchers during digest", async () => {
     //   const watchFn1 = function () {
     //     logs.push(1);
     //   };
@@ -1191,7 +1190,7 @@ describe("Model", () => {
     //   model.$watch(watchFn1, addWatcherOnce);
     //   model.$watch(watchFn2);
 
-    //   model.$digest();
+    //   await wait();
 
     //   expect(logs).toEqual([1, 2, 3, 1, 2, 3]);
     // });
@@ -1280,168 +1279,168 @@ describe("Model", () => {
     //   expect(logs).toEqual([]);
     // });
 
-    // describe("$watch deregistration", () => {
-    //   beforeEach(() => (logs = []));
-    //   it("should return a function that allows listeners to be deregistered", () => {
-    //     const listener = jasmine.createSpy("watch listener");
-    //     let listenerRemove;
+    describe("$watch deregistration", () => {
+      beforeEach(() => (logs = []));
+      it("should return a function that allows listeners to be deregistered", async () => {
+        const listener = jasmine.createSpy("watch listener");
+        let listenerRemove;
 
-    //     listenerRemove = model.$watch("foo", listener);
-    //     model.$digest(); // init
-    //     expect(listener).toHaveBeenCalled();
-    //     expect(listenerRemove).toBeDefined();
+        listenerRemove = model.$watch("foo", listener);
+        model.$digest(); // init
+        expect(listener).toHaveBeenCalled();
+        expect(listenerRemove).toBeDefined();
 
-    //     listener.calls.reset();
-    //     model.foo = "bar";
-    //     model.$digest(); // trigger
-    //     expect(listener).toHaveBeenCalled();
+        listener.calls.reset();
+        model.foo = "bar";
+        await wait();
+        expect(listener).toHaveBeenCalled();
 
-    //     listener.calls.reset();
-    //     model.foo = "baz";
-    //     listenerRemove();
-    //     model.$digest(); // trigger
-    //     expect(listener).not.toHaveBeenCalled();
-    //   });
+        listener.calls.reset();
+        listenerRemove();
+        model.foo = "baz";
+        await wait();
+        expect(listener).not.toHaveBeenCalled();
+      });
 
-    //   it("should allow a watch to be deregistered while in a digest", () => {
-    //     let remove1;
-    //     let remove2;
-    //     model.$watch("remove", () => {
-    //       remove1();
-    //       remove2();
-    //     });
-    //     remove1 = model.$watch("thing", () => {});
-    //     remove2 = model.$watch("thing", () => {});
-    //     expect(() => {
-    //       model.$apply("remove = true");
-    //     }).not.toThrow();
-    //   });
+      it("should allow a watch to be deregistered while in a digest", () => {
+        let remove1;
+        let remove2;
+        model.$watch("remove", () => {
+          remove1();
+          remove2();
+        });
+        remove1 = model.$watch("thing", () => {});
+        remove2 = model.$watch("thing", () => {});
+        expect(() => {
+          model.$apply("remove = true");
+        }).not.toThrow();
+      });
 
-    //   it("should not mess up the digest loop if deregistration happens during digest", () => {
-    //     // we are testing this due to regression #5525 which is related to how the digest loops lastDirtyWatch short-circuiting optimization works
-    //     // scenario: watch1 deregistering watch1
-    //     let scope = model.$new();
-    //     let deregWatch1 = scope.$watch(
-    //       () => {
-    //         logs.push("watch1");
-    //         return "watch1";
-    //       },
-    //       () => {
-    //         deregWatch1();
-    //         logs.push("watchAction1");
-    //       },
-    //     );
-    //     scope.$watch(
-    //       () => {
-    //         logs.push("watch2");
-    //         return "watch2";
-    //       },
-    //       () => logs.push("watchAction2"),
-    //     );
-    //     scope.$watch(
-    //       () => {
-    //         logs.push("watch3");
-    //         return "watch3";
-    //       },
-    //       () => logs.push("watchAction3"),
-    //     );
+      //   it("should not mess up the digest loop if deregistration happens during digest", () => {
+      //     // we are testing this due to regression #5525 which is related to how the digest loops lastDirtyWatch short-circuiting optimization works
+      //     // scenario: watch1 deregistering watch1
+      //     let scope = model.$new();
+      //     let deregWatch1 = scope.$watch(
+      //       () => {
+      //         logs.push("watch1");
+      //         return "watch1";
+      //       },
+      //       () => {
+      //         deregWatch1();
+      //         logs.push("watchAction1");
+      //       },
+      //     );
+      //     scope.$watch(
+      //       () => {
+      //         logs.push("watch2");
+      //         return "watch2";
+      //       },
+      //       () => logs.push("watchAction2"),
+      //     );
+      //     scope.$watch(
+      //       () => {
+      //         logs.push("watch3");
+      //         return "watch3";
+      //       },
+      //       () => logs.push("watchAction3"),
+      //     );
 
-    //     model.$digest();
+      //     model.$digest();
 
-    //     expect(logs).toEqual([
-    //       "watch1",
-    //       "watchAction1",
-    //       "watch2",
-    //       "watchAction2",
-    //       "watch3",
-    //       "watchAction3",
-    //       "watch2",
-    //       "watch3",
-    //     ]);
-    //     scope.$destroy();
-    //     logs = [];
+      //     expect(logs).toEqual([
+      //       "watch1",
+      //       "watchAction1",
+      //       "watch2",
+      //       "watchAction2",
+      //       "watch3",
+      //       "watchAction3",
+      //       "watch2",
+      //       "watch3",
+      //     ]);
+      //     scope.$destroy();
+      //     logs = [];
 
-    //     // scenario: watch1 deregistering watch2
-    //     scope = model.$new();
-    //     scope.$watch(
-    //       () => {
-    //         logs.push("watch1");
-    //         return "watch1";
-    //       },
-    //       () => {
-    //         deregWatch2();
-    //         logs.push("watchAction1");
-    //       },
-    //     );
-    //     let deregWatch2 = scope.$watch(
-    //       () => {
-    //         logs.push("watch2");
-    //         return "watch2";
-    //       },
-    //       () => logs.push("watchAction2"),
-    //     );
-    //     scope.$watch(
-    //       () => {
-    //         logs.push("watch3");
-    //         return "watch3";
-    //       },
-    //       () => logs.push("watchAction3"),
-    //     );
+      //     // scenario: watch1 deregistering watch2
+      //     scope = model.$new();
+      //     scope.$watch(
+      //       () => {
+      //         logs.push("watch1");
+      //         return "watch1";
+      //       },
+      //       () => {
+      //         deregWatch2();
+      //         logs.push("watchAction1");
+      //       },
+      //     );
+      //     let deregWatch2 = scope.$watch(
+      //       () => {
+      //         logs.push("watch2");
+      //         return "watch2";
+      //       },
+      //       () => logs.push("watchAction2"),
+      //     );
+      //     scope.$watch(
+      //       () => {
+      //         logs.push("watch3");
+      //         return "watch3";
+      //       },
+      //       () => logs.push("watchAction3"),
+      //     );
 
-    //     model.$digest();
+      //     model.$digest();
 
-    //     expect(logs).toEqual([
-    //       "watch1",
-    //       "watchAction1",
-    //       "watch3",
-    //       "watchAction3",
-    //       "watch1",
-    //       "watch3",
-    //     ]);
-    //     scope.$destroy();
-    //     logs = [];
+      //     expect(logs).toEqual([
+      //       "watch1",
+      //       "watchAction1",
+      //       "watch3",
+      //       "watchAction3",
+      //       "watch1",
+      //       "watch3",
+      //     ]);
+      //     scope.$destroy();
+      //     logs = [];
 
-    //     // scenario: watch2 deregistering watch1
-    //     scope = model.$new();
-    //     deregWatch1 = scope.$watch(
-    //       () => {
-    //         logs.push("watch1");
-    //         return "watch1";
-    //       },
-    //       () => logs.push("watchAction1"),
-    //     );
-    //     scope.$watch(
-    //       () => {
-    //         logs.push("watch2");
-    //         return "watch2";
-    //       },
-    //       () => {
-    //         deregWatch1();
-    //         logs.push("watchAction2");
-    //       },
-    //     );
-    //     scope.$watch(
-    //       () => {
-    //         logs.push("watch3");
-    //         return "watch3";
-    //       },
-    //       () => logs.push("watchAction3"),
-    //     );
+      //     // scenario: watch2 deregistering watch1
+      //     scope = model.$new();
+      //     deregWatch1 = scope.$watch(
+      //       () => {
+      //         logs.push("watch1");
+      //         return "watch1";
+      //       },
+      //       () => logs.push("watchAction1"),
+      //     );
+      //     scope.$watch(
+      //       () => {
+      //         logs.push("watch2");
+      //         return "watch2";
+      //       },
+      //       () => {
+      //         deregWatch1();
+      //         logs.push("watchAction2");
+      //       },
+      //     );
+      //     scope.$watch(
+      //       () => {
+      //         logs.push("watch3");
+      //         return "watch3";
+      //       },
+      //       () => logs.push("watchAction3"),
+      //     );
 
-    //     model.$digest();
+      //     model.$digest();
 
-    //     expect(logs).toEqual([
-    //       "watch1",
-    //       "watchAction1",
-    //       "watch2",
-    //       "watchAction2",
-    //       "watch3",
-    //       "watchAction3",
-    //       "watch2",
-    //       "watch3",
-    //     ]);
-    //   });
-    // });
+      //     expect(logs).toEqual([
+      //       "watch1",
+      //       "watchAction1",
+      //       "watch2",
+      //       "watchAction2",
+      //       "watch3",
+      //       "watchAction3",
+      //       "watch2",
+      //       "watch3",
+      //     ]);
+      //   });
+    });
 
     // describe("$watchCollection", () => {
     //   describe("constiable", () => {
@@ -2267,6 +2266,22 @@ describe("Model", () => {
       expect(model.b).toEqual(2);
     });
 
+    it("executes $eval'ed function and returns result", function () {
+      model.aValue = 42;
+      var result = model.$eval(function (scope) {
+        return model.aValue;
+      });
+      expect(result).toBe(42);
+    });
+
+    it("passes the second $eval argument straight through", function () {
+      model.aValue = 42;
+      var result = model.$eval(function (scope, arg) {
+        return model.aValue + arg;
+      }, 2);
+      expect(result).toBe(44);
+    });
+
     it("should allow passing locals to the expression", () => {
       expect(model.$eval("a+1", { a: 2 })).toBe(3);
 
@@ -2486,5 +2501,920 @@ describe("Model", () => {
   //   //   model.$digest();
   //   //   expect(this1).toEqual(this2);
   //   // });
+  // });
+
+  // describe("$apply", () => {
+  //   beforeEach(() => (logs = []));
+
+  //   it("should apply expression with full lifecycle", () => {
+  //     let log = "";
+  //     const child = model.$new();
+  //     model.$watch("a", (a) => {
+  //       log += "1";
+  //     });
+  //     child.$apply("$parent.a=0");
+  //     expect(log).toEqual("1");
+  //   });
+
+  //   it("should catch exceptions", () => {
+  //     let log = "";
+  //     const child = model.$new();
+  //     model.$watch("a", (a) => {
+  //       log += "1";
+  //     });
+  //     model.a = 0;
+  //     child.$apply(() => {
+  //       throw new Error("MyError");
+  //     });
+  //     expect(log).toEqual("1");
+  //     expect(logs[0].message).toEqual("MyError");
+  //   });
+
+  //   it("should log exceptions from $digest", () => {
+  //     model.$watch("a", () => {
+  //       model.b++;
+  //     });
+  //     model.$watch("b", () => {
+  //       model.a++;
+  //     });
+  //     model.a = model.b = 0;
+
+  //     expect(() => {
+  //       model.$apply();
+  //     }).toThrow();
+
+  //     expect(logs[0]).toBeDefined();
+
+  //     expect(model.$$phase).toBe(0);
+  //   });
+
+  //   describe("exceptions", () => {
+  //     let log;
+
+  //     beforeEach(() => {
+  //       logs = [];
+  //       log = "";
+  //       model.$watch(() => {
+  //         log += "$digest;";
+  //       });
+  //       model.$digest();
+  //       log = "";
+  //     });
+
+  //     it("should execute and return value and update", () => {
+  //       model.name = "abc";
+  //       expect(model.$apply((scope) => scope.name)).toEqual("abc");
+  //       expect(log).toEqual("$digest;");
+  //       expect(logs).toEqual([]);
+  //     });
+
+  //     it("should catch exception and update", () => {
+  //       const error = new Error("MyError");
+  //       model.$apply(() => {
+  //         throw error;
+  //       });
+  //       expect(log).toEqual("$digest;");
+  //       expect(logs).toEqual([error]);
+  //     });
+  //   });
+
+  //   describe("recursive $apply protection", () => {
+  //     beforeEach(() => (logs = []));
+
+  //     it("should throw an exception if $apply is called while an $apply is in progress", () => {
+  //       model.$apply(() => {
+  //         model.$apply();
+  //       });
+  //       expect(logs[0].message.match(/progress/g).length).toBeTruthy();
+  //     });
+
+  //     it("should not clear the state when calling $apply during an $apply", () => {
+  //       model.$apply(() => {
+  //         model.$apply();
+  //         expect(logs[0].message.match(/progress/g).length).toBeTruthy();
+  //         logs = [];
+  //         model.$apply();
+  //         expect(logs[0].message.match(/progress/g).length).toBeTruthy();
+  //       });
+  //       logs = [];
+  //       model.$apply();
+  //       expect(logs).toEqual([]);
+  //     });
+
+  //     it("should throw an exception if $apply is called while flushing evalAsync queue", () => {
+  //       model.$apply(() => {
+  //         model.$evalAsync(() => {
+  //           model.$apply();
+  //         });
+  //       });
+  //       expect(logs[0].message.match(/progress/g).length).toBeTruthy();
+  //     });
+
+  //     it("should throw an exception if $apply is called while a watch is being initialized", () => {
+  //       const childScope1 = model.$new();
+  //       childScope1.$watch("x", () => {
+  //         childScope1.$apply();
+  //       });
+  //       childScope1.$apply();
+  //       expect(logs[0].message.match(/progress/g).length).toBeTruthy();
+  //     });
+
+  //     it("should thrown an exception if $apply in called from a watch fn (after init)", () => {
+  //       const childScope2 = model.$new();
+  //       childScope2.$apply(() => {
+  //         childScope2.$watch("x", (newVal, oldVal) => {
+  //           if (newVal !== oldVal) {
+  //             childScope2.$apply();
+  //           }
+  //         });
+  //       });
+  //       childScope2.$apply(() => {
+  //         childScope2.x = "something";
+  //       });
+
+  //       expect(logs[0].message.match(/progress/g).length).toBeTruthy();
+  //     });
+  //   });
+  // });
+
+  // describe("$applyAsync", () => {
+  //   beforeEach(() => (logs = []));
+  //   it("should evaluate in the context of specific $scope", () => {
+  //     const scope = model.$new();
+  //     let id = scope.$applyAsync('x = "CODE ORANGE"');
+
+  //     $browser.cancel(id);
+  //     setTimeout(() => {
+  //       expect(scope.x).toBe("CODE ORANGE");
+  //       expect(model.x).toBeUndefined();
+  //     });
+
+  //     expect(scope.x).toBeUndefined();
+  //   });
+
+  //   it("should evaluate queued expressions in order", () => {
+  //     model.x = [];
+  //     let id1 = model.$applyAsync('x.push("expr1")');
+  //     let id2 = model.$applyAsync('x.push("expr2")');
+
+  //     $browser.cancel(id1);
+  //     $browser.cancel(id2);
+  //     setTimeout(() => {
+  //       expect(model.x).toEqual(["expr1", "expr2"]);
+  //     });
+  //     expect(model.x).toEqual([]);
+  //   });
+
+  //   it("should evaluate subsequently queued items in same turn", () => {
+  //     model.x = [];
+  //     let id = model.$applyAsync(() => {
+  //       model.x.push("expr1");
+  //       model.$applyAsync('x.push("expr2")');
+  //       expect($browser.deferredFns.length).toBe(0);
+  //     });
+
+  //     $browser.cancel(id);
+  //     setTimeout(() => {
+  //       expect(model.x).toEqual(["expr1", "expr2"]);
+  //     });
+  //     expect(model.x).toEqual([]);
+  //   });
+
+  //   it("should pass thrown exceptions to $exceptionHandler", () => {
+  //     let id = model.$applyAsync(() => {
+  //       throw "OOPS";
+  //     });
+
+  //     $browser.cancel(id);
+  //     expect(logs).toEqual([]);
+  //     setTimeout(() => expect(logs[0]).toEqual("OOPS"));
+  //   });
+
+  //   it("should evaluate subsequent expressions after an exception is thrown", () => {
+  //     let id = model.$applyAsync(() => {
+  //       throw "OOPS";
+  //     });
+  //     let id2 = model.$applyAsync('x = "All good!"');
+
+  //     $browser.cancel(id);
+  //     $browser.cancel(id2);
+  //     setTimeout(() => expect(model.x).toBe("All good!"));
+  //     expect(model.x).toBeUndefined();
+  //   });
+
+  //   it("should be cancelled if a model digest occurs before the next tick", () => {
+  //     const cancel = spyOn($browser, "cancel").and.callThrough();
+  //     const expression = jasmine.createSpy("expr");
+
+  //     model.$applyAsync(expression);
+  //     model.$digest();
+  //     expect(expression).toHaveBeenCalled();
+  //     expect(cancel).toHaveBeenCalled();
+  //     expression.calls.reset();
+  //     cancel.calls.reset();
+
+  //     // assert that another digest won't call the function again
+  //     model.$digest();
+  //     expect(expression).not.toHaveBeenCalled();
+  //     expect(cancel).not.toHaveBeenCalled();
+  //   });
+  // });
+
+  // describe("$$postDigest", () => {
+  //   beforeEach(() => (logs = []));
+  //   it("should process callbacks as a queue (FIFO) when the scope is digested", () => {
+  //     let signature = "";
+
+  //     model.$$postDigest(() => {
+  //       signature += "A";
+  //       model.$$postDigest(() => {
+  //         signature += "D";
+  //       });
+  //     });
+
+  //     model.$$postDigest(() => {
+  //       signature += "B";
+  //     });
+
+  //     model.$$postDigest(() => {
+  //       signature += "C";
+  //     });
+
+  //     expect(signature).toBe("");
+  //     model.$digest();
+  //     expect(signature).toBe("ABCD");
+  //   });
+
+  //   it("should support $apply calls nested in $$postDigest callbacks", () => {
+  //     let signature = "";
+
+  //     model.$$postDigest(() => {
+  //       signature += "A";
+  //     });
+
+  //     model.$$postDigest(() => {
+  //       signature += "B";
+  //       model.$apply();
+  //       signature += "D";
+  //     });
+
+  //     model.$$postDigest(() => {
+  //       signature += "C";
+  //     });
+
+  //     expect(signature).toBe("");
+  //     model.$digest();
+  //     expect(signature).toBe("ABCD");
+  //   });
+
+  //   it("should run a $$postDigest call on all child scopes when a parent scope is digested", () => {
+  //     const parent = model.$new();
+  //     const child = parent.$new();
+  //     let count = 0;
+
+  //     model.$$postDigest(() => {
+  //       count++;
+  //     });
+
+  //     parent.$$postDigest(() => {
+  //       count++;
+  //     });
+
+  //     child.$$postDigest(() => {
+  //       count++;
+  //     });
+
+  //     expect(count).toBe(0);
+  //     model.$digest();
+  //     expect(count).toBe(3);
+  //   });
+
+  //   it("should run a $$postDigest call even if the child scope is isolated", () => {
+  //     const parent = model.$new();
+  //     const child = parent.$new(true);
+  //     let signature = "";
+
+  //     parent.$$postDigest(() => {
+  //       signature += "A";
+  //     });
+
+  //     child.$$postDigest(() => {
+  //       signature += "B";
+  //     });
+
+  //     expect(signature).toBe("");
+  //     model.$digest();
+  //     expect(signature).toBe("AB");
+  //   });
+  // });
+
+  // describe("events", () => {
+  //   describe("$on", () => {
+  //     it("should add listener for both $emit and $broadcast events", () => {
+  //       logs = "";
+  //       const child = model.$new();
+
+  //       function eventFn() {
+  //         logs += "X";
+  //       }
+
+  //       child.$on("abc", eventFn);
+  //       expect(logs).toEqual("");
+
+  //       child.$emit("abc");
+  //       expect(logs).toEqual("X");
+
+  //       child.$broadcast("abc");
+  //       expect(logs).toEqual("XX");
+  //     });
+
+  //     it("should increment ancestor $$listenerCount entries", () => {
+  //       const child1 = model.$new();
+  //       const child2 = child1.$new();
+  //       const spy = jasmine.createSpy();
+
+  //       model.$on("event1", spy);
+  //       expect(model.$$listenerCount.event1).toEqual(1);
+
+  //       child1.$on("event1", spy);
+  //       expect(model.$$listenerCount.event1).toEqual(2);
+  //       expect(child1.$$listenerCount.event1).toEqual(1);
+
+  //       child2.$on("event2", spy);
+  //       expect(model.$$listenerCount.event1).toEqual(2);
+  //       expect(model.$$listenerCount.event2).toEqual(1);
+  //       expect(child1.$$listenerCount.event1).toEqual(1);
+  //       expect(child1.$$listenerCount.event2).toEqual(1);
+  //       expect(child2.$$listenerCount.event2).toEqual(1);
+  //     });
+
+  //     describe("deregistration", () => {
+  //       it("should return a function that deregisters the listener", () => {
+  //         let log = "";
+  //         const child = model.$new();
+  //         let listenerRemove;
+
+  //         function eventFn() {
+  //           log += "X";
+  //         }
+
+  //         listenerRemove = child.$on("abc", eventFn);
+  //         expect(log).toEqual("");
+  //         expect(listenerRemove).toBeDefined();
+
+  //         child.$emit("abc");
+  //         child.$broadcast("abc");
+  //         expect(log).toEqual("XX");
+  //         expect(model.$$listenerCount.abc).toBe(1);
+
+  //         log = "";
+  //         listenerRemove();
+  //         child.$emit("abc");
+  //         child.$broadcast("abc");
+  //         expect(log).toEqual("");
+  //         expect(model.$$listenerCount.abc).toBeUndefined();
+  //       });
+
+  //       // See issue https://github.com/angular/angular.js/issues/16135
+  //       it("should deallocate the listener array entry", () => {
+  //         const remove1 = model.$on("abc", () => {});
+  //         model.$on("abc", () => {});
+
+  //         expect(model.$$listeners.get("abc").length).toBe(2);
+  //         expect(0 in model.$$listeners.get("abc")).toBe(true);
+
+  //         remove1();
+
+  //         expect(model.$$listeners.get("abc").length).toBe(2);
+  //         expect(0 in model.$$listeners.get("abc")).toBe(false);
+  //       });
+
+  //       it("should call next listener after removing the current listener via its own handler", () => {
+  //         const listener1 = jasmine.createSpy("listener1").and.callFake(() => {
+  //           remove1();
+  //         });
+  //         let remove1 = model.$on("abc", listener1);
+
+  //         const listener2 = jasmine.createSpy("listener2");
+  //         const remove2 = model.$on("abc", listener2);
+
+  //         const listener3 = jasmine.createSpy("listener3");
+  //         const remove3 = model.$on("abc", listener3);
+
+  //         model.$broadcast("abc");
+  //         expect(listener1).toHaveBeenCalled();
+  //         expect(listener2).toHaveBeenCalled();
+  //         expect(listener3).toHaveBeenCalled();
+
+  //         listener1.calls.reset();
+  //         listener2.calls.reset();
+  //         listener3.calls.reset();
+
+  //         model.$broadcast("abc");
+  //         expect(listener1).not.toHaveBeenCalled();
+  //         expect(listener2).toHaveBeenCalled();
+  //         expect(listener3).toHaveBeenCalled();
+  //       });
+
+  //       it("should call all subsequent listeners when a previous listener is removed via a handler", () => {
+  //         const listener1 = jasmine.createSpy();
+  //         const remove1 = model.$on("abc", listener1);
+
+  //         const listener2 = jasmine.createSpy().and.callFake(remove1);
+  //         const remove2 = model.$on("abc", listener2);
+
+  //         const listener3 = jasmine.createSpy();
+  //         const remove3 = model.$on("abc", listener3);
+
+  //         model.$broadcast("abc");
+  //         expect(listener1).toHaveBeenCalled();
+  //         expect(listener2).toHaveBeenCalled();
+  //         expect(listener3).toHaveBeenCalled();
+
+  //         listener1.calls.reset();
+  //         listener2.calls.reset();
+  //         listener3.calls.reset();
+
+  //         model.$broadcast("abc");
+  //         expect(listener1).not.toHaveBeenCalled();
+  //         expect(listener2).toHaveBeenCalled();
+  //         expect(listener3).toHaveBeenCalled();
+  //       });
+
+  //       it("should not call listener when removed by previous", () => {
+  //         const listener1 = jasmine.createSpy("listener1");
+  //         const remove1 = model.$on("abc", listener1);
+
+  //         const listener2 = jasmine.createSpy("listener2").and.callFake(() => {
+  //           remove3();
+  //         });
+  //         const remove2 = model.$on("abc", listener2);
+
+  //         const listener3 = jasmine.createSpy("listener3");
+  //         let remove3 = model.$on("abc", listener3);
+
+  //         const listener4 = jasmine.createSpy("listener4");
+  //         const remove4 = model.$on("abc", listener4);
+
+  //         model.$broadcast("abc");
+  //         expect(listener1).toHaveBeenCalled();
+  //         expect(listener2).toHaveBeenCalled();
+  //         expect(listener3).not.toHaveBeenCalled();
+  //         expect(listener4).toHaveBeenCalled();
+
+  //         listener1.calls.reset();
+  //         listener2.calls.reset();
+  //         listener3.calls.reset();
+  //         listener4.calls.reset();
+
+  //         model.$broadcast("abc");
+  //         expect(listener1).toHaveBeenCalled();
+  //         expect(listener2).toHaveBeenCalled();
+  //         expect(listener3).not.toHaveBeenCalled();
+  //         expect(listener4).toHaveBeenCalled();
+  //       });
+
+  //       it("should decrement ancestor $$listenerCount entries", () => {
+  //         const child1 = model.$new();
+  //         const child2 = child1.$new();
+  //         const spy = jasmine.createSpy();
+
+  //         model.$on("event1", spy);
+  //         expect(model.$$listenerCount.event1).toEqual(1);
+
+  //         child1.$on("event1", spy);
+  //         expect(model.$$listenerCount.event1).toEqual(2);
+  //         expect(child1.$$listenerCount.event1).toEqual(1);
+
+  //         const deregisterEvent2Listener = child2.$on("event2", spy);
+  //         expect(model.$$listenerCount.event1).toEqual(2);
+  //         expect(model.$$listenerCount.event2).toEqual(1);
+  //         expect(child1.$$listenerCount.event1).toEqual(1);
+  //         expect(child1.$$listenerCount.event2).toEqual(1);
+  //         expect(child2.$$listenerCount.event2).toEqual(1);
+
+  //         deregisterEvent2Listener();
+
+  //         expect(model.$$listenerCount.event1).toEqual(2);
+  //         expect(child1.$$listenerCount.event1).toEqual(1);
+  //         expect(child2.$$listenerCount).toBeTruthy();
+  //       });
+
+  //       it("should not decrement $$listenerCount when called second time", () => {
+  //         const child = model.$new();
+  //         const listener1Spy = jasmine.createSpy();
+  //         const listener2Spy = jasmine.createSpy();
+
+  //         child.$on("abc", listener1Spy);
+  //         expect(model.$$listenerCount.abc).toEqual(1);
+  //         expect(child.$$listenerCount.abc).toEqual(1);
+
+  //         const deregisterEventListener = child.$on("abc", listener2Spy);
+  //         expect(model.$$listenerCount.abc).toEqual(2);
+  //         expect(child.$$listenerCount.abc).toEqual(2);
+
+  //         deregisterEventListener();
+
+  //         expect(model.$$listenerCount.abc).toEqual(1);
+  //         expect(child.$$listenerCount.abc).toEqual(1);
+
+  //         deregisterEventListener();
+
+  //         expect(model.$$listenerCount.abc).toEqual(1);
+  //         expect(child.$$listenerCount.abc).toEqual(1);
+  //       });
+  //     });
+  //   });
+
+  //   describe("$emit", () => {
+  //     let log;
+  //     let child;
+  //     let grandChild;
+  //     let greatGrandChild;
+
+  //     function logger(event) {
+  //       log += `${event.currentScope.id}>`;
+  //     }
+
+  //     beforeEach(() => {
+  //       log = "";
+  //       logs = [];
+  //       child = model.$new();
+  //       grandChild = child.$new();
+  //       greatGrandChild = grandChild.$new();
+
+  //       model.id = 0;
+  //       child.id = 1;
+  //       grandChild.id = 2;
+  //       greatGrandChild.id = 3;
+
+  //       model.$on("myEvent", logger);
+  //       child.$on("myEvent", logger);
+  //       grandChild.$on("myEvent", logger);
+  //       greatGrandChild.$on("myEvent", logger);
+  //     });
+
+  //     it("should bubble event up to the root scope", () => {
+  //       grandChild.$emit("myEvent");
+  //       expect(log).toEqual("2>1>0>");
+  //     });
+
+  //     it("should allow all events on the same scope to run even if stopPropagation is called", () => {
+  //       child.$on("myEvent", logger);
+  //       grandChild.$on("myEvent", (e) => {
+  //         e.stopPropagation();
+  //       });
+  //       grandChild.$on("myEvent", logger);
+  //       grandChild.$on("myEvent", logger);
+  //       grandChild.$emit("myEvent");
+  //       expect(log).toEqual("2>2>2>");
+  //     });
+
+  //     it("should dispatch exceptions to the $exceptionHandler", () => {
+  //       child.$on("myEvent", () => {
+  //         throw "bubbleException";
+  //       });
+  //       grandChild.$emit("myEvent");
+  //       expect(log).toEqual("2>1>0>");
+  //       expect(logs).toEqual(["bubbleException"]);
+  //     });
+
+  //     it("should allow stopping event propagation", () => {
+  //       child.$on("myEvent", (event) => {
+  //         event.stopPropagation();
+  //       });
+  //       grandChild.$emit("myEvent");
+  //       expect(log).toEqual("2>1>");
+  //     });
+
+  //     it("should forward method arguments", () => {
+  //       child.$on("abc", (event, arg1, arg2) => {
+  //         expect(event.name).toBe("abc");
+  //         expect(arg1).toBe("arg1");
+  //         expect(arg2).toBe("arg2");
+  //       });
+  //       child.$emit("abc", "arg1", "arg2");
+  //     });
+
+  //     it("should allow removing event listener inside a listener on $emit", () => {
+  //       const spy1 = jasmine.createSpy("1st listener");
+  //       const spy2 = jasmine.createSpy("2nd listener");
+  //       const spy3 = jasmine.createSpy("3rd listener");
+
+  //       const remove1 = child.$on("evt", spy1);
+  //       const remove2 = child.$on("evt", spy2);
+  //       const remove3 = child.$on("evt", spy3);
+
+  //       spy1.and.callFake(remove1);
+
+  //       expect(child.$$listeners.get("evt").length).toBe(3);
+
+  //       // should call all listeners and remove 1st
+  //       child.$emit("evt");
+  //       expect(spy1).toHaveBeenCalled();
+  //       expect(spy2).toHaveBeenCalled();
+  //       expect(spy3).toHaveBeenCalled();
+  //       expect(child.$$listeners.get("evt").length).toBe(3); // cleanup will happen on next $emit
+
+  //       spy1.calls.reset();
+  //       spy2.calls.reset();
+  //       spy3.calls.reset();
+
+  //       // should call only 2nd because 1st was already removed and 2nd removes 3rd
+  //       spy2.and.callFake(remove3);
+  //       child.$emit("evt");
+  //       expect(spy1).not.toHaveBeenCalled();
+  //       expect(spy2).toHaveBeenCalled();
+  //       expect(spy3).not.toHaveBeenCalled();
+  //       expect(child.$$listeners.get("evt").length).toBe(1);
+  //     });
+
+  //     it("should allow removing event listener inside a listener on $broadcast", () => {
+  //       const spy1 = jasmine.createSpy("1st listener");
+  //       const spy2 = jasmine.createSpy("2nd listener");
+  //       const spy3 = jasmine.createSpy("3rd listener");
+
+  //       const remove1 = child.$on("evt", spy1);
+  //       const remove2 = child.$on("evt", spy2);
+  //       const remove3 = child.$on("evt", spy3);
+
+  //       spy1.and.callFake(remove1);
+
+  //       expect(child.$$listeners.get("evt").length).toBe(3);
+
+  //       // should call all listeners and remove 1st
+  //       child.$broadcast("evt");
+  //       expect(spy1).toHaveBeenCalled();
+  //       expect(spy2).toHaveBeenCalled();
+  //       expect(spy3).toHaveBeenCalled();
+  //       expect(child.$$listeners.get("evt").length).toBe(3); // cleanup will happen on next $broadcast
+
+  //       spy1.calls.reset();
+  //       spy2.calls.reset();
+  //       spy3.calls.reset();
+
+  //       // should call only 2nd because 1st was already removed and 2nd removes 3rd
+  //       spy2.and.callFake(remove3);
+  //       child.$broadcast("evt");
+  //       expect(spy1).not.toHaveBeenCalled();
+  //       expect(spy2).toHaveBeenCalled();
+  //       expect(spy3).not.toHaveBeenCalled();
+  //       expect(child.$$listeners.get("evt").length).toBe(1);
+  //     });
+
+  //     describe("event object", () => {
+  //       it("should have methods/properties", () => {
+  //         let eventFired = false;
+
+  //         child.$on("myEvent", (e) => {
+  //           expect(e.targetScope).toBe(grandChild);
+  //           expect(e.currentScope).toBe(child);
+  //           expect(e.name).toBe("myEvent");
+  //           eventFired = true;
+  //         });
+  //         grandChild.$emit("myEvent");
+  //         expect(eventFired).toBe(true);
+  //       });
+
+  //       it("should have its `currentScope` property set to null after emit", () => {
+  //         let event;
+
+  //         child.$on("myEvent", (e) => {
+  //           event = e;
+  //         });
+  //         grandChild.$emit("myEvent");
+
+  //         expect(event.currentScope).toBe(null);
+  //         expect(event.targetScope).toBe(grandChild);
+  //         expect(event.name).toBe("myEvent");
+  //       });
+
+  //       it("should have preventDefault method and defaultPrevented property", () => {
+  //         let event = grandChild.$emit("myEvent");
+  //         expect(event.defaultPrevented).toBe(false);
+
+  //         child.$on("myEvent", (event) => {
+  //           event.preventDefault();
+  //         });
+  //         event = grandChild.$emit("myEvent");
+  //         expect(event.defaultPrevented).toBe(true);
+  //         expect(event.currentScope).toBe(null);
+  //       });
+  //     });
+  //   });
+
+  //   describe("$broadcast", () => {
+  //     describe("event propagation", () => {
+  //       let log;
+  //       let child1;
+  //       let child2;
+  //       let child3;
+  //       let grandChild11;
+  //       let grandChild21;
+  //       let grandChild22;
+  //       let grandChild23;
+  //       let greatGrandChild211;
+
+  //       function logger(event) {
+  //         log += `${event.currentScope.id}>`;
+  //       }
+
+  //       beforeEach(() => {
+  //         log = "";
+  //         child1 = model.$new();
+  //         child2 = model.$new();
+  //         child3 = model.$new();
+  //         grandChild11 = child1.$new();
+  //         grandChild21 = child2.$new();
+  //         grandChild22 = child2.$new();
+  //         grandChild23 = child2.$new();
+  //         greatGrandChild211 = grandChild21.$new();
+
+  //         model.id = 0;
+  //         child1.id = 1;
+  //         child2.id = 2;
+  //         child3.id = 3;
+  //         grandChild11.id = 11;
+  //         grandChild21.id = 21;
+  //         grandChild22.id = 22;
+  //         grandChild23.id = 23;
+  //         greatGrandChild211.id = 211;
+
+  //         model.$on("myEvent", logger);
+  //         child1.$on("myEvent", logger);
+  //         child2.$on("myEvent", logger);
+  //         child3.$on("myEvent", logger);
+  //         grandChild11.$on("myEvent", logger);
+  //         grandChild21.$on("myEvent", logger);
+  //         grandChild22.$on("myEvent", logger);
+  //         grandChild23.$on("myEvent", logger);
+  //         greatGrandChild211.$on("myEvent", logger);
+
+  //         //          R
+  //         //       /  |   \
+  //         //     1    2    3
+  //         //    /   / | \
+  //         //   11  21 22 23
+  //         //       |
+  //         //      211
+  //       });
+
+  //       it("should broadcast an event from the root scope", () => {
+  //         model.$broadcast("myEvent");
+  //         expect(log).toBe("0>1>11>2>21>211>22>23>3>");
+  //       });
+
+  //       it("should broadcast an event from a child scope", () => {
+  //         child2.$broadcast("myEvent");
+  //         expect(log).toBe("2>21>211>22>23>");
+  //       });
+
+  //       it("should broadcast an event from a leaf scope with a sibling", () => {
+  //         grandChild22.$broadcast("myEvent");
+  //         expect(log).toBe("22>");
+  //       });
+
+  //       it("should broadcast an event from a leaf scope without a sibling", () => {
+  //         grandChild23.$broadcast("myEvent");
+  //         expect(log).toBe("23>");
+  //       });
+
+  //       it("should not not fire any listeners for other events", () => {
+  //         model.$broadcast("fooEvent");
+  //         expect(log).toBe("");
+  //       });
+
+  //       it("should not descend past scopes with a $$listerCount of 0 or undefined", () => {
+  //         const EVENT = "fooEvent";
+  //         const spy = jasmine.createSpy("listener");
+
+  //         // Precondition: There should be no listeners for fooEvent.
+  //         expect(model.$$listenerCount[EVENT]).toBeUndefined();
+
+  //         // Add a spy listener to a child scope.
+  //         model.$$childHead.$$listeners[EVENT] = [spy];
+
+  //         // model's count for 'fooEvent' is undefined, so spy should not be called.
+  //         model.$broadcast(EVENT);
+  //         expect(spy).not.toHaveBeenCalled();
+  //       });
+
+  //       it("should return event object", () => {
+  //         const result = child1.$broadcast("some");
+
+  //         expect(result).toBeDefined();
+  //         expect(result.name).toBe("some");
+  //         expect(result.targetScope).toBe(child1);
+  //       });
+  //     });
+
+  //     describe("listener", () => {
+  //       it("should receive event object", () => {
+  //         const scope = model;
+  //         const child = scope.$new();
+  //         let eventFired = false;
+
+  //         child.$on("fooEvent", (event) => {
+  //           eventFired = true;
+  //           expect(event.name).toBe("fooEvent");
+  //           expect(event.targetScope).toBe(scope);
+  //           expect(event.currentScope).toBe(child);
+  //         });
+  //         scope.$broadcast("fooEvent");
+
+  //         expect(eventFired).toBe(true);
+  //       });
+
+  //       it("should have the event's `currentScope` property set to null after broadcast", () => {
+  //         const scope = model;
+  //         const child = scope.$new();
+  //         let event;
+
+  //         child.$on("fooEvent", (e) => {
+  //           event = e;
+  //         });
+  //         scope.$broadcast("fooEvent");
+
+  //         expect(event.name).toBe("fooEvent");
+  //         expect(event.targetScope).toBe(scope);
+  //         expect(event.currentScope).toBe(null);
+  //       });
+
+  //       it("should support passing messages as constargs", () => {
+  //         const scope = model;
+  //         const child = scope.$new();
+  //         let args;
+
+  //         child.$on("fooEvent", function () {
+  //           args = arguments;
+  //         });
+  //         scope.$broadcast("fooEvent", "do", "re", "me", "fa");
+
+  //         expect(args.length).toBe(5);
+  //         expect(sliceArgs(args, 1)).toEqual(["do", "re", "me", "fa"]);
+  //       });
+  //     });
+  //   });
+
+  //   it("should allow recursive $emit/$broadcast", () => {
+  //     let callCount = 0;
+  //     model.$on("evt", ($event, arg0) => {
+  //       callCount++;
+  //       if (arg0 !== 1234) {
+  //         model.$emit("evt", 1234);
+  //         model.$broadcast("evt", 1234);
+  //       }
+  //     });
+
+  //     model.$emit("evt");
+  //     model.$broadcast("evt");
+  //     expect(callCount).toBe(6);
+  //   });
+
+  //   it("should allow recursive $emit/$broadcast between parent/child", () => {
+  //     const child = model.$new();
+  //     let calls = "";
+
+  //     model.$on("evt", ($event, arg0) => {
+  //       calls += "r"; // For "root".
+  //       if (arg0 === "fromChild") {
+  //         model.$broadcast("evt", "fromRoot2");
+  //       }
+  //     });
+
+  //     child.$on("evt", ($event, arg0) => {
+  //       calls += "c"; // For "child".
+  //       if (arg0 === "fromRoot1") {
+  //         child.$emit("evt", "fromChild");
+  //       }
+  //     });
+
+  //     model.$broadcast("evt", "fromRoot1");
+  //     expect(calls).toBe("rccrrc");
+  //   });
+  // });
+
+  // describe("doc examples", () => {
+  //   it("should properly fire off watch listeners upon scope changes", () => {
+  //     // <docs tag="docs1">
+  //     const scope = model.$new();
+  //     scope.salutation = "Hello";
+  //     scope.name = "World";
+
+  //     expect(scope.greeting).toEqual(undefined);
+
+  //     scope.$watch("name", () => {
+  //       scope.greeting = `${scope.salutation} ${scope.name}!`;
+  //     }); // initialize the watch
+
+  //     expect(scope.greeting).toEqual(undefined);
+  //     scope.name = "Misko";
+  //     // still old value, since watches have not been called yet
+  //     expect(scope.greeting).toEqual(undefined);
+
+  //     scope.$digest(); // fire all  the watches
+  //     expect(scope.greeting).toEqual("Hello Misko!");
+  //     // </docs>
+  //   });
   // });
 });

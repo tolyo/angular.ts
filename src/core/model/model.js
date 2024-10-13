@@ -22,6 +22,7 @@ const $rootModelErr = minErr("$rootModel");
 
 /** @type {AsyncQueueTask[]} */
 export const $$asyncQueue = [];
+export const $$postDigestQueue = [];
 
 export class RootModelProvider {
   constructor() {
@@ -220,8 +221,9 @@ class Handler {
    * @returns {*} - The value of the property or a method if accessing `watch` or `sync`.
    */
   get(target, property, proxy) {
-    if (property === isProxySymbol) return true;
+    this.proxy = proxy;
 
+    if (property === isProxySymbol) return true;
     const propertyMap = {
       $watch: this.$watch.bind(this),
       $new: this.$new.bind(this),
@@ -229,6 +231,7 @@ class Handler {
       $eval: this.$eval.bind(this),
       $apply: this.$apply.bind(this),
       $evalAsync: this.$evalAsync.bind(this),
+      $$postDigest: this.$$postDigest.bind(this),
       $target: this.$target(),
       $digest: this.$digest.bind(this),
       $handler: this,
@@ -238,10 +241,6 @@ class Handler {
       $$watchersCount: this.$$watchersCount,
     };
 
-    // Store the proxy reference when the property is "$watch"
-    if (property === "$watch") this.proxy = proxy;
-
-    // Return from the property map if found, else return the original property from target
     return Object.prototype.hasOwnProperty.call(propertyMap, property)
       ? propertyMap[property]
       : target[property];
@@ -437,6 +436,10 @@ class Handler {
       $exceptionHandler(e);
       throw e;
     }
+  }
+
+  $$postDigest(fn) {
+    $$postDigestQueue.push(fn);
   }
 
   $destroy() {
