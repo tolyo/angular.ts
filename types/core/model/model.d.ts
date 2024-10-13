@@ -14,8 +14,6 @@ export function createModel(target?: any, context?: Handler): any | ProxyConstru
  * @property {Function} fn
  * @property {Object} locals
  */
-/** @type {AsyncQueueTask[]} */
-export const $$asyncQueue: AsyncQueueTask[];
 export const $$postDigestQueue: any[];
 /**
  * @type {Function[]}
@@ -44,6 +42,7 @@ export type Listener = {
     listenerFn: ListenerFunction;
     id: number;
     oneTime: boolean;
+    property: string;
 };
 /**
  * Listener function type.
@@ -83,6 +82,8 @@ declare class Handler {
     $parent: Handler;
     /** @type {number} */
     $$watchersCount: number;
+    /** @type {AsyncQueueTask[]} */
+    $$asyncQueue: AsyncQueueTask[];
     /**
      * Intercepts and handles property assignments on the target object. If a new value is
      * an object, it will be recursively proxied.
@@ -104,6 +105,13 @@ declare class Handler {
      * @returns {*} - The value of the property or a method if accessing `watch` or `sync`.
      */
     get(target: any, property: string | number | symbol, proxy: ProxyConstructor): any;
+    /**
+     * @private
+     * @param {Listener[]} listeners
+     * @param {*} oldValue
+     * @param {*} newValue
+     */
+    private scheduleListener;
     deleteProperty(target: any, property: any): boolean;
     /**
      * Returns the underlying object being wrapped by the Proxy
@@ -118,6 +126,7 @@ declare class Handler {
      * @param {ListenerFunction} listenerFn - A function to execute when changes are detected.
      */
     $watch(watchProp: ((any: any) => any), listenerFn: ListenerFunction): () => void;
+    $watchGroup(obj: any, listenerFn: any): void;
     $new(isIsolated: boolean, parent: any): any;
     registerKey(key: any, listener: any): void;
     deregisterKey(key: any, id: any): boolean;
@@ -140,12 +149,12 @@ declare class Handler {
      */
     incrementWatchersCount(count: number): void;
     /**
-     * Invokes the registered listener function when a watched property changes.
+     * Invokes the registered listener function with watched property changes.
      *
      * @param {Listener} listener - The property path that was changed.
      * @param {*} oldValue - The old value of the property.
      * @param {*} newValue - The new value of the property.
      */
-    notifyListeners(listener: Listener, oldValue: any, newValue: any): void;
+    notifyListener(listener: Listener, oldValue: any, newValue: any): void;
 }
 export {};

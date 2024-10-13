@@ -75,7 +75,6 @@ import { LocationProvider } from "./core/location/location";
 import { LogProvider } from "./services/log";
 import { ParseProvider } from "./core/parser/parse";
 import { RootModelProvider } from "./core/model/model.js";
-import { RootScopeProvider } from "./core/scope/scope";
 import { $QProvider } from "./core/q/q";
 import { SceProvider, SceDelegateProvider } from "./core/sce/sce";
 import { TaskTrackerFactoryProvider } from "./core/task-tracker-factory";

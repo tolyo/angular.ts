@@ -299,10 +299,14 @@ describe("Model", () => {
     );
     model.aValue = "2";
     await wait();
-    expect(model.counter).toBe(0);
+    expect(model.counter).toBe(1);
     model.aValue = "3";
     await wait();
-    expect(model.counter).toBe(1);
+    expect(model.counter).toBe(3);
+
+    model.aValue = "6";
+    await wait();
+    expect(model.counter).toBe(6);
   });
 
   describe("watching objects", () => {
@@ -821,49 +825,49 @@ describe("Model", () => {
         expect(model.$$watchersCount).toEqual(0);
       });
 
-      //   it("should remove $watchCollection of constant literals after initial digest", () => {
-      //     model.$watchCollection("[]", () => {});
-      //     model.$watchCollection("{}", () => {});
-      //     model.$watchCollection("1", () => {});
-      //     model.$watchCollection('"foo"', () => {});
-      //     expect(model.$$watchersCount).not.toEqual(0);
-      //     model.$digest();
+      it("should remove $watchCollection of constant literals after initial digest", () => {
+        model.$watchCollection("[]", () => {});
+        model.$watchCollection("{}", () => {});
+        model.$watchCollection("1", () => {});
+        model.$watchCollection('"foo"', () => {});
+        expect(model.$$watchersCount).not.toEqual(0);
+        model.$digest();
 
-      //     expect(model.$$watchersCount).toEqual(0);
-      //   });
+        expect(model.$$watchersCount).toEqual(0);
+      });
 
-      //   it("should remove $watchGroup of constant literals after initial digest", () => {
-      //     model.$watchGroup(["[]", "{}", "1", '"foo"'], () => {});
-      //     expect(model.$$watchersCount).not.toEqual(0);
-      //     model.$digest();
+      it("should remove $watchGroup of constant literals after initial digest", () => {
+        model.$watchGroup(["[]", "{}", "1", '"foo"'], () => {});
+        expect(model.$$watchersCount).not.toEqual(0);
+        model.$digest();
 
-      //     expect(model.$$watchersCount).toEqual(0);
-      //   });
+        expect(model.$$watchersCount).toEqual(0);
+      });
 
-      //   it("should remove $watch of filtered constant literals after initial digest", () => {
-      //     model.$watch('[1] | filter:"x"', () => {});
-      //     model.$watch("1 | limitTo:2", () => {});
-      //     expect(model.$$watchersCount).not.toEqual(0);
-      //     model.$digest();
+      it("should remove $watch of filtered constant literals after initial digest", () => {
+        model.$watch('[1] | filter:"x"', () => {});
+        model.$watch("1 | limitTo:2", () => {});
+        expect(model.$$watchersCount).not.toEqual(0);
+        model.$digest();
 
-      //     expect(model.$$watchersCount).toEqual(0);
-      //   });
+        expect(model.$$watchersCount).toEqual(0);
+      });
 
-      //   it("should remove $watchCollection of filtered constant literals after initial digest", () => {
-      //     model.$watchCollection('[1] | filter:"x"', () => {});
-      //     expect(model.$$watchersCount).not.toEqual(0);
-      //     model.$digest();
+      it("should remove $watchCollection of filtered constant literals after initial digest", () => {
+        model.$watchCollection('[1] | filter:"x"', () => {});
+        expect(model.$$watchersCount).not.toEqual(0);
+        model.$digest();
 
-      //     expect(model.$$watchersCount).toEqual(0);
-      //   });
+        expect(model.$$watchersCount).toEqual(0);
+      });
 
-      //   it("should remove $watchGroup of filtered constant literals after initial digest", () => {
-      //     model.$watchGroup(['[1] | filter:"x"', "1 | limitTo:2"], () => {});
-      //     expect(model.$$watchersCount).not.toEqual(0);
-      //     model.$digest();
+      it("should remove $watchGroup of filtered constant literals after initial digest", () => {
+        model.$watchGroup(['[1] | filter:"x"', "1 | limitTo:2"], () => {});
+        expect(model.$$watchersCount).not.toEqual(0);
+        model.$digest();
 
-      //     expect(model.$$watchersCount).toEqual(0);
-      //   });
+        expect(model.$$watchersCount).toEqual(0);
+      });
 
       it("should ignore $watch of constant expressions", () => {
         model.$watch("1 + 1", () => {});
@@ -1064,9 +1068,6 @@ describe("Model", () => {
     });
 
     // it("should prevent infinite loop when creating and resolving a promise in a watched expression", () => {
-    //   module((modelProvider) => {
-    //     modelProvider.digestTtl(10);
-    //   });
     //   () => {
     //     const d = $q.defer();
 
@@ -1094,7 +1095,7 @@ describe("Model", () => {
     //   });
     // });
 
-    it("should not fire upon $watch registration on initial $digest", async () => {
+    it("should not fire upon $watch registration on initial registeration", async () => {
       logs = "";
       model.a = 1;
       model.$watch("a", () => {
@@ -1171,29 +1172,30 @@ describe("Model", () => {
       expect(watch2).toHaveBeenCalled();
     });
 
-    // it("should not skip watchers when adding new watchers during digest", async () => {
-    //   const watchFn1 = function () {
-    //     logs.push(1);
-    //   };
-    //   const watchFn2 = function () {
-    //     logs.push(2);
-    //   };
-    //   const watchFn3 = function () {
-    //     logs.push(3);
-    //   };
-    //   const addWatcherOnce = function (newValue, oldValue) {
-    //     if (newValue === oldValue) {
-    //       model.$watch(watchFn3);
-    //     }
-    //   };
+    it("should not skip watchers when adding new watchers during digest", async () => {
+      const watch1 = jasmine.createSpy("watch1");
+      const watch2 = jasmine.createSpy("watch2");
+      model.$watch("foo", () => {
+        model.$watch("foo", watch1);
+        model.$watch("foo", watch2);
+      });
+      model.$digest();
+      expect(watch1).toHaveBeenCalled();
+      expect(watch2).toHaveBeenCalled();
+    });
 
-    //   model.$watch(watchFn1, addWatcherOnce);
-    //   model.$watch(watchFn2);
-
-    //   await wait();
-
-    //   expect(logs).toEqual([1, 2, 3, 1, 2, 3]);
-    // });
+    it("should not skip watchers when adding new watchers during property update", async () => {
+      const watch1 = jasmine.createSpy("watch1");
+      const watch2 = jasmine.createSpy("watch2");
+      model.$watch("foo", () => {
+        model.$watch("foo", watch1);
+        model.$watch("foo", watch2);
+      });
+      model.foo = 2;
+      await wait();
+      expect(watch1).toHaveBeenCalled();
+      expect(watch2).toHaveBeenCalled();
+    });
 
     // it("should not run the current watcher twice when removing a watcher during digest", () => {
     //   let removeWatcher3;
@@ -2314,6 +2316,25 @@ describe("Model", () => {
       model.$digest();
       expect(model.asyncEvaluated).toBe(true);
       expect(model.asyncEvaluatedImmediately).toBe(false);
+    });
+
+    it("executes $evalAsync'ed functions added by watch functions", async function () {
+      model.aValue = [1, 2, 3];
+      model.asyncEvaluated = false;
+      model.$watch(
+        function () {
+          if (!model.asyncEvaluated) {
+            model.$evalAsync(function () {
+              model.asyncEvaluated = true;
+            });
+          }
+          return model.aValue;
+        },
+        function () {},
+      );
+      model.$digest();
+      await wait();
+      expect(model.asyncEvaluated).toBe(true);
     });
 
     // it("should run callback before $watch", async () => {

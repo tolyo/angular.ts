@@ -675,7 +675,6 @@ export class Scope {
         }
       }
     }
-    // TODO: fix this type signature
     return this.$watch(changeDetector, $watchCollectionAction);
   }
 

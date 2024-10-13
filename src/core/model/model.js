@@ -20,8 +20,6 @@ const $rootModelErr = minErr("$rootModel");
  * @property {Object} locals
  */
 
-/** @type {AsyncQueueTask[]} */
-export const $$asyncQueue = [];
 export const $$postDigestQueue = [];
 
 /**
@@ -82,6 +80,7 @@ export function createModel(target = {}, context) {
  * @property {ListenerFunction} listenerFn - The function invoked when changes are detected.
  * @property {number} id
  * @property {boolean} oneTime
+ * @property {string} property
  */
 
 /**
@@ -136,6 +135,9 @@ class Handler {
 
     /** @type {number} */
     this.$$watchersCount = 0;
+
+    /** @type {AsyncQueueTask[]} */
+    this.$$asyncQueue = [];
   }
 
   /**
@@ -187,15 +189,8 @@ class Handler {
         const listeners = this.listeners.get(property);
 
         if (listeners) {
-          listeners.forEach((listener) =>
-            Promise.resolve().then(() => {
-              this.notifyListeners(listener, oldValue, value);
-              if (listener.oneTime) {
-                this.deregisterKey(property, listener.id);
-                this.incrementWatchersCount(-1);
-              }
-            }),
-          );
+          debugger;
+          this.scheduleListener(listeners, oldValue, value);
         }
       }
       // Right now this is only for Arrays
@@ -204,11 +199,7 @@ class Handler {
         keys.forEach((key) => {
           const listeners = this.listeners.get(key);
           if (listeners) {
-            listeners.forEach((listener) => {
-              Promise.resolve().then(() =>
-                this.notifyListeners(listener, oldValue, this.target),
-              );
-            });
+            this.scheduleListener(listeners, oldValue, this.target);
           }
         });
       }
@@ -232,6 +223,7 @@ class Handler {
     if (property === isProxySymbol) return true;
     const propertyMap = {
       $watch: this.$watch.bind(this),
+      $watchGroup: this.$watchGroup.bind(this),
       $new: this.$new.bind(this),
       $destroy: this.$destroy.bind(this),
       $eval: this.$eval.bind(this),
@@ -252,6 +244,29 @@ class Handler {
       : target[property];
   }
 
+  /**
+   * @private
+   * @param {Listener[]} listeners
+   * @param {*} oldValue
+   * @param {*} newValue
+   */
+  scheduleListener(listeners, oldValue, newValue) {
+    Promise.resolve().then(() => {
+      let index = 0;
+      while (index < listeners.length) {
+        const listener = listeners[index];
+        this.notifyListener(listener, oldValue, newValue);
+        if (
+          listener.oneTime &&
+          this.deregisterKey(listener.property, listener.id)
+        ) {
+          this.incrementWatchersCount(-1);
+        }
+        index++;
+      }
+    });
+  }
+
   deleteProperty(target, property) {
     var oldValue = structuredClone(target);
     delete target[property];
@@ -260,26 +275,18 @@ class Handler {
       keys.forEach((key) => {
         const listeners = this.listeners.get(key);
         if (listeners) {
-          listeners.forEach((listener) =>
-            Promise.resolve().then(() => {
-              this.notifyListeners(
-                listener,
-                oldValue,
-                Array.isArray(this.target) ? this.target : undefined,
-              );
-            }),
+          this.scheduleListener(
+            listeners,
+            oldValue,
+            Array.isArray(this.target) ? this.target : undefined,
           );
         }
       });
-    }
-
-    const listeners = this.listeners.get(property);
-    if (listeners) {
-      listeners.forEach((listener) =>
-        Promise.resolve().then(() =>
-          this.notifyListeners(listener, target[property], this),
-        ),
-      );
+    } else {
+      const listeners = this.listeners.get(property);
+      if (listeners) {
+        this.scheduleListener(listeners, target[property], this);
+      }
     }
     return true;
   }
@@ -306,13 +313,17 @@ class Handler {
       return () => {};
     }
 
+    /** @type {string} */
+    let key = getProperty(get);
+
+    /** @type {Listener} */
     const listener = {
       originalTarget: this.target,
       listenerFn: listenerFn,
       id: nextUid(),
       oneTime: get.oneTime,
+      property: key,
     };
-    let key = getProperty(get);
 
     this.registerKey(key, listener);
     let watchedValue = get(this.target);
@@ -341,6 +352,8 @@ class Handler {
       }
     };
   }
+
+  $watchGroup(obj, listenerFn) {}
 
   $new(isIsolated = false, parent) {
     let child;
@@ -392,9 +405,10 @@ class Handler {
       }
     });
 
-    $$asyncQueue.forEach((x) => {
+    while (this.$$asyncQueue.length) {
+      const x = this.$$asyncQueue.shift();
       x.fn(x.handler, x.locals);
-    });
+    }
   }
 
   $eval(expr, locals) {
@@ -417,7 +431,7 @@ class Handler {
     //   );
     // }
 
-    $$asyncQueue.push({
+    this.$$asyncQueue.push({
       handler: this,
       fn: $parse(expr),
       locals,
@@ -479,19 +493,19 @@ class Handler {
   }
 
   /**
-   * Invokes the registered listener function when a watched property changes.
+   * Invokes the registered listener function with watched property changes.
    *
    * @param {Listener} listener - The property path that was changed.
    * @param {*} oldValue - The old value of the property.
    * @param {*} newValue - The new value of the property.
    */
-  notifyListeners(listener, oldValue, newValue) {
+  notifyListener(listener, oldValue, newValue) {
     const { originalTarget, listenerFn } = listener;
     try {
       listenerFn(newValue, oldValue, originalTarget);
-      $$asyncQueue.forEach((x) => {
+      this.$$asyncQueue.forEach((x) => {
         if (x.handler.$id == this.$id) {
-          x.fn(x.handler, x.locals);
+          Promise.resolve().then(x.fn(x.handler, x.locals));
         }
       });
     } catch (e) {
