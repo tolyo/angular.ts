@@ -27,18 +27,18 @@ describe("ngClass", () => {
       $rootScope,
     );
     $rootScope.dynClass = "A";
-    $rootScope.$digest();
+    ;
     expect(element[0].classList.contains("existing")).toBe(true);
     expect(element[0].classList.contains("A")).toBe(true);
 
     $rootScope.dynClass = "B";
-    $rootScope.$digest();
+    ;
     expect(element[0].classList.contains("existing")).toBe(true);
     expect(element[0].classList.contains("A")).toBe(false);
     expect(element[0].classList.contains("B")).toBe(true);
 
     delete $rootScope.dynClass;
-    $rootScope.$digest();
+    ;
     expect(element[0].classList.contains("existing")).toBe(true);
     expect(element[0].classList.contains("A")).toBe(false);
     expect(element[0].classList.contains("B")).toBe(false);
@@ -53,21 +53,21 @@ describe("ngClass", () => {
       hasOwnProperty: true,
       isPrototypeOf: true,
     };
-    $rootScope.$digest();
+    ;
     expect(element[0].classList.contains("existing")).toBe(true);
     expect(element[0].classList.contains("watch")).toBe(true);
     expect(element[0].classList.contains("hasOwnProperty")).toBe(true);
     expect(element[0].classList.contains("isPrototypeOf")).toBe(true);
 
     $rootScope.dynClass.watch = false;
-    $rootScope.$digest();
+    ;
     expect(element[0].classList.contains("existing")).toBe(true);
     expect(element[0].classList.contains("watch")).toBe(false);
     expect(element[0].classList.contains("hasOwnProperty")).toBe(true);
     expect(element[0].classList.contains("isPrototypeOf")).toBe(true);
 
     delete $rootScope.dynClass;
-    $rootScope.$digest();
+    ;
     expect(element[0].classList.contains("existing")).toBe(true);
     expect(element[0].classList.contains("watch")).toBe(false);
     expect(element[0].classList.contains("hasOwnProperty")).toBe(false);
@@ -78,7 +78,7 @@ describe("ngClass", () => {
     element = $compile(
       "<div class=\"existing\" ng-class=\"['A', 'B']\"></div>",
     )($rootScope);
-    $rootScope.$digest();
+    ;
     expect(element[0].classList.contains("existing")).toBeTruthy();
     expect(element[0].classList.contains("A")).toBeTruthy();
     expect(element[0].classList.contains("B")).toBeTruthy();
@@ -94,7 +94,7 @@ describe("ngClass", () => {
           "</div>",
       )($rootScope);
       $rootScope.conditionA = true;
-      $rootScope.$digest();
+      ;
       expect(element[0].classList.contains("existing")).toBeTruthy();
       expect(element[0].classList.contains("A")).toBeTruthy();
       expect(element[0].classList.contains("B")).toBeFalsy();
@@ -103,7 +103,7 @@ describe("ngClass", () => {
       $rootScope.conditionB = function () {
         return true;
       };
-      $rootScope.$digest();
+      ;
       expect(element[0].classList.contains("existing")).toBeTruthy();
       expect(element[0].classList.contains("A")).toBeTruthy();
       expect(element[0].classList.contains("B")).toBeTruthy();
@@ -113,7 +113,7 @@ describe("ngClass", () => {
 
   it("should not break when passed non-string/array/object, truthy values", () => {
     element = $compile('<div ng-class="42"></div>')($rootScope);
-    $rootScope.$digest();
+    ;
     expect(element[0].classList.contains("42")).toBeTruthy();
   });
 
@@ -121,23 +121,23 @@ describe("ngClass", () => {
     element = $compile(
       "<div class=\"existing\" ng-class=\"['A', {'B': condition}]\"></div>",
     )($rootScope);
-    $rootScope.$digest();
+    ;
     expect(element[0].classList.contains("existing")).toBeTruthy();
     expect(element[0].classList.contains("A")).toBeTruthy();
     expect(element[0].classList.contains("B")).toBeFalsy();
     $rootScope.condition = true;
-    $rootScope.$digest();
+    ;
     expect(element[0].classList.contains("B")).toBeTruthy();
   });
 
   it("should remove classes when the referenced object is the same but its property is changed", () => {
     element = $compile('<div ng-class="classes"></div>')($rootScope);
     $rootScope.classes = { A: true, B: true };
-    $rootScope.$digest();
+    ;
     expect(element[0].classList.contains("A")).toBeTruthy();
     expect(element[0].classList.contains("B")).toBeTruthy();
     $rootScope.classes.A = false;
-    $rootScope.$digest();
+    ;
     expect(element[0].classList.contains("A")).toBeFalsy();
     expect(element[0].classList.contains("B")).toBeTruthy();
   });
@@ -146,7 +146,7 @@ describe("ngClass", () => {
     element = $compile('<div class="existing" ng-class="\'A B\'"></div>')(
       $rootScope,
     );
-    $rootScope.$digest();
+    ;
     expect(element[0].classList.contains("existing")).toBeTruthy();
     expect(element[0].classList.contains("A")).toBeTruthy();
     expect(element[0].classList.contains("B")).toBeTruthy();
@@ -156,7 +156,7 @@ describe("ngClass", () => {
     element = $compile(
       "<div class=\"existing\" ng-class=\"['A B', 'C']\"></div>",
     )($rootScope);
-    $rootScope.$digest();
+    ;
     expect(element[0].classList.contains("existing")).toBeTruthy();
     expect(element[0].classList.contains("A")).toBeTruthy();
     expect(element[0].classList.contains("B")).toBeTruthy();
@@ -168,13 +168,13 @@ describe("ngClass", () => {
       $rootScope,
     );
     $rootScope.dynClass = "A";
-    $rootScope.$digest();
+    ;
     expect(element[0].classList.contains("existing")).toBe(true);
 
     // add extra class, change model and eval
     element[0].classList.add("newClass");
     $rootScope.dynClass = "B";
-    $rootScope.$digest();
+    ;
 
     expect(element[0].classList.contains("existing")).toBe(true);
     expect(element[0].classList.contains("B")).toBe(true);
@@ -184,13 +184,13 @@ describe("ngClass", () => {
   it('should preserve class added post compilation without pre-existing classes"', () => {
     element = $compile('<div ng-class="dynClass"></div>')($rootScope);
     $rootScope.dynClass = "A";
-    $rootScope.$digest();
+    ;
     expect(element[0].classList.contains("A")).toBe(true);
 
     // add extra class, change model and eval
     element[0].classList.add("newClass");
     $rootScope.dynClass = "B";
-    $rootScope.$digest();
+    ;
 
     expect(element[0].classList.contains("B")).toBe(true);
     expect(element[0].classList.contains("newClass")).toBe(true);
@@ -201,9 +201,9 @@ describe("ngClass", () => {
       '<div class="ui-panel ui-selected" ng-class="dynCls"></div>',
     )($rootScope);
     $rootScope.dynCls = "panel";
-    $rootScope.$digest();
+    ;
     $rootScope.dynCls = "foo";
-    $rootScope.$digest();
+    ;
     expect(element[0].className).toBe("ui-panel ui-selected foo");
   });
 
@@ -212,7 +212,7 @@ describe("ngClass", () => {
       $rootScope,
     );
     $rootScope.dynCls = "panel";
-    $rootScope.$digest();
+    ;
     expect(element[0].className).toBe("panel bar");
   });
 
@@ -221,32 +221,32 @@ describe("ngClass", () => {
       $rootScope,
     );
     $rootScope.dynCls = "panel";
-    $rootScope.$digest();
+    ;
     $rootScope.dynCls = "window";
-    $rootScope.$digest();
+    ;
     expect(element[0].className).toBe("bar window");
   });
 
   it("should remove classes even if they were added by another code", () => {
     element = $compile('<div ng-class="dynCls"></div>')($rootScope);
     $rootScope.dynCls = "foo";
-    $rootScope.$digest();
+    ;
     element[0].classList.add("foo");
     $rootScope.dynCls = "";
-    $rootScope.$digest();
+    ;
   });
 
   it("should convert undefined and null values to an empty string", () => {
     element = $compile('<div ng-class="dynCls"></div>')($rootScope);
     $rootScope.dynCls = [undefined, null];
-    $rootScope.$digest();
+    ;
   });
 
   it("should ngClass odd/even", () => {
     element = $compile(
       '<ul><li ng-repeat="i in [0,1]" class="existing" ng-class-odd="\'odd\'" ng-class-even="\'even\'"></li><ul>',
     )($rootScope);
-    $rootScope.$digest();
+    ;
     const e1 = JQLite(element[0].childNodes[1]);
     const e2 = JQLite(element[0].childNodes[3]);
     expect(e1[0].classList.contains("existing")).toBeTruthy();
@@ -283,7 +283,7 @@ describe("ngClass", () => {
         "</li>" +
         "<ul>",
     )($rootScope);
-    $rootScope.$digest();
+    ;
 
     const e1 = element.children().eq(0)[0];
     const e2 = element.children().eq(1)[0];
@@ -304,7 +304,7 @@ describe("ngClass", () => {
     element = $compile(
       "<div ng-class=\"{'same yes': test, 'same no': !test}\"></div>",
     )($rootScope)[0];
-    $rootScope.$digest();
+    ;
 
     expect(element).toHaveClass("same");
     expect(element).not.toHaveClass("yes");
@@ -422,7 +422,7 @@ describe("ngClass", () => {
       $rootScope.foo = false;
     });
     element = $compile('<div ng-class="{foo:foo}"></div>')($rootScope);
-    $rootScope.$digest();
+    ;
     expect(element[0].classList.contains("foo")).toBe(false);
   });
 
@@ -434,10 +434,10 @@ describe("ngClass", () => {
         "<ul>",
     )($rootScope);
     $rootScope.items = ["b", "c", "d"];
-    $rootScope.$digest();
+    ;
 
     $rootScope.items.unshift("a");
-    $rootScope.$digest();
+    ;
 
     const e1 = JQLite(element[0].childNodes[1]);
     const e4 = JQLite(element[0].childNodes[3]);
@@ -457,10 +457,10 @@ describe("ngClass", () => {
         "<ul>",
     )($rootScope);
     $rootScope.items = ["a", "b", "a"];
-    $rootScope.$digest();
+    ;
 
     $rootScope.items = ["a", "a"];
-    $rootScope.$digest();
+    ;
 
     const e1 = JQLite(element[0].childNodes[1]);
     const e2 = JQLite(element[0].childNodes[3]);
@@ -480,10 +480,10 @@ describe("ngClass", () => {
         "<ul>",
     )($rootScope);
     $rootScope.items = ["a", "b"];
-    $rootScope.$digest();
+    ;
 
     $rootScope.items = ["b", "a"];
-    $rootScope.$digest();
+    ;
 
     const e1 = JQLite(element[0].childNodes[1]);
     const e2 = JQLite(element[0].childNodes[3]);
@@ -538,11 +538,11 @@ describe("ngClass", () => {
     element = $compile('<div ng-class="classVar"></div>')($rootScope);
 
     $rootScope.classVar = [{ orange: true }];
-    $rootScope.$digest();
+    ;
     expect(element[0]).toHaveClass("orange");
 
     $rootScope.classVar[0].orange = false;
-    $rootScope.$digest();
+    ;
 
     expect(element[0]).not.toHaveClass("orange");
   });
@@ -552,11 +552,11 @@ describe("ngClass", () => {
     element = $compile('<div ng-class="[classVar]"></div>')($rootScope);
 
     $rootScope.classVar = { orange: true };
-    $rootScope.$digest();
+    ;
     expect(element[0]).toHaveClass("orange");
 
     $rootScope.classVar.orange = false;
-    $rootScope.$digest();
+    ;
 
     expect(element[0]).not.toHaveClass("orange");
   });
@@ -567,11 +567,11 @@ describe("ngClass", () => {
     );
 
     $rootScope.classVar1 = { orange: true };
-    $rootScope.$digest();
+    ;
     expect(element[0]).toHaveClass("orange");
 
     $rootScope.classVar1.orange = false;
-    $rootScope.$digest();
+    ;
 
     expect(element[0]).not.toHaveClass("orange");
   });
@@ -613,7 +613,7 @@ describe("ngClass", () => {
     $rootScope.classVar = [{ orange: true }];
     element = $compile('<div ng-class="classVar"></div>')($rootScope);
 
-    $rootScope.$digest();
+    ;
     expect(element[0]).toHaveClass("orange");
 
     $rootScope.$apply("classVar[0].orange = false");
@@ -664,7 +664,7 @@ describe("ngClass", () => {
     it("should not be copied when using an expression", () => {
       element = $compile('<div ng-class="fooClass"></div>')($rootScope)[0];
       $rootScope.fooClass = { foo: veryLargeObj };
-      $rootScope.$digest();
+      ;
 
       expect(element).toHaveClass("foo");
       expect(getProp).not.toHaveBeenCalled();
@@ -675,7 +675,7 @@ describe("ngClass", () => {
         $rootScope,
       )[0];
       $rootScope.veryLargeObj = veryLargeObj;
-      $rootScope.$digest();
+      ;
 
       expect(element).toHaveClass("foo");
       expect(getProp).not.toHaveBeenCalled();
@@ -686,7 +686,7 @@ describe("ngClass", () => {
         $rootScope,
       )[0];
       $rootScope.veryLargeObj = veryLargeObj;
-      $rootScope.$digest();
+      ;
 
       expect(element).toHaveClass("foo");
       expect(getProp).not.toHaveBeenCalled();
@@ -697,7 +697,7 @@ describe("ngClass", () => {
         '<div ng-class="::{foo: veryLargeObj, bar: bar}"></div>',
       )($rootScope)[0];
       $rootScope.veryLargeObj = veryLargeObj;
-      $rootScope.$digest();
+      ;
 
       expect(element).toHaveClass("foo");
       expect(element).not.toHaveClass("bar");
@@ -744,22 +744,22 @@ describe("ngClass", () => {
 //       expect($animate.queue.length).toBe(0);
 
 //       $rootScope.val = "one";
-//       $rootScope.$digest();
+//       ;
 //       expect($animate.queue.shift().event).toBe("addClass");
 //       expect($animate.queue.length).toBe(0);
 
 //       $rootScope.val = "";
-//       $rootScope.$digest();
+//       ;
 //       expect($animate.queue.shift().event).toBe("removeClass"); // only removeClass is called
 //       expect($animate.queue.length).toBe(0);
 
 //       $rootScope.val = "one";
-//       $rootScope.$digest();
+//       ;
 //       expect($animate.queue.shift().event).toBe("addClass");
 //       expect($animate.queue.length).toBe(0);
 
 //       $rootScope.val = "two";
-//       $rootScope.$digest();
+//       ;
 //       expect($animate.queue.shift().event).toBe("addClass");
 //       expect($animate.queue.shift().event).toBe("removeClass");
 //       expect($animate.queue.length).toBe(0);
@@ -800,9 +800,9 @@ describe("ngClass", () => {
 //         expect(element[0].classList.contains("crazy")).toBe(false);
 //         expect(enterComplete).toBe(false);
 
-//         $rootScope.$digest();
+//         ;
 //         $animate.flush();
-//         $rootScope.$digest();
+//         ;
 
 //         expect(element[0].classList.contains("crazy")).toBe(true);
 //         expect(enterComplete).toBe(true);
@@ -825,7 +825,7 @@ describe("ngClass", () => {
 //         '<div ng-class="{one:one, two:two, three:three}"></div>',
 //       );
 //       $compile(element)($rootScope);
-//       $rootScope.$digest();
+//       ;
 
 //       // this fires twice due to the class observer firing
 //       let item = $animate.queue.shift();
@@ -835,7 +835,7 @@ describe("ngClass", () => {
 //       expect($animate.queue.length).toBe(0);
 
 //       $rootScope.three = false;
-//       $rootScope.$digest();
+//       ;
 
 //       item = $animate.queue.shift();
 //       expect(item.event).toBe("removeClass");
@@ -845,7 +845,7 @@ describe("ngClass", () => {
 
 //       $rootScope.two = false;
 //       $rootScope.three = true;
-//       $rootScope.$digest();
+//       ;
 
 //       item = $animate.queue.shift();
 //       expect(item.event).toBe("addClass");

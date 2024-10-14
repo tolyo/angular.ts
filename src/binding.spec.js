@@ -46,7 +46,7 @@ describe("binding", () => {
 
   it("BindUpdate", () => {
     $compile('<div ng-init="a=123"/>')($rootScope);
-    $rootScope.$digest();
+    ;
     expect($rootScope.a).toBe(123);
   });
 

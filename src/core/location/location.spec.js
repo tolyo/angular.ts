@@ -785,7 +785,7 @@ describe("$location", () => {
   //         $browser,
   //         "url",
   //       ).and.callThrough();
-  //       $rootScope.$digest();
+  //       ;
   //       expect($browserUrl).not.toHaveBeenCalled();
   //     });
   //   });
@@ -815,7 +815,7 @@ describe("$location", () => {
   //         }
   //       });
   //       expect($browser.url()).toEqual("http://server/base/#!/home");
-  //       $rootScope.$digest();
+  //       ;
   //       expect(handlerCalled).toEqual(true);
   //       expect($browser.url()).toEqual("http://server/base/#!/");
   //     });
@@ -829,7 +829,7 @@ describe("$location", () => {
   //     });
   //     inject(($location, $browser, $rootScope) => {
   //       expect(() => {
-  //         $rootScope.$digest();
+  //         ;
   //       }).not.toThrow();
   //     });
   //   });
@@ -843,7 +843,7 @@ describe("$location", () => {
   //     });
   //     inject(($location, $browser, $rootScope) => {
   //       expect(() => {
-  //         $rootScope.$digest();
+  //         ;
   //       }).not.toThrow();
   //     });
   //   });
@@ -857,7 +857,7 @@ describe("$location", () => {
   //     });
   //     inject(($location, $browser, $rootScope) => {
   //       expect(() => {
-  //         $rootScope.$digest();
+  //         ;
   //       }).not.toThrow();
   //     });
   //   });
@@ -867,10 +867,10 @@ describe("$location", () => {
   //     initService({ html5Mode: true, supportHistory: true });
   //     mockUpBrowser({ initialUrl: "http://localhost:9876/", baseHref: "/" });
   //     inject(($location, $browser, $rootScope) => {
-  //       $rootScope.$digest();
+  //       ;
   //       $browser.url("http://localhost:9876/?q='");
   //       expect(() => {
-  //         $rootScope.$digest();
+  //         ;
   //       }).not.toThrow();
   //     });
   //   });
@@ -880,7 +880,7 @@ describe("$location", () => {
   //     initService({ html5Mode: true, supportHistory: true });
   //     mockUpBrowser({ initialUrl: "http://localhost:9876/", baseHref: "/" });
   //     inject(($window, $location, $browser, $rootScope) => {
-  //       $rootScope.$digest();
+  //       ;
   //       $window.location.href = "http://localhost:9876/?q='";
   //       expect(() => {
   //         JQLite($window).triggerHandler("popstate");
@@ -901,7 +901,7 @@ describe("$location", () => {
   //       $window,
   //     ) => {
   //       $location.url("baz");
-  //       $rootScope.$digest();
+  //       ;
 
   //       const originalUrl = $window.location.href;
 
@@ -931,7 +931,7 @@ describe("$location", () => {
   //       $window,
   //     ) => {
   //       $location.url("baz");
-  //       $rootScope.$digest();
+  //       ;
 
   //       $rootScope.$apply(() => {
   //         $rootScope.$evalAsync(() => {
@@ -969,7 +969,7 @@ describe("$location", () => {
 
   //         updatePathOnLocationChangeSuccessTo("/Home");
 
-  //         $rootScope.$digest();
+  //         ;
 
   //         expect($browser.url()).toEqual("http://server/app/#!/Home");
   //         expect($location.path()).toEqual("/Home");
@@ -991,7 +991,7 @@ describe("$location", () => {
 
   //         updatePathOnLocationChangeSuccessTo("/");
 
-  //         $rootScope.$digest();
+  //         ;
 
   //         expect($browser.url()).toEqual("http://server/app/#!/");
   //         expect($location.path()).toEqual("/");
@@ -1014,7 +1014,7 @@ describe("$location", () => {
   //         ).and.callThrough();
 
   //         updatePathOnLocationChangeSuccessTo("/Home");
-  //         $rootScope.$digest();
+  //         ;
 
   //         expect($browser.url()).toEqual("http://server/app/#!/Home");
   //         expect($location.path()).toEqual("/Home");
@@ -1037,7 +1037,7 @@ describe("$location", () => {
   //         ).and.callThrough();
 
   //         updatePathOnLocationChangeSuccessTo("/");
-  //         $rootScope.$digest();
+  //         ;
 
   //         expect($browser.url()).toEqual("http://server/app/#!/");
   //         expect($location.path()).toEqual("/");
@@ -1059,7 +1059,7 @@ describe("$location", () => {
   //         const $location = $injector.get("$location");
   //         updatePathOnLocationChangeSuccessTo("/Home");
 
-  //         $rootScope.$digest();
+  //         ;
 
   //         expect($browser.url()).toEqual("http://server/app/Home");
   //         expect($location.path()).toEqual("/Home");
@@ -1079,7 +1079,7 @@ describe("$location", () => {
   //         const $location = $injector.get("$location");
   //         updatePathOnLocationChangeSuccessTo("/");
 
-  //         $rootScope.$digest();
+  //         ;
 
   //         expect($browser.url()).toEqual("http://server/app/");
   //         expect($location.path()).toEqual("/");
@@ -1099,7 +1099,7 @@ describe("$location", () => {
   //         const $location = $injector.get("$location");
   //         updatePathOnLocationChangeSuccessTo("/Home");
 
-  //         $rootScope.$digest();
+  //         ;
 
   //         expect($browser.url()).toEqual("http://server/app/Home");
   //         expect($location.path()).toEqual("/Home");
@@ -1119,7 +1119,7 @@ describe("$location", () => {
   //         const $location = $injector.get("$location");
   //         updatePathOnLocationChangeSuccessTo("/");
 
-  //         $rootScope.$digest();
+  //         ;
 
   //         expect($browser.url()).toEqual("http://server/app/");
   //         expect($location.path()).toEqual("/");
@@ -1140,7 +1140,7 @@ describe("$location", () => {
   //         const $location = $injector.get("$location");
   //         updatePathOnLocationChangeSuccessTo("/", { q: "'" });
 
-  //         $rootScope.$digest();
+  //         ;
 
   //         expect($location.path()).toEqual("/");
   //         expect($location.search()).toEqual({ q: "'" });
@@ -1200,7 +1200,7 @@ describe("$location", () => {
   //         }
   //       });
 
-  //       $rootScope.$digest();
+  //       ;
   //       expect($location.absUrl()).toBe(NEW_URL);
   //     });
   //   });
@@ -1299,7 +1299,7 @@ describe("$location", () => {
   //         },
   //       );
 
-  //       $rootScope.$digest();
+  //       ;
   //       expect($browser.url()).toBe("http://new.com/a/b#!/changed");
   //     });
   //   });
@@ -1310,7 +1310,7 @@ describe("$location", () => {
   //     inject(($rootScope, $browser, $location) => {
   //       $location.hash("test");
 
-  //       $rootScope.$digest();
+  //       ;
   //       expect($browser.url()).toBe("http://new.com/a/b##test");
   //     });
   //   });
@@ -1334,7 +1334,7 @@ describe("$location", () => {
   //     mockUpBrowser({ initialUrl: "http://new.com/a/b/", baseHref: "/a/b/" });
   //     inject(($location, $rootScope, $window) => {
   //       $window.history.pushState({ b: 3 });
-  //       $rootScope.$digest();
+  //       ;
 
   //       expect($location.state()).toEqual({ b: 3 });
 
@@ -1343,7 +1343,7 @@ describe("$location", () => {
   //         null,
   //         `${$window.location.href}c?d=e#f`,
   //       );
-  //       $rootScope.$digest();
+  //       ;
 
   //       expect($location.path()).toBe("/c");
   //       expect($location.search()).toEqual({ d: "e" });
@@ -1358,10 +1358,10 @@ describe("$location", () => {
   //     mockUpBrowser({ initialUrl: "http://server/app/", baseHref: "/app/" });
   //     inject(($rootScope, $injector, $window) => {
   //       const $location = $injector.get("$location");
-  //       $rootScope.$digest(); // allow $location initialization to finish
+  //       ; // allow $location initialization to finish
 
   //       $window.history.pushState({}, null, "http://server/app/Home?q='");
-  //       $rootScope.$digest();
+  //       ;
 
   //       expect($location.absUrl()).toEqual("http://server/app/Home?q='");
   //       expect($location.path()).toEqual("/Home");
@@ -1375,7 +1375,7 @@ describe("$location", () => {
   //     mockUpBrowser({ initialUrl: "http://server/app/", baseHref: "/app/" });
   //     inject(($rootScope, $injector, $window) => {
   //       const $location = $injector.get("$location");
-  //       $rootScope.$digest(); // allow $location initialization to finish
+  //       ; // allow $location initialization to finish
 
   //       $window.location.href = "http://server/app/Home?q='";
   //       JQLite($window).triggerHandler("popstate");

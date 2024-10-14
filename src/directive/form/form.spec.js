@@ -53,7 +53,7 @@ describe("form", () => {
         "</form>",
     )(scope);
     scope.inputPresent = true;
-    scope.$digest();
+    ;
 
     const form = scope.myForm;
     control.$setValidity("required", false);
@@ -115,7 +115,7 @@ describe("form", () => {
         "</form>",
     )(scope);
 
-    scope.$digest();
+    ;
 
     const form = scope.myForm;
 
@@ -158,7 +158,7 @@ describe("form", () => {
         '<form name="otherForm"></form>',
     )(scope);
 
-    scope.$digest();
+    ;
 
     const form = scope.myForm;
     const { otherForm } = scope;
@@ -173,14 +173,14 @@ describe("form", () => {
 
     // rename the childControl
     scope.controlName = "childControlMoved";
-    scope.$digest();
+    ;
 
     expect(form.childControlMoved).toBeUndefined();
     expect(otherForm.childControl).toBeUndefined();
     expect(otherForm.childControlMoved).toBe(childControl);
 
     scope.hasChildControl = false;
-    scope.$digest();
+    ;
 
     expect(form.childControlMoved).toBeUndefined();
     expect(otherForm.childControlMoved).toBeUndefined();
@@ -195,7 +195,7 @@ describe("form", () => {
         "</form></div>",
     )(scope);
 
-    scope.$digest();
+    ;
     expect(scope.ctrl.myForm).toBeUndefined();
 
     scope.$apply("formPresent = true");
@@ -256,7 +256,7 @@ describe("form", () => {
         </form>
       </div>
     `)(scope);
-    scope.$digest();
+    ;
     expect(scope.formA.$error.required.length).toBe(1);
     expect(scope.formA.$error.required).toEqual([scope.formA.firstName]);
     expect(scope.formB.$error.required.length).toBe(1);
@@ -310,7 +310,7 @@ describe("form", () => {
           '<input type="text" ng-model="name" />' +
           "</form>",
       )(scope);
-      scope.$digest();
+      ;
 
       const inputElm = form.find("input").eq(0);
 
@@ -331,7 +331,7 @@ describe("form", () => {
           "</div>" +
           "</form>",
       )(scope);
-      scope.$digest();
+      ;
 
       const inputElm = form.find("input").eq(0);
       inputElm[0].setAttribute("value", "a");
@@ -350,7 +350,7 @@ describe("form", () => {
           '<input type="text" ng-model="name" />' +
           "</form>",
       )(scope);
-      scope.$digest();
+      ;
 
       const inputElm = form.find("input").eq(0);
       inputElm[0].setAttribute("value", "a");
@@ -373,7 +373,7 @@ describe("form", () => {
           '<button ng-click="test.$rollbackViewValue()" />' +
           "</form>",
       )(scope);
-      scope.$digest();
+      ;
 
       const inputElm = form.find("input").eq(0);
       inputElm[0].setAttribute("value", "a");
@@ -394,7 +394,7 @@ describe("form", () => {
           '<button ng-click="test.$rollbackViewValue()" />' +
           "</form>",
       )(scope);
-      scope.$digest();
+      ;
 
       const inputElm = form.find("input").eq(0);
       inputElm[0].setAttribute("value", "a");
@@ -945,7 +945,7 @@ describe("form", () => {
           '<form name="otherForm"></form>',
       )(scope);
 
-      scope.$digest();
+      ;
 
       const form = scope.myForm;
       const { otherForm } = scope;
@@ -960,14 +960,14 @@ describe("form", () => {
 
       // rename the childForm
       scope.formName = "childFormMoved";
-      scope.$digest();
+      ;
 
       expect(form.childFormMoved).toBeUndefined();
       expect(otherForm.childForm).toBeUndefined();
       expect(otherForm.childFormMoved).toBe(childForm);
 
       scope.hasChildForm = false;
-      scope.$digest();
+      ;
 
       expect(form.childFormMoved).toBeUndefined();
       expect(otherForm.childFormMoved).toBeUndefined();
@@ -1014,27 +1014,27 @@ describe("form", () => {
           "</form>",
       )(scope);
 
-      scope.$digest();
+      ;
     });
 
     it("should have ng-valid/ng-invalid css class", () => {
       expect(doc[0].classList.contains("ng-valid")).toBeTrue();
 
       control.$setValidity("error", false);
-      scope.$digest();
+      ;
       expect(doc[0].classList.contains("ng-invalid")).toBeTrue();
       expect(doc[0].classList.contains("ng-valid-error")).toBe(false);
       expect(doc[0].classList.contains("ng-invalid-error")).toBe(true);
 
       control.$setValidity("another", false);
-      scope.$digest();
+      ;
       expect(doc[0].classList.contains("ng-valid-error")).toBe(false);
       expect(doc[0].classList.contains("ng-invalid-error")).toBe(true);
       expect(doc[0].classList.contains("ng-valid-another")).toBe(false);
       expect(doc[0].classList.contains("ng-invalid-another")).toBe(true);
 
       control.$setValidity("error", true);
-      scope.$digest();
+      ;
       expect(doc[0].classList.contains("ng-invalid")).toBeTrue();
       expect(doc[0].classList.contains("ng-valid-error")).toBe(true);
       expect(doc[0].classList.contains("ng-invalid-error")).toBe(false);
@@ -1042,7 +1042,7 @@ describe("form", () => {
       expect(doc[0].classList.contains("ng-invalid-another")).toBe(true);
 
       control.$setValidity("another", true);
-      scope.$digest();
+      ;
       expect(doc[0].classList.contains("ng-valid")).toBeTrue();
       expect(doc[0].classList.contains("ng-valid-error")).toBe(true);
       expect(doc[0].classList.contains("ng-invalid-error")).toBe(false);
@@ -1052,7 +1052,7 @@ describe("form", () => {
       // validators are skipped, e.g. because of a parser error
       control.$setValidity("error", null);
       control.$setValidity("another", null);
-      scope.$digest();
+      ;
       expect(doc[0].classList.contains("ng-valid-error")).toBe(false);
       expect(doc[0].classList.contains("ng-invalid-error")).toBe(false);
       expect(doc[0].classList.contains("ng-valid-another")).toBe(false);
@@ -1073,7 +1073,7 @@ describe("form", () => {
   describe("$pending", () => {
     beforeEach(() => {
       doc = $compile('<form name="form"></form>')(scope);
-      scope.$digest();
+      ;
     });
 
     it("should set valid and invalid to undefined when a validation error state is set as pending", () => {
@@ -1110,7 +1110,7 @@ describe("form", () => {
           "</form>",
       )(scope);
 
-      scope.$digest();
+      ;
 
       const form = doc;
       const formCtrl = scope.testForm;
@@ -1127,7 +1127,7 @@ describe("form", () => {
       expect(input2[0].classList.contains("ng-dirty")).toBeTrue();
 
       formCtrl.$setPristine();
-      scope.$digest();
+      ;
 
       expect(form[0].classList.contains("ng-pristine")).toBeTrue();
       expect(form[0].classList.contains("ng-dirty")).toBeFalse();
@@ -1147,7 +1147,7 @@ describe("form", () => {
         '<form name="testForm">' + '<input ng-model="anonymous">' + "</form>",
       )(scope);
 
-      scope.$digest();
+      ;
 
       const form = doc;
       const formCtrl = scope.testForm;
@@ -1160,7 +1160,7 @@ describe("form", () => {
       expect(input[0].classList.contains("ng-dirty")).toBeTrue();
 
       formCtrl.$setPristine();
-      scope.$digest();
+      ;
       expect(form[0].classList.contains("ng-pristine")).toBeTrue();
       expect(formCtrl.$pristine).toBe(true);
       expect(formCtrl.$dirty).toBe(false);
@@ -1178,7 +1178,7 @@ describe("form", () => {
           "</form>",
       )(scope);
 
-      scope.$digest();
+      ;
 
       const form = doc;
       const formCtrl = scope.testForm;
@@ -1194,9 +1194,9 @@ describe("form", () => {
       expect(nestedInput[0].classList.contains("ng-dirty")).toBeTrue();
 
       formCtrl.$setPristine();
-      scope.$digest();
+      ;
       expect(form[0].classList.contains("ng-pristine")).toBeTrue();
-      scope.$digest();
+      ;
 
       expect(formCtrl.$pristine).toBe(true);
       expect(formCtrl.$dirty).toBe(false);
@@ -1216,7 +1216,7 @@ describe("form", () => {
           '<input name="alias" type="text" ng-model="name" />' +
           "</form>",
       )(scope);
-      scope.$digest();
+      ;
 
       scope.myForm.alias.$setTouched();
       expect(scope.myForm.alias.$touched).toBe(true);
@@ -1233,7 +1233,7 @@ describe("form", () => {
           "</div>" +
           "</form>",
       )(scope);
-      scope.$digest();
+      ;
 
       scope.myForm.childForm.alias.$setTouched();
       expect(scope.myForm.childForm.alias.$touched).toBe(true);
@@ -1247,7 +1247,7 @@ describe("form", () => {
     it("should return an empty array if the controller has no controls", () => {
       doc = $compile('<form name="testForm"></form>')(scope);
 
-      scope.$digest();
+      ;
 
       const formCtrl = scope.testForm;
 
@@ -1264,7 +1264,7 @@ describe("form", () => {
           "</form>",
       )(scope);
 
-      scope.$digest();
+      ;
 
       const form = doc;
       const formCtrl = scope.testForm;
@@ -1304,7 +1304,7 @@ describe("form", () => {
         "</form>",
     )(scope);
 
-    scope.$digest();
+    ;
     const formA = scope.form.nestedA;
     expect(formA).toBeDefined();
     expect(formA.$name).toBe("nestedA");
@@ -1315,7 +1315,7 @@ describe("form", () => {
 
     scope.idA = "B";
     scope.idB = "Y";
-    scope.$digest();
+    ;
 
     expect(scope.form.nestedA).toBeUndefined();
     expect(scope.form.nestedB).toBe(formA);
@@ -1327,7 +1327,7 @@ describe("form", () => {
     const element = $compile('<form name="name{{nameID}}"></form>')(scope);
     const element2 = $compile('<div ng-form="ngform{{nameID}}"></div>')(scope);
     scope.nameID = "A";
-    scope.$digest();
+    ;
     const form = element.controller("form");
     const form2 = element2.controller("form");
     expect(scope.nameA).toBe(form);
@@ -1336,7 +1336,7 @@ describe("form", () => {
     expect(form2.$name).toBe("ngformA");
 
     scope.nameID = "B";
-    scope.$digest();
+    ;
     expect(scope.nameA).toBeUndefined();
     expect(scope.ngformA).toBeUndefined();
     expect(scope.nameB).toBe(form);
@@ -1347,12 +1347,12 @@ describe("form", () => {
 
   it("should rename forms with an initially blank name", () => {
     const element = $compile('<form name="{{name}}"></form>')(scope);
-    scope.$digest();
+    ;
     const form = element.controller("form");
     expect(scope[""]).toBe(form);
     expect(form.$name).toBe("");
     scope.name = "foo";
-    scope.$digest();
+    ;
     expect(scope.foo).toBe(form);
     expect(form.$name).toBe("foo");
     expect(scope.foo).toBe(form);
@@ -1367,7 +1367,7 @@ describe("form", () => {
           "</form>",
       )(scope);
 
-      scope.$digest();
+      ;
     });
 
     it("should not init in submitted state", () => {

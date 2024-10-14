@@ -346,7 +346,7 @@ export function InterpolateProvider() {
               expressions,
               $$watchDelegate(scope, listener) {
                 let lastValue;
-                return scope.$watchGroup(
+                return scope.$watch(
                   parseFns,
                   function interpolateFnWatcher(values, oldValues) {
                     const currValue = compute(values);

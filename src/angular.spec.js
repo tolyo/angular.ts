@@ -1782,7 +1782,7 @@ describe("angular", () => {
         '<div>{{greeting = "hello world"}}</div>',
       );
       element = $compile(template)($rootScope);
-      $rootScope.$digest();
+      ;
       expect(template.text()).toEqual("hello world");
       expect($rootScope.greeting).toEqual("hello world");
     });
@@ -1792,7 +1792,7 @@ describe("angular", () => {
         '<div>{{greeting = "hello world"}}</div>',
       );
       element = $compile(template)($rootScope);
-      $rootScope.$digest();
+      ;
       expect(template.text()).toEqual("hello world");
     });
 
@@ -1805,7 +1805,7 @@ describe("angular", () => {
       element = compile($rootScope, (clone) => {
         templateClone = clone;
       });
-      $rootScope.$digest();
+      ;
 
       expect(template.text()).toEqual('{{greeting = "hello world"}}');
       expect(element.text()).toEqual("hello world");
@@ -1816,7 +1816,7 @@ describe("angular", () => {
     it("should link to cloned node and create scope", () => {
       const template = JQLite('<div>{{greeting = "hello world"}}</div>');
       element = $compile(template)($rootScope, () => {});
-      $rootScope.$digest();
+      ;
       expect(template.text()).toEqual('{{greeting = "hello world"}}');
       expect(element.text()).toEqual("hello world");
       expect($rootScope.greeting).toEqual("hello world");

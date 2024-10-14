@@ -24,10 +24,10 @@ describe("ngShow / ngHide", () => {
     it("should show and hide an element", () => {
       element = JQLite('<div ng-show="exp"></div>');
       element = $compile(element)($scope);
-      $scope.$digest();
+      ;
       expect(element[0].classList.contains("ng-hide")).toBeTrue();
       $scope.exp = true;
-      $scope.$digest();
+      ;
       expect(element[0].classList.contains("ng-hide")).toBeFalse();
     });
 
@@ -36,7 +36,7 @@ describe("ngShow / ngHide", () => {
       element = JQLite('<div ng-show="exp"></div>');
       element = $compile(element)($scope);
       $scope.exp = function () {};
-      $scope.$digest();
+      ;
       expect(element[0].classList.contains("ng-hide")).toBeFalse();
     });
 
@@ -45,7 +45,7 @@ describe("ngShow / ngHide", () => {
       element = $compile(element)($scope);
       expect(element[0].classList.contains("ng-hide")).toBeTrue();
       $scope.exp = true;
-      $scope.$digest();
+      ;
       expect(element[0].classList.contains("ng-hide")).toBeFalse();
     });
 
@@ -53,7 +53,7 @@ describe("ngShow / ngHide", () => {
       ["false", "undefined", "null", "NaN", "''", "0"].forEach((x) => {
         element = JQLite(`<div ng-show="${x}"></div>`);
         element = $compile(element)($scope);
-        $scope.$digest();
+        ;
         expect(element[0].classList.contains("ng-hide")).toBeTrue();
       });
     });
@@ -62,7 +62,7 @@ describe("ngShow / ngHide", () => {
       ["'f'", "'0'", "'false'", "'no'", "'n'", "'[]'"].forEach((x) => {
         element = JQLite(`<div ng-show="${x}"></div>`);
         element = $compile(element)($scope);
-        $scope.$digest();
+        ;
         expect(element[0].classList.contains("ng-hide")).toBeFalse();
       });
     });
@@ -71,7 +71,7 @@ describe("ngShow / ngHide", () => {
       ["[]", "{}"].forEach((x) => {
         element = JQLite(`<div ng-show="${x}"></div>`);
         element = $compile(element)($scope);
-        $scope.$digest();
+        ;
         expect(element[0].classList.contains("ng-hide")).toBeFalse();
       });
     });
@@ -83,7 +83,7 @@ describe("ngShow / ngHide", () => {
       element = $compile(element)($scope);
       expect(element[0].classList.contains("ng-hide")).toBeFalse();
       $scope.exp = true;
-      $scope.$digest();
+      ;
       expect(element[0].classList.contains("ng-hide")).toBeTrue();
     });
 
@@ -91,7 +91,7 @@ describe("ngShow / ngHide", () => {
       ["false", "undefined", "null", "NaN", "''", "0"].forEach((x) => {
         element = JQLite(`<div ng-hide="${x}"></div>`);
         element = $compile(element)($scope);
-        $scope.$digest();
+        ;
         expect(element[0].classList.contains("ng-hide")).toBeFalse();
       });
     });
@@ -100,7 +100,7 @@ describe("ngShow / ngHide", () => {
       ["'f'", "'0'", "'false'", "'no'", "'n'", "'[]'"].forEach((x) => {
         element = JQLite(`<div ng-hide="${x}"></div>`);
         element = $compile(element)($scope);
-        $scope.$digest();
+        ;
         expect(element[0].classList.contains("ng-hide")).toBeTrue();
       });
     });
@@ -109,7 +109,7 @@ describe("ngShow / ngHide", () => {
       ["[]", "{}"].forEach((x) => {
         element = JQLite(`<div ng-hide="${x}"></div>`);
         element = $compile(element)($scope);
-        $scope.$digest();
+        ;
         expect(element[0].classList.contains("ng-hide")).toBeTrue();
       });
     });
@@ -160,7 +160,7 @@ describe("ngShow / ngHide", () => {
 //       const $scope = $rootScope.$new();
 //       $scope.on = true;
 //       element = $compile(html('<div ng-show="on">data</div>'))($scope);
-//       $scope.$digest();
+//       ;
 
 //       item = $animate.queue.shift();
 //       expect(item.event).toBe("removeClass");
@@ -168,7 +168,7 @@ describe("ngShow / ngHide", () => {
 //       expect(item.element).toBeShown();
 
 //       $scope.on = false;
-//       $scope.$digest();
+//       ;
 
 //       item = $animate.queue.shift();
 //       expect(item.event).toBe("addClass");
@@ -187,14 +187,14 @@ describe("ngShow / ngHide", () => {
 //       element = $compile(
 //         html('<div class="show-hide" ng-show="on">data</div>'),
 //       )($scope);
-//       $scope.$digest();
+//       ;
 
 //       item = $animate.queue.shift();
 //       expect(item.event).toEqual("addClass");
 //       expect(item.options.tempClasses).toEqual("ng-hide-animate");
 
 //       $scope.on = true;
-//       $scope.$digest();
+//       ;
 //       item = $animate.queue.shift();
 //       expect(item.event).toEqual("removeClass");
 //       expect(item.options.tempClasses).toEqual("ng-hide-animate");
@@ -211,7 +211,7 @@ describe("ngShow / ngHide", () => {
 //       const $scope = $rootScope.$new();
 //       $scope.off = true;
 //       element = $compile(html('<div ng-hide="off">datum</div>'))($scope);
-//       $scope.$digest();
+//       ;
 
 //       item = $animate.queue.shift();
 //       expect(item.event).toBe("addClass");
@@ -219,7 +219,7 @@ describe("ngShow / ngHide", () => {
 //       expect(item.element).toBeHidden();
 
 //       $scope.off = false;
-//       $scope.$digest();
+//       ;
 
 //       item = $animate.queue.shift();
 //       expect(item.event).toBe("removeClass");
@@ -238,14 +238,14 @@ describe("ngShow / ngHide", () => {
 //       element = $compile(
 //         html('<div class="show-hide" ng-hide="on">data</div>'),
 //       )($scope);
-//       $scope.$digest();
+//       ;
 
 //       item = $animate.queue.shift();
 //       expect(item.event).toEqual("removeClass");
 //       expect(item.options.tempClasses).toEqual("ng-hide-animate");
 
 //       $scope.on = true;
-//       $scope.$digest();
+//       ;
 //       item = $animate.queue.shift();
 //       expect(item.event).toEqual("addClass");
 //       expect(item.options.tempClasses).toEqual("ng-hide-animate");

@@ -22,7 +22,7 @@ export function ngShowDirective($animate) {
             tempClasses: NG_HIDE_IN_PROGRESS_CLASS,
           });
         } else {
-          scope.$$postDigest(() => {
+          scope.$postUpdate(() => {
             if (value) {
               element
                 .elements()
@@ -56,7 +56,7 @@ export function ngHideDirective($animate) {
             tempClasses: NG_HIDE_IN_PROGRESS_CLASS,
           });
         } else {
-          scope.$$postDigest(() => {
+          scope.$postUpdate(() => {
             if (value) {
               element
                 .elements()

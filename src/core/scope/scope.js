@@ -58,7 +58,7 @@ const $rootScopeMinErr = minErr("$rootScope");
 
 /** @type {AsyncQueueTask[]} */
 export const $$asyncQueue = [];
-export const $$postDigestQueue = [];
+export const $postUpdateQueue = [];
 
 /**
  * @type {Function[]}
@@ -332,16 +332,16 @@ export class Scope {
      });
      expect(scope.counter).toEqual(0);
 
-     scope.$digest();
+     ;
      // the listener is always called during the first $digest loop after it was registered
      expect(scope.counter).toEqual(1);
 
-     scope.$digest();
+     ;
      // but now it will not be called unless the value changes
      expect(scope.counter).toEqual(1);
 
      scope.name = 'adam';
-     scope.$digest();
+     ;
      expect(scope.counter).toEqual(2);
 
      // Using a function as a watchExpression
@@ -363,12 +363,12 @@ export class Scope {
      expect(scope.foodCounter).toEqual(0);
 
      // Run the digest but since food has not changed count will still be zero
-     scope.$digest();
+     ;
      expect(scope.foodCounter).toEqual(0);
 
      // Update food and run digest.  Now the counter will increment
      food = 'cheeseburger';
-     scope.$digest();
+     ;
      expect(scope.foodCounter).toEqual(1);
 
  * ```
@@ -710,16 +710,16 @@ export class Scope {
      });
      expect(scope.counter).toEqual(0);
 
-     scope.$digest();
+     ;
      // the listener is always called during the first $digest loop after it was registered
      expect(scope.counter).toEqual(1);
 
-     scope.$digest();
+     ;
      // but now it will not be called unless the value changes
      expect(scope.counter).toEqual(1);
 
      scope.name = 'adam';
-     scope.$digest();
+     ;
      expect(scope.counter).toEqual(2);
  * ```
  *
@@ -861,14 +861,14 @@ export class Scope {
     this.clearPhase();
 
     // postDigestQueuePosition isn't local here because this loop can be reentered recursively.
-    while (postDigestQueuePosition < $$postDigestQueue.length) {
+    while (postDigestQueuePosition < $postUpdateQueue.length) {
       try {
-        $$postDigestQueue[postDigestQueuePosition++]();
+        $postUpdateQueue[postDigestQueuePosition++]();
       } catch (e) {
         $exceptionHandler(e);
       }
     }
-    $$postDigestQueue.length = postDigestQueuePosition = 0;
+    $postUpdateQueue.length = postDigestQueuePosition = 0;
 
     // Check for changes to browser url that happened during the $digest
     // (for which no event is fired; e.g. via `history.pushState()`)
@@ -905,7 +905,7 @@ export class Scope {
    * Some of the things to consider are:
    *
    * * Any external event on a directive/component will not trigger a digest while the hosting
-   *   scope is suspended - even if the event handler calls `$apply()` or `$rootScope.$digest()`.
+   *   scope is suspended - even if the event handler calls `$apply()` or ``.
    * * Transcluded content exists on a scope that inherits from outside a directive but exists
    *   as a child of the directive's containing scope. If the containing scope is suspended the
    *   transcluded scope will also be suspended, even if the scope from which the transcluded
@@ -1119,8 +1119,8 @@ export class Scope {
     return id;
   }
 
-  $$postDigest(fn) {
-    $$postDigestQueue.push(fn);
+  $postUpdate(fn) {
+    $postUpdateQueue.push(fn);
   }
 
   /**

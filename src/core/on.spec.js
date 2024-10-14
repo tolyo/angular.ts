@@ -101,7 +101,7 @@ describe("ngOn* event binding", () => {
       $rootScope,
     );
     const cb = ($rootScope.cb = jasmine.createSpy("ng-on cb"));
-    $rootScope.$digest();
+    ;
     element.triggerHandler("asdf");
     expect(cb).toHaveBeenCalled();
     expect(element.attr("asdf")).toBe("foo");
@@ -112,7 +112,7 @@ describe("ngOn* event binding", () => {
       $rootScope,
     );
     const cb = ($rootScope.cb = jasmine.createSpy("ng-on cb"));
-    $rootScope.$digest();
+    ;
     element.triggerHandler("asdf");
     expect(cb).toHaveBeenCalled();
     expect(element.attr("asdf")).toBe("foo");
@@ -123,7 +123,7 @@ describe("ngOn* event binding", () => {
       $rootScope,
     );
     const cb = ($rootScope.cb = jasmine.createSpy("ng-on cb"));
-    $rootScope.$digest();
+    ;
     element.triggerHandler("asdf");
     expect(cb).toHaveBeenCalled();
     expect(element[0].asdf).toBe(123);
@@ -197,7 +197,7 @@ describe("ngOn* event binding", () => {
   it("should correctly bind to kebab-cased event names", () => {
     const element = $compile('<span ng-on-foo-bar="cb()"></span>')($rootScope);
     const cb = ($rootScope.cb = jasmine.createSpy("ng-on cb"));
-    $rootScope.$digest();
+    ;
 
     element.triggerHandler("foobar");
     element.triggerHandler("fooBar");
@@ -210,7 +210,7 @@ describe("ngOn* event binding", () => {
   it("should correctly bind to camelCased event names", () => {
     const element = $compile('<span ng-on-foo_bar="cb()"></span>')($rootScope);
     const cb = ($rootScope.cb = jasmine.createSpy("ng-on cb"));
-    $rootScope.$digest();
+    ;
 
     element.triggerHandler("foobar");
     element.triggerHandler("foo-bar");

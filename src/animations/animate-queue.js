@@ -183,7 +183,7 @@ export function AnimateQueueProvider($animateProvider) {
           if (postDigestCalled) {
             fn();
           } else {
-            $rootScope.$$postDigest(() => {
+            $rootScope.$postUpdate(() => {
               postDigestCalled = true;
               fn();
             });
@@ -208,8 +208,8 @@ export function AnimateQueueProvider($animateProvider) {
           // use $postDigest, it's important that the code below executes at the end.
           // This basically means that the page is fully downloaded and compiled before
           // any animations are triggered.
-          $rootScope.$$postDigest(() => {
-            $rootScope.$$postDigest(() => {
+          $rootScope.$postUpdate(() => {
+            $rootScope.$postUpdate(() => {
               // we check for null directly in the event that the application already called
               // .enabled() with whatever arguments that it provided it with
               if (animationsEnabled === null) {
@@ -597,7 +597,7 @@ export function AnimateQueueProvider($animateProvider) {
 
         markElementAnimationState(node, PRE_DIGEST_STATE, newAnimation);
 
-        $rootScope.$$postDigest(() => {
+        $rootScope.$postUpdate(() => {
           // It is possible that the DOM nodes inside `originalElement` have been replaced. This can
           // happen if the animated element is a transcluded clone and also has a `templateUrl`
           // directive on it. Therefore, we must recreate `element` in order to interact with the

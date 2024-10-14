@@ -29,10 +29,10 @@ describe("boolean attr directives", () => {
       $rootScope,
     );
     $rootScope.isDisabled = 0;
-    $rootScope.$digest();
+    ;
     expect(element.attr("disabled")).toBeFalsy();
     $rootScope.isDisabled = 1;
-    $rootScope.$digest();
+    ;
     expect(element.attr("disabled")).toBeTruthy();
   });
 
@@ -41,10 +41,10 @@ describe("boolean attr directives", () => {
       $rootScope,
     );
     $rootScope.isDisabled = false;
-    $rootScope.$digest();
+    ;
     expect(element.attr("disabled")).toBeFalsy();
     $rootScope.isDisabled = true;
-    $rootScope.$digest();
+    ;
     expect(element.attr("disabled")).toBeTruthy();
   });
 
@@ -53,10 +53,10 @@ describe("boolean attr directives", () => {
       $rootScope,
     );
     $rootScope.isChecked = false;
-    $rootScope.$digest();
+    ;
     expect(element.attr("checked")).toBeFalsy();
     $rootScope.isChecked = true;
-    $rootScope.$digest();
+    ;
     expect(element.attr("checked")).toBeTruthy();
   });
 
@@ -68,7 +68,7 @@ describe("boolean attr directives", () => {
     )($rootScope);
 
     $rootScope.value = "true";
-    $rootScope.$digest();
+    ;
     expect(element[0].checked).toBe(true);
 
     element[0].checked = !element[0].checked;
@@ -86,10 +86,10 @@ describe("boolean attr directives", () => {
       '<select><option value=""></option><option ng-selected="isSelected">Greetings!</option></select>',
     )($rootScope);
     $rootScope.isSelected = false;
-    $rootScope.$digest();
+    ;
     expect(element.children()[1].selected).toBeFalsy();
     $rootScope.isSelected = true;
-    $rootScope.$digest();
+    ;
     expect(element.children()[1].selected).toBeTruthy();
   });
 
@@ -98,20 +98,20 @@ describe("boolean attr directives", () => {
       $rootScope,
     );
     $rootScope.isReadonly = false;
-    $rootScope.$digest();
+    ;
     expect(element.attr("readOnly")).toBeFalsy();
     $rootScope.isReadonly = true;
-    $rootScope.$digest();
+    ;
     expect(element.attr("readOnly")).toBeTruthy();
   });
 
   it("should bind open", () => {
     element = $compile('<details ng-open="isOpen"></details>')($rootScope);
     $rootScope.isOpen = false;
-    $rootScope.$digest();
+    ;
     expect(element.attr("open")).toBeFalsy();
     $rootScope.isOpen = true;
-    $rootScope.$digest();
+    ;
     expect(element.attr("open")).toBeTruthy();
   });
 
@@ -121,10 +121,10 @@ describe("boolean attr directives", () => {
         $rootScope,
       );
       $rootScope.isMultiple = false;
-      $rootScope.$digest();
+      ;
       expect(element.attr("multiple")).toBeFalsy();
       $rootScope.isMultiple = "multiple";
-      $rootScope.$digest();
+      ;
       expect(element.attr("multiple")).toBeFalsy(); // ignore
     });
 

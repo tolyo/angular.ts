@@ -43,7 +43,7 @@ describe("scriptDirective", () => {
       '<script type="text/javascript">some {{binding}}</script>' +
       '<script type="text/ng-template" id="/some">other {{binding}}</script>';
     $compile(doc)($rootScope);
-    $rootScope.$digest();
+    ;
 
     const scripts = doc.find("script");
     expect(scripts.eq(0)[0].text).toBe("some {{binding}}");

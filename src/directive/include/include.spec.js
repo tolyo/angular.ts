@@ -41,7 +41,7 @@ describe("ngInclude", () => {
       );
       const injector = angular.bootstrap(element);
       $rootScope = injector.get("$rootScope");
-      $rootScope.$digest();
+      ;
       setTimeout(() => {
         expect(element.text()).toEqual("hello");
         dealoc($rootScope);
@@ -57,7 +57,7 @@ describe("ngInclude", () => {
       $rootScope.fooUrl = $sce.trustAsResourceUrl(
         "http://localhost:4000/mock/hello",
       );
-      $rootScope.$digest();
+      ;
       await wait(100);
       expect(element.text()).toEqual("Hello");
       dealoc($rootScope);
@@ -73,7 +73,7 @@ describe("ngInclude", () => {
       $templateCache.set("myUrl", [200, "{{name}}", {}]);
       $rootScope.name = "misko";
       $rootScope.url = "myUrl";
-      $rootScope.$digest();
+      ;
       expect(body.text()).toEqual("misko");
       body.empty();
       dealoc($rootScope);
@@ -85,7 +85,7 @@ describe("ngInclude", () => {
       $rootScope = injector.get("$rootScope");
       $rootScope.expr = "Alibaba";
       $rootScope.url = "/mock/interpolation";
-      $rootScope.$digest();
+      ;
 
       setTimeout(() => {
         expect(element.text()).toEqual("Alibaba");
@@ -99,7 +99,7 @@ describe("ngInclude", () => {
       $rootScope = injector.get("$rootScope");
       $rootScope.url = "http://example.com/myUrl";
       expect(() => {
-        $rootScope.$digest();
+        ;
       }).toThrowError(/insecurl/);
     });
 
@@ -111,7 +111,7 @@ describe("ngInclude", () => {
       let $sce = injector.get("$sce");
       $rootScope.url = $sce.trustAsUrl("http://example.com/myUrl");
       expect(() => {
-        $rootScope.$digest();
+        ;
       }).toThrowError(/insecurl/);
     });
 
@@ -121,11 +121,11 @@ describe("ngInclude", () => {
       $rootScope = injector.get("$rootScope");
       $rootScope.expr = "igor";
       $rootScope.url = "/mock/interpolation";
-      $rootScope.$digest();
+      ;
       setTimeout(() => {
         expect(element.text()).toEqual("igor");
         $rootScope.url = undefined;
-        $rootScope.$digest();
+        ;
       }, 100);
       setTimeout(() => {
         expect(element.text()).toEqual("");
@@ -148,7 +148,7 @@ describe("ngInclude", () => {
       const injector = angular.bootstrap(element, ["myModule"]);
       $rootScope = injector.get("$rootScope");
       $rootScope.url = "/mock/interpolation";
-      $rootScope.$digest();
+      ;
 
       setTimeout(() => {
         expect(called).toBe(true);
@@ -171,7 +171,7 @@ describe("ngInclude", () => {
       const injector = angular.bootstrap(element, ["myModule"]);
       $rootScope = injector.get("$rootScope");
       $rootScope.url = "/mock/interpolation";
-      $rootScope.$digest();
+      ;
 
       setTimeout(() => {
         expect(called).toBe(true);
@@ -195,7 +195,7 @@ describe("ngInclude", () => {
 
       const injector = angular.bootstrap(element, ["myModule"]);
       $rootScope = injector.get("$rootScope");
-      $rootScope.$digest();
+      ;
 
       setTimeout(() => {
         expect(contentLoadedSpy).not.toHaveBeenCalled();
@@ -212,11 +212,11 @@ describe("ngInclude", () => {
       );
       const injector = angular.bootstrap(element, ["myModule"]);
       $rootScope = injector.get("$rootScope");
-      $rootScope.$digest();
+      ;
 
       expect($rootScope.loaded).not.toBeDefined();
       $rootScope.url = "/mock/hello";
-      $rootScope.$digest();
+      ;
 
       setTimeout(() => {
         expect(element.text()).toEqual("Hello");
@@ -231,18 +231,18 @@ describe("ngInclude", () => {
       element = JQLite('<div><ng-include src="url"></ng-include></div>');
       const injector = angular.bootstrap(element, ["myModule"]);
       $rootScope = injector.get("$rootScope");
-      $rootScope.$digest();
+      ;
       expect($rootScope.$$childHead).toBeFalsy();
 
       $rootScope.url = "/mock/hello";
-      $rootScope.$digest();
+      ;
 
       setTimeout(() => {
         expect($rootScope.$$childHead.$parent).toBe($rootScope);
         expect(element.text()).toBe("Hello");
 
         $rootScope.url = "/mock/401";
-        $rootScope.$digest();
+        ;
       }, 100);
 
       setTimeout(() => {
@@ -250,14 +250,14 @@ describe("ngInclude", () => {
         expect(element.text()).toBe("");
 
         $rootScope.url = "/mock/hello";
-        $rootScope.$digest();
+        ;
       }, 200);
 
       setTimeout(() => {
         expect($rootScope.$$childHead.$parent).toBe($rootScope);
 
         $rootScope.url = null;
-        $rootScope.$digest();
+        ;
       }, 300);
 
       setTimeout(() => {
@@ -272,16 +272,16 @@ describe("ngInclude", () => {
       const injector = angular.bootstrap(element, ["myModule"]);
       $rootScope = injector.get("$rootScope");
       $rootScope.url = "/mock/hello";
-      $rootScope.$digest();
+      ;
       await wait(100);
 
       expect(element.text()).toEqual("Hello");
       $rootScope.url = null;
-      $rootScope.$digest();
+      ;
       await wait(100);
       expect(element.text()).toEqual("");
       $rootScope.url = "/mock/hello";
-      $rootScope.$digest();
+      ;
       // No request being made
       expect(element.text()).toEqual("Hello");
     });
@@ -292,7 +292,7 @@ describe("ngInclude", () => {
       const injector = angular.bootstrap(element, ["myModule"]);
       $rootScope = injector.get("$rootScope");
       $rootScope.url = "/mock/401";
-      $rootScope.$digest();
+      ;
       expect(element.text()).toBe("");
     });
 
@@ -310,7 +310,7 @@ describe("ngInclude", () => {
         called++;
       });
 
-      $rootScope.$digest();
+      ;
       setTimeout(() => {
         expect(element.text()).toBe("Hello");
         done();
@@ -325,10 +325,10 @@ describe("ngInclude", () => {
       const injector = angular.bootstrap(element, ["myModule"]);
       $rootScope = injector.get("$rootScope");
       $rootScope.templateUrl = "/mock/hello";
-      $rootScope.$digest();
+      ;
       $rootScope.expr = "test";
       $rootScope.templateUrl = "/mock/interpolation";
-      $rootScope.$digest();
+      ;
       expect(element.text()).toBe("");
 
       setTimeout(() => {
@@ -346,20 +346,20 @@ describe("ngInclude", () => {
       $rootScope = injector.get("$rootScope");
       $rootScope.hrefUrl = "fooUrl1";
       $rootScope.includeUrl = "/mock/hello";
-      $rootScope.$digest();
+      ;
 
       await wait(100);
       expect(element.text()).toBe("Hello");
       expect(element.find("span").attr("foo")).toBe("#/fooUrl1");
 
       $rootScope.hrefUrl = "fooUrl2";
-      $rootScope.$digest();
+      ;
 
       expect(element.text()).toBe("Hello");
       expect(element.find("span").attr("foo")).toBe("#/fooUrl2");
 
       $rootScope.includeUrl = "/mock/hello2";
-      $rootScope.$digest();
+      ;
 
       await wait(100);
       expect(element.text()).toBe("Hello2");
@@ -378,7 +378,7 @@ describe("ngInclude", () => {
       element = JQLite("<svg><test></test></svg>");
       const injector = angular.bootstrap(element, ["myModule"]);
       $rootScope = injector.get("$rootScope");
-      $rootScope.$digest();
+      ;
       await wait(100);
       const child = element.find("rect");
       expect(child.length).toBe(2);
@@ -397,7 +397,7 @@ describe("ngInclude", () => {
       element = JQLite("<svg><test></test></svg>");
       const injector = angular.bootstrap(element, ["myModule"]);
       $rootScope = injector.get("$rootScope");
-      $rootScope.$digest();
+      ;
       await wait(200);
       expect(element.find("a").length).toBe(0);
     });
@@ -410,9 +410,9 @@ describe("ngInclude", () => {
       const injector = angular.bootstrap(element, ["myModule"]);
       $rootScope = injector.get("$rootScope");
       $rootScope.show = true;
-      $rootScope.$digest();
+      ;
       $rootScope.show = false;
-      $rootScope.$digest();
+      ;
 
       setTimeout(() => {
         expect(element.text()).toBe("");
@@ -428,7 +428,7 @@ describe("ngInclude", () => {
       const spy = spyOn($rootScope, "$digest").and.callThrough();
 
       $rootScope.url = "/mock/hello";
-      $rootScope.$digest();
+      ;
 
       setTimeout(() => {
         expect(element.text()).toEqual("Hello");
@@ -491,7 +491,7 @@ describe("ngInclude", () => {
           $rootScope.value = true;
         });
 
-        $rootScope.$digest();
+        ;
 
         setTimeout(() => {
           expect(autoScrollSpy).toHaveBeenCalled();
@@ -514,7 +514,7 @@ describe("ngInclude", () => {
         $rootScope.$apply(() => {
           $rootScope.tpl = "/mock/hello";
         });
-        $rootScope.$digest();
+        ;
 
         setTimeout(() => {
           expect(autoScrollSpy).not.toHaveBeenCalled();
@@ -568,7 +568,7 @@ describe("ngInclude", () => {
       //     expect($animate.queue.shift().event).toBe("enter");
 
       //     $animate.flush();
-      //     $rootScope.$digest();
+      //     ;
 
       //     expect(autoScrollSpy).toHaveBeenCalled();
       //   },
@@ -714,7 +714,7 @@ describe("ngInclude", () => {
     //     element = $compile(
     //       html("<div><div " + 'ng-include="tpl">' + "</div></div>"),
     //     )($rootScope);
-    //     $rootScope.$digest();
+    //     ;
 
     //     const animation = $animate.queue.pop();
     //     expect(animation.event).toBe("enter");
@@ -728,14 +728,14 @@ describe("ngInclude", () => {
     //     element = $compile(
     //       html("<div><div " + 'ng-include="tpl">' + "</div></div>"),
     //     )($rootScope);
-    //     $rootScope.$digest();
+    //     ;
 
     //     let animation = $animate.queue.shift();
     //     expect(animation.event).toBe("enter");
     //     expect(animation.element.text()).toBe("data");
 
     //     $rootScope.tpl = "";
-    //     $rootScope.$digest();
+    //     ;
 
     //     animation = $animate.queue.shift();
     //     expect(animation.event).toBe("leave");
@@ -750,13 +750,13 @@ describe("ngInclude", () => {
     //     element = $compile(
     //       html("<div><div " + 'ng-include="tpl">' + "</div></div>"),
     //     )($rootScope);
-    //     $rootScope.$digest();
+    //     ;
 
     //     const item1 = $animate.queue.shift().element;
     //     expect(item1.text()).toBe("one");
 
     //     $rootScope.tpl = "two";
-    //     $rootScope.$digest();
+    //     ;
 
     //     const itemA = $animate.queue.shift().element;
     //     const itemB = $animate.queue.shift().element;

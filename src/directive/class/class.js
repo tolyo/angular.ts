@@ -47,7 +47,7 @@ function classDirective(name, selector) {
           if (hasAnimate(element[0])) {
             attr.$addClass(classString);
           } else {
-            scope.$$postDigest(() => {
+            scope.$postUpdate(() => {
               if (classString !== "") {
                 element[0].classList.add(...classString.trim().split(" "));
               }
@@ -60,7 +60,7 @@ function classDirective(name, selector) {
           if (hasAnimate(element[0])) {
             attr.$removeClass(classString);
           } else {
-            scope.$$postDigest(() => {
+            scope.$postUpdate(() => {
               if (classString !== "") {
                 element[0].classList.remove(...classString.trim().split(" "));
               }
@@ -82,7 +82,7 @@ function classDirective(name, selector) {
             attr.$addClass(toAddString);
             attr.$removeClass(toRemoveString);
           } else {
-            scope.$$postDigest(() => {
+            scope.$postUpdate(() => {
               if (toAddString !== "") {
                 element[0].classList.add(...toAddString.trim().split(" "));
               }

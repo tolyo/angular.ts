@@ -82,7 +82,7 @@ describe("$animate", () => {
       $animate.enabled(false);
       expect(element[0].classList.contains("ng-hide")).toBeFalse();
       $animate.addClass(element, "ng-hide");
-      $rootScope.$digest();
+      ;
       expect(element[0].classList.contains("ng-hide")).toBeTrue();
     });
 
@@ -117,10 +117,10 @@ describe("$animate", () => {
       $animate.enabled(false);
       expect(rect[0].classList.contains("ng-hide")).toBeFalse();
       $animate.addClass(rect, "ng-hide");
-      $rootScope.$digest();
+      ;
       expect(rect[0].classList.contains("ng-hide")).toBeTrue();
       $animate.removeClass(rect, "ng-hide");
-      $rootScope.$digest();
+      ;
       expect(rect[0].classList.contains("ng-hide")).toBeFalse();
     });
 
@@ -171,25 +171,25 @@ describe("$animate", () => {
       $animate.addClass(element, "on", {
         to: { color: "green" },
       });
-      $rootScope.$digest();
+      ;
       assertColor("green");
 
       $animate.setClass(element, "off", "on", {
         to: { color: "black" },
       });
-      $rootScope.$digest();
+      ;
       assertColor("black");
 
       $animate.removeClass(element, "off", {
         to: { color: "blue" },
       });
-      $rootScope.$digest();
+      ;
       assertColor("blue");
 
       $animate.leave(element, {
         to: { color: "yellow" },
       });
-      $rootScope.$digest();
+      ;
       assertColor("yellow");
 
       function assertColor(color) {
@@ -205,7 +205,7 @@ describe("$animate", () => {
         from: { color: "green" },
         to: { borderColor: "purple" },
       });
-      $rootScope.$digest();
+      ;
 
       const { style } = element[0];
       expect(style.color).toBe("green");
@@ -217,7 +217,7 @@ describe("$animate", () => {
 
       $animate.addClass(element, "ng-hide");
       $animate.removeClass(element, "ng-hide");
-      $rootScope.$digest();
+      ;
 
       expect(element[0].classList.contains("ng-hide")).toBeFalse();
     });
@@ -227,7 +227,7 @@ describe("$animate", () => {
 
       $animate.removeClass(element, "ng-hide");
       $animate.addClass(element, "ng-hide");
-      $rootScope.$digest();
+      ;
 
       expect(element[0].classList.contains("ng-hide")).toBeTrue();
     });
@@ -338,7 +338,7 @@ describe("$animate", () => {
 
         expect(() => {
           fn();
-          $rootScope.$digest();
+          ;
         }).not.toThrow();
 
         const optionsArg = captureSpy.calls.mostRecent().args[2];
@@ -353,7 +353,7 @@ describe("$animate", () => {
 
       $animate.enter(element1, $rootElement, null, { addClass: " " });
       $animate.enter(element2, $rootElement, null, { addClass: "valid-name" });
-      $rootScope.$digest();
+      ;
 
       expect(element2[0].classList.contains("valid-name")).toBeTruthy();
     });
@@ -375,7 +375,7 @@ describe("$animate", () => {
       const runner = $animate.enter(element, parent, null, copiedOptions);
       expect(copiedOptions).toEqual(initialOptions);
 
-      $rootScope.$digest();
+      ;
       expect(copiedOptions).toEqual(initialOptions);
     });
 
@@ -418,7 +418,7 @@ describe("$animate", () => {
         $animate.removeClass(element, "test-class1");
         $animate.addClass(element, "test-class2");
         $animate.setClass(element, "test-class3", "test-class4");
-        $rootScope.$digest();
+        ;
         expect(element[0].classList.contains("test-class1")).toBeFalse();
         expect(element[0].classList.contains("test-class2")).toBeTrue();
         expect(element[0].classList.contains("test-class3")).toBeTrue();
@@ -443,7 +443,7 @@ describe("$animate", () => {
         $animate.addClass(element, "test1");
         $animate.removeClass(element, "test2");
 
-        $rootScope.$digest();
+        ;
         element = JQLite('<p class="test4">test</p>');
 
         $rootScope.$apply(() => {
@@ -486,7 +486,7 @@ describe("$animate", () => {
         $animate.addClass(target, "test-class2");
         $animate.setClass(target, "test-class3", "test-class4");
 
-        $rootScope.$digest();
+        ;
 
         expect(target[0].classList.contains("test-class2")).toBeTrue();
         expect(target[0].classList.contains("test-class3")).toBeTrue();

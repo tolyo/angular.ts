@@ -570,9 +570,9 @@ describe("ngSwitch", () => {
 //         ),
 //       )($scope);
 
-//       $rootScope.$digest(); // re-enable the animations;
+//       ; // re-enable the animations;
 //       $scope.val = "one";
-//       $scope.$digest();
+//       ;
 
 //       item = $animate.queue.shift();
 //       expect(item.event).toBe("enter");
@@ -596,16 +596,16 @@ describe("ngSwitch", () => {
 //         ),
 //       )($scope);
 
-//       $rootScope.$digest(); // re-enable the animations;
+//       ; // re-enable the animations;
 //       $scope.val = "two";
-//       $scope.$digest();
+//       ;
 
 //       item = $animate.queue.shift();
 //       expect(item.event).toBe("enter");
 //       expect(item.element.text()).toBe("two");
 
 //       $scope.val = "three";
-//       $scope.$digest();
+//       ;
 
 //       item = $animate.queue.shift();
 //       expect(item.event).toBe("leave");

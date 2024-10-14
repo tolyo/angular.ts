@@ -259,7 +259,7 @@
 - $animate.leave(kids[5]); //stagger index=0
 - $animate.leave(kids[6]); //stagger index=1
 -
-- $scope.$digest();
+- ;
 - });
 - ```
 

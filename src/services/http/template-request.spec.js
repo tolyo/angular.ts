@@ -102,7 +102,7 @@ describe("$templateRequest", () => {
       content = html;
     });
 
-    $rootScope.$digest();
+    ;
     expect(content).toBe("<div>Hello</div>");
   });
 
@@ -115,7 +115,7 @@ describe("$templateRequest", () => {
     await $templateRequest("/mock/div").then(tplRequestCb);
 
     $templateRequest("/mock/div").then(tplRequestCb);
-    $rootScope.$digest();
+    ;
 
     expect(content[0]).toBe("<div>Hello</div>");
     expect(content[1]).toBe("<div>Hello</div>");
@@ -130,7 +130,7 @@ describe("$templateRequest", () => {
     }
 
     await $templateRequest("tpl.html").then(tplRequestCb);
-    $rootScope.$digest();
+    ;
 
     expect(content[0]).toBe("_matias");
   });
@@ -147,7 +147,7 @@ describe("$templateRequest", () => {
   it("should not call `$exceptionHandler` when the template is empty", async () => {
     const onError = jasmine.createSpy("onError");
     await $templateRequest("/mock/empty").catch(onError);
-    $rootScope.$digest();
+    ;
 
     expect(onError).not.toHaveBeenCalled();
   });
@@ -158,13 +158,13 @@ describe("$templateRequest", () => {
 
     expect(() => {
       $templateRequest("tpl.html"); // should go through $sce
-      $rootScope.$digest();
+      ;
     }).toThrow();
 
     $templateCache.set("tpl.html", ""); // should work (empty template)
     expect(() => {
       $templateRequest("tpl.html");
-      $rootScope.$digest();
+      ;
     }).not.toThrow();
     $templateCache = new Map();
   });
@@ -175,7 +175,7 @@ describe("$templateRequest", () => {
 
     expect($templateRequest.totalPendingRequests).toBe(2);
 
-    $rootScope.$digest();
+    ;
     await res;
     expect($templateRequest.totalPendingRequests).toBe(0);
   });

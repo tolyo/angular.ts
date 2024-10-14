@@ -56,21 +56,21 @@ describe("ngRepeat", () => {
     Array.prototype.extraProperty = "should be ignored";
     // INIT
     scope.items = [{ name: "misko" }, { name: "shyam" }];
-    scope.$digest();
+    ;
     expect(element.find("li").length).toEqual(2);
     expect(element.text()).toEqual("misko;shyam;");
     delete Array.prototype.extraProperty;
 
     // GROW
     scope.items.push({ name: "adam" });
-    scope.$digest();
+    ;
     expect(element.find("li").length).toEqual(3);
     expect(element.text()).toEqual("misko;shyam;adam;");
 
     // // SHRINK
     scope.items.pop();
     scope.items.shift();
-    scope.$digest();
+    ;
     expect(element.find("li").length).toEqual(1);
     expect(element.text()).toEqual("shyam;");
   });
@@ -80,14 +80,14 @@ describe("ngRepeat", () => {
       "<ul>" + '<li ng-repeat="item in ::items">{{item.name}};</li>' + "</ul>",
     )(scope);
 
-    scope.$digest();
+    ;
 
     scope.items = [{ name: "misko" }, { name: "shyam" }];
-    scope.$digest();
+    ;
     expect(element.find("li").length).toEqual(2);
     expect(element.text()).toEqual("misko;shyam;");
     scope.items.push({ name: "adam" });
-    scope.$digest();
+    ;
     expect(element.find("li").length).toEqual(2);
     expect(element.text()).toEqual("misko;shyam;");
   });
@@ -97,14 +97,14 @@ describe("ngRepeat", () => {
       "<ul>" + '<li ng-repeat="item in items">{{::item.name}};</li>' + "</ul>",
     )(scope);
 
-    scope.$digest();
+    ;
 
     scope.items = [{ name: "misko" }, { name: "shyam" }];
-    scope.$digest();
+    ;
     expect(element.find("li").length).toEqual(2);
     expect(element.text()).toEqual("misko;shyam;");
     scope.items.push({ name: "adam" });
-    scope.$digest();
+    ;
     expect(element.find("li").length).toEqual(3);
     expect(element.text()).toEqual("misko;shyam;adam;");
   });
@@ -121,7 +121,7 @@ describe("ngRepeat", () => {
 
     const htmlCollection = document.getElementsByClassName("test");
     scope.items = htmlCollection;
-    scope.$digest();
+    ;
     expect(element.find("li").length).toEqual(3);
     expect(element.text()).toEqual("x;y;x;");
 
@@ -144,7 +144,7 @@ describe("ngRepeat", () => {
     )(scope);
 
     scope.items = collection;
-    scope.$digest();
+    ;
     expect(element.find("li").length).toEqual(3);
     expect(element.text()).toEqual("x;y;z;");
   });
@@ -156,7 +156,7 @@ describe("ngRepeat", () => {
         "</ul>",
     )(scope);
     scope.items = { misko: "swe", shyam: "set" };
-    scope.$digest();
+    ;
     expect(element.text()).toEqual("misko:swe|shyam:set|");
   });
 
@@ -167,7 +167,7 @@ describe("ngRepeat", () => {
         "</ul>",
     )(scope);
     scope.items = { me: "swe", you: "set" };
-    scope.$digest();
+    ;
     expect(element.text()).toEqual("me:swe|you:set|");
   });
 
@@ -184,7 +184,7 @@ describe("ngRepeat", () => {
       dogname: "Bingo",
       codename: "20",
     };
-    scope.$digest();
+    ;
     expect(element.text()).toEqual(
       "age:20|wealth:20|prodname:Bingo|dogname:Bingo|codename:20|",
     );
@@ -202,11 +202,11 @@ describe("ngRepeat", () => {
     items.shyam = "set";
 
     scope.items = items;
-    scope.$digest();
+    ;
     expect(element.text()).toEqual("misko:swe|shyam:set|");
 
     delete items.shyam;
-    scope.$digest();
+    ;
     expect(element.text()).toEqual("misko:swe|");
   });
 
@@ -218,12 +218,12 @@ describe("ngRepeat", () => {
           "</ul>",
       )(scope);
       scope.items = [{ id: "misko" }, { id: "igor" }];
-      scope.$digest();
+      ;
       const li0 = element.find("li")[0];
       const li1 = element.find("li")[1];
 
       scope.items.push(scope.items.shift());
-      scope.$digest();
+      ;
       expect(element.find("li")[0]).toBe(li1);
       expect(element.find("li")[1]).toBe(li0);
     });
@@ -235,12 +235,12 @@ describe("ngRepeat", () => {
           "</ul>",
       )(scope);
       scope.items = [{ name: "misko" }, { name: "igor" }];
-      scope.$digest();
+      ;
       const li0 = element.find("li")[0];
       const li1 = element.find("li")[1];
 
       scope.items.push(scope.items.shift());
-      scope.$digest();
+      ;
       expect(element.find("li")[0]).toBe(li1);
       expect(element.find("li")[1]).toBe(li0);
     });
@@ -255,7 +255,7 @@ describe("ngRepeat", () => {
           "</ul>",
       )(scope);
       scope.items = [{ name: "igor" }, { name: "misko" }];
-      scope.$digest();
+      ;
 
       expect(element.find("li").text()).toBe("igor;");
     });
@@ -278,14 +278,14 @@ describe("ngRepeat", () => {
         { id: 1, name: "igor" },
         { id: 2, name: "misko" },
       ];
-      scope.$digest();
+      ;
       expect(element.text()).toBe("igor;misko;");
 
       const li0 = element.find("li")[0];
       const li1 = element.find("li")[1];
 
       scope.items.push(scope.items.shift());
-      scope.$digest();
+      ;
       expect(element.find("li")[0]).toBe(li1);
       expect(element.find("li")[1]).toBe(li0);
     });
@@ -300,75 +300,75 @@ describe("ngRepeat", () => {
       Array.prototype.extraProperty = "should be ignored";
       // INIT
       scope.items = [true, true, true];
-      scope.$digest();
+      ;
       expect(element.find("li").length).toEqual(3);
       expect(element.text()).toEqual("true;true;true;");
       delete Array.prototype.extraProperty;
 
       scope.items = [false, true, true];
-      scope.$digest();
+      ;
       expect(element.find("li").length).toEqual(3);
       expect(element.text()).toEqual("false;true;true;");
 
       scope.items = [false, true, false];
-      scope.$digest();
+      ;
       expect(element.find("li").length).toEqual(3);
       expect(element.text()).toEqual("false;true;false;");
 
       scope.items = [true];
-      scope.$digest();
+      ;
       expect(element.find("li").length).toEqual(1);
       expect(element.text()).toEqual("true;");
 
       scope.items = [true, true, false];
-      scope.$digest();
+      ;
       expect(element.find("li").length).toEqual(3);
       expect(element.text()).toEqual("true;true;false;");
 
       scope.items = [true, false, false];
-      scope.$digest();
+      ;
       expect(element.find("li").length).toEqual(3);
       expect(element.text()).toEqual("true;false;false;");
 
       // string
       scope.items = ["a", "a", "a"];
-      scope.$digest();
+      ;
       expect(element.find("li").length).toEqual(3);
       expect(element.text()).toEqual("a;a;a;");
 
       scope.items = ["ab", "a", "a"];
-      scope.$digest();
+      ;
       expect(element.find("li").length).toEqual(3);
       expect(element.text()).toEqual("ab;a;a;");
 
       scope.items = ["test"];
-      scope.$digest();
+      ;
       expect(element.find("li").length).toEqual(1);
       expect(element.text()).toEqual("test;");
 
       scope.items = ["same", "value"];
-      scope.$digest();
+      ;
       expect(element.find("li").length).toEqual(2);
       expect(element.text()).toEqual("same;value;");
 
       // number
       scope.items = [12, 12, 12];
-      scope.$digest();
+      ;
       expect(element.find("li").length).toEqual(3);
       expect(element.text()).toEqual("12;12;12;");
 
       scope.items = [53, 12, 27];
-      scope.$digest();
+      ;
       expect(element.find("li").length).toEqual(3);
       expect(element.text()).toEqual("53;12;27;");
 
       scope.items = [89];
-      scope.$digest();
+      ;
       expect(element.find("li").length).toEqual(1);
       expect(element.text()).toEqual("89;");
 
       scope.items = [89, 23];
-      scope.$digest();
+      ;
       expect(element.find("li").length).toEqual(2);
       expect(element.text()).toEqual("89;23;");
     });
@@ -384,7 +384,7 @@ describe("ngRepeat", () => {
       )(scope);
       document.getElementById("dummy").appendChild(element[0]);
       scope.items = { misko: true, shyam: true, zhenbo: true };
-      scope.$digest();
+      ;
       expect(element.find("li").length).toEqual(3);
       expect(element.text()).toEqual("misko:true;shyam:true;zhenbo:true;");
       element.find("input").eq(0)[0].click();
@@ -407,7 +407,7 @@ describe("ngRepeat", () => {
       expect(element.find("input")[2].checked).toBe(true);
 
       scope.items = { misko: false, shyam: true, zhenbo: true };
-      scope.$digest();
+      ;
       expect(element.text()).toEqual("misko:false;shyam:true;zhenbo:true;");
       expect(element.find("input")[0].checked).toBe(false);
       expect(element.find("input")[1].checked).toBe(true);
@@ -426,7 +426,7 @@ describe("ngRepeat", () => {
           '<li ng-repeat="(k, v) in [1, 2] track by trackBy(k, v)"></li>' +
           "</ul>",
       )(scope);
-      scope.$digest();
+      ;
 
       expect(scope.trackBy).toHaveBeenCalledTimes(2);
       expect(scope.trackBy.calls.argsFor(0)).toEqual([0, 1]);
@@ -446,7 +446,7 @@ describe("ngRepeat", () => {
           "</li>" +
           "</ul>",
       )(scope);
-      scope.$digest();
+      ;
 
       expect(scope.trackBy).toHaveBeenCalledTimes(4);
       expect(scope.trackBy.calls.argsFor(0)).toEqual([0, 1, 0, 3]);
@@ -472,10 +472,10 @@ describe("ngRepeat", () => {
       ];
 
       expect(scope.results).toBeUndefined();
-      scope.$digest();
+      ;
 
       scope.x = "bl";
-      scope.$digest();
+      ;
 
       expect(scope.results).toEqual([
         { name: "blue" },
@@ -484,7 +484,7 @@ describe("ngRepeat", () => {
       ]);
 
       scope.items = [];
-      scope.$digest();
+      ;
 
       expect(scope.results).toEqual([]);
     });
@@ -500,11 +500,11 @@ describe("ngRepeat", () => {
       )(scope);
 
       scope.items = [1, 2, 3, 4, 5, 6];
-      scope.$digest();
+      ;
       expect(element.text().trim()).toEqual("123456");
 
       scope.x = "0";
-      scope.$digest();
+      ;
 
       expect(element.text().trim()).toEqual("No results found...");
     });
@@ -526,7 +526,7 @@ describe("ngRepeat", () => {
           element = $compile(`<div><div ng-repeat="${expr}"></div></div>`)(
             scope,
           );
-          scope.$digest();
+          ;
           expect(scope[name]).toEqual([
             { name: "blue" },
             { name: "black" },
@@ -599,7 +599,7 @@ describe("ngRepeat", () => {
       };
       scope.items = [{ name: "igor" }, { name: "misko" }];
 
-      scope.$digest();
+      ;
 
       expect(element.text()).toEqual("igor/misko/");
     });
@@ -615,7 +615,7 @@ describe("ngRepeat", () => {
 
       scope.items = [{ name: "igor" }, { name: "misko" }];
 
-      scope.$digest();
+      ;
 
       expect(element.text()).toEqual("misko/");
     });
@@ -632,7 +632,7 @@ describe("ngRepeat", () => {
       )(scope);
       scope.items = new Class();
       scope.items.name = "value";
-      scope.$digest();
+      ;
       expect(element.text()).toEqual("name:value;");
     });
 
@@ -655,7 +655,7 @@ describe("ngRepeat", () => {
           "</ul>",
       )(scope);
       scope.items = ["misko", "shyam", "frodo"];
-      scope.$digest();
+      ;
       expect(element.text()).toEqual("misko:0|shyam:1|frodo:2|");
     });
 
@@ -666,7 +666,7 @@ describe("ngRepeat", () => {
           "</ul>",
       )(scope);
       scope.items = { misko: "m", shyam: "s", frodo: "f" };
-      scope.$digest();
+      ;
       expect(element.text()).toEqual("misko:m:0|shyam:s:1|frodo:f:2|");
     });
 
@@ -677,7 +677,7 @@ describe("ngRepeat", () => {
           "</ul>",
       )(scope);
       scope.items = { misko: "m", shyam: "s", frodo: "f", length: 0 };
-      scope.$digest();
+      ;
       expect(element.text()).toEqual(
         "misko:m:0|shyam:s:1|frodo:f:2|length:0:3|",
       );
@@ -690,13 +690,13 @@ describe("ngRepeat", () => {
           "</ul>",
       )(scope);
       scope.items = ["misko", "shyam", "doug"];
-      scope.$digest();
+      ;
       expect(element.text()).toEqual(
         "misko:true-false-false|shyam:false-true-false|doug:false-false-true|",
       );
 
       scope.items.push("frodo");
-      scope.$digest();
+      ;
       expect(element.text()).toEqual(
         "misko:true-false-false|" +
           "shyam:false-true-false|" +
@@ -706,13 +706,13 @@ describe("ngRepeat", () => {
 
       scope.items.pop();
       scope.items.pop();
-      scope.$digest();
+      ;
       expect(element.text()).toEqual(
         "misko:true-false-false|shyam:false-false-true|",
       );
 
       scope.items.pop();
-      scope.$digest();
+      ;
       expect(element.text()).toEqual("misko:true-false-true|");
     });
 
@@ -723,13 +723,13 @@ describe("ngRepeat", () => {
           "</ul>",
       )(scope);
       scope.items = ["misko", "shyam", "doug"];
-      scope.$digest();
+      ;
       expect(element.text()).toEqual(
         "misko:true-false|shyam:false-true|doug:true-false|",
       );
 
       scope.items.push("frodo");
-      scope.$digest();
+      ;
       expect(element.text()).toBe(
         "misko:true-false|" +
           "shyam:false-true|" +
@@ -739,7 +739,7 @@ describe("ngRepeat", () => {
 
       scope.items.shift();
       scope.items.pop();
-      scope.$digest();
+      ;
       expect(element.text()).toBe("shyam:true-false|doug:false-true|");
     });
 
@@ -750,7 +750,7 @@ describe("ngRepeat", () => {
           "</ul>",
       )(scope);
       scope.items = { misko: "m", shyam: "s", doug: "d", frodo: "f" };
-      scope.$digest();
+      ;
       expect(element.text()).toEqual(
         "misko:m:true-false-false|" +
           "shyam:s:false-true-false|" +
@@ -760,13 +760,13 @@ describe("ngRepeat", () => {
 
       delete scope.items.doug;
       delete scope.items.frodo;
-      scope.$digest();
+      ;
       expect(element.text()).toEqual(
         "misko:m:true-false-false|shyam:s:false-false-true|",
       );
 
       delete scope.items.shyam;
-      scope.$digest();
+      ;
       expect(element.text()).toEqual("misko:m:true-false-true|");
     });
 
@@ -777,7 +777,7 @@ describe("ngRepeat", () => {
           "</ul>",
       )(scope);
       scope.items = { misko: "m", shyam: "s", doug: "d", frodo: "f" };
-      scope.$digest();
+      ;
       expect(element.text()).toBe(
         "misko:m:true-false|" +
           "shyam:s:false-true|" +
@@ -787,7 +787,7 @@ describe("ngRepeat", () => {
 
       delete scope.items.frodo;
       delete scope.items.shyam;
-      scope.$digest();
+      ;
       expect(element.text()).toBe("misko:m:true-false|doug:d:false-true|");
     });
 
@@ -804,7 +804,7 @@ describe("ngRepeat", () => {
         frodo: "f",
         $toBeFilteredOut: "xxxx",
       };
-      scope.$digest();
+      ;
 
       expect(element.text()).toEqual(
         "misko:m:true-false-false|" +
@@ -827,7 +827,7 @@ describe("ngRepeat", () => {
         frodo: "f",
         $toBeFilteredOut: "xxxx",
       };
-      scope.$digest();
+      ;
       expect(element.text()).toEqual(
         "misko:m:true-false|" +
           "shyam:s:false-true|" +
@@ -843,7 +843,7 @@ describe("ngRepeat", () => {
       scope.items = ["a", "b", "c"];
       scope.items.$$hashKey = "xxx";
       scope.items.$root = "yyy";
-      scope.$digest();
+      ;
 
       expect(element.text()).toEqual("a|b|c|");
     });
@@ -860,7 +860,7 @@ describe("ngRepeat", () => {
         ["a", "b"],
         ["c", "d"],
       ];
-      scope.$digest();
+      ;
 
       expect(element.text()).toEqual("a|b|Xc|d|X");
     });
@@ -872,7 +872,7 @@ describe("ngRepeat", () => {
       scope.array = ["a", "b", "c"];
       scope.array.foo = "23";
       scope.array.bar = function () {};
-      scope.$digest();
+      ;
 
       expect(element.text()).toBe("a|b|c|");
     });
@@ -884,7 +884,7 @@ describe("ngRepeat", () => {
       scope.array = ["a", "b"];
       scope.array[4] = "c";
       scope.array[6] = "d";
-      scope.$digest();
+      ;
 
       expect(element.text()).toBe("a|b|||c||d|");
     });
@@ -894,7 +894,7 @@ describe("ngRepeat", () => {
         '<ul><li ng-repeat="item in array">{{item}}|</li></ul>',
       )(scope);
       scope.array = ["a", 1, null, undefined, {}];
-      scope.$digest();
+      ;
 
       expect(element.text()).toMatch(/a\|1\|\|\|\{\s*\}\|/);
     });
@@ -904,14 +904,14 @@ describe("ngRepeat", () => {
         '<ul><li ng-repeat="item in array">{{item}}|</li></ul>',
       )(scope);
       scope.array = ["a", "b"];
-      scope.$digest();
+      ;
 
       let lis = element.find("li");
       lis.eq(0).data("mark", "a");
       lis.eq(1).data("mark", "b");
 
       scope.array = ["b", "a"];
-      scope.$digest();
+      ;
 
       lis = element.find("li");
       expect(lis.eq(0).data("mark")).toEqual("b");
@@ -1087,7 +1087,7 @@ describe("ngRepeat", () => {
           "</div>",
       )(scope);
 
-      scope.$digest();
+      ;
 
       const ends = element.find("p");
       expect(ends.length).toBe(3);
@@ -1097,7 +1097,7 @@ describe("ngRepeat", () => {
       element[0].insertBefore(extra, ends[1]);
 
       scope.values.splice(1, 1);
-      scope.$digest();
+      ;
 
       // expect the strong tag to be removed too
       expect(
@@ -1116,7 +1116,7 @@ describe("ngRepeat", () => {
           "</div>",
       )(scope);
 
-      scope.$digest();
+      ;
 
       const ends = element.find("p");
       expect(ends.length).toBe(3);
@@ -1127,7 +1127,7 @@ describe("ngRepeat", () => {
 
       // move the third block to the beginning
       scope.values.unshift(scope.values.pop());
-      scope.$digest();
+      ;
 
       // expect the strong tag to be moved too
       expect(
@@ -1164,13 +1164,13 @@ describe("ngRepeat", () => {
       d = 4;
 
       scope.items = [a, b, c];
-      scope.$digest();
+      ;
       lis = element.find("li");
     });
 
     it("should preserve the order of elements", () => {
       scope.items = [a, c, d];
-      scope.$digest();
+      ;
       const newElements = element.find("li");
       expect(newElements[0]).toEqual(lis[0]);
       expect(newElements[1]).toEqual(lis[2]);
@@ -1179,47 +1179,47 @@ describe("ngRepeat", () => {
 
     it("should throw error on adding existing duplicates and recover", () => {
       scope.items = [a, a, a];
-      scope.$digest();
+      ;
       expect(logs.shift().message).toMatch(/Duplicate key/);
 
       // recover
       scope.items = [a];
-      scope.$digest();
+      ;
       let newElements = element.find("li");
       expect(newElements.length).toEqual(1);
       expect(newElements[0]).toEqual(lis[0]);
 
       scope.items = [];
-      scope.$digest();
+      ;
       newElements = element.find("li");
       expect(newElements.length).toEqual(0);
     });
 
     it("should throw error on new duplicates and recover", () => {
       scope.items = [d, d, d];
-      scope.$digest();
+      ;
       expect(logs.shift().message).toMatch(/Duplicate key/);
 
       // recover
       scope.items = [a];
-      scope.$digest();
+      ;
       let newElements = element.find("li");
       expect(newElements.length).toEqual(1);
       expect(newElements[0]).toEqual(lis[0]);
 
       scope.items = [];
-      scope.$digest();
+      ;
       newElements = element.find("li");
       expect(newElements.length).toEqual(0);
     });
 
     it("should reverse items when the collection is reversed", () => {
       scope.items = [a, b, c];
-      scope.$digest();
+      ;
       lis = element.find("li");
 
       scope.items = [c, b, a];
-      scope.$digest();
+      ;
       const newElements = element.find("li");
       expect(newElements.length).toEqual(3);
       expect(newElements[0]).toEqual(lis[2]);
@@ -1232,12 +1232,12 @@ describe("ngRepeat", () => {
       // model that is composed of primitives.
 
       scope.items = ["hello", "cau", "ahoj"];
-      scope.$digest();
+      ;
       lis = element.find("li");
       lis[2].id = "yes";
 
       scope.items = ["ahoj", "hello", "cau"];
-      scope.$digest();
+      ;
       const newLis = element.find("li");
       expect(newLis.length).toEqual(3);
       expect(newLis[0]).toEqual(lis[2]);
@@ -1247,14 +1247,14 @@ describe("ngRepeat", () => {
 
     it("should be stable even if the collection is initially undefined", () => {
       scope.items = undefined;
-      scope.$digest();
+      ;
 
       scope.items = [{ name: "A" }, { name: "B" }, { name: "C" }];
-      scope.$digest();
+      ;
 
       lis = element.find("li");
       scope.items.shift();
-      scope.$digest();
+      ;
 
       const newLis = element.find("li");
       expect(newLis.length).toBe(2);
@@ -1281,7 +1281,7 @@ describe("ngRepeat", () => {
       element = $compile(
         '<div><div ng-repeat="i in [1,2]" elm-trans>{{i}}</div></div>',
       )(scope);
-      scope.$digest();
+      ;
       expect(element.text()).toBe("[[1]][[2]]");
     });
 
@@ -1295,7 +1295,7 @@ describe("ngRepeat", () => {
       scope = injector.get("$rootScope");
       $templateCache = injector.get("$templateCache");
       $templateCache.set("test.html", "hello");
-      scope.$digest();
+      ;
       setTimeout(() => {
         expect(element.text()).toBe("hellohello");
         done();
@@ -1306,7 +1306,7 @@ describe("ngRepeat", () => {
       element = $compile(
         '<div><div ng-repeat="i in [1,2,3,4]" ng-if="i % 2 === 0">{{i}};</div></div>',
       )(scope);
-      scope.$digest();
+      ;
       expect(element.text()).toBe("2;4;");
     });
   });
@@ -1325,10 +1325,10 @@ describe("ngRepeat", () => {
           "</div>",
       )(scope);
 
-      scope.$digest();
+      ;
       expect(element.text()).toEqual("T1:D1;T2:D2;");
       scope.books.push({ title: "T3", description: "D3" });
-      scope.$digest();
+      ;
       expect(element.text()).toEqual("T1:D1;T2:D2;T3:D3;");
     });
 
@@ -1343,12 +1343,12 @@ describe("ngRepeat", () => {
           "</div>",
       )(scope);
 
-      scope.$digest();
+      ;
       expect(element.find("div").length).toBe(6);
       scope.values.shift();
       scope.values.push(4);
 
-      scope.$digest();
+      ;
       expect(element.find("div").length).toBe(6);
       expect(element.text()).not.toContain("if:1;");
     });
@@ -1401,7 +1401,7 @@ describe("ngRepeat", () => {
         const element = $compile('<iso><span ng-bind="val"></span></iso>')(
           $rootScope,
         );
-        $rootScope.$digest();
+        ;
         expect(element.text().trim()).toEqual("transcluded content");
         dealoc(element);
       });
@@ -1420,7 +1420,7 @@ describe("ngRepeat", () => {
         const element = $compile(
           '<div><span ng-repeat="a in [1]"><span assert-a></span></span></div>',
         )($rootScope);
-        $rootScope.$digest();
+        ;
         dealoc(element);
       });
     });
@@ -1492,10 +1492,10 @@ describe("ngRepeat", () => {
 //       ),
 //     )(scope);
 
-//     scope.$digest(); // re-enable the animations;
+//     ; // re-enable the animations;
 
 //     scope.items = ["1", "2", "3"];
-//     scope.$digest();
+//     ;
 
 //     item = $animate.queue.shift();
 //     expect(item.event).toBe("enter");
@@ -1527,7 +1527,7 @@ describe("ngRepeat", () => {
 //     )(scope);
 
 //     scope.items = ["1", "2", "3"];
-//     scope.$digest();
+//     ;
 
 //     item = $animate.queue.shift();
 //     expect(item.event).toBe("enter");
@@ -1542,7 +1542,7 @@ describe("ngRepeat", () => {
 //     expect(item.element.text()).toBe("3");
 
 //     scope.items = ["1", "3"];
-//     scope.$digest();
+//     ;
 
 //     item = $animate.queue.shift();
 //     expect(item.event).toBe("leave");
@@ -1579,11 +1579,11 @@ describe("ngRepeat", () => {
 //       )(scope);
 
 //       scope.items = ["1", "2", "3"];
-//       scope.$digest();
+//       ;
 //       expect(element.text()).toBe("123");
 
 //       scope.items = ["1", "3"];
-//       scope.$digest();
+//       ;
 
 //       expect(element.text()).toBe("123"); // the original order should be preserved
 //       $animate.flush();
@@ -1608,7 +1608,7 @@ describe("ngRepeat", () => {
 //     )(scope);
 
 //     scope.items = ["1", "2", "3"];
-//     scope.$digest();
+//     ;
 
 //     item = $animate.queue.shift();
 //     expect(item.event).toBe("enter");
@@ -1623,7 +1623,7 @@ describe("ngRepeat", () => {
 //     expect(item.element.text()).toBe("3");
 
 //     scope.items = ["2", "3", "1"];
-//     scope.$digest();
+//     ;
 
 //     item = $animate.queue.shift();
 //     expect(item.event).toBe("move");

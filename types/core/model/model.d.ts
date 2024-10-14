@@ -14,7 +14,7 @@ export function createModel(target?: any, context?: Handler): any | ProxyConstru
  * @property {Function} fn
  * @property {Object} locals
  */
-export const $$postDigestQueue: any[];
+export const $postUpdateQueue: any[];
 /**
  * @type {Function[]}
  */
@@ -126,24 +126,22 @@ declare class Handler {
      * @param {ListenerFunction} listenerFn - A function to execute when changes are detected.
      */
     $watch(watchProp: ((any: any) => any), listenerFn: ListenerFunction): () => void;
-    $watchGroup(obj: any, listenerFn: any): void;
     $new(isIsolated: boolean, parent: any): any;
     registerKey(key: any, listener: any): void;
     deregisterKey(key: any, id: any): boolean;
     /**
      * @deprecated
-     * Invokes all registered listener functions for any watched properties.
      */
     $digest(): void;
     $eval(expr: any, locals: any): any;
-    $evalAsync(expr: any, locals: any): void;
-    $apply(expr: any): void;
-    $applyAsync(expr: any): void;
+    $evalAsync(expr: any, locals: any): Promise<any>;
+    $apply(expr: any): any;
+    $applyAsync(expr: any): Promise<any>;
     /**
      * @private
      */
     private retry;
-    $$postDigest(fn: any): void;
+    $postUpdate(fn: any): void;
     $destroy(): void;
     /**
      * @param {number} count

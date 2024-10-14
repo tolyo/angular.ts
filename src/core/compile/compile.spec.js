@@ -748,7 +748,7 @@ describe("$compile", () => {
       // According to spec SVG element className property is readonly, but only FF
       // implements it this way which causes compile exceptions.
       element = $compile("<svg><text>{{1}}</text></svg>")($rootScope);
-      $rootScope.$digest();
+      ;
       expect(element.text()).toEqual("1");
     });
 
@@ -1019,7 +1019,7 @@ describe("$compile", () => {
             gotValue = value;
           });
 
-          $rootScope.$digest();
+          ;
 
           expect(gotValue).toEqual("42");
         },
@@ -1062,7 +1062,7 @@ describe("$compile", () => {
         "<my-directive></my-directive>",
         function (element, attrs) {
           attrs.$addClass("some-class");
-          $rootScope.$digest();
+          ;
           expect(element[0].classList.contains("some-class")).toBe(true);
         },
       );
@@ -1074,7 +1074,7 @@ describe("$compile", () => {
         '<my-directive class="some-class"></my-directive>',
         function (element, attrs) {
           attrs.$removeClass("some-class");
-          $rootScope.$digest();
+          ;
           expect(element[0].classList.contains("some-class")).toBe(false);
         },
       );
@@ -1086,7 +1086,7 @@ describe("$compile", () => {
         '<my-directive class="one three four"></my-directive>',
         function (element, attrs) {
           attrs.$updateClass("one two three", "one three four");
-          $rootScope.$digest();
+          ;
           expect(element[0].classList.contains("one")).toBe(true);
           expect(element[0].classList.contains("two")).toBe(true);
           expect(element[0].classList.contains("three")).toBe(true);
@@ -1603,7 +1603,7 @@ describe("$compile", () => {
     $compile(el)($rootScope);
 
     $rootScope.parentAttr = 41;
-    $rootScope.$digest();
+    ;
     expect(givenScope.myAttr).toBe(42);
   });
 
@@ -1680,7 +1680,7 @@ describe("$compile", () => {
     $compile(el)($rootScope);
 
     $rootScope.parentAttr = 41;
-    $rootScope.$digest();
+    ;
     expect(givenScope.myAttr).toBe(42);
   });
 
@@ -1716,7 +1716,7 @@ describe("$compile", () => {
     $compile(el)($rootScope);
 
     isolateScope.myAttr = 42;
-    $rootScope.$digest();
+    ;
     expect($rootScope.parentAttr).toBe(42);
   });
 
@@ -1738,7 +1738,7 @@ describe("$compile", () => {
 
     $rootScope.parentAttr = 42;
     isolateScope.myAttr = 43;
-    $rootScope.$digest();
+    ;
     expect($rootScope.parentAttr).toBe(42);
     expect(isolateScope.myAttr).toBe(42);
   });
@@ -1762,7 +1762,7 @@ describe("$compile", () => {
     var el = $('<div my-directive my-attr="parentFunction()"></div>');
     $compile(el)($rootScope);
     expect(() => {
-      $rootScope.$digest();
+      ;
     }).toThrowError();
   });
 
@@ -1784,7 +1784,7 @@ describe("$compile", () => {
     };
     var el = $('<div my-directive my-attr="parentFunction()"></div>');
     $compile(el)($rootScope);
-    $rootScope.$digest();
+    ;
     expect(givenScope.myAttr).toEqual([1, 2, 3]);
   });
 
@@ -2047,7 +2047,7 @@ describe("$compile", () => {
       var el = $('<div my-directive="abc"></div>');
 
       $compile(el)($rootScope);
-      $rootScope.$digest();
+      ;
 
       expect(ctl.myAttr).toEqual("abc");
     });
@@ -4763,7 +4763,7 @@ describe("$compile", () => {
       $compile("<fff></fff>")($rootScope);
       $compile("<ffff></ffff>")($rootScope);
       $compile("<fffff></fffff>")($rootScope);
-      $rootScope.$digest();
+      ;
 
       expect(log.join("; ")).toEqual(
         "ff template: true; " +
@@ -4974,7 +4974,7 @@ describe("$compile", () => {
       $rootScope.name = "Lucas";
       $rootScope.color = "blue";
       $compile(element[0].childNodes)($rootScope);
-      $rootScope.$digest();
+      ;
       expect(element.text()).toEqual("Name: Lucas\nColor: blue");
     });
 
@@ -5047,7 +5047,7 @@ describe("$compile", () => {
       );
 
       $compile(element[0].childNodes)($rootScope);
-      $rootScope.$digest();
+      ;
       document.body.appendChild(element[0]);
       expect(element.find("span").text()).toContain("Should render");
     });
@@ -5082,7 +5082,7 @@ describe("$compile", () => {
         '<div><div ng-repeat="i in [1,2]"><div after>A</div></div></div>',
       );
       $compile(element)($rootScope);
-      $rootScope.$digest();
+      ;
       expect(element.text()).toBe("ABAB");
     });
 
@@ -5099,7 +5099,7 @@ describe("$compile", () => {
       element = JQLite("<div><div remove-node></div><div>{{test}}</div></div>");
       $rootScope.test = "Hello";
       $compile(element)($rootScope);
-      $rootScope.$digest();
+      ;
       expect(element.children().length).toBe(1);
       expect(element.text()).toBe("Hello");
     });
@@ -5373,14 +5373,14 @@ describe("$compile", () => {
       it("should compile template when replacing", () => {
         reloadModules();
         element = $compile("<div><div replace>ignore</div><div>")($rootScope);
-        $rootScope.$digest();
+        ;
         expect(element.text()).toEqual("Replace!");
       });
 
       it("should compile template when appending", () => {
         reloadModules();
         element = $compile("<div><div append>ignore</div><div>")($rootScope);
-        $rootScope.$digest();
+        ;
         expect(element.text()).toEqual("Append!");
       });
 
@@ -5445,7 +5445,7 @@ describe("$compile", () => {
         element = $compile(
           "<div>" + '<div ng-repeat="i in [1,2]" replace></div>' + "</div>",
         )($rootScope);
-        $rootScope.$digest();
+        ;
         expect(element.text()).toEqual("Replace!Replace!");
       });
 
@@ -5454,7 +5454,7 @@ describe("$compile", () => {
         element = $compile(
           "<div>" + '<div ng-repeat="i in [1,2]" append></div>' + "</div>",
         )($rootScope);
-        $rootScope.$digest();
+        ;
         expect(element.text()).toEqual("Append!Append!");
       });
 
@@ -5463,7 +5463,7 @@ describe("$compile", () => {
         element = $compile("<div replace-with-interpolated-class></div>")(
           $rootScope,
         );
-        $rootScope.$digest();
+        ;
         expect(element[0].classList.contains("class_2")).toBeTrue();
       });
 
@@ -5510,7 +5510,7 @@ describe("$compile", () => {
         element = $compile('<div>{{log("A")}} foo {{::log("B")}}</div>')(
           $rootScope,
         );
-        $rootScope.$digest();
+        ;
         expect(log.join("; ")).toEqual("A; B; A; B");
       });
 
@@ -5665,7 +5665,7 @@ describe("$compile", () => {
           '<svg><g svg-anchor="/foo/bar" text="foo/bar!"></g></svg>',
         )($rootScope);
         const child = element.children().eq(0);
-        $rootScope.$digest();
+        ;
         expect(getNodeName(child)).toMatch(/a/i);
         expect(isSVGElement(child[0])).toBe(true);
         expect(child[0].href.baseVal).toBe("/foo/bar");
@@ -5693,7 +5693,7 @@ describe("$compile", () => {
         element = $compile('<math><mn pow="2"><mn>8</mn></mn></math>')(
           $rootScope,
         );
-        $rootScope.$digest();
+        ;
         const child = element.children().eq(0);
         expect(getNodeName(child)).toMatch(/msup/i);
         expect(isUnknownElement(child[0])).toBe(false);
@@ -5720,7 +5720,7 @@ describe("$compile", () => {
         element = $compile(
           "<template-url-with-prototype><template-url-with-prototype>",
         )($rootScope);
-        $rootScope.$digest();
+        ;
         expect(element.find("p")[0].innerHTML).toEqual("Test Value");
       });
     });
@@ -5954,7 +5954,7 @@ describe("$compile", () => {
         expect(element[0].outerHTML).toEqual(
           '<div cross-domain-template=""></div>',
         );
-        $rootScope.$digest();
+        ;
         expect(element[0].outerHTML).toEqual(
           '<div cross-domain-template=""><span>example.com/cached-version</span></div>',
         );
@@ -5963,7 +5963,7 @@ describe("$compile", () => {
       it("should load cross domain templates when trusted", (done) => {
         element = $compile("<div trusted-template></div>")($rootScope);
         expect(element[0].outerHTML).toEqual('<div trusted-template=""></div>');
-        $rootScope.$digest();
+        ;
         setTimeout(() => {
           expect(element[0].outerHTML).toEqual(
             '<div trusted-template="">Hello</div>',
@@ -5981,7 +5981,7 @@ describe("$compile", () => {
           '<div><b hello=""></b><b cau=""></b></div>',
         );
 
-        $rootScope.$digest();
+        ;
 
         expect(element[0].outerHTML).toEqual(
           '<div><b hello=""></b><b cau=""><span>Cau!</span></b></div>',
@@ -6004,7 +6004,7 @@ describe("$compile", () => {
           '<div><b i-hello=""></b><b i-cau=""></b></div>',
         );
 
-        $rootScope.$digest();
+        ;
 
         expect(element[0].outerHTML).toBe(
           '<div><b i-hello=""></b><span i-cau="">Cau!</span></div>',
@@ -6023,7 +6023,7 @@ describe("$compile", () => {
         $rootScope.name = "Elvis";
         element = $compile('<div><b hello=""></b></div>')($rootScope);
 
-        $rootScope.$digest();
+        ;
 
         setTimeout(() => {
           expect(element[0].outerHTML).toEqual(
@@ -6038,7 +6038,7 @@ describe("$compile", () => {
         $rootScope.name = "Elvis";
         element = $compile("<div><b i-hello></b></div>")($rootScope);
 
-        $rootScope.$digest();
+        ;
 
         expect(element[0].outerHTML).toBe(
           '<div><span i-hello="">Hello, Elvis!</span></div>',
@@ -6050,7 +6050,7 @@ describe("$compile", () => {
         $rootScope.name = "Elvis";
         element = $compile('<div><b hello=""></b></div>')($rootScope);
 
-        $rootScope.$digest();
+        ;
 
         expect(element[0].outerHTML).toEqual(
           '<div><b hello=""><span replace="">Hello, Elvis!</span></b></div>',
@@ -6061,7 +6061,7 @@ describe("$compile", () => {
         $rootScope.name = "Elvis";
         element = $compile("<div replace></div>")($rootScope);
 
-        $rootScope.$digest();
+        ;
 
         expect(element[0].outerHTML).toEqual(
           '<span replace="">Hello, Elvis!</span>',
@@ -6085,11 +6085,11 @@ describe("$compile", () => {
 
         e1 = template($rootScope.$new(), () => {}); // clone
         expect(e1.text()).toEqual("");
-        // $rootScope.$digest();
+        // ;
         setTimeout(() => {
           e2 = template($rootScope.$new(), () => {}); // clone
           //
-          $rootScope.$digest();
+          ;
           expect(e1.text()).toEqual("HelloElvis  ");
           expect(e2.text()).toEqual("HelloElvis  ");
 
@@ -6114,7 +6114,7 @@ describe("$compile", () => {
 
         await wait(100);
         e2 = template($rootScope.$new(), () => {}); // clone
-        $rootScope.$digest();
+        ;
         expect(e1.text()).toEqual("Elvis");
         expect(e2.text()).toEqual("Elvis");
 
@@ -6142,7 +6142,7 @@ describe("$compile", () => {
 
         await wait(100);
         e2 = template($rootScope.$new(), () => {}); // clone
-        $rootScope.$digest();
+        ;
         expect(e1.text()).toEqual("HelloElvis");
         expect(e2.text()).toEqual("HelloElvis");
 
@@ -6162,7 +6162,7 @@ describe("$compile", () => {
 
         e2 = template($rootScope.$new(), () => {}); // clone
 
-        $rootScope.$digest();
+        ;
         setTimeout(() => {
           expect(e1.text()).toEqual("Elvis");
           expect(e2.text()).toEqual("Elvis");
@@ -6224,7 +6224,7 @@ describe("$compile", () => {
         element = $compile("<div test></div>")($rootScope, (node) => {
           node[0].classList.add("clonefn-class");
         });
-        $rootScope.$digest();
+        ;
         expect(element[0].classList.contains("template-class")).toBeTrue();
         expect(element[0].classList.contains("clonefn-class")).toBeTrue();
       });
@@ -6293,8 +6293,8 @@ describe("$compile", () => {
           expect(log[0]).toEqual("first-C");
 
           log.push("FLUSH");
-          // //$rootScope.$digest();
-          $rootScope.$digest();
+          // //;
+          ;
           expect(log.join("; ")).toEqual(
             "first-C; FLUSH; second-C; last-C; third-C; " +
               "first-PreL; second-PreL; last-PreL; third-PreL; " +
@@ -6319,7 +6319,7 @@ describe("$compile", () => {
           expect(log[0]).toEqual("iFirst-C");
 
           log.push("FLUSH");
-          $rootScope.$digest();
+          ;
           expect(log.join("; ")).toEqual(
             "iFirst-C; FLUSH; iSecond-C; iThird-C; iLast-C; " +
               "iFirst-PreL; iSecond-PreL; iThird-PreL; iLast-PreL; " +
@@ -6343,7 +6343,7 @@ describe("$compile", () => {
           //expect(log.join("; ")).toEqual("first-C; FLUSH; second-C; last-C; third-C");
 
           element = template($rootScope);
-          $rootScope.$digest();
+          ;
           expect(log.join("; ")).toEqual(
             "first-C; FLUSH; second-C; last-C; third-C; " +
               "first-PreL; second-PreL; last-PreL; third-PreL; " +
@@ -6367,7 +6367,7 @@ describe("$compile", () => {
           expect(log[0]).toEqual("iFirst-C");
           log.push("FLUSH");
           element = template($rootScope);
-          $rootScope.$digest();
+          ;
           expect(log.join("; ")).toEqual(
             "iFirst-C; FLUSH; iSecond-C; iThird-C; iLast-C; " +
               "iFirst-PreL; iSecond-PreL; iThird-PreL; iLast-PreL; " +
@@ -6386,7 +6386,7 @@ describe("$compile", () => {
         it("should allow multiple elements in template", () => {
           $templateCache.set("second.html", "before <b>mid</b> after");
           element = $compile("<div second></div>")($rootScope);
-          $rootScope.$digest();
+          ;
           expect(element.text()).toEqual("before mid after");
         });
 
@@ -6397,7 +6397,7 @@ describe("$compile", () => {
           );
           element = JQLite('<b hello="">{{1+2}}</b>');
           $compile(element)($rootScope);
-          $rootScope.$digest();
+          ;
           expect(element.text()).toEqual("3==3");
         });
 
@@ -6430,7 +6430,7 @@ describe("$compile", () => {
 
           //   expect(() => {
           //     $compile("<p template></p>")($rootScope);
-          //     $rootScope.$digest();
+          //     ;
           //   }).toThrowError(/tplrt/);
           // });
 
@@ -6447,7 +6447,7 @@ describe("$compile", () => {
             $templateCache.set("template.html", "<div>Hello World!</div> \n");
             element = $compile("<p template></p>")($rootScope);
             expect(() => {
-              $rootScope.$digest();
+              ;
             }).not.toThrow();
             expect(element.length).toBe(1);
             expect(element.text()).toBe("Hello World!");
@@ -6460,7 +6460,7 @@ describe("$compile", () => {
             );
             element = $compile("<p template></p>")($rootScope);
             expect(() => {
-              $rootScope.$digest();
+              ;
             }).not.toThrow();
             expect(element.length).toBe(1);
             expect(element.text()).toBe("Hello World!");
@@ -6473,7 +6473,7 @@ describe("$compile", () => {
             );
             element = $compile("<p template></p>")($rootScope);
             expect(() => {
-              $rootScope.$digest();
+              ;
             }).not.toThrow();
             expect(element.length).toBe(1);
             expect(element.text()).toBe("Hello World!");
@@ -6552,7 +6552,7 @@ describe("$compile", () => {
         expect(() => {
           element = $compile("<div replace-with-tr></div>")($rootScope);
         }).not.toThrow();
-        $rootScope.$digest();
+        ;
         expect(getNodeName(element)).toMatch(/tr/i);
       });
 
@@ -6561,7 +6561,7 @@ describe("$compile", () => {
         expect(() => {
           element = $compile("<div replace-with-td></div>")($rootScope);
         }).not.toThrow();
-        $rootScope.$digest();
+        ;
         expect(getNodeName(element)).toMatch(/td/i);
       });
 
@@ -6570,7 +6570,7 @@ describe("$compile", () => {
         expect(() => {
           element = $compile("<div replace-with-th></div>")($rootScope);
         }).not.toThrow();
-        $rootScope.$digest();
+        ;
         expect(getNodeName(element)).toMatch(/th/i);
       });
 
@@ -6579,7 +6579,7 @@ describe("$compile", () => {
         expect(() => {
           element = $compile("<div replace-with-thead></div>")($rootScope);
         }).not.toThrow();
-        $rootScope.$digest();
+        ;
         expect(getNodeName(element)).toMatch(/thead/i);
       });
 
@@ -6588,7 +6588,7 @@ describe("$compile", () => {
         expect(() => {
           element = $compile("<div replace-with-tbody></div>")($rootScope);
         }).not.toThrow();
-        $rootScope.$digest();
+        ;
         expect(getNodeName(element)).toMatch(/tbody/i);
       });
 
@@ -6597,7 +6597,7 @@ describe("$compile", () => {
         expect(() => {
           element = $compile("<div replace-with-tfoot></div>")($rootScope);
         }).not.toThrow();
-        $rootScope.$digest();
+        ;
         expect(getNodeName(element)).toMatch(/tfoot/i);
       });
 
@@ -6606,7 +6606,7 @@ describe("$compile", () => {
         expect(() => {
           element = $compile("<div replace-with-option></div>")($rootScope);
         }).not.toThrow();
-        $rootScope.$digest();
+        ;
         expect(getNodeName(element)).toMatch(/option/i);
       });
 
@@ -6615,7 +6615,7 @@ describe("$compile", () => {
         expect(() => {
           element = $compile("<div replace-with-optgroup></div>")($rootScope);
         }).not.toThrow();
-        $rootScope.$digest();
+        ;
         expect(getNodeName(element)).toMatch(/optgroup/i);
       });
 
@@ -6641,7 +6641,7 @@ describe("$compile", () => {
             element = $compile(
               '<svg><g svg-anchor="/foo/bar" text="foo/bar!"></g></svg>',
             )($rootScope);
-            $rootScope.$digest();
+            ;
             const child = element.children().eq(0);
             expect(getNodeName(child)).toMatch(/a/i);
             expect(isSVGElement(child[0])).toBe(true);
@@ -6677,7 +6677,7 @@ describe("$compile", () => {
             element = $compile('<math><mn pow="2"><mn>8</mn></mn></math>')(
               $rootScope,
             );
-            $rootScope.$digest();
+            ;
             const child = element.children().eq(0);
             expect(getNodeName(child)).toMatch(/msup/i);
             expect(isUnknownElement(child[0])).toBe(false);
@@ -6709,7 +6709,7 @@ describe("$compile", () => {
             element = $compile(
               "<template-url-with-prototype><template-url-with-prototype>",
             )($rootScope);
-            $rootScope.$digest();
+            ;
             expect(element.find("p")[0].innerHTML).toEqual("Test Value");
           },
         );
@@ -6745,7 +6745,7 @@ describe("$compile", () => {
             )($rootScope);
             expect(element.text()).toEqual("");
 
-            $rootScope.$digest();
+            ;
 
             expect(element.text()).toEqual("template content");
           },
@@ -6928,7 +6928,7 @@ describe("$compile", () => {
           "<a log>{{name}}; scopeId: {{$id}}</a>",
         );
         element = $compile("<div><span tscope></span></div>")($rootScope);
-        $rootScope.$digest();
+        ;
         expect(log.length).toEqual(2);
         $rootScope.name = "Jozo";
         $rootScope.$apply();
@@ -6941,7 +6941,7 @@ describe("$compile", () => {
           "<p><a log>{{name}}; scopeId: {{$id}}</a></p>",
         );
         element = $compile("<div><span trscope></span></div>")($rootScope);
-        $rootScope.$digest();
+        ;
         expect(log.length).toEqual(2);
         $rootScope.name = "Jozo";
         $rootScope.$apply();
@@ -6953,7 +6953,7 @@ describe("$compile", () => {
         element = $compile(
           '<div><span ng-repeat="i in [1,2,3]" trscope></span></div>',
         )($rootScope);
-        $rootScope.$digest();
+        ;
         expect(log.length).toEqual(6);
         $rootScope.name = "Jozo";
         $rootScope.$apply();
@@ -6963,7 +6963,7 @@ describe("$compile", () => {
       it("should allow creation of new isolated scopes for directives with templates", () => {
         $templateCache.set("tiscope.html", "<a log></a>");
         element = $compile("<div><span tiscope></span></div>")($rootScope);
-        $rootScope.$digest();
+        ;
         expect(log.length).toEqual(2);
         $rootScope.name = "abc";
         expect(iscope.$parent).toBe($rootScope);
@@ -6999,7 +6999,7 @@ describe("$compile", () => {
       it("should not allow more than one isolate/new scope creation per element regardless of `templateUrl`", () => {
         $templateCache.set("tiscope.html", "<div>Hello, world !</div>");
         $compile("<div tiscope-a scope-b></div>")($rootScope);
-        $rootScope.$digest();
+        ;
         expect(log[0].match(/multidir/)).toBeTruthy();
       });
 
@@ -7028,7 +7028,7 @@ describe("$compile", () => {
           it("should return the new scope for children in the directive template", () => {
             $templateCache.set("tscope.html", "<a></a>");
             element = $compile("<div tscope></div>")($rootScope);
-            $rootScope.$digest();
+            ;
             expect($rootScope.$$childHead.$parent).toBe($rootScope);
           });
 
@@ -7056,7 +7056,7 @@ describe("$compile", () => {
             $templateCache.set("tiscope.html", "<a></a>");
             element = $compile("<div tiscope></div>")($rootScope);
             expect($rootScope.$$childHead).toBeDefined(); // ??? this is the current behavior, not desired feature
-            $rootScope.$digest();
+            ;
             expect($rootScope.$$childHead).not.toBe($rootScope);
           });
 
@@ -7377,7 +7377,7 @@ describe("$compile", () => {
       //             $rootScope,
       //           );
       //           $rootScope.$apply();
-      //           $rootScope.$digest();
+      //           ;
       //           directiveElement = element.find("a");
       //           child = directiveElement.find("span");
       //           expect(child.scope()).toBe(directiveElement.isolateScope());
@@ -7512,7 +7512,7 @@ describe("$compile", () => {
         element = $compile('<div name="attr: {{name}}">text: {{name}}</div>')(
           $rootScope,
         );
-        $rootScope.$digest();
+        ;
         expect(element.text()).toEqual("text: angular");
         expect(element.attr("name")).toEqual("attr: angular");
       });
@@ -7523,12 +7523,12 @@ describe("$compile", () => {
           '<div name="attr: {{::name}}">text: {{::name}}</div>',
         )($rootScope);
         expect($rootScope.$$watchers.length).toBe(2);
-        $rootScope.$digest();
+        ;
         expect(element.text()).toEqual("text: angular");
         expect(element.attr("name")).toEqual("attr: angular");
         expect($rootScope.$$watchers.length).toBe(0);
         $rootScope.name = "not-angular";
-        $rootScope.$digest();
+        ;
         expect(element.text()).toEqual("text: angular");
         expect(element.attr("name")).toEqual("attr: angular");
       });
@@ -7539,19 +7539,19 @@ describe("$compile", () => {
           '<div name="attr: {{::name}}">text: {{ ::name }}</div>',
         )($rootScope);
         expect($rootScope.$$watchers.length).toBe(2);
-        $rootScope.$digest();
+        ;
         expect(element.text()).toEqual("text: angular");
         expect(element.attr("name")).toEqual("attr: angular");
         expect($rootScope.$$watchers.length).toBe(0);
         $rootScope.name = "not-angular";
-        $rootScope.$digest();
+        ;
         expect(element.text()).toEqual("text: angular");
         expect(element.attr("name")).toEqual("attr: angular");
       });
 
       it("should interpolate a multi-part expression for regular attributes", () => {
         element = $compile('<div foo="some/{{id}}"></div>')($rootScope);
-        $rootScope.$digest();
+        ;
         expect(element.attr("foo")).toBe("some/");
         $rootScope.$apply(() => {
           $rootScope.id = 1;
@@ -7635,7 +7635,7 @@ describe("$compile", () => {
           element = $compile('<div name="attr: {{name}}">text: {{name}}</div>')(
             $rootScope,
           );
-          $rootScope.$digest();
+          ;
           expect(element.text()).toEqual("text: angular");
           expect(element.attr("name")).toEqual("attr: angular");
         });
@@ -7676,7 +7676,7 @@ describe("$compile", () => {
         element = $compile(
           '<div some-attr="foo-{{1+1}}" replace-some-attr></div>',
         )($rootScope);
-        $rootScope.$digest();
+        ;
         expect(element.attr("some-attr")).toEqual("bar-2");
       });
 
@@ -7685,7 +7685,7 @@ describe("$compile", () => {
         expect(directiveAttrs.someAttr).toBe("nonBound");
 
         expect(observeSpy).not.toHaveBeenCalled();
-        $rootScope.$digest();
+        ;
         expect(observeSpy).toHaveBeenCalled();
       });
 
@@ -7693,7 +7693,7 @@ describe("$compile", () => {
         const element = $compile('<img src="abc" data-src="123">')($rootScope);
         expect(element.attr("src")).toEqual("abc");
         expect(element.attr("data-src")).toEqual("123");
-        $rootScope.$digest();
+        ;
         expect(element.attr("src")).toEqual("abc");
         expect(element.attr("data-src")).toEqual("123");
       });
@@ -7714,7 +7714,7 @@ describe("$compile", () => {
         $compile("<observing-directive observer></observing-directive>")(
           $rootScope,
         );
-        $rootScope.$digest();
+        ;
         expect(observeSpy).not.toHaveBeenCalledWith(undefined);
       });
 
@@ -7739,7 +7739,7 @@ describe("$compile", () => {
         );
 
         $compile('<div some-attr="{{value}}" error></div>')($rootScope);
-        $rootScope.$digest();
+        ;
 
         expect(observeSpy).toHaveBeenCalled();
         expect(observeSpy).toHaveBeenCalledTimes(2);
@@ -7749,7 +7749,7 @@ describe("$compile", () => {
         element = $compile(
           '<select ng-model="x"><option value="">Greet {{name}}!</option></select>',
         )($rootScope);
-        $rootScope.$digest();
+        ;
         expect(
           element[0].outerHTML.replace(' selected="selected"', ""),
         ).toEqual(
@@ -7758,7 +7758,7 @@ describe("$compile", () => {
             "</select>",
         );
         $rootScope.name = "Misko";
-        $rootScope.$digest();
+        ;
         expect(
           element[0].outerHTML.replace(' selected="selected"', ""),
         ).toEqual(
@@ -7776,7 +7776,7 @@ describe("$compile", () => {
         // Run the actual test
         const base = JQLite('<div>&mdash; {{ "This doesn\'t." }}</div>');
         element = $compile(base)($rootScope);
-        $rootScope.$digest();
+        ;
         expect(element.text()).toBe("— This doesn't.");
 
         // Unregister the MutationObserver (and hope it doesn't mess up with subsequent tests)
@@ -7816,7 +7816,7 @@ describe("$compile", () => {
           $rootScope,
         );
         $rootScope.hello = "ahoj";
-        $rootScope.$digest();
+        ;
         expect(element.text()).toBe("ahoj|ahoj|ahoj");
       });
 
@@ -7838,7 +7838,7 @@ describe("$compile", () => {
         element = $compile(tmpl)($rootScope);
 
         $rootScope.hello = "ahoj";
-        $rootScope.$digest();
+        ;
 
         expect(element.text()).toBe("ahoj|ahoj|ahoj");
       });
@@ -7862,7 +7862,7 @@ describe("$compile", () => {
         element = $compile(tmpl)($rootScope);
 
         $rootScope.hello = "ahoj";
-        $rootScope.$digest();
+        ;
 
         expect(element.text()).toBe("ahoj|ahoj|ahoj");
       });
@@ -7890,7 +7890,7 @@ describe("$compile", () => {
           $rootScope,
         );
         $rootScope.hello = "ahoj";
-        $rootScope.$digest();
+        ;
         expect(element.text()).toBe("ahoj|ahoj|ahoj");
       });
 
@@ -7915,7 +7915,7 @@ describe("$compile", () => {
         expect(log).toEqual([]);
 
         $rootScope.myVal = "carrot";
-        $rootScope.$digest();
+        ;
 
         expect(log[0]).toEqual("carrot");
       });
@@ -9062,7 +9062,7 @@ describe("$compile", () => {
           $rootScope.a = "foo";
 
           element = $compile(template)($rootScope);
-          $rootScope.$digest();
+          ;
           expect(constructorSpy).toHaveBeenCalled();
           expect(prototypeSpy).not.toHaveBeenCalled();
 
@@ -9094,7 +9094,7 @@ describe("$compile", () => {
           $rootScope.b = NaN;
 
           element = $compile(template)($rootScope);
-          $rootScope.$digest();
+          ;
 
           expect(onChangesSpy).toHaveBeenCalledTimes(2);
           expect(onChangesSpy.calls.argsFor(0)[0]).toEqual({
@@ -9222,7 +9222,7 @@ describe("$compile", () => {
 
           // Update val to trigger the onChanges
           $rootScope.a = 42;
-          $rootScope.$digest();
+          ;
           expect(log).toEqual([
             [
               "OuterController",
@@ -9678,7 +9678,7 @@ describe("$compile", () => {
         const scope = $rootScope.$$childHead;
         expect(scope.ctrl.getProp()).toBe("default");
 
-        $rootScope.$digest();
+        ;
         expect(scope.ctrl.getProp()).toBe("default");
       });
 
@@ -9706,10 +9706,10 @@ describe("$compile", () => {
         element = $compile("<div test-dir></div>")($rootScope);
         const scope = $rootScope.$$childHead;
         expect(scope.ctrl.getProp()).toBe("default");
-        $rootScope.$digest();
+        ;
         expect(scope.ctrl.getProp()).toBe("default");
         scope.prop = "foop";
-        $rootScope.$digest();
+        ;
         expect(scope.ctrl.getProp()).toBe("foop");
       });
 
@@ -9742,23 +9742,23 @@ describe("$compile", () => {
             '<div other-tpl-dir param1="::foo" param2="bar"></div>',
           )($rootScope);
           expect(countWatches($rootScope)).toEqual(6); // 4 -> template watch group, 2 -> '='
-          $rootScope.$digest();
+          ;
           expect(element.html()).toBe("1:;2:;3:;4:");
           expect(countWatches($rootScope)).toEqual(6);
 
           $rootScope.foo = "foo";
-          $rootScope.$digest();
+          ;
           expect(element.html()).toBe("1:foo;2:;3:foo;4:");
           expect(countWatches($rootScope)).toEqual(4);
 
           $rootScope.foo = "baz";
           $rootScope.bar = "bar";
-          $rootScope.$digest();
+          ;
           expect(element.html()).toBe("1:foo;2:bar;3:foo;4:bar");
           expect(countWatches($rootScope)).toEqual(3);
 
           $rootScope.bar = "baz";
-          $rootScope.$digest();
+          ;
           expect(element.html()).toBe("1:foo;2:baz;3:foo;4:bar");
         });
 
@@ -9780,23 +9780,23 @@ describe("$compile", () => {
             '<div other-tpl-dir param1="{{::foo}}" param2="{{bar}}"></div>',
           )($rootScope);
           expect(countWatches($rootScope)).toEqual(6); // 4 -> template watch group, 2 -> {{ }}
-          $rootScope.$digest();
+          ;
           expect(element.html()).toBe("1:;2:;3:;4:");
           expect(countWatches($rootScope)).toEqual(4); // (- 2) -> bind-once in template
 
           $rootScope.foo = "foo";
-          $rootScope.$digest();
+          ;
           expect(element.html()).toBe("1:foo;2:;3:;4:");
           expect(countWatches($rootScope)).toEqual(3);
 
           $rootScope.foo = "baz";
           $rootScope.bar = "bar";
-          $rootScope.$digest();
+          ;
           expect(element.html()).toBe("1:foo;2:bar;3:;4:");
           expect(countWatches($rootScope)).toEqual(3);
 
           $rootScope.bar = "baz";
-          $rootScope.$digest();
+          ;
           expect(element.html()).toBe("1:foo;2:baz;3:;4:");
         });
 
@@ -9822,23 +9822,23 @@ describe("$compile", () => {
           element = $compile(
             '<div other-tpl-dir param1="::foo" param2="bar"></div>',
           )($rootScope);
-          $rootScope.$digest();
+          ;
           expect(element.html()).toBe("1:;2:;3:;4:");
           expect(countWatches($rootScope)).toEqual(6); // 4 -> template watch group, 2 -> '='
 
           $rootScope.foo = "foo";
-          $rootScope.$digest();
+          ;
           expect(element.html()).toBe("1:foo;2:;3:foo;4:");
           expect(countWatches($rootScope)).toEqual(4);
 
           $rootScope.foo = "baz";
           $rootScope.bar = "bar";
-          $rootScope.$digest();
+          ;
           expect(element.html()).toBe("1:foo;2:bar;3:foo;4:bar");
           expect(countWatches($rootScope)).toEqual(3);
 
           $rootScope.bar = "baz";
-          $rootScope.$digest();
+          ;
           expect(element.html()).toBe("1:foo;2:baz;3:foo;4:bar");
         });
 
@@ -9864,23 +9864,23 @@ describe("$compile", () => {
           element = $compile(
             '<div other-tpl-dir param1="{{::foo}}" param2="{{bar}}"></div>',
           )($rootScope);
-          $rootScope.$digest();
+          ;
           expect(element.html()).toBe("1:;2:;3:;4:");
           expect(countWatches($rootScope)).toEqual(4); // (4 - 2) -> template watch group, 2 -> {{ }}
 
           $rootScope.foo = "foo";
-          $rootScope.$digest();
+          ;
           expect(element.html()).toBe("1:foo;2:;3:;4:");
           expect(countWatches($rootScope)).toEqual(3);
 
           $rootScope.foo = "baz";
           $rootScope.bar = "bar";
-          $rootScope.$digest();
+          ;
           expect(element.html()).toBe("1:foo;2:bar;3:;4:");
           expect(countWatches($rootScope)).toEqual(3);
 
           $rootScope.bar = "baz";
-          $rootScope.$digest();
+          ;
           expect(element.html()).toBe("1:foo;2:baz;3:;4:");
         });
 
@@ -9910,7 +9910,7 @@ describe("$compile", () => {
               '<div><hello greeting="greeting"></hello></div>' +
               "</div>",
           )($rootScope);
-          $rootScope.$digest();
+          ;
           element.find("button")[0].click();
           expect(element.find("p").text()).toBe("Hello!");
         });
@@ -10348,7 +10348,7 @@ describe("$compile", () => {
             expect($rootScope.name).toEqual("outer");
             expect(component.input).toEqual("$onInit");
 
-            $rootScope.$digest();
+            ;
 
             expect($rootScope.name).toEqual("outer");
             expect(component.input).toEqual("$onInit");
@@ -10371,7 +10371,7 @@ describe("$compile", () => {
             expect(component.input).toEqual("$onInit");
 
             $rootScope.name[0] = "inner";
-            $rootScope.$digest();
+            ;
 
             expect($rootScope.name).toEqual(["inner"]);
             expect(component.input).toEqual("$onInit");
@@ -10394,7 +10394,7 @@ describe("$compile", () => {
             expect(component.input).toEqual("$onInit");
 
             $rootScope.name = ["outer"];
-            $rootScope.$digest();
+            ;
 
             expect($rootScope.name).toEqual(["outer"]);
             expect(component.input).toEqual(["outer"]);
@@ -10482,7 +10482,7 @@ describe("$compile", () => {
             );
 
             expect(component.input).toEqual("$onInit");
-            $rootScope.$digest();
+            ;
 
             expect($rootScope.name).toEqual("outer2");
             expect(component.input).toEqual("outer2");
@@ -11173,11 +11173,11 @@ describe("$compile", () => {
           $rootScope,
         );
         const p = element.find("p");
-        $rootScope.$digest();
+        ;
         expect(p.text()).toBe("Test: ");
 
         $rootScope.text = "Kittens";
-        $rootScope.$digest();
+        ;
         expect(p.text()).toBe("Test: Kittens");
       });
 
@@ -11226,7 +11226,7 @@ describe("$compile", () => {
             'dir-str="Hello, {{whom}}!" ' +
             'dir-fn="fn()"></div>',
         )($rootScope);
-        $rootScope.$digest();
+        ;
         expect(controllerCalled).toBe(true);
       });
 
@@ -11388,7 +11388,7 @@ describe("$compile", () => {
                     'dir-str="Hello, {{whom}}!" ' +
                     'dir-fn="fn()"></div>',
                 )($rootScope);
-                $rootScope.$digest();
+                ;
                 expect(controllerCalled).toBe(true);
                 if (ddo.controllerAs || ddo.controller.indexOf(" as ") !== -1) {
                   if (ddo.scope) {
@@ -11469,7 +11469,7 @@ describe("$compile", () => {
             'bar-fn="fn2()" > ' +
             "</div>",
         )($rootScope);
-        $rootScope.$digest();
+        ;
         expect(controller1Called).toBe(true);
         expect(controller2Called).toBe(true);
       });
@@ -11540,7 +11540,7 @@ describe("$compile", () => {
             'bar-fn="fn2()" > ' +
             "</div>",
         )($rootScope);
-        $rootScope.$digest();
+        ;
         expect(controller1Called).toBe(true);
         expect(controller2Called).toBe(true);
       });
@@ -11612,7 +11612,7 @@ describe("$compile", () => {
             'bar-fn="fn2()" > ' +
             "</div>",
         )($rootScope);
-        $rootScope.$digest();
+        ;
         expect(controller1Called).toBe(true);
         expect(controller2Called).toBe(true);
       });
@@ -11660,7 +11660,7 @@ describe("$compile", () => {
             "</child>" +
             "</div>",
         )($rootScope);
-        $rootScope.$digest();
+        ;
 
         const parentCtrl = element.controller("ngController");
         const childCtrl = element.find("child").controller("child");
@@ -11675,7 +11675,7 @@ describe("$compile", () => {
         expect(childCtrl.fromParent4).not.toBe(childCtrl.value4);
 
         childCtrl.fromParent2 = "modified";
-        $rootScope.$digest();
+        ;
 
         expect(parentCtrl.value2).toBe("modified");
         expect(childCtrl.value2).toBe("child2");
@@ -11725,7 +11725,7 @@ describe("$compile", () => {
             "</child>" +
             "</div>",
         )($rootScope);
-        $rootScope.$digest();
+        ;
 
         const parentCtrl = element.controller("ngController");
         const childCtrl = element.find("child").controller("child");
@@ -11740,7 +11740,7 @@ describe("$compile", () => {
         expect(childCtrl.fromParent4).not.toBe(childCtrl.value4);
 
         childCtrl.fromParent2 = "modified";
-        $rootScope.$digest();
+        ;
 
         expect(parentCtrl.value2).toBe("modified");
         expect(childCtrl.value2).toBe("child2");
@@ -11766,7 +11766,7 @@ describe("$compile", () => {
         initInjector("test1");
         $templateCache.set("test.html", "<p>isolate</p>");
         element = $compile("<div foo-dir>")($rootScope);
-        $rootScope.$digest();
+        ;
         expect(controllerCalled).toBe(true);
         const childScope = $rootScope.$$childHead;
         expect(childScope).not.toBe($rootScope);
@@ -11824,7 +11824,7 @@ describe("$compile", () => {
             'dir-str="Hello, {{whom}}!" ' +
             'dir-fn="fn()"></div>',
         )($rootScope);
-        $rootScope.$digest();
+        ;
         expect(controllerCalled).toBe(true);
         const childScope = $rootScope.$$childHead;
         expect(childScope).not.toBe($rootScope);
@@ -11884,7 +11884,7 @@ describe("$compile", () => {
             'dir-str="Hello, {{whom}}!" ' +
             'dir-fn="fn()"></div>',
         )($rootScope);
-        $rootScope.$digest();
+        ;
         expect(controllerCalled).toBe(true);
         const childScope = $rootScope.$$childHead;
         expect(childScope).not.toBe($rootScope);
@@ -11920,7 +11920,7 @@ describe("$compile", () => {
           const scope = $rootScope.$$childHead;
           expect(scope.ctrl.getProp()).toBe("default");
 
-          $rootScope.$digest();
+          ;
           expect(scope.ctrl.getProp()).toBe("default");
         });
 
@@ -11950,7 +11950,7 @@ describe("$compile", () => {
           const scope = $rootScope.$$childHead;
           expect(scope.ctrl.getProp()).toBe("default");
 
-          $rootScope.$digest();
+          ;
           expect(scope.ctrl.getProp()).toBe("default");
         });
       });
@@ -12219,7 +12219,7 @@ describe("$compile", () => {
         initInjector("test1");
         $templateCache.set("dirB.html", "<p>dirB</p>");
         element = $compile("<div dir-a dir-b></div>")($rootScope);
-        $rootScope.$digest();
+        ;
         expect(log[0]).toEqual("dirAController.name: dirA");
       });
 
@@ -12539,7 +12539,7 @@ describe("$compile", () => {
         element = element.children().eq(0);
         expect(element[0].checked).toBe(false);
         $rootScope.$$childHead.model = true;
-        $rootScope.$digest();
+        ;
         expect(element[0].checked).toBe(true);
       });
 
@@ -12567,7 +12567,7 @@ describe("$compile", () => {
         expect(normalScope).toBe($rootScope);
         expect(normalScope.name).toEqual(undefined);
         expect(isolateScope.name).toEqual("WORKS");
-        $rootScope.$digest();
+        ;
         expect(element.text()).toEqual("WORKS");
       });
 
@@ -12626,7 +12626,7 @@ describe("$compile", () => {
             "</div>",
         )($rootScope);
 
-        $rootScope.$digest();
+        ;
         expect(log.join("; ")).toEqual(
           "inside=isolate; " +
             "outside replaced=non-isolate; " + // outside
@@ -13330,7 +13330,7 @@ describe("$compile", () => {
           const elem1 = $compile(tmplWithFoo)($rootScope);
           const elem2 = $compile(tmplWithBar)($rootScope);
 
-          $rootScope.$digest();
+          ;
 
           expect(elem1.text()).toBe("[Hello, world!]");
           expect(elem2.text()).toBe("[This is a header!|This is a footer!]");
@@ -13506,7 +13506,7 @@ describe("$compile", () => {
         //     "</div>",
         //   );
         //   element = template($rootScope, function () {});
-        //   $rootScope.$digest();
+        //   ;
 
         //   expect(linkFn).toHaveBeenCalled();
         //   expect(CACHE.size).toEqual(cacheSize + 2);
@@ -13515,7 +13515,7 @@ describe("$compile", () => {
         //   const destroyedScope = $rootScope.$new();
         //   destroyedScope.$destroy();
         //   const clone = template(destroyedScope, () => {});
-        //   $rootScope.$digest();
+        //   ;
         //   // expect(linkFn).not.toHaveBeenCalled();
         //   // clone.remove();
         // });
@@ -14413,7 +14413,7 @@ describe("$compile", () => {
             element = $compile("<div sync-sync>transcluded content</div>")(
               $rootScope,
             );
-            $rootScope.$digest();
+            ;
             expect(element.text()).toEqual("transcluded content");
           });
 
@@ -14421,7 +14421,7 @@ describe("$compile", () => {
             element = $compile("<div sync-async>transcluded content</div>")(
               $rootScope,
             );
-            $rootScope.$digest();
+            ;
             expect(element.text()).toEqual("transcluded content");
           });
 
@@ -14429,7 +14429,7 @@ describe("$compile", () => {
             element = $compile("<div async-sync>transcluded content</div>")(
               $rootScope,
             );
-            $rootScope.$digest();
+            ;
             expect(element.text()).toEqual("transcluded content");
           });
 
@@ -14437,7 +14437,7 @@ describe("$compile", () => {
             element = $compile("<div async-async>transcluded content</div>")(
               $rootScope,
             );
-            $rootScope.$digest();
+            ;
             expect(element.text()).toEqual("transcluded content");
           });
 
@@ -14523,7 +14523,7 @@ describe("$compile", () => {
             element = $compile('<iso><span ng-bind="val"></span></iso>')(
               $rootScope,
             );
-            $rootScope.$digest();
+            ;
             expect(element.text()).toEqual("transcluded content");
           });
 
@@ -14532,7 +14532,7 @@ describe("$compile", () => {
             element = $compile(
               '<iso-async1><span ng-bind="val"></span></iso-async1>',
             )($rootScope);
-            $rootScope.$digest();
+            ;
             expect(element.text()).toEqual("transcluded content");
           });
 
@@ -14541,7 +14541,7 @@ describe("$compile", () => {
             element = $compile(
               '<iso-async2><span ng-bind="val"></span></iso-async2>',
             )($rootScope);
-            $rootScope.$digest();
+            ;
             expect(element.text()).toEqual("transcluded content");
           });
         });
@@ -14568,12 +14568,12 @@ describe("$compile", () => {
 
             initInjector("test1");
             let element = $compile("<div my-example></div>")($rootScope);
-            $rootScope.$digest();
+            ;
             expect(element.text()).toEqual("myExample 0!");
             dealoc(element);
 
             element = $compile("<div my-example><p></p></div>")($rootScope);
-            $rootScope.$digest();
+            ;
             expect(element.text()).toEqual("myExample 1!has children");
             dealoc(element);
           });
@@ -14700,7 +14700,7 @@ describe("$compile", () => {
         $templateCache.set("template.html", "<p second>template.html</p>");
         expect(() => {
           $compile("<div template first></div>");
-          $rootScope.$digest();
+          ;
         }).toThrowError(/multidir/);
       });
 
@@ -14926,7 +14926,7 @@ describe("$compile", () => {
         initInjector("test1");
         $templateCache.set("template.html", "<div transclude></div>");
         element = $compile("<div template></div>")($rootScope);
-        $rootScope.$digest();
+        ;
         expect(transclude).toBeDefined();
       });
 
@@ -14967,7 +14967,7 @@ describe("$compile", () => {
         element = $compile("<div><div outer><div inner></div></div></div>")(
           $rootScope,
         );
-        $rootScope.$digest();
+        ;
         const child = element.children();
 
         expect(log).toEqual(["outer:div", "innerAgain:div", "inner:div"]);
@@ -14997,7 +14997,7 @@ describe("$compile", () => {
         $rootScope,
       );
       $rootScope.bar = "bar";
-      $rootScope.$digest();
+      ;
       expect(element.text()).toBe("bar");
     });
 
@@ -15013,7 +15013,7 @@ describe("$compile", () => {
       element = $compile("<div><div foo=\"'foo'\" bar=\"'bar'\"></div></div>")(
         $rootScope,
       );
-      $rootScope.$digest();
+      ;
       expect(element.text()).toBe("foobar");
     });
 
@@ -15022,7 +15022,7 @@ describe("$compile", () => {
       element = $compile(
         "<ul><li ng-repeat=\"item in ['-->', 'x']\">{{item}}|</li></ul>",
       )($rootScope);
-      $rootScope.$digest();
+      ;
 
       expect(element.text()).toBe("-->|x|");
     });
@@ -15167,7 +15167,7 @@ describe("$compile", () => {
         initInjector("test1");
         $templateCache.set("baz.html", "<div>Baz</div>");
         element = $compile("<trans><inner></inner></trans>")($rootScope);
-        $rootScope.$digest();
+        ;
 
         expect(innerCompilationCount).toBe(0);
         transclude((child) => {
@@ -15288,7 +15288,7 @@ describe("$compile", () => {
         initInjector("test1");
         $templateCache.set("inner.html", "<inner></inner>");
         element = $compile("<outer></outer>")($rootScope);
-        $rootScope.$digest();
+        ;
 
         expect(innerCompilationCount).toBe(1);
       });
@@ -15639,7 +15639,7 @@ describe("$compile", () => {
       it("should NOT require trusted values for trusted URIs", () => {
         element = $compile(`<${tag} src="{{testUrl}}"></${tag}>`)($rootScope);
         $rootScope.testUrl = "http://example.com/image.mp4"; // `http` is trusted
-        $rootScope.$digest();
+        ;
         expect(element.attr("src")).toEqual("http://example.com/image.mp4");
       });
 
@@ -15649,19 +15649,19 @@ describe("$compile", () => {
         // Some browsers complain if you try to write `javascript:` into an `img[src]`
         // So for the test use something different
         $rootScope.testUrl = $sce.trustAsMediaUrl("untrusted:foo()");
-        $rootScope.$digest();
+        ;
         expect(element.attr("src")).toEqual("untrusted:foo()");
 
         // As a URL
         element = $compile(`<${tag} src="{{testUrl}}"></${tag}>`)($rootScope);
         $rootScope.testUrl = $sce.trustAsUrl("untrusted:foo()");
-        $rootScope.$digest();
+        ;
         expect(element.attr("src")).toEqual("untrusted:foo()");
 
         // As a RESOURCE URL
         element = $compile(`<${tag} src="{{testUrl}}"></${tag}>`)($rootScope);
         $rootScope.testUrl = $sce.trustAsResourceUrl("untrusted:foo()");
-        $rootScope.$digest();
+        ;
         expect(element.attr("src")).toEqual("untrusted:foo()");
       });
     });
@@ -15674,7 +15674,7 @@ describe("$compile", () => {
           `<video><${tag} src="{{testUrl}}"></${tag}></video>`,
         )($rootScope);
         $rootScope.testUrl = "http://example.com/image.mp4"; // `http` is trusted
-        $rootScope.$digest();
+        ;
         expect(element.find(tag).attr("src")).toEqual(
           "http://example.com/image.mp4",
         );
@@ -15686,7 +15686,7 @@ describe("$compile", () => {
           `<video><${tag} src="{{testUrl}}"></${tag}></video>`,
         )($rootScope);
         $rootScope.testUrl = $sce.trustAsMediaUrl("javascript:foo()");
-        $rootScope.$digest();
+        ;
         expect(element.find(tag).attr("src")).toEqual("javascript:foo()");
 
         // As a URL
@@ -15694,7 +15694,7 @@ describe("$compile", () => {
           `<video><${tag} src="{{testUrl}}"></${tag}></video>`,
         )($rootScope);
         $rootScope.testUrl = $sce.trustAsUrl("javascript:foo()");
-        $rootScope.$digest();
+        ;
         expect(element.find(tag).attr("src")).toEqual("javascript:foo()");
 
         // As a RESOURCE URL
@@ -15702,7 +15702,7 @@ describe("$compile", () => {
           `<video><${tag} src="{{testUrl}}"></${tag}></video>`,
         )($rootScope);
         $rootScope.testUrl = $sce.trustAsResourceUrl("javascript:foo()");
-        $rootScope.$digest();
+        ;
         expect(element.find(tag).attr("src")).toEqual("javascript:foo()");
       });
     });
@@ -15714,26 +15714,26 @@ describe("$compile", () => {
       // Some browsers complain if you try to write `javascript:` into an `img[src]`
       // So for the test use something different
       $rootScope.testUrl = $sce.trustAsMediaUrl("someUntrustedThing:foo();");
-      $rootScope.$digest();
+      ;
       expect(element.attr("src")).toEqual("someUntrustedThing:foo();");
     });
 
     it("should sanitize concatenated values even if they are trusted", () => {
       element = $compile('<img src="{{testUrl}}ponies"></img>')($rootScope);
       $rootScope.testUrl = $sce.trustAsUrl("untrusted:foo();");
-      $rootScope.$digest();
+      ;
       expect(element.attr("src")).toEqual("unsafe:untrusted:foo();ponies");
 
       element = $compile('<img src="http://{{testUrl2}}"></img>')($rootScope);
       $rootScope.testUrl2 = $sce.trustAsUrl("xyz;");
-      $rootScope.$digest();
+      ;
       expect(element.attr("src")).toEqual("http://xyz;");
 
       element = $compile('<img src="{{testUrl3}}{{testUrl3}}"></img>')(
         $rootScope,
       );
       $rootScope.testUrl3 = $sce.trustAsUrl("untrusted:foo();");
-      $rootScope.$digest();
+      ;
       expect(element.attr("src")).toEqual(
         "unsafe:untrusted:foo();untrusted:foo();",
       );
@@ -15770,12 +15770,12 @@ describe("$compile", () => {
 
       element = $compile('<img src="{{testUrl}}ponies"></img>')($rootScope);
       $rootScope.testUrl = $sce.trustAsUrl("javascript:foo();");
-      $rootScope.$digest();
+      ;
       expect(element.attr("src")).toEqual("someSanitizedUrl");
 
       element = $compile('<img src="http://{{testUrl}}"></img>')($rootScope);
       $rootScope.testUrl = $sce.trustAsUrl("xyz");
-      $rootScope.$digest();
+      ;
       expect(element.attr("src")).toEqual("someSanitizedUrl");
     });
 
@@ -15818,14 +15818,14 @@ describe("$compile", () => {
     it("should NOT require trusted values for trusted URI values", () => {
       element = $compile('<img srcset="{{testUrl}}"></img>')($rootScope);
       $rootScope.testUrl = "http://example.com/image.png"; // `http` is trusted
-      $rootScope.$digest();
+      ;
       expect(element.attr("srcset")).toEqual("http://example.com/image.png");
     });
 
     it("should accept trusted values, if they are also trusted URIs", () => {
       element = $compile('<img srcset="{{testUrl}}"></img>')($rootScope);
       $rootScope.testUrl = $sce.trustAsUrl("http://example.com");
-      $rootScope.$digest();
+      ;
       expect(element.attr("srcset")).toEqual("http://example.com");
     });
 
@@ -15834,14 +15834,14 @@ describe("$compile", () => {
       // Use trustAsHtml and ng-bind-html to work around this.
       element = $compile('<img srcset="{{testUrl}}"></img>')($rootScope);
       $rootScope.testUrl = $sce.trustAsUrl("javascript:something");
-      $rootScope.$digest();
+      ;
       expect(element.attr("srcset")).toEqual("unsafe:javascript:something");
 
       element = $compile('<img srcset="{{testUrl}},{{testUrl}}"></img>')(
         $rootScope,
       );
       $rootScope.testUrl = $sce.trustAsUrl("javascript:something");
-      $rootScope.$digest();
+      ;
       expect(element.attr("srcset")).toEqual(
         "unsafe:javascript:something ,unsafe:javascript:something",
       );
@@ -15926,7 +15926,7 @@ describe("$compile", () => {
 
       forEach(testSet, (ref, url) => {
         $rootScope.testUrl = url;
-        $rootScope.$digest();
+        ;
         expect(element.attr("srcset")).toEqual(ref);
       });
     });
@@ -15936,33 +15936,33 @@ describe("$compile", () => {
     it("should NOT require trusted values for trusted URI values", () => {
       $rootScope.testUrl = "http://example.com/image.png"; // `http` is trusted
       element = $compile('<a href="{{testUrl}}"></a>')($rootScope);
-      $rootScope.$digest();
+      ;
       expect(element.attr("href")).toEqual("http://example.com/image.png");
 
       element = $compile('<a ng-href="{{testUrl}}"></a>')($rootScope);
-      $rootScope.$digest();
+      ;
       expect(element.attr("ng-href")).toEqual("http://example.com/image.png");
     });
 
     it("should accept trusted values for non-trusted URI values", () => {
       $rootScope.testUrl = $sce.trustAsUrl("javascript:foo()"); // `javascript` is not trusted
       element = $compile('<a href="{{testUrl}}"></a>')($rootScope);
-      $rootScope.$digest();
+      ;
       expect(element.attr("href")).toEqual("javascript:foo()");
 
       element = $compile('<a ng-href="{{testUrl}}"></a>')($rootScope);
-      $rootScope.$digest();
+      ;
       expect(element.attr("ng-href")).toEqual("javascript:foo()");
     });
 
     it("should sanitize non-trusted values", () => {
       $rootScope.testUrl = "javascript:foo()"; // `javascript` is not trusted
       element = $compile('<a href="{{testUrl}}"></a>')($rootScope);
-      $rootScope.$digest();
+      ;
       expect(element.attr("href")).toEqual("unsafe:javascript:foo()");
 
       element = $compile('<a ng-href="{{testUrl}}"></a>')($rootScope);
-      $rootScope.$digest();
+      ;
       expect(element.attr("href")).toEqual("unsafe:javascript:foo()");
     });
 
@@ -16086,16 +16086,16 @@ describe("$compile", () => {
           '<foo href="http://example.com/{{testUrl}}"></foo><foo href="http://example.com/{{::testUrl}}"></foo>',
       )($rootScope);
       $rootScope.testUrl = [1];
-      $rootScope.$digest();
+      ;
 
       $rootScope.testUrl = [];
-      $rootScope.$digest();
+      ;
 
       $rootScope.testUrl = { a: "b" };
-      $rootScope.$digest();
+      ;
 
       $rootScope.testUrl = {};
-      $rootScope.$digest();
+      ;
       expect(true).toBeTrue();
     });
   });
@@ -16328,7 +16328,7 @@ describe("$compile", () => {
       $rootScope.name = "Misko";
       element = $compile('<span ng-attr-test="{{name}}"></span>')($rootScope);
       expect(element.attr("test")).toBeUndefined();
-      $rootScope.$digest();
+      ;
       expect(element.attr("test")).toBe("Misko");
     });
 
@@ -16338,7 +16338,7 @@ describe("$compile", () => {
         $rootScope,
       );
       expect(element.attr("test")).toBe("123");
-      $rootScope.$digest();
+      ;
       expect(element.attr("test")).toBe("Misko");
     });
 
@@ -16348,7 +16348,7 @@ describe("$compile", () => {
         $rootScope,
       );
       expect(element.attr("test")).toBe("123");
-      $rootScope.$digest();
+      ;
       expect(element.attr("test")).toBe("Misko");
     });
 
@@ -16356,7 +16356,7 @@ describe("$compile", () => {
       element = $compile('<span ng-attr-test="foo"></span>')($rootScope);
       expect(element.attr("test")).toBeUndefined();
 
-      $rootScope.$digest();
+      ;
       expect(element.attr("test")).toBe("foo");
     });
 
@@ -16364,13 +16364,13 @@ describe("$compile", () => {
       element = $compile('<span ng-attr-test="{{name}}{{emphasis}}"></span>')(
         $rootScope,
       );
-      $rootScope.$digest();
+      ;
       expect(element.attr("test")).toBeUndefined();
       $rootScope.name = "caitp";
-      $rootScope.$digest();
+      ;
       expect(element.attr("test")).toBeUndefined();
       $rootScope.emphasis = "!!!";
-      $rootScope.$digest();
+      ;
       expect(element.attr("test")).toBe("caitp!!!");
     });
 
@@ -16426,7 +16426,7 @@ describe("$compile", () => {
           '<div async-test test="123" ng-attr-test="{{test}}"></div>',
         )($rootScope);
         expect(element.attr("test")).toBe("123");
-        $rootScope.$digest();
+        ;
         expect(log).toEqual(["TEST", "TEST"]);
       });
 
@@ -16436,7 +16436,7 @@ describe("$compile", () => {
           '<div async-test ng-attr-test="{{test}}" test="123"></div>',
         )($rootScope);
         expect(element.attr("test")).toBe("123");
-        $rootScope.$digest();
+        ;
         expect(log).toEqual(["TEST", "TEST"]);
       });
     });
@@ -16449,7 +16449,7 @@ describe("$compile", () => {
       expect(element.attr("test")).toBeUndefined();
       expect(element.attr("test2")).toBeUndefined();
       expect(element.attr("test3")).toBeUndefined();
-      $rootScope.$digest();
+      ;
       expect(element.attr("test")).toBe("Misko");
       expect(element.attr("test2")).toBe("Misko");
       expect(element.attr("test3")).toBe("Misko");
@@ -16494,7 +16494,7 @@ describe("$compile", () => {
     it('should work with the "href" attribute', () => {
       $rootScope.value = "test";
       element = $compile('<a ng-attr-href="test/{{value}}"></a>')($rootScope);
-      $rootScope.$digest();
+      ;
       expect(element.attr("href")).toBe("test/test");
     });
 
@@ -16509,7 +16509,7 @@ describe("$compile", () => {
       expect(element.attr("test4")).toBeUndefined();
       expect(element.attr("test5")).toBeUndefined();
       expect(element.attr("test6")).toBeUndefined();
-      $rootScope.$digest();
+      ;
       expect(element.attr("test2")).toBe("Misko");
       expect(element.attr("test3")).toBe("Misko");
       expect(element.attr("test4")).toBe("Misko");
@@ -16523,11 +16523,11 @@ describe("$compile", () => {
         element = $compile('<img ng-attr-src="{{name}}">')($rootScope);
         expect(element.attr("src")).toBeUndefined();
 
-        $rootScope.$digest();
+        ;
         expect(element.attr("src")).toBe("some-image.png");
 
         $rootScope.name = "other-image.png";
-        $rootScope.$digest();
+        ;
         expect(element.attr("src")).toBe("other-image.png");
       });
 
@@ -16536,11 +16536,11 @@ describe("$compile", () => {
         element = $compile('<img ng-attr-data-src="{{name}}">')($rootScope);
         expect(element.attr("data-src")).toBeUndefined();
 
-        $rootScope.$digest();
+        ;
         expect(element.attr("data-src")).toBe("some-image.png");
 
         $rootScope.name = "other-image.png";
-        $rootScope.$digest();
+        ;
         expect(element.attr("data-src")).toBe("other-image.png");
       });
 
@@ -16551,12 +16551,12 @@ describe("$compile", () => {
         )($rootScope);
         expect(element.attr("data-src")).toBeUndefined();
 
-        $rootScope.$digest();
+        ;
         expect(element.attr("src")).toBe("constant.png");
         expect(element.attr("data-src")).toBe("some-image.png");
 
         $rootScope.name = "other-image.png";
-        $rootScope.$digest();
+        ;
         expect(element.attr("src")).toBe("constant.png");
         expect(element.attr("data-src")).toBe("other-image.png");
       });
@@ -16571,7 +16571,7 @@ describe("$compile", () => {
         expect(element.attr("dash-test")).toBeUndefined();
         expect(element.attr("dash-test2")).toBeUndefined();
         expect(element.attr("dash-test3")).toBeUndefined();
-        $rootScope.$digest();
+        ;
         expect(element.attr("dash-test")).toBe("JamieMason");
         expect(element.attr("dash-test2")).toBe("JamieMason");
         expect(element.attr("dash-test3")).toBe("JamieMason");
@@ -16585,7 +16585,7 @@ describe("$compile", () => {
         expect(element.attr("dash-test2")).toBeUndefined();
         expect(element.attr("dash-test3")).toBeUndefined();
         expect(element.attr("dash-test4")).toBeUndefined();
-        $rootScope.$digest();
+        ;
         expect(element.attr("dash-test2")).toBe("JamieMason");
         expect(element.attr("dash-test3")).toBe("JamieMason");
         expect(element.attr("dash-test4")).toBe("JamieMason");
@@ -16601,7 +16601,7 @@ describe("$compile", () => {
         $compile(
           '<span data-dash-starter data-on-dash-start="starter"></span>',
         )($rootScope);
-        $rootScope.$digest();
+        ;
         expect(log[0]).toEqual("starter");
       });
 
@@ -16615,7 +16615,7 @@ describe("$compile", () => {
         $compile('<span data-dash-ender data-on-dash-end="ender"></span>')(
           $rootScope,
         );
-        $rootScope.$digest();
+        ;
         expect(log[0]).toEqual("ender");
       });
     });
@@ -16789,7 +16789,7 @@ describe("$compile", () => {
         $rootScope,
       );
       expect(element.attr("view-box")).toBeUndefined();
-      $rootScope.$digest();
+      ;
       expect(element.attr("view-box")).toBe("0 0 0 0");
     });
 
@@ -16806,7 +16806,7 @@ describe("$compile", () => {
           "</feSpecularLighting></filter></svg>",
       )($rootScope);
       expect(element.attr("viewBox")).toBeUndefined();
-      $rootScope.$digest();
+      ;
 
       expect(element.attr("view-box")).toBe("0 0 0 0");
       expect(element.find("filter").attr("filter-units")).toBe("0.42");
@@ -16826,7 +16826,7 @@ describe("$compile", () => {
           "<span ng-show-end='show'></span>" +
           "</div>",
       )($rootScope);
-      $rootScope.$digest();
+      ;
       await wait(100);
       const spans = element.find("span");
       expect(spans.eq(0)[0].classList.contains("ng-hide")).toBeTrue();
@@ -16841,7 +16841,7 @@ describe("$compile", () => {
           "<span ng-repeat-end>{{i}}B;</span>" +
           "</div>",
       )($rootScope);
-      $rootScope.$digest();
+      ;
       expect(element.text()).toEqual("1A1B;2A2B;");
     });
 
@@ -16854,7 +16854,7 @@ describe("$compile", () => {
           "<span ng-repeat-end>{{i}}B;</span>" +
           "</div>",
       )($rootScope);
-      $rootScope.$digest();
+      ;
       expect(element.text()).toEqual("1A:1B;2A:2B;");
     });
 
@@ -16866,7 +16866,7 @@ describe("$compile", () => {
           "<span ng-repeat-end>{{i}}B;</span>" +
           "<div></div>",
       )($rootScope);
-      $rootScope.$digest();
+      ;
       element = JQLite(element[0].parentNode.childNodes); // reset because repeater is top level.
       expect(element.text()).toEqual("1A1B;2A2B;");
     });
@@ -16892,7 +16892,7 @@ describe("$compile", () => {
           "<div ng-repeat-end>{{i}}B;</div>" +
           "<div></div>",
       )($rootScope);
-      $rootScope.$digest();
+      ;
       element = JQLite(element[0].parentNode.childNodes); // reset because repeater is top level.
       expect(element.text()).toEqual("1A..1B;2A..2B;");
     });
@@ -16907,7 +16907,7 @@ describe("$compile", () => {
           "<div ng-repeat-end>){{i}};</div>" +
           "<div></div>",
       )($rootScope);
-      $rootScope.$digest();
+      ;
       element = JQLite(element[0].parentNode.childNodes); // reset because repeater is top level.
       expect(element.text()).toEqual("1(2-23-3)1;2(2-23-3)2;");
     });
@@ -17112,7 +17112,7 @@ describe("$compile", () => {
           "</div>",
       )($rootScope);
 
-      $rootScope.$digest();
+      ;
 
       expect(element.text()).toBe("XY");
       ///expect(angular.element(element[0].firstChild).data("x")).toBe("abc");
@@ -17140,7 +17140,7 @@ describe("$compile", () => {
           "<span ng-show-end></span>" +
           "</div>",
       )($rootScope);
-      $rootScope.$digest();
+      ;
       await wait(100);
       const spans = element.find("span");
       expect(spans.eq(0)[0].classList.contains("ng-hide")).toBeTrue();
@@ -17159,13 +17159,13 @@ describe("$compile", () => {
   //     const element = JQLite('<div class="{{val1}} {{val2}} fire"></div>');
   //     $compile(element)($rootScope);
 
-  //     $rootScope.$digest();
+  //     ;
 
   //     expect(element[0].classList.contains("fire")).toBe(true);
 
   //     $rootScope.val1 = "ice";
   //     $rootScope.val2 = "rice";
-  //     $rootScope.$digest();
+  //     ;
 
   //     data = $animate.queue.shift();
   //     expect(data.event).toBe("addClass");
@@ -17176,7 +17176,7 @@ describe("$compile", () => {
   //     expect(element[0].classList.contains("fire")).toBe(true);
 
   //     $rootScope.val2 = "dice";
-  //     $rootScope.$digest();
+  //     ;
 
   //     data = $animate.queue.shift();
   //     expect(data.event).toBe("addClass");
@@ -17192,7 +17192,7 @@ describe("$compile", () => {
 
   //     $rootScope.val1 = "";
   //     $rootScope.val2 = "";
-  //     $rootScope.$digest();
+  //     ;
 
   //     data = $animate.queue.shift();
   //     expect(data.event).toBe("removeClass");

@@ -1410,7 +1410,7 @@ describe("directive", () => {
     injector.loadNewModules(["a"]);
     injector.invoke(($compile, $rootScope) => {
       const elem = $compile("<div a-directive></div>")($rootScope); // compile and link
-      $rootScope.$digest();
+      ;
       expect(elem.text()).toEqual("test directive");
       elem.remove();
     });
@@ -1424,7 +1424,7 @@ describe("directive", () => {
     injector.loadNewModules(["a"]);
     injector.invoke(($compile, $rootScope) => {
       const elem = $compile("<div a-directive></div>")($rootScope); // compile and link
-      $rootScope.$digest();
+      ;
       expect(elem.text()).toEqual("test directive");
       elem.remove();
     });

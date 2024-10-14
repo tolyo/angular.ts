@@ -226,7 +226,7 @@ function SelectController($element, $scope) {
   function scheduleRender() {
     if (renderScheduled) return;
     renderScheduled = true;
-    $scope.$$postDigest(() => {
+    $scope.$postUpdate(() => {
       renderScheduled = false;
       self.ngModelCtrl.$render();
     });
@@ -238,7 +238,7 @@ function SelectController($element, $scope) {
 
     updateScheduled = true;
 
-    $scope.$$postDigest(() => {
+    $scope.$postUpdate(() => {
       if ($scope.$$destroyed) return;
 
       updateScheduled = false;
@@ -349,7 +349,7 @@ function SelectController($element, $scope) {
         currentValue === removeValue
       ) {
         // When multiple (selected) options are destroyed at the same time, we don't want
-        // to run a model update for each of them. Instead, run a single update in the $$postDigest
+        // to run a model update for each of them. Instead, run a single update in the $postUpdate
         scheduleViewValueUpdate(true);
       }
     });

@@ -371,7 +371,7 @@ describe("ngModel", () => {
         };
 
         ctrl.$setViewValue("123");
-        scope.$digest();
+        ;
 
         expect(element[0].classList.contains("ng-valid-parse")).toBeTrue();
         expect(element[0].classList.contains("ng-invalid-parse")).toBeFalse();
@@ -381,7 +381,7 @@ describe("ngModel", () => {
 
         parserIsFailing = true;
         ctrl.$setViewValue("12345");
-        scope.$digest();
+        ;
 
         expect(element[0].classList.contains("ng-valid-parse")).toBeFalse();
         expect(element[0].classList.contains("ng-invalid-parse")).toBeTrue();
@@ -422,7 +422,7 @@ describe("ngModel", () => {
         expect(scope.value).toBeUndefined();
 
         defer.resolve();
-        scope.$digest();
+        ;
 
         expect(ctrl.$modelValue).toBe("b");
         expect(scope.value).toBe("b");
@@ -434,7 +434,7 @@ describe("ngModel", () => {
         expect(scope.value).toBe("b");
 
         defer.resolve();
-        scope.$digest();
+        ;
 
         expect(ctrl.$modelValue).toBe("c");
         expect(scope.value).toBe("c");
@@ -519,11 +519,11 @@ describe("ngModel", () => {
         )($rootScope);
 
         $rootScope.val = 123;
-        $rootScope.$digest();
+        ;
         expect($rootScope.form.field.$viewValue).toBe("123");
 
         $rootScope.val = null;
-        $rootScope.$digest();
+        ;
         expect($rootScope.form.field.$viewValue).toBe(null);
 
         dealoc(form);
@@ -534,11 +534,11 @@ describe("ngModel", () => {
           '<form name="form"><input type="text" name="field" ng-model="val" /></form>',
         )($rootScope);
         $rootScope.val = 123;
-        $rootScope.$digest();
+        ;
         expect($rootScope.form.field.$viewValue).toBe("123");
 
         $rootScope.val = null;
-        $rootScope.$digest();
+        ;
         expect($rootScope.form.field.$viewValue).toBe(null);
 
         dealoc(form);
@@ -549,11 +549,11 @@ describe("ngModel", () => {
           '<form name="form"><input type="email" name="field" ng-model="val" /></form>',
         )($rootScope);
         $rootScope.val = 123;
-        $rootScope.$digest();
+        ;
         expect($rootScope.form.field.$viewValue).toBe("123");
 
         $rootScope.val = null;
-        $rootScope.$digest();
+        ;
         expect($rootScope.form.field.$viewValue).toBe(null);
 
         dealoc(form);
@@ -564,11 +564,11 @@ describe("ngModel", () => {
           '<form name="form"><input type="url" name="field" ng-model="val" /></form>',
         )($rootScope);
         $rootScope.val = 123;
-        $rootScope.$digest();
+        ;
         expect($rootScope.form.field.$viewValue).toBe("123");
 
         $rootScope.val = null;
-        $rootScope.$digest();
+        ;
         expect($rootScope.form.field.$viewValue).toBe(null);
 
         dealoc(form);
@@ -633,7 +633,7 @@ describe("ngModel", () => {
         //   const input = $compile(
         //     '<input name="myControl" maxlength="1" ng-model="value" >',
         //   )($rootScope);
-        //   $rootScope.$digest();
+        //   ;
 
         //   spyOn($animate, "addClass");
         //   spyOn($animate, "removeClass");
@@ -646,7 +646,7 @@ describe("ngModel", () => {
         //   setModelValue(ctrl, 3);
         //   ctrl.$processModelValue();
 
-        //   // $animate adds / removes classes in the $$postDigest, which
+        //   // $animate adds / removes classes in the $postUpdate, which
         //   // we cannot trigger with $digest, because that would set the model from the scope,
         //   // so we simply check if the functions have been called
         //   expect($animate.removeClass.calls.mostRecent().args[0][0]).toBe(
@@ -973,7 +973,7 @@ describe("ngModel", () => {
         expect(ctrl.$pending.promiseValidator).toBe(true);
 
         defer.resolve();
-        scope.$digest();
+        ;
 
         expect(ctrl.$valid).toBe(true);
         expect(ctrl.$invalid).toBe(false);
@@ -982,7 +982,7 @@ describe("ngModel", () => {
         scope.$apply('value = "123"');
 
         defer.reject();
-        scope.$digest();
+        ;
 
         expect(ctrl.$valid).toBe(false);
         expect(ctrl.$invalid).toBe(true);
@@ -1067,9 +1067,9 @@ describe("ngModel", () => {
         newDefer = defer;
 
         newDefer.reject();
-        scope.$digest();
+        ;
         oldDefer.resolve();
-        scope.$digest();
+        ;
 
         expect(ctrl.$valid).toBe(false);
         expect(ctrl.$invalid).toBe(true);
@@ -1103,7 +1103,7 @@ describe("ngModel", () => {
         expect(isObject(ctrl.$pending)).toBe(true);
 
         defers[1].resolve();
-        scope.$digest();
+        ;
         expect(ctrl.$valid).toBe(true);
         expect(ctrl.$invalid).toBe(false);
         expect(isObject(ctrl.$pending)).toBe(false);
@@ -1131,7 +1131,7 @@ describe("ngModel", () => {
         expect(isObject(ctrl.$pending)).toBe(false);
 
         defer.resolve();
-        scope.$digest();
+        ;
 
         expect(ctrl.$valid).toBe(false);
         expect(ctrl.$invalid).toBe(true);
@@ -1186,12 +1186,12 @@ describe("ngModel", () => {
         const formCtrl = $rootScope.myForm;
         const usernameCtrl = formCtrl.username;
 
-        $rootScope.$digest();
+        ;
         expect(usernameCtrl.$invalid).toBe(true);
         expect(formCtrl.$invalid).toBe(true);
 
         usernameCtrl.$setViewValue("valid-username");
-        $rootScope.$digest();
+        ;
 
         expect(usernameCtrl.$invalid).toBe(false);
         expect(formCtrl.$invalid).toBe(false);
@@ -1219,41 +1219,41 @@ describe("ngModel", () => {
           return usernameDefer.promise;
         };
 
-        $rootScope.$digest();
+        ;
         expect(usernameCtrl.$invalid).toBe(true);
         expect(formCtrl.$invalid).toBe(true);
 
         usernameCtrl.$setViewValue("valid-username");
-        $rootScope.$digest();
+        ;
 
         expect(formCtrl.$pending.usernameAvailability).toBeTruthy();
         expect(usernameCtrl.$invalid).toBeUndefined();
         expect(formCtrl.$invalid).toBeUndefined();
 
         usernameDefer.resolve();
-        $rootScope.$digest();
+        ;
         expect(usernameCtrl.$invalid).toBe(false);
         expect(formCtrl.$invalid).toBe(true);
 
         ageCtrl.$setViewValue(22);
-        $rootScope.$digest();
+        ;
 
         expect(usernameCtrl.$invalid).toBe(false);
         expect(ageCtrl.$invalid).toBe(false);
         expect(formCtrl.$invalid).toBe(false);
 
         usernameCtrl.$setViewValue("valid");
-        $rootScope.$digest();
+        ;
 
         expect(usernameCtrl.$invalid).toBe(true);
         expect(ageCtrl.$invalid).toBe(false);
         expect(formCtrl.$invalid).toBe(true);
 
         usernameCtrl.$setViewValue("another-valid-username");
-        $rootScope.$digest();
+        ;
 
         usernameDefer.resolve();
-        $rootScope.$digest();
+        ;
 
         expect(usernameCtrl.$invalid).toBe(false);
         expect(formCtrl.$invalid).toBe(false);
@@ -1471,11 +1471,11 @@ describe("ngModel", () => {
     it("should set ng-empty or ng-not-empty when the view value changes", () => {
       const element = $compile('<input ng-model="value" />')($rootScope);
 
-      $rootScope.$digest();
+      ;
       expect(element.val()).toBe("");
 
       $rootScope.value = "XXX";
-      $rootScope.$digest();
+      ;
       expect(element.val()).toBe("XXX");
 
       element.val("");
@@ -1492,7 +1492,7 @@ describe("ngModel", () => {
         $rootScope,
       );
 
-      $rootScope.$digest();
+      ;
       expect(element[0].classList.contains("ng-valid")).toBeTrue();
       expect(element[0].classList.contains("ng-pristine")).toBeTrue();
       expect(element[0].classList.contains("ng-touched")).toBeFalse();
@@ -1530,7 +1530,7 @@ describe("ngModel", () => {
       const element = $compile(
         '<input type="email" ng-model="value" required />',
       )($rootScope);
-      $rootScope.$digest();
+      ;
 
       expect(element[0].classList.contains("ng-invalid")).toBeTrue();
       expect(element[0].classList.contains("ng-invalid-required")).toBeTrue();

@@ -640,7 +640,7 @@ describe("validators", () => {
       inputElm = $compile(
         '<input type="text" ng-model="notDefined" required />',
       )($rootScope);
-      $rootScope.$digest();
+      ;
       expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
     });
 

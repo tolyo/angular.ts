@@ -2766,7 +2766,7 @@ describe("$http", function () {
 //         doFirstCacheRequest();
 
 //         await $http({ method: "get", url: "/url", cache }).then(callback);
-//         $rootScope.$digest();
+//         ;
 
 //         expect(callback).toHaveBeenCalled();
 //         expect(callback.calls.mostRecent().args[0].data).toBe("content");
@@ -2786,7 +2786,7 @@ describe("$http", function () {
 //           url: $sce.trustAsResourceUrl("/url"),
 //           cache,
 //         }).then(callback);
-//         $rootScope.$digest();
+//         ;
 
 //         expect(callback).toHaveBeenCalled();
 //         expect(callback.calls.mostRecent().args[0].data).toBe("content");
@@ -2796,7 +2796,7 @@ describe("$http", function () {
 //         doFirstCacheRequest();
 
 //         await $http({ url: "/url", cache }).then(callback);
-//         $rootScope.$digest();
+//         ;
 
 //         expect(callback).toHaveBeenCalled();
 //         expect(callback.calls.mostRecent().args[0].data).toBe("content");
@@ -2883,7 +2883,7 @@ describe("$http", function () {
 //         });
 
 //         await $http({ method: "GET", url: "/url", cache }).then(callback);
-//         $rootScope.$digest();
+//         ;
 //         expect(callback).toHaveBeenCalled();
 //       }));
 
@@ -2900,7 +2900,7 @@ describe("$http", function () {
 //         });
 
 //         await $http({ method: "GET", url: "/url", cache }).then(callback);
-//         $rootScope.$digest();
+//         ;
 //         expect(callback).toHaveBeenCalled();
 //       }));
 
@@ -2933,7 +2933,7 @@ describe("$http", function () {
 //         });
 
 //         await $http({ method: "get", url: "/url", cache }).then(callback);
-//         $rootScope.$digest();
+//         ;
 //         expect(callback).toHaveBeenCalled();
 //       }));
 
@@ -2944,7 +2944,7 @@ describe("$http", function () {
 //         });
 
 //         await $http({ method: "get", url: "/url", cache }).then(callback);
-//         $rootScope.$digest();
+//         ;
 //         expect(callback).toHaveBeenCalled();
 //       }));
 
@@ -2975,7 +2975,7 @@ describe("$http", function () {
 //           cache,
 //           headers: { foo: "baz" },
 //         }).then(callback);
-//         $rootScope.$digest();
+//         ;
 
 //         expect(callback.calls.mostRecent().args[0].config.headers.foo).toBe(
 //           "baz",
@@ -3030,7 +3030,7 @@ describe("$http", function () {
 //         });
 
 //         await $http({ method: "GET", url: "/abc", cache }).then(callback);
-//         $rootScope.$digest();
+//         ;
 //         expect(callback).toHaveBeenCalled();
 //       });
 
@@ -3045,7 +3045,7 @@ describe("$http", function () {
 //           callback();
 //         });
 
-//         $rootScope.$digest();
+//         ;
 //         expect(callback).toHaveBeenCalled();
 //       }));
 
@@ -3064,7 +3064,7 @@ describe("$http", function () {
 
 //           // Second should be served from cache, without sending request to server.
 //           await $http({ method: "get", url: "/url" }).then(callback);
-//           $rootScope.$digest();
+//           ;
 
 //           expect(callback).toHaveBeenCalled();
 //           expect(callback.calls.mostRecent().args[0].data).toBe("content");
@@ -3100,7 +3100,7 @@ describe("$http", function () {
 
 //           // Serve request from default cache when no local given.
 //           await $http({ method: "get", url: "/url" }).then(callback);
-//           $rootScope.$digest();
+//           ;
 //           expect(callback).toHaveBeenCalled();
 //           expect(callback.calls.mostRecent().args[0].data).toBe(
 //             "content-default-cache",
@@ -3111,7 +3111,7 @@ describe("$http", function () {
 //           await $http({ method: "get", url: "/url", cache: localCache }).then(
 //             callback,
 //           );
-//           $rootScope.$digest();
+//           ;
 //           expect(callback).toHaveBeenCalled();
 //           expect(callback.calls.mostRecent().args[0].data).toBe(
 //             "content-local-cache",
@@ -3213,7 +3213,7 @@ describe("$http", function () {
 //         expect($http.pendingRequests.length).toBe(0);
 
 //         await $http({ method: "get", url: "/some" });
-//         $rootScope.$digest();
+//         ;
 //         expect($http.pendingRequests.length).toBe(1);
 
 //         $httpBackend.flush();
@@ -3227,7 +3227,7 @@ describe("$http", function () {
 
 //         await $http({ method: "get", url: "/cached", cache: true });
 //         await $http({ method: "get", url: "/cached", cache: true });
-//         $rootScope.$digest();
+//         ;
 //         expect($http.pendingRequests.length).toBe(2);
 
 //         $httpBackend.flush();
@@ -3235,7 +3235,7 @@ describe("$http", function () {
 
 //         await $http({ method: "get", url: "/cached", cache: true });
 //         spyOn($http.pendingRequests, "push").and.callThrough();
-//         $rootScope.$digest();
+//         ;
 //         expect($http.pendingRequests.push).toHaveBeenCalled();
 
 //         $rootScope.$apply();
@@ -3248,7 +3248,7 @@ describe("$http", function () {
 //           expect($http.pendingRequests.length).toBe(0);
 //         });
 
-//         $rootScope.$digest();
+//         ;
 //         expect($http.pendingRequests.length).toBe(1);
 //         $httpBackend.flush();
 //       });
@@ -3343,7 +3343,7 @@ describe("$http", function () {
 //         expect(incOutstandingRequestCountSpy).toHaveBeenCalledOnceWith("$http");
 //         expect(completeOutstandingRequestSpy).not.toHaveBeenCalled();
 
-//         $rootScope.$digest();
+//         ;
 
 //         expect(incOutstandingRequestCountSpy).toHaveBeenCalledOnceWith("$http");
 //         expect(completeOutstandingRequestSpy).toHaveBeenCalledOnceWith(
@@ -3423,7 +3423,7 @@ describe("$http", function () {
 //         expect(completeOutstandingRequestSpy).not.toHaveBeenCalled();
 
 //         $http.get("");
-//         $rootScope.$digest();
+//         ;
 
 //         expect(reqInterceptorFulfilled).toBe(false);
 //         expect(resInterceptorFulfilled).toBe(false);
@@ -3439,7 +3439,7 @@ describe("$http", function () {
 //         expect(completeOutstandingRequestSpy).not.toHaveBeenCalled();
 
 //         resInterceptorDeferred.resolve();
-//         $rootScope.$digest();
+//         ;
 
 //         expect(reqInterceptorFulfilled).toBe(true);
 //         expect(resInterceptorFulfilled).toBe(true);
@@ -3456,14 +3456,14 @@ describe("$http", function () {
 //         expect(completeOutstandingRequestSpy).not.toHaveBeenCalled();
 
 //         $http.get("").catch(() => {});
-//         $rootScope.$digest();
+//         ;
 
 //         expect(reqInterceptorFulfilled).toBe(false);
 //         expect(incOutstandingRequestCountSpy).toHaveBeenCalledOnceWith("$http");
 //         expect(completeOutstandingRequestSpy).not.toHaveBeenCalled();
 
 //         reqInterceptorDeferred.reject();
-//         $rootScope.$digest();
+//         ;
 
 //         expect(reqInterceptorFulfilled).toBe(true);
 //         expect(incOutstandingRequestCountSpy).toHaveBeenCalledOnceWith("$http");
@@ -3480,7 +3480,7 @@ describe("$http", function () {
 //         expect(completeOutstandingRequestSpy).not.toHaveBeenCalled();
 
 //         $http.get("").catch(() => {});
-//         $rootScope.$digest();
+//         ;
 
 //         expect(reqInterceptorFulfilled).toBe(false);
 //         expect(resInterceptorFulfilled).toBe(false);
@@ -3496,7 +3496,7 @@ describe("$http", function () {
 //         expect(completeOutstandingRequestSpy).not.toHaveBeenCalled();
 
 //         resInterceptorDeferred.reject();
-//         $rootScope.$digest();
+//         ;
 
 //         expect(reqInterceptorFulfilled).toBe(true);
 //         expect(resInterceptorFulfilled).toBe(true);
@@ -3702,7 +3702,7 @@ describe("$http", function () {
 //         withCredentials: true,
 //         responseType: "json",
 //       });
-//       $rootScope.$digest();
+//       ;
 //       expect($httpBackend).toHaveBeenCalled();
 //     });
 
@@ -3730,7 +3730,7 @@ describe("$http", function () {
 //         timeout: 12345,
 //         responseType: "json",
 //       });
-//       $rootScope.$digest();
+//       ;
 //       expect($httpBackend).toHaveBeenCalled();
 //     });
 
@@ -3771,7 +3771,7 @@ describe("$http", function () {
 //       .respond(200, "<h1>Header!</h1>", {});
 //     $http.get("/template1.html").then(handler);
 //     // Ensure requests are sent
-//     $rootScope.$digest();
+//     ;
 
 //     $httpBackend.flush(null, null, false);
 //     expect($rootScope.$applyAsync).toHaveBeenCalled();
@@ -3792,7 +3792,7 @@ describe("$http", function () {
 //     $http.get("/template1.html").then(log.fn("response 1"));
 //     $http.get("/template2.html").then(log.fn("response 2"));
 //     // Ensure requests are sent
-//     $rootScope.$digest();
+//     ;
 
 //     $httpBackend.flush(null, null, false);
 //     expect(log).toEqual([]);
@@ -3816,7 +3816,7 @@ describe("$http", function () {
 //     $http.get("/template2.html").then(log.fn("response 2"));
 //     $http.get("/template3.html").then(log.fn("response 3"));
 //     // Ensure requests are sent
-//     $rootScope.$digest();
+//     ;
 
 //     // Intermediate $digest occurs before 3rd response is received, assert that pending responses
 //     /// are handled

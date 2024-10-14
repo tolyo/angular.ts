@@ -28,7 +28,7 @@
 - // use the type inference to auto inject arguments, or use implicit injection
 - $injector.invoke(function($rootScope, $compile, $document) {
 -     $compile($document)($rootScope);
--     $rootScope.$digest();
+-     ;
 - });
 - ```
 

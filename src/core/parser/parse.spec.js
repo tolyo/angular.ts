@@ -2656,17 +2656,17 @@ describe("parser", () => {
       expect($rootScope.$$watchers.length).toBe(1);
       expect(fn($rootScope)).toEqual("bar");
 
-      $rootScope.$digest();
+      ;
       expect($rootScope.$$watchers.length).toBe(0);
       expect(fn($rootScope)).toEqual("bar");
 
       $rootScope.foo = "man";
-      $rootScope.$digest();
+      ;
       expect($rootScope.$$watchers.length).toBe(0);
       expect(fn($rootScope)).toEqual("man");
 
       $rootScope.foo = "shell";
-      $rootScope.$digest();
+      ;
       expect($rootScope.$$watchers.length).toBe(0);
       expect(fn($rootScope)).toEqual("shell");
     });
@@ -2677,16 +2677,16 @@ describe("parser", () => {
         if (value !== old) logs.push(value);
       });
 
-      $rootScope.$digest();
+      ;
       expect($rootScope.$$watchers.length).toBe(1);
 
       $rootScope.foo = "bar";
-      $rootScope.$digest();
+      ;
       expect($rootScope.$$watchers.length).toBe(0);
       expect(logs[0]).toEqual("bar");
 
       $rootScope.foo = "man";
-      $rootScope.$digest();
+      ;
       expect($rootScope.$$watchers.length).toBe(0);
       expect(logs.length).toEqual(1);
     });
@@ -2703,17 +2703,17 @@ describe("parser", () => {
       });
 
       $rootScope.foo = "bar";
-      $rootScope.$digest();
+      ;
       expect($rootScope.$$watchers.length).toBe(2);
       expect(logs[0]).toBeUndefined();
 
       $rootScope.foo = "man";
-      $rootScope.$digest();
+      ;
       expect($rootScope.$$watchers.length).toBe(1);
       expect(logs[1]).toEqual("man");
 
       $rootScope.foo = "shell";
-      $rootScope.$digest();
+      ;
       expect($rootScope.$$watchers.length).toBe(1);
       expect(logs.length).toEqual(2);
     });
@@ -2722,9 +2722,9 @@ describe("parser", () => {
       const fn = $parse("::foo");
       $rootScope.$watch(fn);
       $rootScope.foo = null;
-      $rootScope.$digest();
+      ;
       $rootScope.foo = "foo";
-      $rootScope.$digest();
+      ;
       expect(fn()).toEqual(undefined);
     });
 
@@ -2746,7 +2746,7 @@ describe("parser", () => {
         return 1;
       };
       scope.$watch($parse(":: foo() | count", interceptor));
-      scope.$digest();
+      ;
       expect(countFilter.calls.count()).toBe(1);
     });
   });
@@ -2778,23 +2778,23 @@ describe("parser", () => {
           expect(logs).toEqual([]);
           expect($rootScope.$$watchers.length).toBe(1);
 
-          $rootScope.$digest();
+          ;
           expect($rootScope.$$watchers.length).toBe(1);
           expect(logs[0]).toEqual({ foo: undefined, bar: undefined });
 
           $rootScope.foo = "foo";
-          $rootScope.$digest();
+          ;
           expect($rootScope.$$watchers.length).toBe(1);
           expect(logs[0]).toEqual({ foo: undefined, bar: undefined });
 
           $rootScope.foo = "foobar";
           $rootScope.bar = "bar";
-          $rootScope.$digest();
+          ;
           expect($rootScope.$$watchers.length).toBe(0);
           expect(logs[2]).toEqual({ foo: "foobar", bar: "bar" });
 
           $rootScope.foo = "baz";
-          $rootScope.$digest();
+          ;
           expect($rootScope.$$watchers.length).toBe(0);
           expect(logs[3]).toBeUndefined();
         });
@@ -2812,23 +2812,23 @@ describe("parser", () => {
           expect(logs.length).toEqual(0);
           expect($rootScope.$$watchers.length).toBe(1);
 
-          $rootScope.$digest();
+          ;
           expect($rootScope.$$watchers.length).toBe(1);
           expect(logs[0]).toEqual([undefined, undefined]);
 
           $rootScope.foo = "foo";
-          $rootScope.$digest();
+          ;
           expect($rootScope.$$watchers.length).toBe(1);
           expect(logs[1]).toEqual(["foo", undefined]);
 
           $rootScope.foo = "foobar";
           $rootScope.bar = "bar";
-          $rootScope.$digest();
+          ;
           expect($rootScope.$$watchers.length).toBe(0);
           expect(logs[2]).toEqual(["foobar", "bar"]);
 
           $rootScope.foo = "baz";
-          $rootScope.$digest();
+          ;
           expect($rootScope.$$watchers.length).toBe(0);
           expect(logs[3]).toBeUndefined();
         });
@@ -2849,18 +2849,18 @@ describe("parser", () => {
           });
 
           $rootScope.foo = "bar";
-          $rootScope.$digest();
+          ;
           expect($rootScope.$$watchers.length).toBe(2);
           expect(logs[0]).toEqual(["bar"]);
           expect(logs[1]).toEqual([undefined]);
 
           $rootScope.foo = "baz";
-          $rootScope.$digest();
+          ;
           expect($rootScope.$$watchers.length).toBe(1);
           expect(logs[2]).toEqual(["baz"]);
 
           $rootScope.bar = "qux";
-          $rootScope.$digest();
+          ;
           expect($rootScope.$$watchers.length).toBe(1);
           expect(logs[3]).toBeUndefined();
         });
@@ -2882,14 +2882,14 @@ describe("parser", () => {
       };
 
       scope.$watch("a && b()");
-      scope.$digest();
-      scope.$digest();
+      ;
+      ;
       expect(bCalled).toBe(0);
 
       scope.a = true;
-      scope.$digest();
+      ;
       expect(bCalled).toBe(1);
-      scope.$digest();
+      ;
       expect(bCalled).toBe(2);
     });
 
@@ -2900,12 +2900,12 @@ describe("parser", () => {
       };
 
       scope.$watch("a || b()");
-      scope.$digest();
+      ;
       expect(bCalled).toBe(true);
 
       bCalled = false;
       scope.a = true;
-      scope.$digest();
+      ;
       expect(bCalled).toBe(false);
     });
 
@@ -2916,11 +2916,11 @@ describe("parser", () => {
       };
 
       scope.$watch("a ? b() : 1");
-      scope.$digest();
+      ;
       expect(bCalled).toBe(false);
 
       scope.a = true;
-      scope.$digest();
+      ;
       expect(bCalled).toBe(true);
     });
   });
@@ -2951,15 +2951,15 @@ describe("parser", () => {
 
       scope.$watch("a | foo:b:1");
       scope.a = 0;
-      scope.$digest();
+      ;
       expect(filterCalled).toBe(true);
 
       filterCalled = false;
-      scope.$digest();
+      ;
       expect(filterCalled).toBe(false);
 
       scope.a++;
-      scope.$digest();
+      ;
       expect(filterCalled).toBe(true);
     });
 
@@ -2975,14 +2975,14 @@ describe("parser", () => {
 
       scope.$watch("[(a | foo:b:1), undefined]");
       scope.a = 0;
-      scope.$digest();
+      ;
       expect(filterCalls).toEqual([0]);
 
-      scope.$digest();
+      ;
       expect(filterCalls).toEqual([0]);
 
       scope.a++;
-      scope.$digest();
+      ;
       expect(filterCalls).toEqual([0, 1]);
     });
 
@@ -2998,14 +2998,14 @@ describe("parser", () => {
 
       scope.$watch("::[(a | foo:b:1), undefined]");
       scope.a = 0;
-      scope.$digest();
+      ;
       expect(filterCalls).toEqual([0]);
 
-      scope.$digest();
+      ;
       expect(filterCalls).toEqual([0]);
 
       scope.a++;
-      scope.$digest();
+      ;
       expect(filterCalls).toEqual([0, 1]);
     });
 
@@ -3026,11 +3026,11 @@ describe("parser", () => {
 
       scope.$watch("a | foo:b:1");
       scope.a = 0;
-      scope.$digest();
+      ;
       expect(filterCalled).toBe(true);
 
       filterCalled = false;
-      scope.$digest();
+      ;
       expect(filterCalled).toBe(true);
     });
 
@@ -3054,11 +3054,11 @@ describe("parser", () => {
         watcherCalls++;
       });
 
-      scope.$digest();
+      ;
       expect(filterCalls).toBe(1);
       expect(watcherCalls).toBe(1);
 
-      scope.$digest();
+      ;
       expect(filterCalls).toBe(1);
       expect(watcherCalls).toBe(1);
     });
@@ -3069,22 +3069,22 @@ describe("parser", () => {
         watchCalls.push(a[0]);
       });
       scope.a = 0;
-      scope.$digest();
+      ;
       expect(watchCalls).toEqual([0]);
 
-      scope.$digest();
+      ;
       expect(watchCalls).toEqual([0]);
 
       scope.a++;
-      scope.$digest();
+      ;
       expect(watchCalls).toEqual([0, 1]);
 
       scope.a = {};
-      scope.$digest();
+      ;
       expect(watchCalls).toEqual([0, 1, {}]);
 
       scope.a.foo = 42;
-      scope.$digest();
+      ;
       expect(watchCalls).toEqual([0, 1, { foo: 42 }]);
     });
 
@@ -3094,22 +3094,22 @@ describe("parser", () => {
         watchCalls.push(a[0]);
       });
       scope.a = 0;
-      scope.$digest();
+      ;
       expect(watchCalls).toEqual([0]);
 
-      scope.$digest();
+      ;
       expect(watchCalls).toEqual([0]);
 
       scope.a++;
-      scope.$digest();
+      ;
       expect(watchCalls).toEqual([0, 1]);
 
       scope.a = {};
-      scope.$digest();
+      ;
       expect(watchCalls).toEqual([0, 1, {}]);
 
       scope.a.foo = 42;
-      scope.$digest();
+      ;
       expect(watchCalls).toEqual([0, 1, { foo: 42 }]);
     });
   });
@@ -3148,11 +3148,11 @@ describe("parser", () => {
           watcherCalls++;
         });
 
-        scope.$digest();
+        ;
         expect(filterCalls).toBe(2);
         expect(watcherCalls).toBe(1);
 
-        scope.$digest();
+        ;
         expect(filterCalls).toBe(3);
         expect(watcherCalls).toBe(1);
       });
@@ -3204,11 +3204,11 @@ describe("parser", () => {
           watcherCalls++;
         });
 
-        scope.$digest();
+        ;
         expect(filterCalls).toBe(1);
         expect(watcherCalls).toBe(1);
 
-        scope.$digest();
+        ;
         expect(filterCalls).toBe(1);
         expect(watcherCalls).toBe(1);
       });
@@ -3230,11 +3230,11 @@ describe("parser", () => {
           watcherCalls++;
         });
 
-        scope.$digest();
+        ;
         expect(filterCalls).toBe(1);
         expect(watcherCalls).toBe(1);
 
-        scope.$digest();
+        ;
         expect(filterCalls).toBe(1);
         expect(watcherCalls).toBe(1);
       });
@@ -3259,13 +3259,13 @@ describe("parser", () => {
           watcherCalls++;
         });
 
-        scope.$digest();
+        ;
         expect(filterCalls).toBe(1);
         expect(watcherCalls).toBe(1);
 
         date.setYear(1901);
 
-        scope.$digest();
+        ;
         expect(filterCalls).toBe(2);
         expect(watcherCalls).toBe(1);
       });
@@ -3287,13 +3287,13 @@ describe("parser", () => {
           watcherCalls++;
         });
 
-        scope.$digest();
+        ;
         expect(filterCalls).toBe(1);
         expect(watcherCalls).toBe(1);
 
         scope.date.setTime(1234567890);
 
-        scope.$digest();
+        ;
         expect(filterCalls).toBe(2);
         expect(watcherCalls).toBe(2);
       });
@@ -3315,12 +3315,12 @@ describe("parser", () => {
           watcherCalls++;
         });
 
-        scope.$digest();
+        ;
         expect(watcherCalls).toBe(1);
         expect(filterCalls).toBe(1);
 
         scope.date = new Date(1234567890123);
-        scope.$digest();
+        ;
         expect(watcherCalls).toBe(1);
         expect(filterCalls).toBe(1);
       });
@@ -3343,11 +3343,11 @@ describe("parser", () => {
         watcherCalls++;
       });
 
-      scope.$digest();
+      ;
       expect(filterCalls).toBe(1);
       expect(watcherCalls).toBe(1);
 
-      scope.$digest();
+      ;
       expect(filterCalls).toBe(1);
       expect(watcherCalls).toBe(1);
     });
@@ -3369,11 +3369,11 @@ describe("parser", () => {
         watcherCalls++;
       });
 
-      scope.$digest();
+      ;
       expect(filterCalls).toBe(1);
       expect(watcherCalls).toBe(1);
 
-      scope.$digest();
+      ;
       expect(filterCalls).toBe(1);
       expect(watcherCalls).toBe(1);
     });
@@ -3395,11 +3395,11 @@ describe("parser", () => {
         watcherCalls++;
       });
 
-      scope.$digest();
+      ;
       expect(filterCalls).toBe(2);
       expect(watcherCalls).toBe(1);
 
-      scope.$digest();
+      ;
       expect(filterCalls).toBe(3);
       expect(watcherCalls).toBe(1);
     });
@@ -3420,11 +3420,11 @@ describe("parser", () => {
         watcherCalls++;
       });
 
-      scope.$digest();
+      ;
       expect(toStringCalls).toBe(2);
       expect(watcherCalls).toBe(1);
 
-      scope.$digest();
+      ;
       expect(toStringCalls).toBe(3);
       expect(watcherCalls).toBe(1);
     });
@@ -3448,11 +3448,11 @@ describe("parser", () => {
         watcherCalls++;
       });
 
-      scope.$digest();
+      ;
       expect(filterCalls).toBe(2);
       expect(watcherCalls).toBe(1);
 
-      scope.$digest();
+      ;
       expect(filterCalls).toBe(3);
       expect(watcherCalls).toBe(1);
     });
@@ -3513,11 +3513,11 @@ describe("parser", () => {
         watcherCalls++;
       });
 
-      scope.$digest();
+      ;
       expect(filterCalls).toBe(1);
       expect(watcherCalls).toBe(1);
 
-      scope.$digest();
+      ;
       expect(filterCalls).toBe(1);
       expect(watcherCalls).toBe(1);
     });
@@ -3547,7 +3547,7 @@ describe("parser", () => {
       scope.$watch($parse("a", interceptor));
 
       scope.a = 1;
-      scope.$digest();
+      ;
       expect(args).toEqual([1]);
     });
 
@@ -3561,7 +3561,7 @@ describe("parser", () => {
       scope.$watch($parse("::a", interceptor));
 
       scope.a = 1;
-      scope.$digest();
+      ;
       expect(args).toEqual([1]);
     });
 
@@ -3580,7 +3580,7 @@ describe("parser", () => {
       scope.$watch($parse($parse("a", int1), int2));
 
       scope.a = 1;
-      scope.$digest();
+      ;
       expect(args1).toEqual([1]);
       expect(args2).toEqual([3]);
     });
@@ -3628,16 +3628,16 @@ describe("parser", () => {
 
       scope.$watch($parse("a", interceptor));
       scope.a = 0;
-      scope.$digest();
+      ;
       expect(called).toBe(true);
 
       called = false;
-      scope.$digest();
+      ;
       expect(called).toBe(true);
 
       scope.a++;
       called = false;
-      scope.$digest();
+      ;
       expect(called).toBe(true);
     });
 
@@ -3652,11 +3652,11 @@ describe("parser", () => {
       scope.$watch($parse("::a", interceptor));
 
       interceptorCalls = 0;
-      scope.$digest();
+      ;
       expect(interceptorCalls).not.toBe(0);
 
       interceptorCalls = 0;
-      scope.$digest();
+      ;
       expect(interceptorCalls).not.toBe(0);
     });
 
@@ -3676,11 +3676,11 @@ describe("parser", () => {
       scope.$watch($parse("::a | identity", interceptor));
 
       interceptorCalls = 0;
-      scope.$digest();
+      ;
       expect(interceptorCalls).not.toBe(0);
 
       interceptorCalls = 0;
-      scope.$digest();
+      ;
       expect(interceptorCalls).not.toBe(0);
     });
 
@@ -3695,11 +3695,11 @@ describe("parser", () => {
       scope.$watch($parse("::[a]", interceptor));
 
       interceptorCalls = 0;
-      scope.$digest();
+      ;
       expect(interceptorCalls).not.toBe(0);
 
       interceptorCalls = 0;
-      scope.$digest();
+      ;
       expect(interceptorCalls).not.toBe(0);
     });
 
@@ -3712,15 +3712,15 @@ describe("parser", () => {
       scope.$watch($parse("a", interceptor));
       scope.$watch($parse("a + b", interceptor));
       scope.a = scope.b = 0;
-      scope.$digest();
+      ;
       expect(called).toBe(true);
 
       called = false;
-      scope.$digest();
+      ;
       expect(called).toBe(false);
 
       scope.a++;
-      scope.$digest();
+      ;
       expect(called).toBe(true);
     });
 
@@ -3735,11 +3735,11 @@ describe("parser", () => {
       scope.o = { sub: 1 };
 
       called = false;
-      scope.$digest();
+      ;
       expect(called).toBe(true);
 
       called = false;
-      scope.$digest();
+      ;
       expect(called).toBe(true);
     });
 
@@ -3751,12 +3751,12 @@ describe("parser", () => {
       }
       scope.$watch($parse("a", interceptor));
       scope.a = new Date();
-      scope.$digest();
+      ;
       expect(called).toBe(true);
 
       called = false;
       scope.a = new Date(scope.a.valueOf());
-      scope.$digest();
+      ;
       expect(called).toBe(false);
     });
 
@@ -3768,12 +3768,12 @@ describe("parser", () => {
       }
       scope.$watch($parse("a", interceptor));
       scope.a = new Date();
-      scope.$digest();
+      ;
       expect(called).toBe(true);
 
       called = false;
       scope.a.setTime(scope.a.getTime() + 1);
-      scope.$digest();
+      ;
       expect(called).toBe(true);
     });
 
@@ -3784,7 +3784,7 @@ describe("parser", () => {
         return v;
       }
       scope.$watch($parse(undefined, interceptor));
-      scope.$digest();
+      ;
       expect(called).toBe(true);
     });
 
@@ -3793,11 +3793,11 @@ describe("parser", () => {
       scope.$watch($parse("::x", (x) => x));
       scope.$watch($parse("::x", () => 1)); // interceptor that returns non-undefined
 
-      scope.$digest();
+      ;
       expect(scope.$$watchersCount).toBe(3);
 
       scope.x = 1;
-      scope.$digest();
+      ;
       expect(scope.$$watchersCount).toBe(0);
     });
 
@@ -3806,11 +3806,11 @@ describe("parser", () => {
       scope.$watch($parse("::[x]", (x) => x));
       scope.$watch($parse("::[x]", () => 1)); // interceptor that returns non-literal
 
-      scope.$digest();
+      ;
       expect(scope.$$watchersCount).toBe(3);
 
       scope.x = 1;
-      scope.$digest();
+      ;
       expect(scope.$$watchersCount).toBe(0);
     });
 
@@ -4017,10 +4017,10 @@ describe("parser", () => {
           watcherCalls++;
         });
 
-        scope.$digest();
+        ;
         expect(watcherCalls).toBe(1);
 
-        scope.$digest();
+        ;
         expect(watcherCalls).toBe(1);
       });
     });
@@ -4036,10 +4036,10 @@ describe("parser", () => {
           watcherCalls++;
         });
 
-        scope.$digest();
+        ;
         expect(watcherCalls).toBe(1);
 
-        scope.$digest();
+        ;
         expect(watcherCalls).toBe(1);
       });
 
@@ -4053,12 +4053,12 @@ describe("parser", () => {
           watcherCalls++;
         });
 
-        scope.$digest();
+        ;
         expect(watcherCalls).toBe(1);
 
         date.setYear(1901);
 
-        scope.$digest();
+        ;
         expect(watcherCalls).toBe(2);
       });
 
@@ -4071,11 +4071,11 @@ describe("parser", () => {
           watcherCalls++;
         });
 
-        scope.$digest();
+        ;
         expect(watcherCalls).toBe(1);
 
         scope.date = new Date(1234567890123);
-        scope.$digest();
+        ;
         expect(watcherCalls).toBe(1);
       });
 
@@ -4088,11 +4088,11 @@ describe("parser", () => {
           watcherCalls++;
         });
 
-        scope.$digest();
+        ;
         expect(watcherCalls).toBe(1);
 
         scope.date.setTime(scope.date.getTime() + 1);
-        scope.$digest();
+        ;
         expect(watcherCalls).toBe(2);
       });
     });
@@ -4104,12 +4104,12 @@ describe("parser", () => {
       spy.and.callFake(() => value);
       scope.foo = spy;
       scope.$watch("foo()");
-      scope.$digest();
+      ;
       expect(spy).toHaveBeenCalledTimes(2);
-      scope.$digest();
+      ;
       expect(spy).toHaveBeenCalledTimes(3);
       value = "bar";
-      scope.$digest();
+      ;
       expect(spy).toHaveBeenCalledTimes(5);
     });
 
@@ -4127,15 +4127,15 @@ describe("parser", () => {
       };
       scope.$watch("foo(); bar + two", listener);
 
-      scope.$digest();
+      ;
       expect(lastVal).toBe(2);
 
       scope.bar = 2;
-      scope.$digest();
+      ;
       expect(lastVal).toBe(4);
 
       scope.setBarToOne = true;
-      scope.$digest();
+      ;
       expect(lastVal).toBe(3);
     });
 
@@ -4152,15 +4152,15 @@ describe("parser", () => {
 
       scope.curObj = objA;
       scope.input = 1;
-      scope.$digest();
+      ;
       expect(objA.value).toBe(scope.input);
 
       scope.curObj = objB;
-      scope.$digest();
+      ;
       expect(objB.value).toBe(scope.input);
 
       scope.input = 2;
-      scope.$digest();
+      ;
       expect(objB.value).toBe(scope.input);
     });
 
@@ -4173,26 +4173,26 @@ describe("parser", () => {
         lastValue = val;
       });
 
-      scope.$digest();
+      ;
       expect(count).toBe(1);
       expect(lastValue).toEqual({ undefined: true });
 
-      scope.$digest();
+      ;
       expect(count).toBe(1);
       expect(lastValue).toEqual({ undefined: true });
 
       scope.a = true;
-      scope.$digest();
+      ;
       expect(count).toBe(2);
       expect(lastValue).toEqual({ true: true });
 
       scope.a = "abc";
-      scope.$digest();
+      ;
       expect(count).toBe(3);
       expect(lastValue).toEqual({ abc: true });
 
       scope.a = undefined;
-      scope.$digest();
+      ;
       expect(count).toBe(4);
       expect(lastValue).toEqual({ undefined: true });
     });

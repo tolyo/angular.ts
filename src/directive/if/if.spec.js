@@ -147,7 +147,7 @@ describe("ngIf", () => {
       });
       injector = angular.bootstrap(element, ["myModule"]);
 
-      $rootScope.$digest();
+      ;
 
       setTimeout(() => {
         expect(element.text()).toBe("Hello");
@@ -269,7 +269,7 @@ describe("ngIf", () => {
         const element = $compile('<iso><span ng-bind="val"></span></iso>')(
           $rootScope,
         );
-        $rootScope.$digest();
+        ;
         expect(element.text().trim()).toEqual(
           "val=value in iso scope-transcluded content",
         );

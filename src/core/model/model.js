@@ -20,7 +20,7 @@ const $rootModelErr = minErr("$rootModel");
  * @property {Object} locals
  */
 
-export const $$postDigestQueue = [];
+export const $postUpdateQueue = [];
 
 /**
  * @type {Function[]}
@@ -150,7 +150,6 @@ class Handler {
    * @returns {boolean} - Returns true to indicate success of the operation.
    */
   set(target, property, value) {
-    debugger;
     if (property === "getWatchFunction") {
       return true;
     }
@@ -190,7 +189,6 @@ class Handler {
         const listeners = this.listeners.get(property);
 
         if (listeners) {
-          debugger;
           this.scheduleListener(listeners, oldValue, value);
         }
       }
@@ -224,13 +222,12 @@ class Handler {
     if (property === isProxySymbol) return true;
     const propertyMap = {
       $watch: this.$watch.bind(this),
-      $watchGroup: this.$watchGroup.bind(this),
       $new: this.$new.bind(this),
       $destroy: this.$destroy.bind(this),
       $eval: this.$eval.bind(this),
       $apply: this.$apply.bind(this),
       $evalAsync: this.$evalAsync.bind(this),
-      $$postDigest: this.$$postDigest.bind(this),
+      $postUpdate: this.$postUpdate.bind(this),
       $target: this.$target(),
       $digest: this.$digest.bind(this),
       $handler: this,
@@ -252,20 +249,20 @@ class Handler {
    * @param {*} newValue
    */
   scheduleListener(listeners, oldValue, newValue) {
-    Promise.resolve().then(() => {
-      let index = 0;
-      while (index < listeners.length) {
-        const listener = listeners[index];
-        this.notifyListener(listener, oldValue, newValue);
-        if (
-          listener.oneTime &&
-          this.deregisterKey(listener.property, listener.id)
-        ) {
-          this.incrementWatchersCount(-1);
-        }
-        index++;
+    //Promise.resolve().then(() => {
+    let index = 0;
+    while (index < listeners.length) {
+      const listener = listeners[index];
+      this.notifyListener(listener, oldValue, newValue);
+      if (
+        listener.oneTime &&
+        this.deregisterKey(listener.property, listener.id)
+      ) {
+        this.incrementWatchersCount(-1);
       }
-    });
+      index++;
+    }
+    //});
   }
 
   deleteProperty(target, property) {
@@ -354,8 +351,6 @@ class Handler {
     };
   }
 
-  $watchGroup(obj, listenerFn) {}
-
   $new(isIsolated = false, parent) {
     let child;
     if (isIsolated) {
@@ -395,7 +390,6 @@ class Handler {
 
   /**
    * @deprecated
-   * Invokes all registered listener functions for any watched properties.
    */
   $digest() {
     throw new Error("$Digest is deprecated");
@@ -405,34 +399,28 @@ class Handler {
     return $parse(expr)(this.target, locals);
   }
 
-  $evalAsync(expr, locals) {
-    Promise.resolve().then(() => this.$eval(expr, locals));
+  async $evalAsync(expr, locals) {
+    return this.$eval(expr, locals);
   }
 
   $apply(expr) {
     try {
-      const clone = structuredClone(this.target);
-      $parse(expr)(clone);
-      Object.entries(clone).forEach(([key, value]) => {
-        this.proxy[key] = value;
-      });
+      return $parse(expr)(this.proxy);
     } catch (e) {
       $exceptionHandler(e);
     }
   }
 
-  $applyAsync(expr) {
-    const scope = this;
-    if (expr) {
-      $$applyAsyncQueue.push(() => scope.$eval(expr));
-    }
-    // TODO: investigate
-    //expr = $parse(expr);
-
-    if (applyAsyncId === null) {
-      applyAsyncId = $browser.defer(flushApplyAsync, null, "$applyAsync");
+  async $applyAsync(expr) {
+    try {
+      const result = $parse(expr)(this.proxy);
+      return result;
+    } catch (error) {
+      $exceptionHandler(error);
+      throw error;
     }
   }
+
   /**
    * @private
    */
@@ -445,8 +433,8 @@ class Handler {
     }
   }
 
-  $$postDigest(fn) {
-    $$postDigestQueue.push(fn);
+  $postUpdate(fn) {
+    $postUpdateQueue.push(fn);
   }
 
   $destroy() {
@@ -496,15 +484,4 @@ function getProperty(fn) {
 
   fn(new Proxy({}, handler));
   return path.pop();
-}
-
-function flushApplyAsync() {
-  while ($$applyAsyncQueue.length) {
-    try {
-      $$applyAsyncQueue.shift()();
-    } catch (e) {
-      $exceptionHandler(e);
-    }
-  }
-  applyAsyncId = null;
 }

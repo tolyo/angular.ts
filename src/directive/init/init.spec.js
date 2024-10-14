@@ -39,7 +39,7 @@ describe("ngInit", () => {
     });
     injector = angular.bootstrap(element, ["myModule"]);
     $rootScope = injector.get("$rootScope");
-    $rootScope.$digest();
+    ;
     expect($rootScope.template).toEqual("template2.tpl");
     setTimeout(() => {
       expect(element.find("span").text()).toEqual("2");
@@ -59,7 +59,7 @@ describe("ngInit", () => {
         '<div><div ng-controller="TestCtrl" ' +
           'ng-init="test=123"></div></div>',
       )($rootScope);
-      $rootScope.$digest();
+      ;
       expect($rootScope.test).toBeUndefined();
       expect($rootScope.$$childHead.test).toEqual(123);
     });

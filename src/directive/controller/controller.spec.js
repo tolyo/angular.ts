@@ -69,7 +69,7 @@ describe("ngController", () => {
     element = $compile('<div ng-controller="Greeter">{{greet(name)}}</div>')(
       $rootScope,
     );
-    $rootScope.$digest();
+    ;
     expect(element.text()).toBe("Hello Misko!");
   });
 
@@ -77,7 +77,7 @@ describe("ngController", () => {
     element = $compile('<div ng-controller="BoundFoo">{{mark}}</div>')(
       $rootScope,
     );
-    $rootScope.$digest();
+    ;
     expect(element.text()).toBe("foo");
   });
 
@@ -85,7 +85,7 @@ describe("ngController", () => {
     element = $compile('<div ng-controller="Public as p">{{p.mark}}</div>')(
       $rootScope,
     );
-    $rootScope.$digest();
+    ;
     expect(element.text()).toBe("works");
   });
 
@@ -93,7 +93,7 @@ describe("ngController", () => {
     element = $compile(
       '<div ng-controller="PublicModule as p">{{p.mark}}</div>',
     )($rootScope);
-    $rootScope.$digest();
+    ;
     expect(element.text()).toBe("works");
   });
 
@@ -101,14 +101,14 @@ describe("ngController", () => {
     element = $compile(
       '<div ng-controller="Greeter"><div ng-controller="Child">{{greet(name)}}</div></div>',
     )($rootScope);
-    $rootScope.$digest();
+    ;
     expect(element.text()).toBe("Hello Adam!");
     dealoc(element);
 
     element = $compile(
       '<div ng-controller="Greeter"><div ng-controller="Child">{{protoGreet(name)}}</div></div>',
     )($rootScope);
-    $rootScope.$digest();
+    ;
     expect(element.text()).toBe("Hello Adam!");
   });
 
@@ -125,7 +125,7 @@ describe("ngController", () => {
     injector = angular.bootstrap(element, ["myModule"]);
 
     $rootScope = injector.get("$rootScope");
-    $rootScope.$digest();
+    ;
     setTimeout(() => {
       expect(element.text()).toEqual("Vojta");
       dealoc($rootScope);
@@ -150,10 +150,10 @@ describe("ngController", () => {
     $rootScope = injector.get("$rootScope");
 
     $rootScope.expr = "first";
-    $rootScope.$digest();
+    ;
 
     $rootScope.expr = "second";
-    $rootScope.$digest();
+    ;
 
     expect(count).toBe(1);
   });
@@ -174,7 +174,7 @@ describe("ngController", () => {
     injector = angular.bootstrap(element, ["myModule"]);
 
     $rootScope = injector.get("$rootScope");
-    $rootScope.$digest();
+    ;
 
     expect(controllerScope.name).toBeUndefined();
   });

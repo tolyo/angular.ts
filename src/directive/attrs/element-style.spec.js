@@ -25,7 +25,7 @@ describe("style", () => {
       '<style type="text/css">.header{font-size:1.5em; h3{font-size:1.5em}}</style>',
     );
     $compile(element)($rootScope);
-    $rootScope.$digest();
+    ;
 
     expect(element[0].innerHTML).toBe(
       ".header{font-size:1.5em; h3{font-size:1.5em}}",
@@ -37,7 +37,7 @@ describe("style", () => {
       '<style type="text/css">.some-container{ width: {{elementWidth}}px; }</style>',
     );
     $compile(element)($rootScope);
-    $rootScope.$digest();
+    ;
 
     expect(element[0].innerHTML).toBe(".some-container{ width: px; }");
 
@@ -53,7 +53,7 @@ describe("style", () => {
       '<style type="text/css">.header{ h3 { font-size: {{fontSize}}em }}</style>',
     );
     $compile(element)($rootScope);
-    $rootScope.$digest();
+    ;
 
     expect(element[0].innerHTML).toBe(".header{ h3 { font-size: em }}");
 
@@ -69,7 +69,7 @@ describe("style", () => {
       '<style type="text/css">.header{ h3 { font-size: {{fontSize}}{{unit}} }}</style>',
     );
     $compile(element)($rootScope);
-    $rootScope.$digest();
+    ;
 
     expect(element[0].innerHTML).toBe(".header{ h3 { font-size:  }}");
 

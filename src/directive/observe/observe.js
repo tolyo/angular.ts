@@ -20,7 +20,7 @@ export function ngObserveDirective() {
         ).getAttribute(source);
         if (scope[prop] !== newValue) {
           scope[prop] = newValue;
-          scope.$digest();
+          ;
         }
       });
 

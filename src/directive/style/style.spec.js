@@ -24,37 +24,37 @@ describe("ng-style", () => {
 
   it("should set", () => {
     element = $compile("<div ng-style=\"{height: '40px'}\"></div>")($scope);
-    $scope.$digest();
+    ;
     expect(element[0].style.height).toEqual("40px");
   });
 
   it("should silently ignore undefined style", () => {
     element = $compile('<div ng-style="myStyle"></div>')($scope);
-    $scope.$digest();
+    ;
     expect(element[0].classList.contains("ng-exception")).toBeFalsy();
   });
 
   it("should not deep watch objects", () => {
     element = $compile('<div ng-style="{height: heightObj}"></div>')($scope);
-    $scope.$digest();
+    ;
     expect(parseInt(element[0].style.height + 0, 10)).toEqual(0); // height could be '' or '0px'
     $scope.heightObj = {
       toString() {
         return "40px";
       },
     };
-    $scope.$digest();
+    ;
     expect(element[0].style.height).toBe("40px");
 
     element[0].style.height = "10px";
     $scope.heightObj.otherProp = 123;
-    $scope.$digest();
+    ;
     expect(element[0].style.height).toBe("10px");
   });
 
   it("should support binding for object literals", () => {
     element = $compile('<div ng-style="{height: heightStr}"></div>')($scope);
-    $scope.$digest();
+    ;
     expect(parseInt(element[0].style.height + 0, 10)).toEqual(0); // height could be '' or '0px'
     $scope.$apply('heightStr = "40px"');
     expect(element[0].style.height).toBe("40px");
@@ -65,7 +65,7 @@ describe("ng-style", () => {
 
   it("should support lazy one-time binding for object literals", () => {
     element = $compile('<div ng-style="::{height: heightStr}"></div>')($scope);
-    $scope.$digest();
+    ;
     expect(parseInt(element[0].style.height + 0, 10)).toEqual(0); // height could be '' or '0px'
     $scope.$apply('heightStr = "40px"');
     expect(element[0].style.height).toBe("40px");

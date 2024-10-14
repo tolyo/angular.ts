@@ -36,7 +36,7 @@ describe("templateFactory", () => {
   describe("should follow $sce policy and", () => {
     it("accepts relative URLs", async () => {
       let res = $templateFactory.fromUrl("mock/hello");
-      $scope.$digest();
+      ;
       await wait(100);
       expect(res.$$state.status).toBe(1);
     });
@@ -128,7 +128,7 @@ describe("templateFactory", () => {
     it("should not prefix the components dom element with anything", async () => {
       $stateRegistry.register({ name: "cmp", component: "myComponent" });
       $stateService.go("cmp");
-      $scope.$digest();
+      ;
       await wait(100);
       expect(el.html()).toMatch(/\<my-component/);
     });
@@ -139,14 +139,14 @@ describe("templateFactory", () => {
         component: "dataComponent",
       });
       $stateService.go("cmp");
-      $scope.$digest();
+      ;
       expect(el.html()).toMatch(/\<x-data-component/);
     });
 
     it("should prefix the components dom element with x- for components named xFoo", () => {
       $stateRegistry.register({ name: "cmp", component: "xComponent" });
       $stateService.go("cmp");
-      $scope.$digest();
+      ;
       expect(el.html()).toMatch(/\<x-x-component/);
     });
   });

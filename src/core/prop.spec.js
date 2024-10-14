@@ -34,13 +34,13 @@ fdescribe("ngProp*", () => {
     const element = $compile(
       '<button ng-prop-disabled="isDisabled">Button</button>',
     )($rootScope);
-    $rootScope.$digest();
+    ;
     expect(element[0].disabled).toBe(false);
     $rootScope.isDisabled = true;
-    $rootScope.$digest();
+    ;
     expect(element[0].disabled).toBe(true);
     $rootScope.isDisabled = false;
-    $rootScope.$digest();
+    ;
     expect(element[0].disabled).toBe(false);
   });
 
@@ -50,33 +50,33 @@ fdescribe("ngProp*", () => {
     )($rootScope);
     expect(element[0].checked).toBe(false);
     $rootScope.isChecked = true;
-    $rootScope.$digest();
+    ;
     expect(element[0].checked).toBe(true);
     $rootScope.isChecked = false;
-    $rootScope.$digest();
+    ;
     expect(element[0].checked).toBe(false);
   });
 
   it("should bind string properties (title)", () => {
     const element = $compile('<span ng-prop-title="title" />')($rootScope);
     $rootScope.title = 123;
-    $rootScope.$digest();
+    ;
     expect(element[0].title).toBe("123");
     $rootScope.title = "foobar";
-    $rootScope.$digest();
+    ;
     expect(element[0].title).toBe("foobar");
   });
 
   it("should bind variable type properties", () => {
     const element = $compile('<span ng-prop-asdf="asdf" />')($rootScope);
     $rootScope.asdf = 123;
-    $rootScope.$digest();
+    ;
     expect(element[0].asdf).toBe(123);
     $rootScope.asdf = "foobar";
-    $rootScope.$digest();
+    ;
     expect(element[0].asdf).toBe("foobar");
     $rootScope.asdf = true;
-    $rootScope.$digest();
+    ;
     expect(element[0].asdf).toBe(true);
   });
 
@@ -85,31 +85,31 @@ fdescribe("ngProp*", () => {
     const element = $compile('<span ng-prop-text="myText" />')($rootScope);
     // Initialize to truthy value
     $rootScope.myText = "abc";
-    $rootScope.$digest();
+    ;
     expect(element[0].text).toBe("abc");
 
     // Assert various falsey values get assigned to the property
     $rootScope.myText = "";
-    $rootScope.$digest();
+    ;
     expect(element[0].text).toBe("");
     $rootScope.myText = 0;
-    $rootScope.$digest();
+    ;
     expect(element[0].text).toBe(0);
     $rootScope.myText = false;
-    $rootScope.$digest();
+    ;
     expect(element[0].text).toBe(false);
     $rootScope.myText = undefined;
-    $rootScope.$digest();
+    ;
     expect(element[0].text).toBeUndefined();
     $rootScope.myText = null;
-    $rootScope.$digest();
+    ;
     expect(element[0].text).toBe(null);
   });
 
   it("should directly map special properties (class)", () => {
     const element = $compile('<span ng-prop-class="myText" />')($rootScope);
     $rootScope.myText = "abc";
-    $rootScope.$digest();
+    ;
     expect(element[0].class).toBe("abc");
     expect(element[0]).not.toHaveClass("abc");
   });
@@ -117,7 +117,7 @@ fdescribe("ngProp*", () => {
   it("should support mixed case using underscore-separated names", () => {
     const element = $compile('<span ng-prop-a_bcd_e="value" />')($rootScope);
     $rootScope.value = 123;
-    $rootScope.$digest();
+    ;
     expect(element[0].aBcdE).toBe(123);
   });
 
@@ -136,7 +136,7 @@ fdescribe("ngProp*", () => {
     const element = $compile("<a ng-prop-href=\"'test/' + value\"></a>")(
       $rootScope,
     );
-    $rootScope.$digest();
+    ;
     expect(element[0].href).toMatch(/\/test\/test$/);
   });
 
@@ -158,7 +158,7 @@ fdescribe("ngProp*", () => {
       $rootScope,
     );
     $rootScope.asdf = 123;
-    $rootScope.$digest();
+    ;
     expect(element[0].asdf).toBe(123);
     expect(element.attr("asdf")).toBe("foo");
   });
@@ -168,7 +168,7 @@ fdescribe("ngProp*", () => {
       $rootScope,
     );
     $rootScope.asdf = 123;
-    $rootScope.$digest();
+    ;
     expect(element[0].asdf).toBe(123);
     expect(element.attr("asdf")).toBe("foo");
   });
@@ -278,7 +278,7 @@ fdescribe("ngProp*", () => {
       // Some browsers complain if you try to write `javascript:` into an `img[src]`
       // So for the test use something different
       $rootScope.testUrl = $sce.trustAsMediaUrl("someuntrustedthing:foo();");
-      $rootScope.$digest();
+      ;
       expect(element[0].src).toEqual("someuntrustedthing:foo();");
     });
 
@@ -330,33 +330,33 @@ fdescribe("ngProp*", () => {
     it("should NOT require trusted values for trusted URI values", () => {
       $rootScope.testUrl = "http://example.com/image.png"; // `http` is trusted
       let element = $compile('<a ng-prop-href="testUrl"></a>')($rootScope);
-      $rootScope.$digest();
+      ;
       expect(element[0].href).toEqual("http://example.com/image.png");
 
       element = $compile('<a ng-prop-href="testUrl"></a>')($rootScope);
-      $rootScope.$digest();
+      ;
       expect(element[0].href).toEqual("http://example.com/image.png");
     });
 
     it("should accept trusted values for non-trusted URI values", () => {
       $rootScope.testUrl = $sce.trustAsUrl("javascript:foo()"); // `javascript` is not trusted
       let element = $compile('<a ng-prop-href="testUrl"></a>')($rootScope);
-      $rootScope.$digest();
+      ;
       expect(element[0].href).toEqual("javascript:foo()");
 
       element = $compile('<a ng-prop-href="testUrl"></a>')($rootScope);
-      $rootScope.$digest();
+      ;
       expect(element[0].href).toEqual("javascript:foo()");
     });
 
     it("should sanitize non-trusted values", () => {
       $rootScope.testUrl = "javascript:foo()"; // `javascript` is not trusted
       let element = $compile('<a ng-prop-href="testUrl"></a>')($rootScope);
-      $rootScope.$digest();
+      ;
       expect(element[0].href).toEqual("unsafe:javascript:foo()");
 
       element = $compile('<a ng-prop-href="testUrl"></a>')($rootScope);
-      $rootScope.$digest();
+      ;
       expect(element[0].href).toEqual("unsafe:javascript:foo()");
     });
 
@@ -411,16 +411,16 @@ fdescribe("ngProp*", () => {
           "<foo ng-prop-href=\"'http://example.com/' + testUrl\"></foo><foo ng-prop-href=\"::'http://example.com/' + testUrl\"></foo>",
       )($rootScope);
       $rootScope.testUrl = [1];
-      $rootScope.$digest();
+      ;
 
       $rootScope.testUrl = [];
-      $rootScope.$digest();
+      ;
 
       $rootScope.testUrl = { a: "b" };
-      $rootScope.$digest();
+      ;
 
       $rootScope.testUrl = {};
-      $rootScope.$digest();
+      ;
     });
   });
 
@@ -638,7 +638,7 @@ fdescribe("ngProp*", () => {
           $rootScope,
         );
         $rootScope.html = '<div onclick="">hello</div>';
-        $rootScope.$digest();
+        ;
         expect(element.html()).toEqual('<div onclick="">hello</div>');
       });
 
@@ -647,10 +647,10 @@ fdescribe("ngProp*", () => {
           $rootScope,
         );
         $rootScope.html = "hello";
-        $rootScope.$digest();
+        ;
         expect(element.html()).toEqual("hello");
         $rootScope.html = "goodbye";
-        $rootScope.$digest();
+        ;
         expect(element.html()).toEqual("goodbye");
       });
 
@@ -660,11 +660,11 @@ fdescribe("ngProp*", () => {
         );
         $rootScope.html = '<div onclick="">hello</div>';
         expect($rootScope.$$watchers.length).toEqual(1);
-        $rootScope.$digest();
+        ;
         expect(element.text()).toEqual("hello");
         expect($rootScope.$$watchers.length).toEqual(0);
         $rootScope.html = '<div onclick="">hello</div>';
-        $rootScope.$digest();
+        ;
         expect(element.text()).toEqual("hello");
       });
     });
@@ -689,7 +689,7 @@ fdescribe("ngProp*", () => {
         );
         $rootScope.html = '<div onclick="">hello</div>';
         expect(() => {
-          $rootScope.$digest();
+          ;
         }).toThrowError(/unsafe/);
       });
 
@@ -699,7 +699,7 @@ fdescribe("ngProp*", () => {
         );
         $rootScope.html = $sce.trustAsCss('<div onclick="">hello</div>');
         expect(() => {
-          $rootScope.$digest();
+          ;
         }).toThrowError(/unsafe/);
       });
 
@@ -708,7 +708,7 @@ fdescribe("ngProp*", () => {
           $rootScope,
         );
         $rootScope.html = $sce.trustAsHtml('<div onclick="">hello</div>');
-        $rootScope.$digest();
+        ;
         expect(element.html()).toEqual('<div onclick="">hello</div>');
       });
 
@@ -717,10 +717,10 @@ fdescribe("ngProp*", () => {
           $rootScope,
         );
         $rootScope.html = $sce.trustAsHtml("hello");
-        $rootScope.$digest();
+        ;
         expect(element.html()).toEqual("hello");
         $rootScope.html = $sce.trustAsHtml("goodbye");
-        $rootScope.$digest();
+        ;
         expect(element.html()).toEqual("goodbye");
       });
 
@@ -734,7 +734,7 @@ fdescribe("ngProp*", () => {
         $rootScope.getHtml = function () {
           return $sce.trustAsHtml('<div onclick="">hello</div>');
         };
-        $rootScope.$digest();
+        ;
         expect(element.html()).toEqual('<div onclick="">hello</div>');
       });
 
@@ -775,10 +775,10 @@ fdescribe("ngProp*", () => {
         $rootScope.getHtml = function () {
           return $sce.trustAsHtml(html);
         };
-        $rootScope.$digest();
+        ;
         expect(element.html()).toEqual("hello");
         html = "goodbye";
-        $rootScope.$digest();
+        ;
         expect(element.html()).toEqual("goodbye");
       });
     });
@@ -789,7 +789,7 @@ fdescribe("ngProp*", () => {
       const element = $compile('<div ng-prop-style="style"></div>')($rootScope);
       $rootScope.style = "margin-left: 10px";
       expect(() => {
-        $rootScope.$digest();
+        ;
       }).toThrowError(/unsafe/);
     });
 
@@ -797,14 +797,14 @@ fdescribe("ngProp*", () => {
       const element = $compile('<div ng-prop-style="style"></div>')($rootScope);
       $rootScope.style = $sce.trustAsHtml("margin-left: 10px");
       expect(() => {
-        $rootScope.$digest();
+        ;
       }).toThrowError(/unsafe/);
     });
 
     it("should set style for trusted values", () => {
       const element = $compile('<div ng-prop-style="style"></div>')($rootScope);
       $rootScope.style = $sce.trustAsCss("margin-left: 10px");
-      $rootScope.$digest();
+      ;
 
       expect(element[0].style["margin-left"]).toEqual("10px");
     });

@@ -328,7 +328,7 @@ function oneTimeWatchDelegate(
     lastValue =
       useInputs && inputs ? inputs[0] : exp(scope, locals, assign, inputs);
     if (isDone(lastValue)) {
-      scope.$$postDigest(unwatchIfDone);
+      scope.$postUpdate(unwatchIfDone);
     }
     return post(lastValue);
   }

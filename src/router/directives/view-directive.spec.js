@@ -528,21 +528,21 @@ describe("ngView", () => {
 
       // Turn on the div that holds the ng-view
       scope.someBoolean = true;
-      scope.$digest();
+      ;
 
       // Verify that the ng-view is there and it has the correct content
       expect(elem.find("ng-view").text()).toBe(aState.template);
 
       // Turn off the ng-view
       scope.someBoolean = false;
-      scope.$digest();
+      ;
 
       // Verify there is no ng-view in the DOM
       expect(elem.find("ng-view").length).toBe(0);
 
       // Turn on the div that holds the ng-view once again
       scope.someBoolean = true;
-      scope.$digest();
+      ;
 
       // Verify that the ng-view is there and it has the correct content
       expect(elem.find("ng-view").text()).toBe(aState.template);
@@ -561,12 +561,12 @@ describe("ngView", () => {
       expect(classes(elem.find("ng-view"))).not.toContain("someClass");
 
       scope.showClass = true;
-      scope.$digest();
+      ;
 
       expect(classes(elem.find("ng-view"))).toContain("someClass");
 
       scope.showClass = false;
-      scope.$digest();
+      ;
 
       expect(classes(elem.find("ng-view"))).not.toContain("someClass");
     });
@@ -584,14 +584,14 @@ describe("ngView", () => {
 
         // Lets add 3
         scope.views = ["view1", "view2", "view3"];
-        scope.$digest();
+        ;
 
         // Should be 3 ng-views in the DOM
         expect(elem.find("ng-view").length).toBe(scope.views.length);
 
         // Lets add one more - yay two-way binding
         scope.views.push("view4");
-        scope.$digest();
+        ;
 
         // Should have 4 ng-views
         expect(elem.find("ng-view").length).toBe(scope.views.length);
@@ -599,7 +599,7 @@ describe("ngView", () => {
         // Lets remove 2 ng-views from the DOM
         scope.views.pop();
         scope.views.pop();
-        scope.$digest();
+        ;
 
         // Should have 2 ng-views
         expect(elem.find("ng-view").length).toBe(scope.views.length);
@@ -619,7 +619,7 @@ describe("ngView", () => {
 
         scope.views = ["view1", "view2"];
 
-        scope.$digest();
+        ;
 
         let ngViews = elem.find("ng-view");
 
@@ -628,7 +628,7 @@ describe("ngView", () => {
         expect(ngViews.eq(2).length).toBe(0);
 
         scope.views.push("view3");
-        scope.$digest();
+        ;
 
         ngViews = elem.find("ng-view");
 
@@ -653,7 +653,7 @@ describe("ngView", () => {
 
         scope.views = ["view1", "view2"];
 
-        scope.$digest();
+        ;
 
         let ngViews = elem.find("ng-view");
 
@@ -662,7 +662,7 @@ describe("ngView", () => {
         expect(ngViews.eq(2).length).toBe(0);
 
         scope.views.push("view3");
-        scope.$digest();
+        ;
 
         ngViews = elem.find("ng-view");
 
@@ -732,14 +732,14 @@ describe("ngView", () => {
   //     $animate.queue.shift();
 
   //     scope.classOn = true;
-  //     scope.$digest();
+  //     ;
 
   //     animation = $animate.queue.shift();
   //     expect(animation.event).toBe("addClass");
   //     expect(animation.element.text()).toBe(content);
 
   //     scope.classOn = false;
-  //     scope.$digest();
+  //     ;
 
   //     animation = $animate.queue.shift();
   //     expect(animation.event).toBe("removeClass");
@@ -763,7 +763,7 @@ describe("ngView", () => {
   //     expect($animate.queue.length).toBe(0);
 
   //     scope.shouldShow = true;
-  //     scope.$digest();
+  //     ;
 
   //     // $ViewDirective enter animation - Basically it's just the <!-- ngView --> comment
   //     animation = $animate.queue.shift();
@@ -776,7 +776,7 @@ describe("ngView", () => {
   //     expect(animation.element.text()).toBe(content);
 
   //     scope.shouldShow = false;
-  //     scope.$digest();
+  //     ;
 
   //     // ngView leave animation
   //     animation = $animate.queue.shift();
@@ -1048,7 +1048,7 @@ describe("ngView controllers or onEnter handlers", () => {
   it("should not go into an infinite loop when controller uses $state.go", async () => {
     el = JQLite("<div><ng-view></ng-view></div>");
     template = $compile(el)($rootScope);
-    $rootScope.$digest();
+    ;
 
     await $state.transitionTo("aside");
     await wait(100);

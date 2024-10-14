@@ -53,7 +53,7 @@ describe("Scope", function () {
       };
       var listenerFn = jasmine.createSpy();
       $rootScope.$watch(watchFn, listenerFn);
-      $rootScope.$digest();
+      ;
       expect(listenerFn).toHaveBeenCalled();
     });
 
@@ -61,7 +61,7 @@ describe("Scope", function () {
       var watchFn = jasmine.createSpy();
       var listenerFn = function () {};
       $rootScope.$watch(watchFn, listenerFn);
-      $rootScope.$digest();
+      ;
       expect(watchFn).toHaveBeenCalledWith($rootScope);
     });
 
@@ -77,27 +77,27 @@ describe("Scope", function () {
         },
       );
       expect(scope.counter).toBe(0);
-      scope.$digest();
+      ;
       expect(scope.counter).toBe(1);
-      scope.$digest();
+      ;
       expect(scope.counter).toBe(1);
       scope.someValue = "b";
       expect(scope.counter).toBe(1);
-      scope.$digest();
+      ;
       expect(scope.counter).toBe(2);
     });
 
     it("should watch and fire on simple property change", () => {
       const spy = jasmine.createSpy();
       $rootScope.$watch("name", spy);
-      $rootScope.$digest();
+      ;
       spy.calls.reset();
 
       expect(spy).not.toHaveBeenCalled();
-      $rootScope.$digest();
+      ;
       expect(spy).not.toHaveBeenCalled();
       $rootScope.name = "misko";
-      $rootScope.$digest();
+      ;
       expect(spy).toHaveBeenCalledWith("misko", undefined, $rootScope);
     });
 
@@ -111,21 +111,21 @@ describe("Scope", function () {
       }
 
       $rootScope.$watch(Getter, Listener);
-      $rootScope.$digest();
+      ;
     });
 
     it("should watch and fire on expression change", () => {
       const spy = jasmine.createSpy();
       $rootScope.$watch("name.first", spy);
-      $rootScope.$digest();
+      ;
       spy.calls.reset();
 
       $rootScope.name = {};
       expect(spy).not.toHaveBeenCalled();
-      $rootScope.$digest();
+      ;
       expect(spy).not.toHaveBeenCalled();
       $rootScope.name.first = "misko";
-      $rootScope.$digest();
+      ;
       expect(spy).toHaveBeenCalled();
     });
 
@@ -188,11 +188,11 @@ describe("Scope", function () {
       it("should clean up stable watches on the watch queue", () => {
         $rootScope.$watch("::foo", () => {});
         expect($rootScope.$$watchers.length).toEqual(1);
-        $rootScope.$digest();
+        ;
         expect($rootScope.$$watchers.length).toEqual(1);
 
         $rootScope.foo = "foo";
-        $rootScope.$digest();
+        ;
         expect($rootScope.$$watchers.length).toEqual(0);
       });
 
@@ -200,11 +200,11 @@ describe("Scope", function () {
         $rootScope.$watchCollection("::foo", () => {});
         expect($rootScope.$$watchers.length).toEqual(1);
 
-        $rootScope.$digest();
+        ;
         expect($rootScope.$$watchers.length).toEqual(1);
 
         $rootScope.foo = [];
-        $rootScope.$digest();
+        ;
         expect($rootScope.$$watchers.length).toEqual(0);
       });
 
@@ -212,19 +212,19 @@ describe("Scope", function () {
         $rootScope.$watchCollection("::[foo, bar]", () => {});
         expect($rootScope.$$watchers.length).toEqual(1);
 
-        $rootScope.$digest();
+        ;
         expect($rootScope.$$watchers.length).toEqual(1);
 
         $rootScope.foo = 1;
-        $rootScope.$digest();
+        ;
         expect($rootScope.$$watchers.length).toEqual(1);
 
         $rootScope.foo = 2;
-        $rootScope.$digest();
+        ;
         expect($rootScope.$$watchers.length).toEqual(1);
 
         $rootScope.bar = 3;
-        $rootScope.$digest();
+        ;
         expect($rootScope.$$watchers.length).toEqual(0);
       });
 
@@ -232,15 +232,15 @@ describe("Scope", function () {
         $rootScope.$watchGroup(["::foo", "::bar"], () => {});
         expect($rootScope.$$watchers.length).toEqual(2);
 
-        $rootScope.$digest();
+        ;
         expect($rootScope.$$watchers.length).toEqual(2);
 
         $rootScope.foo = "foo";
-        $rootScope.$digest();
+        ;
         expect($rootScope.$$watchers.length).toEqual(1);
 
         $rootScope.bar = "bar";
-        $rootScope.$digest();
+        ;
         expect($rootScope.$$watchers.length).toEqual(0);
       });
     });
@@ -261,7 +261,7 @@ describe("Scope", function () {
       $rootScope.a = $rootScope.b = 0;
 
       try {
-        $rootScope.$digest();
+        ;
         throw new Error("Should have thrown exception");
       } catch (e) {
         console.error(e);
@@ -286,7 +286,7 @@ describe("Scope", function () {
       );
 
       expect(() => {
-        $rootScope.$digest();
+        ;
       }).toThrowError();
 
       expect($rootScope.$$phase).toBe(ScopePhase.NONE);
@@ -323,7 +323,7 @@ describe("Scope", function () {
       $rootScope.$watch(watchFn1, addWatcherOnce);
       $rootScope.$watch(watchFn2);
 
-      $rootScope.$digest();
+      ;
 
       expect(logs).toEqual([1, 2, 3, 1, 2, 3]);
     });
@@ -350,7 +350,7 @@ describe("Scope", function () {
       $rootScope.$watch(watchFn2);
       removeWatcher3 = $rootScope.$watch(watchFn3);
 
-      $rootScope.$digest();
+      ;
 
       expect(logs).toEqual([1, 2, 1, 2]);
     });
@@ -375,7 +375,7 @@ describe("Scope", function () {
       $rootScope.$watch(watchFn2);
       $rootScope.$watch(watchFn3);
 
-      $rootScope.$digest();
+      ;
 
       expect(logs).toEqual([1, 2, 3, 2, 3]);
     });
@@ -384,7 +384,7 @@ describe("Scope", function () {
       $rootScope.$watch(() => NaN);
 
       expect(() => {
-        $rootScope.$digest();
+        ;
       }).not.toThrow();
     });
 
@@ -404,11 +404,11 @@ describe("Scope", function () {
       $rootScope.$watch(() => ({}), logger, true);
       $rootScope.$watch(() => 23, logger);
 
-      $rootScope.$digest();
+      ;
       expect(isNaN(logs.shift())).toBe(true); // jasmine's toBe and toEqual don't work well with NaNs
       expect(logs).toEqual([undefined, "", false, {}, 23]);
       logs = [];
-      $rootScope.$digest();
+      ;
       expect(logs).toEqual([]);
     });
 
@@ -419,19 +419,19 @@ describe("Scope", function () {
         let listenerRemove;
 
         listenerRemove = $rootScope.$watch("foo", listener);
-        $rootScope.$digest(); // init
+        ; // init
         expect(listener).toHaveBeenCalled();
         expect(listenerRemove).toBeDefined();
 
         listener.calls.reset();
         $rootScope.foo = "bar";
-        $rootScope.$digest(); // trigger
+        ; // trigger
         expect(listener).toHaveBeenCalled();
 
         listener.calls.reset();
         $rootScope.foo = "baz";
         listenerRemove();
-        $rootScope.$digest(); // trigger
+        ; // trigger
         expect(listener).not.toHaveBeenCalled();
       });
 
@@ -478,7 +478,7 @@ describe("Scope", function () {
           () => logs.push("watchAction3"),
         );
 
-        $rootScope.$digest();
+        ;
 
         expect(logs).toEqual([
           "watch1",
@@ -520,7 +520,7 @@ describe("Scope", function () {
           () => logs.push("watchAction3"),
         );
 
-        $rootScope.$digest();
+        ;
 
         expect(logs).toEqual([
           "watch1",
@@ -560,7 +560,7 @@ describe("Scope", function () {
           () => logs.push("watchAction3"),
         );
 
-        $rootScope.$digest();
+        ;
 
         expect(logs).toEqual([
           "watch1",
@@ -592,25 +592,25 @@ describe("Scope", function () {
         });
 
         it("should not trigger if nothing change", () => {
-          $rootScope.$digest();
+          ;
           expect(logs).toEqual([
             { newVal: undefined, oldVal: undefined, identical: true },
           ]);
           logs = [];
-          $rootScope.$digest();
+          ;
           expect(logs).toEqual([]);
         });
 
         it("should allow deregistration", () => {
           $rootScope.obj = [];
-          $rootScope.$digest();
+          ;
           expect(logs.length).toBe(1);
           logs = [];
 
           $rootScope.obj.push("a");
           deregister();
 
-          $rootScope.$digest();
+          ;
           expect(logs).toEqual([]);
         });
 
@@ -618,7 +618,7 @@ describe("Scope", function () {
           it("should return oldCollection === newCollection only on the first listener call", () => {
             // first time should be identical
             $rootScope.obj = ["a", "b"];
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([
               { newVal: ["a", "b"], oldVal: ["a", "b"], identical: true },
             ]);
@@ -626,98 +626,98 @@ describe("Scope", function () {
 
             // second time should be different
             $rootScope.obj[1] = "c";
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([{ newVal: ["a", "c"], oldVal: ["a", "b"] }]);
           });
 
           it("should trigger when property changes into array", () => {
             $rootScope.obj = "test";
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([
               { newVal: "test", oldVal: "test", identical: true },
             ]);
 
             logs = [];
             $rootScope.obj = [];
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([{ newVal: [], oldVal: "test" }]);
 
             logs = [];
             $rootScope.obj = {};
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([{ newVal: {}, oldVal: [] }]);
 
             logs = [];
             $rootScope.obj = [];
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([{ newVal: [], oldVal: {} }]);
 
             logs = [];
             $rootScope.obj = undefined;
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([{ newVal: undefined, oldVal: [] }]);
           });
 
           it("should not trigger change when object in collection changes", () => {
             $rootScope.obj = [{}];
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([
               { newVal: [{}], oldVal: [{}], identical: true },
             ]);
 
             logs = [];
             $rootScope.obj[0].name = "foo";
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([]);
           });
 
           it("should watch array properties", () => {
             $rootScope.obj = [];
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([{ newVal: [], oldVal: [], identical: true }]);
 
             logs = [];
             $rootScope.obj.push("a");
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([{ newVal: ["a"], oldVal: [] }]);
 
             logs = [];
             $rootScope.obj[0] = "b";
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([{ newVal: ["b"], oldVal: ["a"] }]);
 
             logs = [];
             $rootScope.obj.push([]);
             $rootScope.obj.push({});
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([{ newVal: ["b", [], {}], oldVal: ["b"] }]);
 
             logs = [];
             const temp = $rootScope.obj[1];
             $rootScope.obj[1] = $rootScope.obj[2];
             $rootScope.obj[2] = temp;
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([
               { newVal: ["b", {}, []], oldVal: ["b", [], {}] },
             ]);
 
             logs = [];
             $rootScope.obj.shift();
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([{ newVal: [{}, []], oldVal: ["b", {}, []] }]);
           });
 
           it("should not infinitely digest when current value is NaN", () => {
             $rootScope.obj = [NaN];
             expect(() => {
-              $rootScope.$digest();
+              ;
             }).not.toThrow();
           });
 
           it("should watch array-like objects like arrays", () => {
             logs = [];
             $rootScope.obj = document.getElementsByTagName("src");
-            $rootScope.$digest();
+            ;
 
             expect(logs.length).toBeTruthy();
           });
@@ -727,7 +727,7 @@ describe("Scope", function () {
           it("should return oldCollection === newCollection only on the first listener call", () => {
             $rootScope.obj = { a: "b" };
             // first time should be identical
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([
               { newVal: { a: "b" }, oldVal: { a: "b" }, identical: true },
             ]);
@@ -735,54 +735,54 @@ describe("Scope", function () {
 
             // second time not identical
             $rootScope.obj.a = "c";
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([{ newVal: { a: "c" }, oldVal: { a: "b" } }]);
           });
 
           it("should trigger when property changes into object", () => {
             $rootScope.obj = "test";
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([
               { newVal: "test", oldVal: "test", identical: true },
             ]);
             logs = [];
 
             $rootScope.obj = {};
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([{ newVal: {}, oldVal: "test" }]);
           });
 
           it("should not trigger change when object in collection changes", () => {
             $rootScope.obj = { name: {} };
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([
               { newVal: { name: {} }, oldVal: { name: {} }, identical: true },
             ]);
             logs = [];
 
             $rootScope.obj.name.bar = "foo";
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([]);
           });
 
           it("should watch object properties", () => {
             $rootScope.obj = {};
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([{ newVal: {}, oldVal: {}, identical: true }]);
             logs = [];
             $rootScope.obj.a = "A";
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([{ newVal: { a: "A" }, oldVal: {} }]);
 
             logs = [];
             $rootScope.obj.a = "B";
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([{ newVal: { a: "B" }, oldVal: { a: "A" } }]);
 
             logs = [];
             $rootScope.obj.b = [];
             $rootScope.obj.c = {};
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([
               { newVal: { a: "B", b: [], c: {} }, oldVal: { a: "B" } },
             ]);
@@ -791,7 +791,7 @@ describe("Scope", function () {
             const temp = $rootScope.obj.a;
             $rootScope.obj.a = $rootScope.obj.b;
             $rootScope.obj.c = temp;
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([
               {
                 newVal: { a: [], b: [], c: "B" },
@@ -801,7 +801,7 @@ describe("Scope", function () {
 
             logs = [];
             delete $rootScope.obj.a;
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([
               { newVal: { b: [], c: "B" }, oldVal: { a: [], b: [], c: "B" } },
             ]);
@@ -810,7 +810,7 @@ describe("Scope", function () {
           it("should not infinitely digest when current value is NaN", () => {
             $rootScope.obj = { a: NaN };
             expect(() => {
-              $rootScope.$digest();
+              ;
             }).not.toThrow();
           });
 
@@ -818,13 +818,13 @@ describe("Scope", function () {
             $rootScope.obj = Object.create(null);
             $rootScope.obj.a = "a";
             $rootScope.obj.b = "b";
-            $rootScope.$digest();
+            ;
             expect(logs[0].newVal).toEqual(
               extend(Object.create(null), { a: "a", b: "b" }),
             );
 
             delete $rootScope.obj.b;
-            $rootScope.$digest();
+            ;
             expect(logs[0].newVal).toEqual(
               extend(Object.create(null), { a: "a" }),
             );
@@ -850,7 +850,7 @@ describe("Scope", function () {
           it("should return oldCollection === newCollection only on the first listener call", () => {
             // first time should be identical
             $rootScope.obj = "a";
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([
               { newVal: ["a"], oldVal: ["a"], identical: true },
             ]);
@@ -858,55 +858,55 @@ describe("Scope", function () {
 
             // second time should be different
             $rootScope.obj = "b";
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([{ newVal: ["b"], oldVal: ["a"] }]);
           });
 
           it("should trigger when property changes into array", () => {
             $rootScope.obj = "test";
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([
               { newVal: ["test"], oldVal: ["test"], identical: true },
             ]);
 
             logs = [];
             $rootScope.obj = [];
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([{ newVal: [[]], oldVal: ["test"] }]);
 
             logs = [];
             $rootScope.obj = {};
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([{ newVal: [{}], oldVal: [[]] }]);
 
             logs = [];
             $rootScope.obj = [];
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([{ newVal: [[]], oldVal: [{}] }]);
 
             logs = [];
             $rootScope.obj = undefined;
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([{ newVal: [undefined], oldVal: [[]] }]);
           });
 
           it("should not trigger change when object in collection changes", () => {
             $rootScope.obj = {};
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([
               { newVal: [{}], oldVal: [{}], identical: true },
             ]);
 
             logs = [];
             $rootScope.obj.name = "foo";
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([]);
           });
 
           it("should not infinitely digest when current value is NaN", () => {
             $rootScope.obj = NaN;
             expect(() => {
-              $rootScope.$digest();
+              ;
             }).not.toThrow();
           });
         });
@@ -928,7 +928,7 @@ describe("Scope", function () {
           it("should return oldCollection === newCollection only on the first listener call", () => {
             $rootScope.obj = "b";
             // first time should be identical
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([
               { newVal: { a: "b" }, oldVal: { a: "b" }, identical: true },
             ]);
@@ -936,20 +936,20 @@ describe("Scope", function () {
             // second time not identical
             logs = [];
             $rootScope.obj = "c";
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([{ newVal: { a: "c" }, oldVal: { a: "b" } }]);
           });
 
           it("should trigger when property changes into object", () => {
             $rootScope.obj = "test";
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([
               { newVal: { a: "test" }, oldVal: { a: "test" }, identical: true },
             ]);
 
             logs = [];
             $rootScope.obj = {};
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([
               { newVal: { a: {} }, oldVal: { a: "test" } },
             ]);
@@ -957,7 +957,7 @@ describe("Scope", function () {
 
           it("should not trigger change when object in collection changes", () => {
             $rootScope.obj = { name: "foo" };
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([
               {
                 newVal: { a: { name: "foo" } },
@@ -968,35 +968,35 @@ describe("Scope", function () {
 
             logs = [];
             $rootScope.obj.name = "bar";
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([]);
           });
 
           it("should watch object properties", () => {
             $rootScope.obj = {};
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([
               { newVal: { a: {} }, oldVal: { a: {} }, identical: true },
             ]);
 
             logs = [];
             $rootScope.obj = "A";
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([{ newVal: { a: "A" }, oldVal: { a: {} } }]);
 
             logs = [];
             $rootScope.obj = "B";
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([{ newVal: { a: "B" }, oldVal: { a: "A" } }]);
 
             logs = [];
             $rootScope.obj = [];
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([{ newVal: { a: [] }, oldVal: { a: "B" } }]);
 
             logs = [];
             delete $rootScope.obj;
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([
               { newVal: { a: undefined }, oldVal: { a: [] } },
             ]);
@@ -1005,7 +1005,7 @@ describe("Scope", function () {
           it("should not infinitely digest when current value is NaN", () => {
             $rootScope.obj = NaN;
             expect(() => {
-              $rootScope.$digest();
+              ;
             }).not.toThrow();
           });
         });
@@ -1026,7 +1026,7 @@ describe("Scope", function () {
 
           it('should default to "undefined" key', () => {
             $rootScope.obj = "test";
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([
               {
                 newVal: { undefined: "test" },
@@ -1039,21 +1039,21 @@ describe("Scope", function () {
           it("should trigger when key changes", () => {
             $rootScope.key = "a";
             $rootScope.obj = "test";
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([
               { newVal: { a: "test" }, oldVal: { a: "test" }, identical: true },
             ]);
 
             logs = [];
             $rootScope.key = "b";
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([
               { newVal: { b: "test" }, oldVal: { a: "test" } },
             ]);
 
             logs = [];
             $rootScope.key = true;
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([
               { newVal: { true: "test" }, oldVal: { b: "test" } },
             ]);
@@ -1062,30 +1062,30 @@ describe("Scope", function () {
           it("should not trigger when key changes but stringified key does not", () => {
             $rootScope.key = 1;
             $rootScope.obj = "test";
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([
               { newVal: { 1: "test" }, oldVal: { 1: "test" }, identical: true },
             ]);
 
             logs = [];
             $rootScope.key = "1";
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([]);
 
             $rootScope.key = true;
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([
               { newVal: { true: "test" }, oldVal: { 1: "test" } },
             ]);
 
             logs = [];
             $rootScope.key = "true";
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([]);
 
             logs = [];
             $rootScope.key = {};
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([
               {
                 newVal: { "[object Object]": "test" },
@@ -1095,14 +1095,14 @@ describe("Scope", function () {
 
             logs = [];
             $rootScope.key = {};
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([]);
           });
 
           it("should not trigger change when object in collection changes", () => {
             $rootScope.key = "a";
             $rootScope.obj = { name: "foo" };
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([
               {
                 newVal: { a: { name: "foo" } },
@@ -1113,7 +1113,7 @@ describe("Scope", function () {
             logs = [];
 
             $rootScope.obj.name = "bar";
-            $rootScope.$digest();
+            ;
             expect(logs).toEqual([]);
           });
 
@@ -1121,7 +1121,7 @@ describe("Scope", function () {
             $rootScope.key = NaN;
             $rootScope.obj = NaN;
             expect(() => {
-              $rootScope.$digest();
+              ;
             }).not.toThrow();
           });
         });
@@ -1133,7 +1133,7 @@ describe("Scope", function () {
         const watchSpy = jasmine.createSpy("watchSpy");
         $rootScope.$watch(watchSpy);
         $rootScope.$suspend();
-        $rootScope.$digest();
+        ;
         expect(watchSpy).not.toHaveBeenCalled();
       });
 
@@ -1142,7 +1142,7 @@ describe("Scope", function () {
         $rootScope.$watch(watchSpy);
         $rootScope.$suspend();
         $rootScope.$resume();
-        $rootScope.$digest();
+        ;
         expect(watchSpy).toHaveBeenCalled();
       });
 
@@ -1151,7 +1151,7 @@ describe("Scope", function () {
         const scope = $rootScope.$new(true);
         scope.$watch(watchSpy);
         $rootScope.$suspend();
-        $rootScope.$digest();
+        ;
         expect(watchSpy).not.toHaveBeenCalled();
       });
 
@@ -1161,7 +1161,7 @@ describe("Scope", function () {
         scope.$watch(watchSpy);
         $rootScope.$suspend();
         $rootScope.$resume();
-        $rootScope.$digest();
+        ;
         expect(watchSpy).toHaveBeenCalled();
       });
 
@@ -1228,7 +1228,7 @@ describe("Scope", function () {
         sibling.$watch(watchSpySibling);
 
         child.$suspend();
-        $rootScope.$digest();
+        ;
         expect(watchSpyParent).toHaveBeenCalled();
         expect(watchSpyChild).not.toHaveBeenCalled();
         expect(watchSpySibling).toHaveBeenCalled();
@@ -1269,7 +1269,7 @@ describe("Scope", function () {
         return scope.w3;
       }, log("w3action"));
       console.error(logs.length);
-      scope.$digest();
+      ;
       logs = [];
     }
 
@@ -1277,14 +1277,14 @@ describe("Scope", function () {
       beforeEach(() => (logs = []));
       it("should check watches only once during an empty digest", () => {
         setupWatches($rootScope, console.log);
-        $rootScope.$digest();
+        ;
         expect(logs).toEqual(["w1", "w2", "w3"]);
       });
 
       it("should quit digest early after we check the last watch that was previously dirty", () => {
         setupWatches($rootScope, console.log);
         $rootScope.w1 = "x";
-        $rootScope.$digest();
+        ;
         expect(logs).toEqual(["w1", "w2", "w3", "w1"]);
       });
 
@@ -1306,7 +1306,7 @@ describe("Scope", function () {
             );
           },
         );
-        $rootScope.$digest();
+        ;
         expect(logs).toEqual([
           "w1",
           "w2",
@@ -1337,7 +1337,7 @@ describe("Scope", function () {
             });
           },
         );
-        $rootScope.$digest();
+        ;
         expect(logs).toEqual([
           "w1",
           "w2",
@@ -1365,12 +1365,12 @@ describe("Scope", function () {
           },
         );
 
-        $rootScope.$digest();
+        ;
         logs = [];
 
         $rootScope.w1 = "x";
         $rootScope.w4 = "x";
-        $rootScope.$digest();
+        ;
         expect(logs).toEqual([
           "w1",
           "w2",
@@ -1446,21 +1446,21 @@ describe("Scope", function () {
 
       scope.a = "foo";
       scope.b = "bar";
-      scope.$digest();
+      ;
       expect(logs[0]).toEqual("foo,bar >>> foo,bar");
 
       logs = [];
-      scope.$digest();
+      ;
       expect(logs).toEqual([]);
 
       scope.a = "a";
-      scope.$digest();
+      ;
       expect(logs[0]).toEqual("foo,bar >>> a,bar");
 
       logs = [];
       scope.a = "A";
       scope.b = "B";
-      scope.$digest();
+      ;
       expect(logs[0]).toEqual("a,bar >>> A,B");
     });
 
@@ -1472,15 +1472,15 @@ describe("Scope", function () {
       });
 
       scope.a = "foo";
-      scope.$digest();
+      ;
       expect(logs[0]).toEqual("foo >>> foo");
 
       logs = [];
-      scope.$digest();
+      ;
       expect(logs).toEqual([]);
 
       scope.a = "bar";
-      scope.$digest();
+      ;
       expect(logs[0]).toEqual("foo >>> bar");
     });
 
@@ -1491,11 +1491,11 @@ describe("Scope", function () {
       });
 
       expect(logs).toEqual([]);
-      scope.$digest();
+      ;
       expect(logs[0]).toEqual(" >>> ");
 
       logs = [];
-      scope.$digest();
+      ;
       expect(logs).toEqual([]);
     });
 
@@ -1519,7 +1519,7 @@ describe("Scope", function () {
       deregisterNone();
       scope.a = "xxx";
       scope.b = "yyy";
-      scope.$digest();
+      ;
       expect(logs).toEqual([]);
     });
 
@@ -1701,7 +1701,7 @@ describe("Scope", function () {
         log += "3";
       });
 
-      $rootScope.$digest();
+      ;
       log = "";
     });
 
@@ -1725,7 +1725,7 @@ describe("Scope", function () {
       const spy = jasmine.createSpy("$watch spy");
       $rootScope.$watch(spy);
       $rootScope.$destroy();
-      $rootScope.$digest();
+      ;
       expect(spy).not.toHaveBeenCalled();
     });
 
@@ -1737,19 +1737,19 @@ describe("Scope", function () {
 
     it("should remove first", () => {
       first.$destroy();
-      $rootScope.$digest();
+      ;
       expect(log).toEqual("23");
     });
 
     it("should remove middle", () => {
       middle.$destroy();
-      $rootScope.$digest();
+      ;
       expect(log).toEqual("13");
     });
 
     it("should remove last", () => {
       last.$destroy();
-      $rootScope.$digest();
+      ;
       expect(log).toEqual("12");
     });
 
@@ -1763,7 +1763,7 @@ describe("Scope", function () {
     });
 
     it("should $destroy a scope only once and ignore any further destroy calls", () => {
-      $rootScope.$digest();
+      ;
       expect(log).toBe("123");
 
       first.$destroy();
@@ -1922,7 +1922,7 @@ describe("Scope", function () {
         $rootScope.$watch(() => {
           log += "$digest;";
         });
-        $rootScope.$digest();
+        ;
         log = "";
       });
 
@@ -2072,103 +2072,103 @@ describe("Scope", function () {
       const expression = jasmine.createSpy("expr");
 
       $rootScope.$applyAsync(expression);
-      $rootScope.$digest();
+      ;
       expect(expression).toHaveBeenCalled();
       expect(cancel).toHaveBeenCalled();
       expression.calls.reset();
       cancel.calls.reset();
 
       // assert that another digest won't call the function again
-      $rootScope.$digest();
+      ;
       expect(expression).not.toHaveBeenCalled();
       expect(cancel).not.toHaveBeenCalled();
     });
   });
 
-  describe("$$postDigest", () => {
+  describe("$postUpdate", () => {
     beforeEach(() => (logs = []));
     it("should process callbacks as a queue (FIFO) when the scope is digested", () => {
       let signature = "";
 
-      $rootScope.$$postDigest(() => {
+      $rootScope.$postUpdate(() => {
         signature += "A";
-        $rootScope.$$postDigest(() => {
+        $rootScope.$postUpdate(() => {
           signature += "D";
         });
       });
 
-      $rootScope.$$postDigest(() => {
+      $rootScope.$postUpdate(() => {
         signature += "B";
       });
 
-      $rootScope.$$postDigest(() => {
+      $rootScope.$postUpdate(() => {
         signature += "C";
       });
 
       expect(signature).toBe("");
-      $rootScope.$digest();
+      ;
       expect(signature).toBe("ABCD");
     });
 
-    it("should support $apply calls nested in $$postDigest callbacks", () => {
+    it("should support $apply calls nested in $postUpdate callbacks", () => {
       let signature = "";
 
-      $rootScope.$$postDigest(() => {
+      $rootScope.$postUpdate(() => {
         signature += "A";
       });
 
-      $rootScope.$$postDigest(() => {
+      $rootScope.$postUpdate(() => {
         signature += "B";
         $rootScope.$apply();
         signature += "D";
       });
 
-      $rootScope.$$postDigest(() => {
+      $rootScope.$postUpdate(() => {
         signature += "C";
       });
 
       expect(signature).toBe("");
-      $rootScope.$digest();
+      ;
       expect(signature).toBe("ABCD");
     });
 
-    it("should run a $$postDigest call on all child scopes when a parent scope is digested", () => {
+    it("should run a $postUpdate call on all child scopes when a parent scope is digested", () => {
       const parent = $rootScope.$new();
       const child = parent.$new();
       let count = 0;
 
-      $rootScope.$$postDigest(() => {
+      $rootScope.$postUpdate(() => {
         count++;
       });
 
-      parent.$$postDigest(() => {
+      parent.$postUpdate(() => {
         count++;
       });
 
-      child.$$postDigest(() => {
+      child.$postUpdate(() => {
         count++;
       });
 
       expect(count).toBe(0);
-      $rootScope.$digest();
+      ;
       expect(count).toBe(3);
     });
 
-    it("should run a $$postDigest call even if the child scope is isolated", () => {
+    it("should run a $postUpdate call even if the child scope is isolated", () => {
       const parent = $rootScope.$new();
       const child = parent.$new(true);
       let signature = "";
 
-      parent.$$postDigest(() => {
+      parent.$postUpdate(() => {
         signature += "A";
       });
 
-      child.$$postDigest(() => {
+      child.$postUpdate(() => {
         signature += "B";
       });
 
       expect(signature).toBe("");
-      $rootScope.$digest();
+      ;
       expect(signature).toBe("AB");
     });
   });
@@ -2777,7 +2777,7 @@ describe("Scope", function () {
       // still old value, since watches have not been called yet
       expect(scope.greeting).toEqual(undefined);
 
-      scope.$digest(); // fire all  the watches
+      ; // fire all  the watches
       expect(scope.greeting).toEqual("Hello Misko!");
       // </docs>
     });

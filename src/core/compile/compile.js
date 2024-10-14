@@ -550,7 +550,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
       // When changes occur, the call to trigger their hooks will be added to this queue
       let onChangesQueue;
 
-      // This function is called in a $$postDigest to trigger all the onChanges hooks in a single digest
+      // This function is called in a $postUpdate to trigger all the onChanges hooks in a single digest
       function flushOnChangesQueue() {
         try {
           if (!--ttl) {
@@ -562,7 +562,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
               ttl,
             );
           }
-          // We must run this hook in an apply since the $$postDigest runs outside apply
+          // We must run this hook in an apply since the $postUpdate runs outside apply
           $rootScope.$apply(() => {
             for (let i = 0, ii = onChangesQueue.length; i < ii; ++i) {
               try {
@@ -3018,7 +3018,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
           ) {
             // If we have not already scheduled the top level onChangesQueue handler then do so now
             if (!onChangesQueue) {
-              scope.$$postDigest(flushOnChangesQueue);
+              scope.$postUpdate(flushOnChangesQueue);
               onChangesQueue = [];
             }
             // If we have not already queued a trigger of onChanges for this controller then do so now

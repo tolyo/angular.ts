@@ -203,7 +203,7 @@ export function AnimationProvider() {
         // were apart of the same postDigest flush call.
         if (animationQueue.length > 1) return runner;
 
-        $rootScope.$$postDigest(() => {
+        $rootScope.$postUpdate(() => {
           const animations = [];
           animationQueue.forEach((entry) => {
             // the element was destroyed early on which removed the runner

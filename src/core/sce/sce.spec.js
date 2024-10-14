@@ -202,18 +202,18 @@ describe("SCE", () => {
         logs.push(`${value}`);
       });
 
-      $rootScope.$digest();
+      ;
       expect(logs[0]).toEqual("undefined"); // initial listener call
 
       $rootScope.foo = $sce.trustAs($sce.HTML, "trustedValue");
       expect($rootScope.$$watchers.length).toBe(1);
-      $rootScope.$digest();
+      ;
 
       expect($rootScope.$$watchers.length).toBe(0);
       expect(logs[1]).toEqual("trustedValue");
 
       $rootScope.foo = $sce.trustAs($sce.HTML, "anotherTrustedValue");
-      $rootScope.$digest();
+      ;
       expect(logs[2]).toBeUndefined(); // watcher no longer active
     });
 
@@ -222,18 +222,18 @@ describe("SCE", () => {
         logs.push(`${value}`);
       });
 
-      $rootScope.$digest();
+      ;
       expect(logs[0]).toEqual("undefined"); // initial listener call
 
       $rootScope.foo = $sce.trustAs($sce.URL, "trustedValue");
       expect($rootScope.$$watchers.length).toBe(1);
-      $rootScope.$digest();
+      ;
 
       expect($rootScope.$$watchers.length).toBe(0);
       expect(logs[1]).toEqual("trustedValue");
 
       $rootScope.foo = $sce.trustAs($sce.URL, "anotherTrustedValue");
-      $rootScope.$digest();
+      ;
       expect(logs[2]).toBeUndefined(); // watcher no longer active
     });
 

@@ -68,7 +68,7 @@ describe("input", () => {
       },
     });
     $compile(input)(scope);
-    scope.$digest();
+    ;
     expect(setterCalls).toBe(0);
   });
 
@@ -112,7 +112,7 @@ describe("input", () => {
       expect(scope.form.nameA.$name).toBe("nameA");
       const oldModel = scope.form.nameA;
       scope.nameID = "B";
-      scope.$digest();
+      ;
       expect(scope.form.nameA).toBeUndefined();
       expect(scope.form.nameB).toBe(oldModel);
       expect(scope.form.nameB.$name).toBe("nameB");
@@ -127,7 +127,7 @@ describe("input", () => {
       expect(model.$name).toBe("nameA");
 
       scope.nameID = "B";
-      scope.$digest();
+      ;
       expect(model.$name).toBe("nameB");
     });
   });
@@ -432,7 +432,7 @@ describe("input", () => {
         it("should validate if min is empty", () => {
           scope.minVal = undefined;
           scope.value = "2014-01";
-          scope.$digest();
+          ;
 
           expect(scope.form.alias.$error.min).toBeFalsy();
         });
@@ -476,7 +476,7 @@ describe("input", () => {
           expect(scope.form.alias.$error.max).toBeFalsy();
 
           scope.maxVal = "2012-01";
-          scope.$digest();
+          ;
 
           expect(
             inputElm.find("input")[0].classList.contains("ng-invalid"),
@@ -487,7 +487,7 @@ describe("input", () => {
         it("should validate if max is empty", () => {
           scope.maxVal = undefined;
           scope.value = "2012-03";
-          scope.$digest();
+          ;
 
           expect(scope.form.alias.$error.max).toBeFalsy();
         });
@@ -621,7 +621,7 @@ describe("input", () => {
           expect(scope.form.alias.$error.min).toBeFalsy();
 
           scope.minVal = "2014-W01";
-          scope.$digest();
+          ;
 
           expect(
             inputElm.find("input")[0].classList.contains("ng-invalid"),
@@ -632,7 +632,7 @@ describe("input", () => {
         it("should validate if min is empty", () => {
           scope.minVal = undefined;
           scope.value = "2013-W03";
-          scope.$digest();
+          ;
 
           expect(scope.form.alias.$error.min).toBeFalsy();
         });
@@ -677,7 +677,7 @@ describe("input", () => {
           expect(scope.form.alias.$error.max).toBeFalsy();
 
           scope.maxVal = "2012-W01";
-          scope.$digest();
+          ;
 
           expect(
             inputElm.find("input")[0].classList.contains("ng-invalid"),
@@ -688,7 +688,7 @@ describe("input", () => {
         it("should validate if max is empty", () => {
           scope.maxVal = undefined;
           scope.value = "2012-W01";
-          scope.$digest();
+          ;
 
           expect(scope.form.alias.$error.max).toBeFalsy();
         });
@@ -824,7 +824,7 @@ describe("input", () => {
           expect(scope.form.alias.$error.min).toBeFalsy();
 
           scope.minVal = "2010-01-01T01:02:00";
-          scope.$digest();
+          ;
 
           expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
           expect(scope.form.alias.$error.min).toBeTruthy();
@@ -833,7 +833,7 @@ describe("input", () => {
         it("should validate if min is empty", () => {
           scope.minVal = undefined;
           scope.value = "2010-01-01T01:02:00";
-          scope.$digest();
+          ;
 
           expect(scope.form.alias.$error.min).toBeFalsy();
         });
@@ -872,7 +872,7 @@ describe("input", () => {
           expect(scope.form.alias.$error.max).toBeFalsy();
 
           scope.maxVal = "2000-01-01T01:02:00";
-          scope.$digest();
+          ;
 
           expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
           expect(scope.form.alias.$error.max).toBeTruthy();
@@ -881,7 +881,7 @@ describe("input", () => {
         it("should validate if max is empty", () => {
           scope.maxVal = undefined;
           scope.value = "2000-01-01T01:02:00";
-          scope.$digest();
+          ;
 
           expect(scope.form.alias.$error.max).toBeFalsy();
         });
@@ -893,7 +893,7 @@ describe("input", () => {
           )(scope);
           scope.maxVal = "2013-01-01T00:00:00";
           scope.value = "2012-01-01T00:00:00";
-          scope.$digest();
+          ;
 
           expect(scope.form.alias.$error.max).toBeFalsy();
           expect(scope.form.alias.$valid).toBeTruthy();
@@ -916,12 +916,12 @@ describe("input", () => {
         expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
 
         scope.max = "2001-01-01T01:02:00";
-        scope.$digest();
+        ;
 
         expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
 
         scope.max = "2024-01-01T01:02:00";
-        scope.$digest();
+        ;
 
         expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
       });
@@ -936,12 +936,12 @@ describe("input", () => {
         expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
 
         scope.min = "2014-01-01T01:02:00";
-        scope.$digest();
+        ;
 
         expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
 
         scope.min = "2009-01-01T01:02:00";
-        scope.$digest();
+        ;
 
         expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
       });
@@ -956,12 +956,12 @@ describe("input", () => {
         expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
 
         scope.max = "2001-01-01T01:02:00";
-        scope.$digest();
+        ;
 
         expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
 
         scope.max = "2024-01-01T01:02:00";
-        scope.$digest();
+        ;
 
         expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
       });
@@ -976,12 +976,12 @@ describe("input", () => {
         expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
 
         scope.min = "2014-01-01T01:02:00";
-        scope.$digest();
+        ;
 
         expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
 
         scope.min = "2009-01-01T01:02:00";
-        scope.$digest();
+        ;
 
         expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
       });
@@ -1130,7 +1130,7 @@ describe("input", () => {
           expect(scope.form.alias.$error.min).toBeFalsy();
 
           scope.minVal = "23:55:00";
-          scope.$digest();
+          ;
 
           expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
           expect(scope.form.alias.$error.min).toBeTruthy();
@@ -1139,7 +1139,7 @@ describe("input", () => {
         it("should validate if min is empty", () => {
           scope.minVal = undefined;
           scope.value = "23:55:00";
-          scope.$digest();
+          ;
 
           expect(scope.form.alias.$error.min).toBeFalsy();
         });
@@ -1174,7 +1174,7 @@ describe("input", () => {
         it("should validate if max is empty", () => {
           scope.maxVal = undefined;
           scope.value = "05:30:00";
-          scope.$digest();
+          ;
 
           expect(scope.form.alias.$error.max).toBeFalsy();
         });
@@ -1191,7 +1191,7 @@ describe("input", () => {
         expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
 
         scope.max = "06:34:00";
-        scope.$digest();
+        ;
 
         expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
       });
@@ -1207,7 +1207,7 @@ describe("input", () => {
         expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
 
         scope.min = "05:50:00";
-        scope.$digest();
+        ;
 
         expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
       });
@@ -1223,7 +1223,7 @@ describe("input", () => {
         expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
 
         scope.max = "06:34:00";
-        scope.$digest();
+        ;
 
         expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
       });
@@ -1239,7 +1239,7 @@ describe("input", () => {
         expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
 
         scope.min = "05:50:00";
-        scope.$digest();
+        ;
 
         expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
       });
@@ -1355,7 +1355,7 @@ describe("input", () => {
           inputElm = formElm.find("input");
 
           scope.value = "2000-01-01";
-          scope.$digest();
+          ;
 
           expect(scope.form.alias.$error.min).toBeFalsy();
         });
@@ -1395,7 +1395,7 @@ describe("input", () => {
 
           scope.value = "2020-01-01";
           scope.max = new Date(2014, 10, 10, 0, 0, 0).toISOString();
-          scope.$digest();
+          ;
 
           expect(scope.form.myControl.$error.max).toBeTruthy();
         });
@@ -1406,7 +1406,7 @@ describe("input", () => {
           )(scope);
 
           scope.value = "2020-01-01";
-          scope.$digest();
+          ;
 
           expect(scope.form.alias.$error.max).toBeFalsy();
         });
@@ -1423,12 +1423,12 @@ describe("input", () => {
         expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
 
         scope.max = "2001-01-01";
-        scope.$digest();
+        ;
 
         expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
 
         scope.max = "2021-01-01";
-        scope.$digest();
+        ;
 
         expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
       });
@@ -1444,12 +1444,12 @@ describe("input", () => {
         expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
 
         scope.min = "2014-01-01";
-        scope.$digest();
+        ;
 
         expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
 
         scope.min = "2009-01-01";
-        scope.$digest();
+        ;
 
         expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
       });
@@ -1465,12 +1465,12 @@ describe("input", () => {
         expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
 
         scope.max = "2001-01-01";
-        scope.$digest();
+        ;
 
         expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
 
         scope.max = "2021-01-01";
-        scope.$digest();
+        ;
 
         expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
       });
@@ -1486,12 +1486,12 @@ describe("input", () => {
         expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
 
         scope.min = "2014-01-01";
-        scope.$digest();
+        ;
 
         expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
 
         scope.min = "2009-01-01";
-        scope.$digest();
+        ;
 
         expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
       });
@@ -1507,12 +1507,12 @@ describe("input", () => {
         expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
 
         scope.max = new Date(2013, 1, 1, 1, 2, 0);
-        scope.$digest();
+        ;
 
         expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
 
         scope.max = new Date(2014, 1, 1, 1, 2, 0);
-        scope.$digest();
+        ;
 
         expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
       });
@@ -1528,12 +1528,12 @@ describe("input", () => {
         expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
 
         scope.min = new Date(2014, 1, 1, 1, 2, 0);
-        scope.$digest();
+        ;
 
         expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
 
         scope.min = new Date(2009, 1, 1, 1, 2, 0);
-        scope.$digest();
+        ;
 
         expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
       });
@@ -1745,7 +1745,7 @@ describe("input", () => {
         scope.value = "one";
         expect(() => {
           $compile('<input type="number" ng-model="value" />')(scope);
-          scope.$digest();
+          ;
         }).toThrowError(/numfmt/);
       });
 
@@ -1903,23 +1903,23 @@ describe("input", () => {
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
 
           scope.min = 10;
-          scope.$digest();
+          ;
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
 
           scope.min = 20;
-          scope.$digest();
+          ;
           expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
 
           scope.min = null;
-          scope.$digest();
+          ;
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
 
           scope.min = "20";
-          scope.$digest();
+          ;
           expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
 
           scope.min = "abc";
-          scope.$digest();
+          ;
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
         });
       });
@@ -1980,23 +1980,23 @@ describe("input", () => {
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
 
           scope.min = 10;
-          scope.$digest();
+          ;
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
 
           scope.min = 20;
-          scope.$digest();
+          ;
           expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
 
           scope.min = null;
-          scope.$digest();
+          ;
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
 
           scope.min = "20";
-          scope.$digest();
+          ;
           expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
 
           scope.min = "abc";
-          scope.$digest();
+          ;
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
         });
       });
@@ -2058,23 +2058,23 @@ describe("input", () => {
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
 
           scope.max = 10;
-          scope.$digest();
+          ;
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
 
           scope.max = 0;
-          scope.$digest();
+          ;
           expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
 
           scope.max = null;
-          scope.$digest();
+          ;
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
 
           scope.max = "4";
-          scope.$digest();
+          ;
           expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
 
           scope.max = "abc";
-          scope.$digest();
+          ;
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
         });
       });
@@ -2136,23 +2136,23 @@ describe("input", () => {
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
 
           scope.max = 10;
-          scope.$digest();
+          ;
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
 
           scope.max = 0;
-          scope.$digest();
+          ;
           expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
 
           scope.max = null;
-          scope.$digest();
+          ;
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
 
           scope.max = "4";
-          scope.$digest();
+          ;
           expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
 
           scope.max = "abc";
-          scope.$digest();
+          ;
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
         });
       });
@@ -2171,7 +2171,7 @@ describe("input", () => {
                 `<form name="form"><input type="number" ng-model="value" name="alias" ${attrHtml} /></form>`,
               )(scope);
               inputElm = formElm.find("input");
-              scope.$digest();
+              ;
               expect(inputElm.val()).toBe("20");
               expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
               expect(scope.value).toBe(20);
@@ -2253,7 +2253,7 @@ describe("input", () => {
                 `<input type="number" ng-model="value" min="{{min}}" ${attrHtml} />`,
               )(scope);
               const ngModel = inputElm.controller("ngModel");
-              scope.$digest();
+              ;
               expect(inputElm.val()).toBe("10");
               expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
               expect(ngModel.$error.step).toBe(true);
@@ -2658,7 +2658,7 @@ describe("input", () => {
         expect(() => {
           scope.value = "one";
           inputElm = $compile('<input type="range" ng-model="value" />')(scope);
-          scope.$digest();
+          ;
         }).toThrowError(/numfmt/);
       });
 
@@ -2670,7 +2670,7 @@ describe("input", () => {
             '<form name="form"><input type="range" ng-model="value" name="alias" min="{{min}}" /></form>',
           )(scope);
           inputElm = formElm.find("input");
-          scope.$digest();
+          ;
 
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
           expect(inputElm.val()).toBe("-3");
@@ -2704,7 +2704,7 @@ describe("input", () => {
           inputElm = $compile(
             '<input type="range" ng-model="value" name="alias" min="{{min}}" />',
           )(scope);
-          scope.$digest();
+          ;
 
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
           expect(inputElm.val()).toBe("0");
@@ -2722,32 +2722,32 @@ describe("input", () => {
           inputElm = $compile(
             '<input type="range" ng-model="value" name="alias" min="{{min}}" />',
           )(scope);
-          scope.$digest();
+          ;
 
           inputElm[0].value = "15";
           inputElm[0].dispatchEvent(new Event("change"));
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
 
           scope.min = 20;
-          scope.$digest();
+          ;
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
           expect(scope.value).toBe(20);
           expect(inputElm.val()).toBe("20");
 
           scope.min = null;
-          scope.$digest();
+          ;
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
           expect(scope.value).toBe(20);
           expect(inputElm.val()).toBe("20");
 
           scope.min = "15";
-          scope.$digest();
+          ;
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
           expect(scope.value).toBe(20);
           expect(inputElm.val()).toBe("20");
 
           scope.min = "abc";
-          scope.$digest();
+          ;
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
           expect(scope.value).toBe(20);
           expect(inputElm.val()).toBe("20");
@@ -2763,7 +2763,7 @@ describe("input", () => {
             '<form name="form"><input type="range" ng-model="value" name="alias" max="{{max}}" /></form>',
           )(scope);
           inputElm = formElm.find("input");
-          scope.$digest();
+          ;
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
           expect(inputElm.val()).toBe("130");
           expect(scope.value).toBe(130);
@@ -2795,7 +2795,7 @@ describe("input", () => {
           inputElm = $compile(
             '<input type="range" ng-model="value" name="alias" max="{{max}}" />',
           )(scope);
-          scope.$digest();
+          ;
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
           expect(inputElm.val()).toBe("100");
           expect(scope.value).toBe(100);
@@ -2812,31 +2812,31 @@ describe("input", () => {
           inputElm = $compile(
             '<input type="range" ng-model="value" name="alias" max="{{max}}" />',
           )(scope);
-          scope.$digest();
+          ;
           inputElm[0].value = "5";
           inputElm[0].dispatchEvent(new Event("change"));
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
 
           scope.max = 0;
-          scope.$digest();
+          ;
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
           expect(scope.value).toBe(0);
           expect(inputElm.val()).toBe("0");
 
           scope.max = null;
-          scope.$digest();
+          ;
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
           expect(scope.value).toBe(0);
           expect(inputElm.val()).toBe("0");
 
           scope.max = "4";
-          scope.$digest();
+          ;
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
           expect(scope.value).toBe(0);
           expect(inputElm.val()).toBe("0");
 
           scope.max = "abc";
-          scope.$digest();
+          ;
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
           expect(scope.value).toBe(0);
           expect(inputElm.val()).toBe("0");
@@ -2850,7 +2850,7 @@ describe("input", () => {
           inputElm = $compile(
             '<input type="range" ng-model="value" name="alias" max="{{max}}" min="{{min}}" />',
           )(scope);
-          scope.$digest();
+          ;
 
           expect(inputElm.val()).toBe("60");
           expect(scope.value).toBe(60);
@@ -2861,12 +2861,12 @@ describe("input", () => {
           inputElm = $compile(
             '<input type="range" ng-model="value" name="alias" max="{{max}}" min="{{min}}" />',
           )(scope);
-          scope.$digest();
+          ;
           expect(inputElm.val()).toBe("70");
           expect(scope.value).toBe(70);
 
           scope.max = 20;
-          scope.$digest();
+          ;
 
           expect(inputElm.val()).toBe("40");
           expect(scope.value).toBe(40);
@@ -3516,7 +3516,7 @@ describe("input", () => {
             '<input type="checkbox" required name="cb" ng-model="value" ng-true-value="\'yes\'" />' +
             "</form>",
         )(scope);
-        scope.$digest();
+        ;
 
         inputElm = formElm.find("input");
 
@@ -3642,7 +3642,7 @@ describe("input", () => {
             '<input type="radio" ng-model="selected" ng-value="\'\'">' +
             '<input type="radio" ng-model="selected" ng-value="0">',
         )(scope);
-        scope.$digest();
+        ;
         expect(inputElm[0].checked).toBe(true);
         expect(inputElm[1].checked).toBe(false);
         expect(inputElm[2].checked).toBe(false);
@@ -3678,7 +3678,7 @@ describe("input", () => {
           scope.selected = 1;
         });
 
-        scope.$digest();
+        ;
 
         expect(inputElm[0].children[0].checked).toBe(true);
         expect(inputElm[0].children[1].checked).toBe(false);
