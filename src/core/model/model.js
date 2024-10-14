@@ -1,12 +1,9 @@
-import { isUndefined, nextUid, minErr } from "../../shared/utils";
+import { isUndefined, nextUid, minErr, isObject } from "../../shared/utils";
 
 /**
  * @type {import('../parser/parse').ParseService}
  */
 let $parse;
-
-/** @type {import('../../services/browser').Browser} */
-let $browser;
 
 /**@type {import('../exception-handler').ErrorHandler} */
 let $exceptionHandler;
@@ -26,7 +23,6 @@ export const $postUpdateQueue = [];
  * @type {Function[]}
  */
 export const $$applyAsyncQueue = [];
-let applyAsyncId = null;
 
 export class RootModelProvider {
   constructor() {
@@ -40,12 +36,10 @@ export class RootModelProvider {
     /**
      * @param {import('../exception-handler').ErrorHandler} exceptionHandler
      * @param {import('../parser/parse').ParseService} parse
-     * @param {import('../../services/browser').Browser} browser
      */
-    (exceptionHandler, parse, browser) => {
+    (exceptionHandler, parse) => {
       $exceptionHandler = exceptionHandler;
       $parse = parse;
-      $browser = browser;
       return this.rootModel;
     },
   ];
@@ -122,6 +116,11 @@ class Handler {
     this.proxy = null;
 
     /**
+     * @type {Proxy[]}
+     */
+    this.children = [];
+
+    /**
      * @type {number} Unique model ID (monotonically increasing) useful for debugging.
      */
     this.$id = nextUid();
@@ -155,6 +154,11 @@ class Handler {
     }
     const oldValue = target[property];
     if (oldValue && oldValue[isProxySymbol]) {
+      if (Array.isArray(value) || isObject(value)) {
+        target[property] = value;
+        return true;
+      }
+
       if (value) {
         const keys = Object.keys(value);
         Object.keys(oldValue.$target).forEach((k) => {
@@ -166,12 +170,14 @@ class Handler {
         keys.forEach((key) => {
           oldValue[key] = value[key];
         });
+        return true;
       }
 
       if (isUndefined(value)) {
         Object.keys(oldValue.$target).forEach((k) => {
           delete oldValue[k];
         });
+        return true;
       }
 
       return true;
@@ -228,6 +234,7 @@ class Handler {
       $apply: this.$apply.bind(this),
       $evalAsync: this.$evalAsync.bind(this),
       $postUpdate: this.$postUpdate.bind(this),
+      $isRoot: this.isRoot.bind(this),
       $target: this.$target(),
       $digest: this.$digest.bind(this),
       $handler: this,
@@ -235,6 +242,7 @@ class Handler {
       $parent: this.$parent,
       $root: this.$root,
       $$watchersCount: this.$$watchersCount,
+      $children: this.children,
     };
 
     return Object.prototype.hasOwnProperty.call(propertyMap, property)
@@ -360,7 +368,9 @@ class Handler {
       child.$$watchersCount = 0;
       child.$parent = parent ? parent.$handler : this.$parent;
     }
+
     const proxy = new Proxy(child, new Handler(child, parent || this));
+    this.children.push(proxy);
     return proxy;
   }
 
@@ -409,6 +419,14 @@ class Handler {
     } catch (e) {
       $exceptionHandler(e);
     }
+  }
+
+  /**
+   * @private
+   * @returns {boolean}
+   */
+  isRoot() {
+    return this.$root == this;
   }
 
   async $applyAsync(expr) {

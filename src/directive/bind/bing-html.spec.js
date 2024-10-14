@@ -16,7 +16,6 @@ describe("ngBindHtml", () => {
   it("should set html", () => {
     const element = $compile('<div ng-bind-html="html"></div>')($rootScope);
     $rootScope.html = "<div>hello</div>";
-    ;
     expect(element.html()).toEqual("<div>hello</div>");
   });
 
@@ -25,11 +24,9 @@ describe("ngBindHtml", () => {
 
     forEach([null, undefined, ""], (val) => {
       $rootScope.html = "some val";
-      ;
       expect(element.html()).toEqual("some val");
 
       $rootScope.html = val;
-      ;
       expect(element.html()).toEqual("");
     });
   });

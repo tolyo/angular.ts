@@ -29,10 +29,8 @@ describe("boolean attr directives", () => {
       $rootScope,
     );
     $rootScope.isDisabled = 0;
-    ;
     expect(element.attr("disabled")).toBeFalsy();
     $rootScope.isDisabled = 1;
-    ;
     expect(element.attr("disabled")).toBeTruthy();
   });
 
@@ -41,10 +39,8 @@ describe("boolean attr directives", () => {
       $rootScope,
     );
     $rootScope.isDisabled = false;
-    ;
     expect(element.attr("disabled")).toBeFalsy();
     $rootScope.isDisabled = true;
-    ;
     expect(element.attr("disabled")).toBeTruthy();
   });
 
@@ -53,10 +49,8 @@ describe("boolean attr directives", () => {
       $rootScope,
     );
     $rootScope.isChecked = false;
-    ;
     expect(element.attr("checked")).toBeFalsy();
     $rootScope.isChecked = true;
-    ;
     expect(element.attr("checked")).toBeTruthy();
   });
 
@@ -68,7 +62,6 @@ describe("boolean attr directives", () => {
     )($rootScope);
 
     $rootScope.value = "true";
-    ;
     expect(element[0].checked).toBe(true);
 
     element[0].checked = !element[0].checked;
@@ -86,10 +79,8 @@ describe("boolean attr directives", () => {
       '<select><option value=""></option><option ng-selected="isSelected">Greetings!</option></select>',
     )($rootScope);
     $rootScope.isSelected = false;
-    ;
     expect(element.children()[1].selected).toBeFalsy();
     $rootScope.isSelected = true;
-    ;
     expect(element.children()[1].selected).toBeTruthy();
   });
 
@@ -98,20 +89,16 @@ describe("boolean attr directives", () => {
       $rootScope,
     );
     $rootScope.isReadonly = false;
-    ;
     expect(element.attr("readOnly")).toBeFalsy();
     $rootScope.isReadonly = true;
-    ;
     expect(element.attr("readOnly")).toBeTruthy();
   });
 
   it("should bind open", () => {
     element = $compile('<details ng-open="isOpen"></details>')($rootScope);
     $rootScope.isOpen = false;
-    ;
     expect(element.attr("open")).toBeFalsy();
     $rootScope.isOpen = true;
-    ;
     expect(element.attr("open")).toBeTruthy();
   });
 
@@ -121,10 +108,8 @@ describe("boolean attr directives", () => {
         $rootScope,
       );
       $rootScope.isMultiple = false;
-      ;
       expect(element.attr("multiple")).toBeFalsy();
       $rootScope.isMultiple = "multiple";
-      ;
       expect(element.attr("multiple")).toBeFalsy(); // ignore
     });
 

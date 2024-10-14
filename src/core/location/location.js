@@ -768,7 +768,7 @@ export function LocationProvider() {
             afterLocationChange(oldUrl, oldState);
           }
         });
-        if ($rootScope.$$phase === ScopePhase.NONE) ;
+        if ($rootScope.$$phase === ScopePhase.NONE);
       });
 
       // update browser

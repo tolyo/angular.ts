@@ -24,7 +24,6 @@ describe("ngSrc", () => {
     it("should not result empty string in img src", () => {
       $scope.image = {};
       element = $compile('<img ng-src="{{image.url}}">')($scope);
-      ;
       expect(element.attr("src")).not.toBe("");
       expect(element.attr("src")).toBeUndefined();
     });
@@ -32,20 +31,17 @@ describe("ngSrc", () => {
     it("should sanitize interpolated url", () => {
       $scope.imageUrl = "javascript:alert(1);";
       element = $compile('<img ng-src="{{imageUrl}}">')($scope);
-      ;
       expect(element.attr("src")).toBe("unsafe:javascript:alert(1);");
     });
 
     it("should sanitize non-interpolated url", () => {
       element = $compile('<img ng-src="javascript:alert(1);">')($scope);
-      ;
       expect(element.attr("src")).toBe("unsafe:javascript:alert(1);");
     });
 
     it("should interpolate the expression and bind to src with raw same-domain value", () => {
       element = $compile('<img ng-src="{{id}}"></img>')($scope);
 
-      ;
       expect(element.attr("src")).toBeUndefined();
 
       $scope.$apply(() => {
@@ -67,13 +63,11 @@ describe("ngSrc", () => {
       $scope.imageUrl = "dynamic";
       element = $compile('<img ng-src="{{imageUrl}}" src="static">')($scope);
       expect(element.attr("src")).toBe("static");
-      ;
       expect(element.attr("src")).toBe("dynamic");
       dealoc(element);
 
       element = $compile('<img src="static" ng-src="{{imageUrl}}">')($scope);
       expect(element.attr("src")).toBe("static");
-      ;
       expect(element.attr("src")).toBe("dynamic");
     });
   });
@@ -135,7 +129,6 @@ describe("ngSrc", () => {
     it("should interpolate the expression and bind to src with a trusted value", () => {
       element = $compile('<iframe ng-src="{{id}}"></iframe>')($scope);
 
-      ;
       expect(element.attr("src")).toBeUndefined();
 
       $scope.$apply(() => {

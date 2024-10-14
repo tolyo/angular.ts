@@ -237,7 +237,6 @@ describe("$interpolate", () => {
     it("should stop watching strings with no expressions after first execution", () => {
       const spy = jasmine.createSpy();
       $rootScope.$watch($interpolate("foo"), spy);
-      ;
       expect(spy).toHaveBeenCalledWith("foo", "foo", $rootScope);
       expect(spy).toHaveBeenCalledTimes(1);
     });
@@ -245,7 +244,6 @@ describe("$interpolate", () => {
     it("should stop watching strings with only constant expressions after first execution", () => {
       const spy = jasmine.createSpy();
       $rootScope.$watch($interpolate("foo {{42}}"), spy);
-      ;
       expect(spy).toHaveBeenCalledWith("foo 42", "foo 42", $rootScope);
       expect(spy).toHaveBeenCalledTimes(1);
     });

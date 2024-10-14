@@ -273,8 +273,6 @@ describe("ngModelOptions", () => {
               '<input type="text" ng-model="name" name="alias" />' +
               "</form>",
           )($rootScope);
-          ;
-
           inputElm = doc.find("input");
           changeGivenInputTo(inputElm, "a");
           expect($rootScope.name).toEqual(undefined);
@@ -935,7 +933,6 @@ describe("ngModelOptions", () => {
           expect($rootScope.value).toBe("12345");
           expect($rootScope.form.input.$pending.promiseValidator).toBe(true);
           defer.reject();
-          ;
           expect($rootScope.value).toBe("12345");
           expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
         });
@@ -958,7 +955,6 @@ describe("ngModelOptions", () => {
           expect(inputElm.val()).toBe("12345");
           expect($rootScope.form.input.$pending.promiseValidator).toBe(true);
           defer.reject();
-          ;
           expect(inputElm.val()).toBe("12345");
           expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
         });

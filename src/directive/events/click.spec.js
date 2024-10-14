@@ -21,7 +21,6 @@ describe("ngClick", () => {
 
   it("should get called on a click", () => {
     element = $compile('<div ng-click="clicked = true"></div>')($rootScope);
-    ;
     expect($rootScope.clicked).toBeFalsy();
 
     element[0].click();
@@ -30,8 +29,6 @@ describe("ngClick", () => {
 
   it("should pass event object", () => {
     element = $compile('<div ng-click="event = $event"></div>')($rootScope);
-    ;
-
     element[0].click();
     expect($rootScope.event).toBeDefined();
   });

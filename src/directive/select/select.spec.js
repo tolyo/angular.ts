@@ -20,7 +20,6 @@ describe("select", () => {
     element = formElement.find("select");
     $compile(formElement)(scope);
     ngModelCtrl = element.controller("ngModel");
-    ;
   }
 
   function setSelectValue(selectElement, optionIndex) {
@@ -350,7 +349,6 @@ describe("select", () => {
       expect(scope.form.nameA.$name).toBe("nameA");
       const oldModel = scope.form.nameA;
       scope.nameID = "B";
-      ;
       expect(scope.form.nameA).toBeUndefined();
       expect(scope.form.nameB).toBe(oldModel);
       expect(scope.form.nameB.$name).toBe("nameB");
@@ -398,7 +396,6 @@ describe("select", () => {
       $compile(select)(scope);
       expect(selectCtrl.writeValue).not.toHaveBeenCalled();
 
-      ;
       expect(selectCtrl.writeValue).toHaveBeenCalled();
       dealoc(select);
     });
@@ -412,16 +409,12 @@ describe("select", () => {
           "</select>",
       );
 
-      ;
-
       let options = element.find("option");
       expect(options[0].selected).toBeTrue();
       expect(options[1].selected).toBeFalse();
       expect(options[2].selected).toBeFalse();
 
       scope.selected = "a";
-      ;
-
       options = element.find("option");
       expect(options.length).toBe(3);
       expect(options[0].selected).toBeFalse();
@@ -429,8 +422,6 @@ describe("select", () => {
       expect(options[2].selected).toBeFalse();
 
       scope.selected = "b";
-      ;
-
       options = element.find("option");
       expect(options[0].selected).toBeFalse();
       expect(options[1].selected).toBeFalse();
@@ -438,15 +429,12 @@ describe("select", () => {
 
       // This will select the empty option
       scope.selected = null;
-      ;
-
       expect(options[0].selected).toBeTrue();
       expect(options[1].selected).toBeFalse();
       expect(options[2].selected).toBeFalse();
 
       // This will add and select the unknown option
       scope.selected = "unmatched value";
-      ;
       options = element.find("option");
 
       expect(options[0].selected).toBeTrue();
@@ -456,7 +444,6 @@ describe("select", () => {
 
       // Back to matched value
       scope.selected = "b";
-      ;
       options = element.find("option");
 
       expect(options[0].selected).toBeFalse();
@@ -481,20 +468,15 @@ describe("select", () => {
           { val: "x", display: "robot x" },
           { val: "y", display: "robot y" },
         ];
-        ;
-
         expect(element[0].value).toBe("");
 
         scope.robot = "x";
-        ;
         expect(element[0].value).toBe("x");
         scope.dynamicOptions.shift();
 
-        ;
         expect(element[0].value).toBe("x");
 
         scope.robot = undefined;
-        ;
         expect(element[0].value).toBe(unknownValue(undefined));
       });
 
@@ -509,11 +491,9 @@ describe("select", () => {
             '<option ng-repeat="opt in dynamicOptions" value="{{opt.val}}">{{opt.display}}</option>' +
             "</select>",
         );
-        ;
         expect(element[0].value).toBe(unknownValue("x"));
 
         scope.robot = undefined;
-        ;
         expect(element.find("option").eq(0)[0].selected).toBe(true);
         expect(element.find("option").eq(0).text()).toBe("--static-select--");
 
@@ -522,11 +502,9 @@ describe("select", () => {
           { val: "x", display: "robot x" },
           { val: "y", display: "robot y" },
         ];
-        ;
         expect(element[0].value).toBe("");
 
         scope.dynamicOptions = [];
-        ;
         expect(element[0].value).toBe("");
       });
 
@@ -583,8 +561,6 @@ describe("select", () => {
         expect(element[0].value).toBe(unknownValue("other"));
 
         scope.robot = undefined;
-        ;
-
         expect(element[0].value).toBe("");
       });
 
@@ -671,8 +647,6 @@ describe("select", () => {
             "</select>",
         );
 
-        ;
-
         let options = element.find("option");
         expect(options.length).toBe(3);
         expect(options[0].selected).toBeTrue();
@@ -680,8 +654,6 @@ describe("select", () => {
         expect(options[2].selected).toBeFalse();
 
         scope.selected = "a";
-        ;
-
         options = element.find("option");
         expect(options.length).toBe(3);
         expect(options[0].selected).toBeFalse();
@@ -689,8 +661,6 @@ describe("select", () => {
         expect(options[2].selected).toBeFalse();
 
         scope.selected = "no match";
-        ;
-
         options = element.find("option");
         expect(options[0].selected).toBeTrue();
         expect(options[1].selected).toBeFalse();
@@ -930,7 +900,6 @@ describe("select", () => {
       ];
       scope.empty = true;
 
-      ;
       expect(element[0].value).toBe("");
       expect(selectCtrl.$hasEmptyOption()).toBe(true);
       expect(selectCtrl.$isEmptyOptionSelected()).toBe(true);
@@ -1435,14 +1404,12 @@ describe("select", () => {
           "</select>",
       );
 
-      ;
       expect(scope.selected).toBeUndefined();
 
       setSelectValue(element, 0);
       expect(scope.selected).toBe("option1");
 
       scope.selected = "option2";
-      ;
       expect(element.find("option").eq(1)[0].selected).toBe(true);
       expect(element.find("option").eq(1).text()).toBe("Option 2");
     });
@@ -1461,15 +1428,12 @@ describe("select", () => {
       const selectCtrl = element.controller("select");
       spyOn(selectCtrl, "removeOption").and.callThrough();
 
-      ;
       expect(scope.selected).toBeUndefined();
       expect(selectCtrl.removeOption).not.toHaveBeenCalled();
 
       // Change value of option2
       scope.option2 = "option2Changed";
       scope.selected = "option2Changed";
-      ;
-
       expect(selectCtrl.removeOption).toHaveBeenCalledWith("");
       expect(element.find("option").eq(1)[0].selected).toBe(true);
       expect(element.find("option").eq(1).text()).toBe("Option 2");
@@ -1486,14 +1450,12 @@ describe("select", () => {
           "</select>",
       );
 
-      ;
       expect(scope.selected).toBeUndefined();
 
       setSelectValue(element, 0);
       expect(scope.selected).toBe("Option 1");
 
       scope.selected = "Option 2";
-      ;
       expect(element.find("option").eq(1)[0].selected).toBe(true);
       expect(element.find("option").eq(1).text()).toBe("Option 2");
     });
@@ -1512,15 +1474,12 @@ describe("select", () => {
       const selectCtrl = element.controller("select");
       spyOn(selectCtrl, "removeOption").and.callThrough();
 
-      ;
       expect(scope.selected).toBeUndefined();
       expect(selectCtrl.removeOption).not.toHaveBeenCalled();
 
       // Change value of option2
       scope.option2 = "Option 2 Changed";
       scope.selected = "Option 2 Changed";
-      ;
-
       expect(selectCtrl.removeOption).toHaveBeenCalledWith("");
       expect(element.find("option").eq(1)[0].selected).toBe(true);
       expect(element.find("option").eq(1).text()).toBe("Option 2 Changed");
@@ -1535,7 +1494,6 @@ describe("select", () => {
       )($rootScope);
 
       $rootScope.foo = "success";
-      ;
       expect(element.find("span").text()).toBe("success");
       dealoc(element);
     });
@@ -1574,18 +1532,13 @@ describe("select", () => {
               "</select>",
           );
 
-          ;
           expect(element.find("option").eq(0).val()).toBe("? string:NOMATCH ?");
 
           scope.selected = prop;
-          ;
-
           expect(element.find("option").eq(0).val()).toBe(hashKey(prop));
 
           // Reset
           scope.selected = false;
-          ;
-
           expect(element.find("option").eq(0).val()).toBe("? boolean:false ?");
 
           setSelectValue(element, 0);
@@ -1622,19 +1575,14 @@ describe("select", () => {
           const selectController = element.controller("select");
           spyOn(selectController, "removeOption").and.callThrough();
 
-          ;
           expect(selectController.removeOption).not.toHaveBeenCalled();
           expect(element.find("option").eq(0).val()).toBe("? string:NOMATCH ?");
 
           scope.selected = prop;
-          ;
-
           expect(element.find("option").eq(0).val()).toBe(hashKey(prop));
           expect(element[0].selectedIndex).toBe(0);
 
           scope.option = "UPDATEDVALUE";
-          ;
-
           expect(selectController.removeOption.calls.count()).toBe(1);
 
           // Updating the option value currently does not update the select model
@@ -1657,8 +1605,6 @@ describe("select", () => {
           );
 
           scope.selected = "UPDATEDVALUE";
-          ;
-
           expect(element[0].selectedIndex).toBe(0);
           expect(element.find("option").eq(0).val()).toBe(
             "string:UPDATEDVALUE",
@@ -1681,8 +1627,6 @@ describe("select", () => {
         });
 
         scope.option = "init";
-        ;
-
         expect(log[0]).toBe("init");
         expect(element.find("option").eq(1).val()).toBe("string:init");
 
@@ -1752,8 +1696,6 @@ describe("select", () => {
               "</select>",
           );
 
-          ;
-
           expect(
             Object.values(element[0].childNodes)
               .map((x) => x.value)
@@ -1770,8 +1712,6 @@ describe("select", () => {
           );
 
           scope.selected = ["string", 1];
-          ;
-
           expect(element.find("option").eq(0)[0].selected).toBe(true);
           expect(element.find("option").eq(2)[0].selected).toBe(true);
 
@@ -1780,8 +1720,6 @@ describe("select", () => {
 
           // reset
           scope.selected = [];
-          ;
-
           forEach(element.find("option"), (option) => {
             // browserTrigger can't produce click + ctrl, so set selection manually
             JQLite(option)[0].selected = true;
@@ -1842,8 +1780,6 @@ describe("select", () => {
           expect(scope.obj.value).toBe(prop === "ngValue" ? A : "A");
 
           scope.options.shift();
-          ;
-
           optionElements = element.find("option");
           expect(optionElements.length).toEqual(3);
           expect(scope.obj.value).toBe(null);
@@ -1886,8 +1822,6 @@ describe("select", () => {
           expect(scope.obj.value).toBe("A");
 
           A.name = "X";
-          ;
-
           optionElements = element.find("option");
           expect(optionElements.length).toEqual(4);
           expect(scope.obj.value).toBe(null);
@@ -1930,8 +1864,6 @@ describe("select", () => {
           expect(scope.obj.value).toBe("A");
 
           A.disabled = true;
-          ;
-
           optionElements = element.find("option");
           expect(optionElements.length).toEqual(4);
           expect(scope.obj.value).toBe(null);
@@ -1970,15 +1902,11 @@ describe("select", () => {
           expect(optionElements[0].value).toEqual(unknownValue(undefined));
 
           B.disabled = true;
-          ;
-
           optionElements = element.find("option");
           expect(optionElements.length).toEqual(4);
           expect(optionElements[0].value).toEqual(unknownValue(undefined));
 
           scope.obj.value = "B";
-          ;
-
           optionElements = element.find("option");
           expect(optionElements.length).toEqual(3);
           expect(scope.obj.value).toBe("B");
@@ -2024,16 +1952,12 @@ describe("select", () => {
           expect(scope.obj.value).toBe("A");
 
           A.disabled = true;
-          ;
-
           optionElements = element.find("option");
           expect(optionElements.length).toEqual(4);
           expect(scope.obj.value).toBe(null);
           expect(element.val()).toBe("? object:null ?");
 
           A.disabled = false;
-          ;
-
           optionElements = element.find("option");
           expect(optionElements.length).toEqual(4);
           expect(scope.obj.value).toBe(null);
@@ -2073,8 +1997,6 @@ describe("select", () => {
           expect(optionElements.length).toEqual(3);
 
           scope.options.push(C);
-          ;
-
           optionElements = element.find("option");
           expect(optionElements.length).toEqual(3);
           expect(optionElements[2].selected).toBe(true);
@@ -2113,8 +2035,6 @@ describe("select", () => {
           expect(optionElements.length).toEqual(3);
 
           scope.obj.value = "C";
-          ;
-
           optionElements = element.find("option");
           expect(element.val()).toBe(prop === "ngValue" ? "string:C" : "C");
           expect(optionElements.length).toEqual(3);
@@ -2122,8 +2042,6 @@ describe("select", () => {
           expect(scope.obj.value).toBe("C");
 
           scope.options = [{ name: "A" }, { name: "B" }, { name: "C" }];
-          ;
-
           optionElements = element.find("option");
           expect(element.val()).toBe(prop === "ngValue" ? "string:C" : "C");
           expect(optionElements.length).toEqual(3);
@@ -2182,8 +2100,6 @@ describe("select", () => {
             ngModelCtrlSpy.calls.reset();
             scope.options.shift();
             scope.options.pop();
-            ;
-
             optionElements = element.find("option");
             expect(optionElements.length).toEqual(1);
             expect(scope.obj.value).toEqual([]);
@@ -2247,8 +2163,6 @@ describe("select", () => {
             ngModelCtrlSpy.calls.reset();
             A.name = "X";
             C.name = "Z";
-            ;
-
             optionElements = element.find("option");
             expect(optionElements.length).toEqual(3);
             expect(scope.obj.value).toEqual([]);
@@ -2314,8 +2228,6 @@ describe("select", () => {
             ngModelCtrlSpy.calls.reset();
             A.disabled = true;
             C.disabled = true;
-            ;
-
             optionElements = element.find("option");
             expect(optionElements.length).toEqual(4);
             expect(scope.obj.value).toEqual(["D"]);
@@ -2361,15 +2273,11 @@ describe("select", () => {
 
             A.disabled = true;
             D.disabled = true;
-            ;
-
             optionElements = element.find("option");
             expect(optionElements.length).toEqual(4);
             expect(element[0].value).toBe("");
 
             scope.obj.value = prop === "ngValue" ? [A, C, D] : ["A", "C", "D"];
-            ;
-
             optionElements = element.find("option");
             expect(optionElements.length).toEqual(4);
             expect(optionElements.eq(0)[0].selected).toBe(true);
@@ -2413,8 +2321,6 @@ describe("select", () => {
             expect(optionElements.eq(1)[0].selected).toBe(true);
 
             scope.options.push(C);
-            ;
-
             optionElements = element.find("option");
 
             expect(optionElements.length).toEqual(3);
@@ -2457,8 +2363,6 @@ describe("select", () => {
             expect(optionElements.length).toEqual(3);
 
             scope.obj.value = ["B", "C"];
-            ;
-
             optionElements = element.find("option");
 
             expect(optionElements.length).toEqual(3);
@@ -2467,8 +2371,6 @@ describe("select", () => {
             expect(scope.obj.value).toEqual(["B", "C"]);
 
             scope.options = [{ name: "A" }, { name: "B" }, { name: "C" }];
-            ;
-
             optionElements = element.find("option");
 
             expect(optionElements.length).toEqual(3);

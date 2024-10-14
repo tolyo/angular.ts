@@ -388,8 +388,6 @@ describe("ngOptions", () => {
       "ng-model": "selected",
       "ng-options": "option.id as option.display for option in values",
     });
-    ;
-
     const options = element.find("option");
     expect(options.length).toEqual(2);
     expect(options.eq(0)).toEqualOption("FF0000", "red");
@@ -401,8 +399,6 @@ describe("ngOptions", () => {
     expect(options.eq(0)[0].selected).toBe(true);
 
     scope.selected = "0000FF";
-    ;
-
     expect(options.eq(1)[0].getAttribute("selected")).toBe("selected");
     expect(options.eq(1).attr("selected")).toBe("selected");
     expect(options.eq(1)[0].selected).toBe(true);
@@ -439,7 +435,6 @@ describe("ngOptions", () => {
         { id: 0, label: "x" },
         { id: 1, label: "y" },
       ];
-      ;
       const options = element.find("option");
       expect(options.length).toEqual(2);
       expect(options.eq(0)).toEqualOption(0, "x");
@@ -613,8 +608,6 @@ describe("ngOptions", () => {
     scope.array.other = "do not watch";
     scope.array.fn = function () {};
     scope.selected = "b";
-    ;
-
     expect(scope.createLabel).toHaveBeenCalledWith("a");
     expect(scope.createLabel).toHaveBeenCalledWith("b");
     expect(scope.createLabel).toHaveBeenCalledWith("c");
@@ -636,8 +629,6 @@ describe("ngOptions", () => {
       $property: "invisible",
     };
     scope.selected = "regularProperty";
-    ;
-
     expect(scope.createLabel).toHaveBeenCalledWith("regularProperty");
     expect(scope.createLabel).not.toHaveBeenCalledWith("$$private");
     expect(scope.createLabel).not.toHaveBeenCalledWith("$property");
@@ -689,8 +680,6 @@ describe("ngOptions", () => {
     expect(optionToSelect.text()).toBe("B");
 
     optionToSelect[0].selected = true;
-    ;
-
     expect(optionToSelect[0].selected).toBe(true);
     expect(scope.selected).toBe(scope.values[0]);
   });
@@ -783,7 +772,6 @@ describe("ngOptions", () => {
 
     // Change the scope but the options should not change
     scope.arr = ["w", "x", "y", "z"];
-    ;
     options = element.find("option");
     expect(options.length).toEqual(4);
     expect(options.eq(0)).toEqualUnknownOption();
@@ -812,30 +800,23 @@ describe("ngOptions", () => {
     expect(options[2].selected).not.toBe(true);
 
     scope.selected = scope.values[0];
-    ;
-
     expect(options[0].selected).not.toBe(true);
     expect(options[1].selected).toBe(true);
     expect(options[2].selected).not.toBe(true);
 
     scope.selected = scope.values[1];
-    ;
-
     expect(options[0].selected).not.toBe(true);
     expect(options[1].selected).not.toBe(true);
     expect(options[2].selected).toBe(true);
 
     // This will select the empty option
     scope.selected = null;
-    ;
-
     expect(options[0].selected).toBe(true);
     expect(options[1].selected).not.toBe(true);
     expect(options[2].selected).not.toBe(true);
 
     // This will add and select the unknown option
     scope.selected = "unmatched value";
-    ;
     options = element.find("option");
 
     expect(options[0].selected).toBe(true);
@@ -845,7 +826,6 @@ describe("ngOptions", () => {
 
     // Back to matched value
     scope.selected = scope.values[1];
-    ;
     options = element.find("option");
 
     expect(options[0].selected).not.toBe(true);
@@ -1531,7 +1511,6 @@ describe("ngOptions", () => {
       expect(scope.selected).toEqual(scope.arr[1]);
 
       scope.selected = {};
-      ;
       expect(options[0].selected).toBeTrue();
       expect(options[1].selected).not.toBeTrue();
       expect(options[2].selected).not.toBeTrue();
@@ -1869,8 +1848,6 @@ describe("ngOptions", () => {
         { cls: "one", name: "Beta" },
         { cls: "two", name: "Gamma" },
       ];
-      ;
-
       optgroups = element.find("optgroup");
       expect(optgroups.length).toBe(2);
 
@@ -1896,8 +1873,6 @@ describe("ngOptions", () => {
         { cls: "two", name: "Delta" },
         { cls: "three", name: "Epsilon" },
       );
-      ;
-
       optgroups = element.find("optgroup");
       expect(optgroups.length).toBe(3);
 
@@ -2355,8 +2330,6 @@ describe("ngOptions", () => {
       expect(element[0].value).toBe("?");
 
       scope.selected = undefined;
-      ;
-
       expect(element[0].value).toBe("");
     });
 
@@ -2615,7 +2588,6 @@ describe("ngOptions", () => {
       createSingleSelect(true);
       // ensure the first option (the blank option) is selected
       expect(element[0].selectedIndex).toEqual(0);
-      ;
       // ensure the option has not changed following the digest
       expect(element[0].selectedIndex).toEqual(0);
     });
@@ -2766,7 +2738,6 @@ describe("ngOptions", () => {
         element = $compile(
           '<custom-select ng-model="value" options="options"></custom-select>',
         )(scope);
-        ;
       }).not.toThrow();
 
       dealoc(element);
@@ -2941,7 +2912,6 @@ describe("ngOptions", () => {
       scope.values = { 0: "A", 1: "B" };
 
       scope.selected = ["1"];
-      ;
       expect(element.find("option")[1].selected).toBe(true);
 
       element.find("option")[0].selected = true;
@@ -3448,7 +3418,6 @@ describe("ngOptions", () => {
       expect(element).toEqualSelectValue("third");
 
       defer.reject();
-      ;
       expect(scope.form.select.$pending).toBeUndefined();
       expect(scope.value).toBeUndefined();
       expect(element).toEqualSelectValue("third");
@@ -3474,7 +3443,6 @@ describe("ngOptions", () => {
       expect(element).toEqualSelectValue("third");
 
       defer.resolve();
-      ;
       expect(scope.form.select.$pending).toBeUndefined();
       expect(scope.value).toBe("third");
       expect(element).toEqualSelectValue("third");

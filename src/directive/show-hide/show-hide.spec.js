@@ -24,10 +24,8 @@ describe("ngShow / ngHide", () => {
     it("should show and hide an element", () => {
       element = JQLite('<div ng-show="exp"></div>');
       element = $compile(element)($scope);
-      ;
       expect(element[0].classList.contains("ng-hide")).toBeTrue();
       $scope.exp = true;
-      ;
       expect(element[0].classList.contains("ng-hide")).toBeFalse();
     });
 
@@ -36,7 +34,6 @@ describe("ngShow / ngHide", () => {
       element = JQLite('<div ng-show="exp"></div>');
       element = $compile(element)($scope);
       $scope.exp = function () {};
-      ;
       expect(element[0].classList.contains("ng-hide")).toBeFalse();
     });
 
@@ -45,7 +42,6 @@ describe("ngShow / ngHide", () => {
       element = $compile(element)($scope);
       expect(element[0].classList.contains("ng-hide")).toBeTrue();
       $scope.exp = true;
-      ;
       expect(element[0].classList.contains("ng-hide")).toBeFalse();
     });
 
@@ -53,7 +49,6 @@ describe("ngShow / ngHide", () => {
       ["false", "undefined", "null", "NaN", "''", "0"].forEach((x) => {
         element = JQLite(`<div ng-show="${x}"></div>`);
         element = $compile(element)($scope);
-        ;
         expect(element[0].classList.contains("ng-hide")).toBeTrue();
       });
     });
@@ -62,7 +57,6 @@ describe("ngShow / ngHide", () => {
       ["'f'", "'0'", "'false'", "'no'", "'n'", "'[]'"].forEach((x) => {
         element = JQLite(`<div ng-show="${x}"></div>`);
         element = $compile(element)($scope);
-        ;
         expect(element[0].classList.contains("ng-hide")).toBeFalse();
       });
     });
@@ -71,7 +65,6 @@ describe("ngShow / ngHide", () => {
       ["[]", "{}"].forEach((x) => {
         element = JQLite(`<div ng-show="${x}"></div>`);
         element = $compile(element)($scope);
-        ;
         expect(element[0].classList.contains("ng-hide")).toBeFalse();
       });
     });
@@ -83,7 +76,6 @@ describe("ngShow / ngHide", () => {
       element = $compile(element)($scope);
       expect(element[0].classList.contains("ng-hide")).toBeFalse();
       $scope.exp = true;
-      ;
       expect(element[0].classList.contains("ng-hide")).toBeTrue();
     });
 
@@ -91,7 +83,6 @@ describe("ngShow / ngHide", () => {
       ["false", "undefined", "null", "NaN", "''", "0"].forEach((x) => {
         element = JQLite(`<div ng-hide="${x}"></div>`);
         element = $compile(element)($scope);
-        ;
         expect(element[0].classList.contains("ng-hide")).toBeFalse();
       });
     });
@@ -100,7 +91,6 @@ describe("ngShow / ngHide", () => {
       ["'f'", "'0'", "'false'", "'no'", "'n'", "'[]'"].forEach((x) => {
         element = JQLite(`<div ng-hide="${x}"></div>`);
         element = $compile(element)($scope);
-        ;
         expect(element[0].classList.contains("ng-hide")).toBeTrue();
       });
     });
@@ -109,7 +99,6 @@ describe("ngShow / ngHide", () => {
       ["[]", "{}"].forEach((x) => {
         element = JQLite(`<div ng-hide="${x}"></div>`);
         element = $compile(element)($scope);
-        ;
         expect(element[0].classList.contains("ng-hide")).toBeTrue();
       });
     });

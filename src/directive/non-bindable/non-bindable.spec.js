@@ -43,7 +43,6 @@ describe("ngNonBindable", () => {
     )($rootScope);
     $rootScope.a = "one";
     $rootScope.b = "two";
-    ;
     // Bindings not contained by ng-non-bindable should resolve.
     const spans = element.find("span");
     expect(spans.eq(0).text()).toEqual("one");

@@ -40,8 +40,6 @@ describe("event directives", () => {
           '<input type="submit" />' +
           "</form>",
       )($rootScope);
-      ;
-
       // Support: Chrome 60+
       // We need to add the form to the DOM in order for `submit` events to be properly fired.
       document.getElementById("dummy").appendChild(element[0]);
@@ -69,8 +67,6 @@ describe("event directives", () => {
           '<input type="submit" />' +
           "</form>",
       )($rootScope);
-      ;
-
       // Support: Chrome 60+ (on Windows)
       // We need to add the form to the DOM in order for `submit` events to be properly fired.
       document.getElementById("dummy").appendChild(element[0]);
@@ -275,8 +271,6 @@ describe("event directives", () => {
         element[0].click();
         logs.push("done");
       });
-
-      ;
 
       expect(logs[0]).toEqual("listener error");
       expect(logs[1]).toEqual("done");

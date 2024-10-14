@@ -35,20 +35,16 @@ describe("ng-bind", () => {
       element = $compile('<div ng-bind="a"></div>')($rootScope);
       expect(element.text()).toEqual("");
       $rootScope.a = "misko";
-      ;
       expect(element.text()).toEqual("misko");
     });
 
     it("should set text to blank if undefined", () => {
       element = $compile('<div ng-bind="a"></div>')($rootScope);
       $rootScope.a = "misko";
-      ;
       expect(element.text()).toEqual("misko");
       $rootScope.a = undefined;
-      ;
       expect(element.text()).toEqual("");
       $rootScope.a = null;
-      ;
       expect(element.text()).toEqual("");
     });
 
@@ -61,7 +57,6 @@ describe("ng-bind", () => {
           '<span ng-bind="false"></span>' +
           "</div>",
       )($rootScope);
-      ;
       expect(element.text()).toEqual("-0false");
     });
 
@@ -74,7 +69,6 @@ describe("ng-bind", () => {
         () => {
           $rootScope.value = prop[0];
           element = $compile('<div ng-bind="value"></div>')($rootScope);
-          ;
           expect(element.text()).toEqual(prop[1]);
         };
       });
@@ -87,21 +81,18 @@ describe("ng-bind", () => {
         },
       };
       element = $compile('<div ng-bind="value"></div>')($rootScope);
-      ;
       expect(element.text()).toEqual("foo");
     });
 
     it("should NOT use toString on array objects", () => {
       $rootScope.value = [];
       element = $compile('<div ng-bind="value"></div>')($rootScope);
-      ;
       expect(element.text()).toEqual("[]");
     });
 
     it("should NOT use toString on Date objects", () => {
       $rootScope.value = new Date(2014, 10, 10, 0, 0, 0);
       element = $compile('<div ng-bind="value"></div>')($rootScope);
-      ;
       expect(element.text()).toBe(JSON.stringify($rootScope.value));
       expect(element.text()).not.toEqual($rootScope.value.toString());
     });
@@ -110,11 +101,9 @@ describe("ng-bind", () => {
       element = $compile('<div ng-bind="::a"></div>')($rootScope);
       $rootScope.a = "lucas";
       expect($rootScope.$$watchers.length).toEqual(1);
-      ;
       expect(element.text()).toEqual("lucas");
       expect($rootScope.$$watchers.length).toEqual(0);
       $rootScope.a = undefined;
-      ;
       expect(element.text()).toEqual("lucas");
     });
 
@@ -126,10 +115,8 @@ describe("ng-bind", () => {
         }
       });
       $rootScope.a = "foo";
-      ;
       expect(element.text()).toEqual("bar");
       $rootScope.a = undefined;
-      ;
       expect(element.text()).toEqual("bar");
     });
 
@@ -141,13 +128,10 @@ describe("ng-bind", () => {
         }
       });
       $rootScope.a = "foo";
-      ;
       expect(element.text()).toEqual("");
       $rootScope.a = "bar";
-      ;
       expect(element.text()).toEqual("bar");
       $rootScope.a = "man";
-      ;
       expect(element.text()).toEqual("bar");
     });
   });
@@ -158,7 +142,6 @@ describe("ng-bind", () => {
         $rootScope,
       );
       $rootScope.name = "Misko";
-      ;
       expect(element.text()).toEqual("Hello Misko!");
     });
 
@@ -168,12 +151,10 @@ describe("ng-bind", () => {
       )($rootScope);
       $rootScope.name = "Misko";
       expect($rootScope.$$watchers.length).toEqual(2);
-      ;
       expect(element.text()).toEqual(" Misko!");
       expect($rootScope.$$watchers.length).toEqual(1);
       $rootScope.hello = "Hello";
       $rootScope.name = "Lucas";
-      ;
       expect(element.text()).toEqual("Hello Misko!");
       expect($rootScope.$$watchers.length).toEqual(0);
     });
@@ -182,8 +163,6 @@ describe("ng-bind", () => {
       element = $compile('<pre>{{ {key:"value", $$key:"hide"}  }}</pre>')(
         $rootScope,
       );
-      ;
-
       expect(JSON.parse(element.text())).toEqual({ key: "value" });
     });
   });
@@ -192,7 +171,6 @@ describe("ng-bind", () => {
     it("should complain about accidental use of interpolation", () => {
       expect(() => {
         $compile('<div ng-bind-html="{{myHtml}}"></div>');
-        ;
       }).toThrowError(/syntax/);
     });
 
@@ -225,17 +203,14 @@ describe("ng-bind", () => {
       it("should set html", () => {
         element = $compile('<div ng-bind-html="html"></div>')($rootScope);
         $rootScope.html = '<div onclick="">hello</div>';
-        ;
         expect(element.html()).toEqual('<div onclick="">hello</div>');
       });
 
       it("should update html", () => {
         element = $compile('<div ng-bind-html="html"></div>')($rootScope);
         $rootScope.html = "hello";
-        ;
         expect(element.html()).toEqual("hello");
         $rootScope.html = "goodbye";
-        ;
         expect(element.html()).toEqual("goodbye");
       });
 
@@ -243,11 +218,9 @@ describe("ng-bind", () => {
         element = $compile('<div ng-bind-html="::html"></div>')($rootScope);
         $rootScope.html = '<div onclick="">hello</div>';
         expect($rootScope.$$watchers.length).toEqual(1);
-        ;
         expect(element.text()).toEqual("hello");
         expect($rootScope.$$watchers.length).toEqual(0);
         $rootScope.html = '<div onclick="">hello</div>';
-        ;
         expect(element.text()).toEqual("hello");
       });
     });
@@ -282,17 +255,14 @@ describe("ng-bind", () => {
       it("should set html for trusted values", () => {
         element = $compile('<div ng-bind-html="html"></div>')($rootScope);
         $rootScope.html = $sce.trustAsHtml('<div onclick="">hello</div>');
-        ;
         expect(element.html()).toEqual('<div onclick="">hello</div>');
       });
 
       it("should update html", () => {
         element = $compile('<div ng-bind-html="html"></div>')(scope);
         scope.html = $sce.trustAsHtml("hello");
-        ;
         expect(element.html()).toEqual("hello");
         scope.html = $sce.trustAsHtml("goodbye");
-        ;
         expect(element.html()).toEqual("goodbye");
       });
 
@@ -304,7 +274,6 @@ describe("ng-bind", () => {
         $rootScope.getHtml = function () {
           return $sce.trustAsHtml('<div onclick="">hello</div>');
         };
-        ;
         expect(element.html()).toEqual('<div onclick="">hello</div>');
       });
 
@@ -361,10 +330,8 @@ describe("ng-bind", () => {
           $rootScope.getHtml = function () {
             return $sce.trustAsHtml(html);
           };
-          ;
           expect(element.html()).toEqual("hello");
           html = "goodbye";
-          ;
           expect(element.html()).toEqual("goodbye");
         };
       });

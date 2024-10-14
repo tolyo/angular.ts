@@ -25,7 +25,6 @@ describe("observe", () => {
   function createDirective(attributeValue, updateProp) {
     const template = `<div ng-observe="${attributeValue}" data-update="${updateProp}"></div>`;
     element = $compile(template)($scope);
-    ;
   }
 
   it("should set the scope property to the attribute value before any changes", () => {

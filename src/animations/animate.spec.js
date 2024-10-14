@@ -82,7 +82,6 @@ describe("$animate", () => {
       $animate.enabled(false);
       expect(element[0].classList.contains("ng-hide")).toBeFalse();
       $animate.addClass(element, "ng-hide");
-      ;
       expect(element[0].classList.contains("ng-hide")).toBeTrue();
     });
 
@@ -117,10 +116,8 @@ describe("$animate", () => {
       $animate.enabled(false);
       expect(rect[0].classList.contains("ng-hide")).toBeFalse();
       $animate.addClass(rect, "ng-hide");
-      ;
       expect(rect[0].classList.contains("ng-hide")).toBeTrue();
       $animate.removeClass(rect, "ng-hide");
-      ;
       expect(rect[0].classList.contains("ng-hide")).toBeFalse();
     });
 
@@ -171,25 +168,21 @@ describe("$animate", () => {
       $animate.addClass(element, "on", {
         to: { color: "green" },
       });
-      ;
       assertColor("green");
 
       $animate.setClass(element, "off", "on", {
         to: { color: "black" },
       });
-      ;
       assertColor("black");
 
       $animate.removeClass(element, "off", {
         to: { color: "blue" },
       });
-      ;
       assertColor("blue");
 
       $animate.leave(element, {
         to: { color: "yellow" },
       });
-      ;
       assertColor("yellow");
 
       function assertColor(color) {
@@ -205,8 +198,6 @@ describe("$animate", () => {
         from: { color: "green" },
         to: { borderColor: "purple" },
       });
-      ;
-
       const { style } = element[0];
       expect(style.color).toBe("green");
       expect(style.borderColor).toBe("purple");
@@ -217,8 +208,6 @@ describe("$animate", () => {
 
       $animate.addClass(element, "ng-hide");
       $animate.removeClass(element, "ng-hide");
-      ;
-
       expect(element[0].classList.contains("ng-hide")).toBeFalse();
     });
 
@@ -227,8 +216,6 @@ describe("$animate", () => {
 
       $animate.removeClass(element, "ng-hide");
       $animate.addClass(element, "ng-hide");
-      ;
-
       expect(element[0].classList.contains("ng-hide")).toBeTrue();
     });
 
@@ -338,7 +325,6 @@ describe("$animate", () => {
 
         expect(() => {
           fn();
-          ;
         }).not.toThrow();
 
         const optionsArg = captureSpy.calls.mostRecent().args[2];
@@ -353,8 +339,6 @@ describe("$animate", () => {
 
       $animate.enter(element1, $rootElement, null, { addClass: " " });
       $animate.enter(element2, $rootElement, null, { addClass: "valid-name" });
-      ;
-
       expect(element2[0].classList.contains("valid-name")).toBeTruthy();
     });
 
@@ -375,7 +359,6 @@ describe("$animate", () => {
       const runner = $animate.enter(element, parent, null, copiedOptions);
       expect(copiedOptions).toEqual(initialOptions);
 
-      ;
       expect(copiedOptions).toEqual(initialOptions);
     });
 
@@ -418,7 +401,6 @@ describe("$animate", () => {
         $animate.removeClass(element, "test-class1");
         $animate.addClass(element, "test-class2");
         $animate.setClass(element, "test-class3", "test-class4");
-        ;
         expect(element[0].classList.contains("test-class1")).toBeFalse();
         expect(element[0].classList.contains("test-class2")).toBeTrue();
         expect(element[0].classList.contains("test-class3")).toBeTrue();
@@ -443,7 +425,6 @@ describe("$animate", () => {
         $animate.addClass(element, "test1");
         $animate.removeClass(element, "test2");
 
-        ;
         element = JQLite('<p class="test4">test</p>');
 
         $rootScope.$apply(() => {
@@ -485,8 +466,6 @@ describe("$animate", () => {
         $animate.removeClass(target, "test-class1");
         $animate.addClass(target, "test-class2");
         $animate.setClass(target, "test-class3", "test-class4");
-
-        ;
 
         expect(target[0].classList.contains("test-class2")).toBeTrue();
         expect(target[0].classList.contains("test-class3")).toBeTrue();

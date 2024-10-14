@@ -371,8 +371,6 @@ describe("ngModel", () => {
         };
 
         ctrl.$setViewValue("123");
-        ;
-
         expect(element[0].classList.contains("ng-valid-parse")).toBeTrue();
         expect(element[0].classList.contains("ng-invalid-parse")).toBeFalse();
         expect(
@@ -381,8 +379,6 @@ describe("ngModel", () => {
 
         parserIsFailing = true;
         ctrl.$setViewValue("12345");
-        ;
-
         expect(element[0].classList.contains("ng-valid-parse")).toBeFalse();
         expect(element[0].classList.contains("ng-invalid-parse")).toBeTrue();
         expect(
@@ -422,8 +418,6 @@ describe("ngModel", () => {
         expect(scope.value).toBeUndefined();
 
         defer.resolve();
-        ;
-
         expect(ctrl.$modelValue).toBe("b");
         expect(scope.value).toBe("b");
 
@@ -434,8 +428,6 @@ describe("ngModel", () => {
         expect(scope.value).toBe("b");
 
         defer.resolve();
-        ;
-
         expect(ctrl.$modelValue).toBe("c");
         expect(scope.value).toBe("c");
       });
@@ -519,11 +511,9 @@ describe("ngModel", () => {
         )($rootScope);
 
         $rootScope.val = 123;
-        ;
         expect($rootScope.form.field.$viewValue).toBe("123");
 
         $rootScope.val = null;
-        ;
         expect($rootScope.form.field.$viewValue).toBe(null);
 
         dealoc(form);
@@ -534,11 +524,9 @@ describe("ngModel", () => {
           '<form name="form"><input type="text" name="field" ng-model="val" /></form>',
         )($rootScope);
         $rootScope.val = 123;
-        ;
         expect($rootScope.form.field.$viewValue).toBe("123");
 
         $rootScope.val = null;
-        ;
         expect($rootScope.form.field.$viewValue).toBe(null);
 
         dealoc(form);
@@ -549,11 +537,9 @@ describe("ngModel", () => {
           '<form name="form"><input type="email" name="field" ng-model="val" /></form>',
         )($rootScope);
         $rootScope.val = 123;
-        ;
         expect($rootScope.form.field.$viewValue).toBe("123");
 
         $rootScope.val = null;
-        ;
         expect($rootScope.form.field.$viewValue).toBe(null);
 
         dealoc(form);
@@ -564,11 +550,9 @@ describe("ngModel", () => {
           '<form name="form"><input type="url" name="field" ng-model="val" /></form>',
         )($rootScope);
         $rootScope.val = 123;
-        ;
         expect($rootScope.form.field.$viewValue).toBe("123");
 
         $rootScope.val = null;
-        ;
         expect($rootScope.form.field.$viewValue).toBe(null);
 
         dealoc(form);
@@ -973,8 +957,6 @@ describe("ngModel", () => {
         expect(ctrl.$pending.promiseValidator).toBe(true);
 
         defer.resolve();
-        ;
-
         expect(ctrl.$valid).toBe(true);
         expect(ctrl.$invalid).toBe(false);
         expect(ctrl.$pending).toBeUndefined();
@@ -982,8 +964,6 @@ describe("ngModel", () => {
         scope.$apply('value = "123"');
 
         defer.reject();
-        ;
-
         expect(ctrl.$valid).toBe(false);
         expect(ctrl.$invalid).toBe(true);
         expect(ctrl.$pending).toBeUndefined();
@@ -1067,10 +1047,7 @@ describe("ngModel", () => {
         newDefer = defer;
 
         newDefer.reject();
-        ;
         oldDefer.resolve();
-        ;
-
         expect(ctrl.$valid).toBe(false);
         expect(ctrl.$invalid).toBe(true);
         expect(ctrl.$pending).toBeUndefined();
@@ -1103,7 +1080,6 @@ describe("ngModel", () => {
         expect(isObject(ctrl.$pending)).toBe(true);
 
         defers[1].resolve();
-        ;
         expect(ctrl.$valid).toBe(true);
         expect(ctrl.$invalid).toBe(false);
         expect(isObject(ctrl.$pending)).toBe(false);
@@ -1131,8 +1107,6 @@ describe("ngModel", () => {
         expect(isObject(ctrl.$pending)).toBe(false);
 
         defer.resolve();
-        ;
-
         expect(ctrl.$valid).toBe(false);
         expect(ctrl.$invalid).toBe(true);
         expect(isObject(ctrl.$pending)).toBe(false);
@@ -1186,13 +1160,10 @@ describe("ngModel", () => {
         const formCtrl = $rootScope.myForm;
         const usernameCtrl = formCtrl.username;
 
-        ;
         expect(usernameCtrl.$invalid).toBe(true);
         expect(formCtrl.$invalid).toBe(true);
 
         usernameCtrl.$setViewValue("valid-username");
-        ;
-
         expect(usernameCtrl.$invalid).toBe(false);
         expect(formCtrl.$invalid).toBe(false);
         delete Object.prototype.someThing;
@@ -1219,42 +1190,30 @@ describe("ngModel", () => {
           return usernameDefer.promise;
         };
 
-        ;
         expect(usernameCtrl.$invalid).toBe(true);
         expect(formCtrl.$invalid).toBe(true);
 
         usernameCtrl.$setViewValue("valid-username");
-        ;
-
         expect(formCtrl.$pending.usernameAvailability).toBeTruthy();
         expect(usernameCtrl.$invalid).toBeUndefined();
         expect(formCtrl.$invalid).toBeUndefined();
 
         usernameDefer.resolve();
-        ;
         expect(usernameCtrl.$invalid).toBe(false);
         expect(formCtrl.$invalid).toBe(true);
 
         ageCtrl.$setViewValue(22);
-        ;
-
         expect(usernameCtrl.$invalid).toBe(false);
         expect(ageCtrl.$invalid).toBe(false);
         expect(formCtrl.$invalid).toBe(false);
 
         usernameCtrl.$setViewValue("valid");
-        ;
-
         expect(usernameCtrl.$invalid).toBe(true);
         expect(ageCtrl.$invalid).toBe(false);
         expect(formCtrl.$invalid).toBe(true);
 
         usernameCtrl.$setViewValue("another-valid-username");
-        ;
-
         usernameDefer.resolve();
-        ;
-
         expect(usernameCtrl.$invalid).toBe(false);
         expect(formCtrl.$invalid).toBe(false);
         expect(formCtrl.$pending).toBeFalsy();
@@ -1471,11 +1430,9 @@ describe("ngModel", () => {
     it("should set ng-empty or ng-not-empty when the view value changes", () => {
       const element = $compile('<input ng-model="value" />')($rootScope);
 
-      ;
       expect(element.val()).toBe("");
 
       $rootScope.value = "XXX";
-      ;
       expect(element.val()).toBe("XXX");
 
       element.val("");
@@ -1492,7 +1449,6 @@ describe("ngModel", () => {
         $rootScope,
       );
 
-      ;
       expect(element[0].classList.contains("ng-valid")).toBeTrue();
       expect(element[0].classList.contains("ng-pristine")).toBeTrue();
       expect(element[0].classList.contains("ng-touched")).toBeFalse();
@@ -1530,8 +1486,6 @@ describe("ngModel", () => {
       const element = $compile(
         '<input type="email" ng-model="value" required />',
       )($rootScope);
-      ;
-
       expect(element[0].classList.contains("ng-invalid")).toBeTrue();
       expect(element[0].classList.contains("ng-invalid-required")).toBeTrue();
 

@@ -39,12 +39,26 @@ describe("Model", () => {
     expect(model.d).toEqual(3);
   });
 
+  describe("$id", () => {
+    it("should have a unique id", () => {
+      expect(model.$id < model.$new().$id).toBeTruthy();
+    });
+  });
+
   describe("inheritance", () => {
     it("can be constructed and used as an object", () => {
       const model = createModel();
       model.aProperty = 1;
 
       expect(model.aProperty).toBe(1);
+    });
+
+    it("constructs a root scope by default while all children non-root", () => {
+      const model = createModel();
+      expect(model.$isRoot()).toBe(true);
+
+      const child = model.$new();
+      expect(child.$isRoot()).toBe(false);
     });
 
     it("inherits the parents properties", () => {
@@ -105,11 +119,23 @@ describe("Model", () => {
       expect(model.aValue).toEqual([1, 2, 3, 4]);
       expect(child.aValue).toEqual(model.aValue);
     });
-  });
 
-  describe("$id", () => {
-    it("should have a unique id", () => {
-      expect(model.$id < model.$new().$id).toBeTruthy();
+    it("cannot override a parent models property", () => {
+      const child = model.$new();
+
+      model.aValue = [1, 2, 3];
+      child.aValue = [1, 2, 3, 4];
+      model.bValue = { a: 1 };
+      child.bValue = { b: 2 };
+      model.cValue = 1;
+      child.cValue = 2;
+
+      expect(model.aValue).toEqual([1, 2, 3]);
+      expect(child.aValue).toEqual([1, 2, 3, 4]);
+      expect(model.bValue).toEqual({ a: 1 });
+      expect(child.bValue).toEqual({ b: 2 });
+      expect(model.cValue).toEqual(1);
+      expect(child.cValue).toEqual(2);
     });
   });
 
@@ -154,7 +180,6 @@ describe("Model", () => {
     it("should not have $root on children, but should inherit", () => {
       const child = model.$new();
       expect(child.$root).toEqual(model.$root);
-      expect(child.$target.hasOwnProperty("$root")).toBeFalsy();
     });
   });
 
@@ -164,7 +189,20 @@ describe("Model", () => {
 
       expect(model.$parent).toEqual(null);
       expect(child.$parent.$id).toEqual(model.$id);
+      expect(child.$parent).toEqual(model.$handler);
       expect(child.$new().$parent).toEqual(child.$handler);
+    });
+
+    it("should keep track of its children", () => {
+      const child = model.$new();
+      expect(model.$children).toEqual([child]);
+
+      const child2 = model.$new();
+      expect(model.$children).toEqual([child, child2]);
+
+      const child3 = child2.$new();
+      expect(model.$children).toEqual([child, child2]);
+      expect(child2.$children).toEqual([child3]);
     });
   });
 
@@ -192,13 +230,10 @@ describe("Model", () => {
   });
 
   describe("$watch", () => {
-    it("can register listeners via watch", async () => {
+    it("can register listeners via watch", () => {
       var listenerFn = jasmine.createSpy();
-      model.$watch((o) => {
-        o.a;
-      }, listenerFn);
+      model.$watch((o) => o.a, listenerFn);
       model.a = 1;
-      await wait();
       expect(listenerFn).toHaveBeenCalled();
     });
 
@@ -215,7 +250,7 @@ describe("Model", () => {
       var watchFn = jasmine.createSpy();
       var listenerFn = () => {};
       model.$watch(watchFn, listenerFn);
-      model.$digest();
+
       expect(watchFn).toHaveBeenCalledWith(model);
     });
 
@@ -307,7 +342,7 @@ describe("Model", () => {
       expect(model.counter).toBe(2);
     });
 
-    it("calls only the listeners registerred at the moment the watched value changes", async () => {
+    it("calls only the listeners registerred at the moment the watched value changes", () => {
       model.someValue = "a";
       model.counter = 0;
 
@@ -318,7 +353,6 @@ describe("Model", () => {
       expect(model.counter).toBe(0);
 
       model.someValue = "b";
-      await wait();
       expect(model.counter).toBe(1);
 
       model.someValue = "b";
@@ -328,7 +362,6 @@ describe("Model", () => {
           model.counter++;
         },
       );
-      await wait();
 
       expect(model.counter).toBe(1);
     });
@@ -465,25 +498,15 @@ describe("Model", () => {
       expect(model.counter).toBe(6);
     });
 
-    it("calls the listener function of a watch on first $digest", function () {
-      var watchFn = function () {
-        return "wat";
-      };
-      var listenerFn = jasmine.createSpy();
-      model.$watch(watchFn, listenerFn);
-      model.$digest();
-      expect(listenerFn).toHaveBeenCalled();
-    });
-
     it("calls the watch function with the scope as the argument", function () {
       var watchFn = jasmine.createSpy();
       var listenerFn = function () {};
       model.$watch(watchFn, listenerFn);
-      model.$digest();
+
       expect(watchFn).toHaveBeenCalledWith(model);
     });
 
-    it("calls the listener function when the watched value changes", async function () {
+    it("calls the listener function when the watched value changes", function () {
       model.someValue = "a";
       model.counter = 0;
       model.$watch(
@@ -495,29 +518,23 @@ describe("Model", () => {
         },
       );
       expect(model.counter).toBe(0);
+
       model.someValue = "1";
-      expect(model.counter).toBe(0);
-      await wait();
       expect(model.counter).toBe(1);
+
       model.someValue = "2";
-      expect(model.counter).toBe(1);
-      await wait();
       expect(model.counter).toBe(2);
     });
 
-    it("should watch and fire on simple property change", async () => {
+    it("should watch and fire on simple property change", () => {
       const spy = jasmine.createSpy();
       model.$watch("name", spy);
-      model.$digest();
+
       spy.calls.reset();
 
       expect(spy).not.toHaveBeenCalled();
-      model.$digest();
-      expect(spy).toHaveBeenCalled();
-      spy.calls.reset();
-
       model.name = "misko";
-      await wait();
+
       expect(spy).toHaveBeenCalledWith("misko", undefined, model);
     });
 
@@ -531,13 +548,12 @@ describe("Model", () => {
       }
 
       model.$watch(Getter, Listener);
-      model.$digest();
     });
 
     it("should watch and fire on expression change", async () => {
       const spy = jasmine.createSpy();
       model.$watch("name.first", spy);
-      model.$digest();
+
       spy.calls.reset();
 
       model.name = {};
@@ -615,7 +631,6 @@ describe("Model", () => {
         model.$watchCollection("1", () => {});
         model.$watchCollection('"foo"', () => {});
         expect(model.$$watchersCount).not.toEqual(0);
-        model.$digest();
 
         expect(model.$$watchersCount).toEqual(0);
       });
@@ -623,7 +638,6 @@ describe("Model", () => {
       it("should remove $watchGroup of constant literals after initial digest", () => {
         model.$watchGroup(["[]", "{}", "1", '"foo"'], () => {});
         expect(model.$$watchersCount).not.toEqual(0);
-        model.$digest();
 
         expect(model.$$watchersCount).toEqual(0);
       });
@@ -632,7 +646,6 @@ describe("Model", () => {
         model.$watch('[1] | filter:"x"', () => {});
         model.$watch("1 | limitTo:2", () => {});
         expect(model.$$watchersCount).not.toEqual(0);
-        model.$digest();
 
         expect(model.$$watchersCount).toEqual(0);
       });
@@ -640,7 +653,6 @@ describe("Model", () => {
       it("should remove $watchCollection of filtered constant literals after initial digest", () => {
         model.$watchCollection('[1] | filter:"x"', () => {});
         expect(model.$$watchersCount).not.toEqual(0);
-        model.$digest();
 
         expect(model.$$watchersCount).toEqual(0);
       });
@@ -648,7 +660,6 @@ describe("Model", () => {
       it("should remove $watchGroup of filtered constant literals after initial digest", () => {
         model.$watchGroup(['[1] | filter:"x"', "1 | limitTo:2"], () => {});
         expect(model.$$watchersCount).not.toEqual(0);
-        model.$digest();
 
         expect(model.$$watchersCount).toEqual(0);
       });
@@ -683,11 +694,11 @@ describe("Model", () => {
       //   model.$watchCollection("::foo", () => {});
       //   expect(model.$$watchersCount).toEqual(1);
 
-      //   model.$digest();
+      //
       //   expect(model.$$watchersCount).toEqual(1);
 
       //   model.foo = [];
-      //   model.$digest();
+      //
       //   expect(model.$$watchersCount).toEqual(0);
       // });
 
@@ -695,19 +706,19 @@ describe("Model", () => {
       //   model.$watchCollection("::[foo, bar]", () => {});
       //   expect(model.$$watchersCount).toEqual(1);
 
-      //   model.$digest();
+      //
       //   expect(model.$$watchersCount).toEqual(1);
 
       //   model.foo = 1;
-      //   model.$digest();
+      //
       //   expect(model.$$watchersCount).toEqual(1);
 
       //   model.foo = 2;
-      //   model.$digest();
+      //
       //   expect(model.$$watchersCount).toEqual(1);
 
       //   model.bar = 3;
-      //   model.$digest();
+      //
       //   expect(model.$$watchersCount).toEqual(0);
       // });
 
@@ -715,15 +726,15 @@ describe("Model", () => {
       //   model.$watchGroup(["::foo", "::bar"], () => {});
       //   expect(model.$$watchersCount).toEqual(2);
 
-      //   model.$digest();
+      //
       //   expect(model.$$watchersCount).toEqual(2);
 
       //   model.foo = "foo";
-      //   model.$digest();
+      //
       //   expect(model.$$watchersCount).toEqual(1);
 
       //   model.bar = "bar";
-      //   model.$digest();
+      //
       //   expect(model.$$watchersCount).toEqual(0);
       // });
     });
@@ -867,7 +878,7 @@ describe("Model", () => {
     //     );
 
     //     expect(() => {
-    //       model.$digest();
+    //
     //     }).toThrow(
     //       "model",
     //       "infdig",
@@ -934,9 +945,7 @@ describe("Model", () => {
       let callCount = 0;
       model.$watch("name", () => {
         callCount++;
-        expect(() => {
-          model.$digest();
-        }).toThrowMatching(/Maximum call stack size exceeded/);
+        expect(() => {}).toThrowMatching(/Maximum call stack size exceeded/);
       });
       model.name = "a";
       await wait();
@@ -963,7 +972,7 @@ describe("Model", () => {
         model.$watch("foo", watch1);
         model.$watch("foo", watch2);
       });
-      model.$digest();
+
       expect(watch1).toHaveBeenCalled();
       expect(watch2).toHaveBeenCalled();
     });
@@ -1003,7 +1012,7 @@ describe("Model", () => {
     //   model.$watch(watchFn2);
     //   removeWatcher3 = model.$watch(watchFn3);
 
-    //   model.$digest();
+    //
 
     //   expect(logs).toEqual([1, 2, 1, 2]);
     // });
@@ -1028,7 +1037,7 @@ describe("Model", () => {
     //   model.$watch(watchFn2);
     //   model.$watch(watchFn3);
 
-    //   model.$digest();
+    //
 
     //   expect(logs).toEqual([1, 2, 3, 2, 3]);
     // });
@@ -1037,7 +1046,7 @@ describe("Model", () => {
     //   model.$watch(() => NaN);
 
     //   expect(() => {
-    //     model.$digest();
+    //
     //   }).not.toThrow();
     // });
 
@@ -1057,11 +1066,11 @@ describe("Model", () => {
     //   model.$watch(() => ({}), logger, true);
     //   model.$watch(() => 23, logger);
 
-    //   model.$digest();
+    //
     //   expect(isNaN(logs.shift())).toBe(true); // jasmine's toBe and toEqual don't work well with NaNs
     //   expect(logs).toEqual([undefined, "", false, {}, 23]);
     //   logs = [];
-    //   model.$digest();
+    //
     //   expect(logs).toEqual([]);
     // });
 
@@ -1072,7 +1081,7 @@ describe("Model", () => {
         let listenerRemove;
 
         listenerRemove = model.$watch("foo", listener);
-        model.$digest(); // init
+        // init
         expect(listener).toHaveBeenCalled();
         expect(listenerRemove).toBeDefined();
 
@@ -1131,7 +1140,7 @@ describe("Model", () => {
       //       () => logs.push("watchAction3"),
       //     );
 
-      //     model.$digest();
+      //
 
       //     expect(logs).toEqual([
       //       "watch1",
@@ -1173,7 +1182,7 @@ describe("Model", () => {
       //       () => logs.push("watchAction3"),
       //     );
 
-      //     model.$digest();
+      //
 
       //     expect(logs).toEqual([
       //       "watch1",
@@ -1213,7 +1222,7 @@ describe("Model", () => {
       //       () => logs.push("watchAction3"),
       //     );
 
-      //     model.$digest();
+      //
 
       //     expect(logs).toEqual([
       //       "watch1",
@@ -1464,25 +1473,25 @@ describe("Model", () => {
     //     });
 
     //     it("should not trigger if nothing change", () => {
-    //       model.$digest();
+    //
     //       expect(logs).toEqual([
     //         { newVal: undefined, oldVal: undefined, identical: true },
     //       ]);
     //       logs = [];
-    //       model.$digest();
+    //
     //       expect(logs).toEqual([]);
     //     });
 
     //     it("should allow deregistration", () => {
     //       model.obj = [];
-    //       model.$digest();
+    //
     //       expect(logs.length).toBe(1);
     //       logs = [];
 
     //       model.obj.push("a");
     //       deregister();
 
-    //       model.$digest();
+    //
     //       expect(logs).toEqual([]);
     //     });
 
@@ -1490,7 +1499,7 @@ describe("Model", () => {
     //       it("should return oldCollection === newCollection only on the first listener call", () => {
     //         // first time should be identical
     //         model.obj = ["a", "b"];
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([
     //           { newVal: ["a", "b"], oldVal: ["a", "b"], identical: true },
     //         ]);
@@ -1498,98 +1507,98 @@ describe("Model", () => {
 
     //         // second time should be different
     //         model.obj[1] = "c";
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([{ newVal: ["a", "c"], oldVal: ["a", "b"] }]);
     //       });
 
     //       it("should trigger when property changes into array", () => {
     //         model.obj = "test";
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([
     //           { newVal: "test", oldVal: "test", identical: true },
     //         ]);
 
     //         logs = [];
     //         model.obj = [];
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([{ newVal: [], oldVal: "test" }]);
 
     //         logs = [];
     //         model.obj = {};
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([{ newVal: {}, oldVal: [] }]);
 
     //         logs = [];
     //         model.obj = [];
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([{ newVal: [], oldVal: {} }]);
 
     //         logs = [];
     //         model.obj = undefined;
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([{ newVal: undefined, oldVal: [] }]);
     //       });
 
     //       it("should not trigger change when object in collection changes", () => {
     //         model.obj = [{}];
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([
     //           { newVal: [{}], oldVal: [{}], identical: true },
     //         ]);
 
     //         logs = [];
     //         model.obj[0].name = "foo";
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([]);
     //       });
 
     //       it("should watch array properties", () => {
     //         model.obj = [];
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([{ newVal: [], oldVal: [], identical: true }]);
 
     //         logs = [];
     //         model.obj.push("a");
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([{ newVal: ["a"], oldVal: [] }]);
 
     //         logs = [];
     //         model.obj[0] = "b";
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([{ newVal: ["b"], oldVal: ["a"] }]);
 
     //         logs = [];
     //         model.obj.push([]);
     //         model.obj.push({});
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([{ newVal: ["b", [], {}], oldVal: ["b"] }]);
 
     //         logs = [];
     //         const temp = model.obj[1];
     //         model.obj[1] = model.obj[2];
     //         model.obj[2] = temp;
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([
     //           { newVal: ["b", {}, []], oldVal: ["b", [], {}] },
     //         ]);
 
     //         logs = [];
     //         model.obj.shift();
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([{ newVal: [{}, []], oldVal: ["b", {}, []] }]);
     //       });
 
     //       it("should not infinitely digest when current value is NaN", () => {
     //         model.obj = [NaN];
     //         expect(() => {
-    //           model.$digest();
+    //
     //         }).not.toThrow();
     //       });
 
     //       it("should watch array-like objects like arrays", () => {
     //         logs = [];
     //         model.obj = document.getElementsByTagName("src");
-    //         model.$digest();
+    //
 
     //         expect(logs.length).toBeTruthy();
     //       });
@@ -1599,7 +1608,7 @@ describe("Model", () => {
     //       it("should return oldCollection === newCollection only on the first listener call", () => {
     //         model.obj = { a: "b" };
     //         // first time should be identical
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([
     //           { newVal: { a: "b" }, oldVal: { a: "b" }, identical: true },
     //         ]);
@@ -1607,54 +1616,54 @@ describe("Model", () => {
 
     //         // second time not identical
     //         model.obj.a = "c";
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([{ newVal: { a: "c" }, oldVal: { a: "b" } }]);
     //       });
 
     //       it("should trigger when property changes into object", () => {
     //         model.obj = "test";
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([
     //           { newVal: "test", oldVal: "test", identical: true },
     //         ]);
     //         logs = [];
 
     //         model.obj = {};
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([{ newVal: {}, oldVal: "test" }]);
     //       });
 
     //       it("should not trigger change when object in collection changes", () => {
     //         model.obj = { name: {} };
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([
     //           { newVal: { name: {} }, oldVal: { name: {} }, identical: true },
     //         ]);
     //         logs = [];
 
     //         model.obj.name.bar = "foo";
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([]);
     //       });
 
     //       it("should watch object properties", () => {
     //         model.obj = {};
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([{ newVal: {}, oldVal: {}, identical: true }]);
     //         logs = [];
     //         model.obj.a = "A";
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([{ newVal: { a: "A" }, oldVal: {} }]);
 
     //         logs = [];
     //         model.obj.a = "B";
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([{ newVal: { a: "B" }, oldVal: { a: "A" } }]);
 
     //         logs = [];
     //         model.obj.b = [];
     //         model.obj.c = {};
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([
     //           { newVal: { a: "B", b: [], c: {} }, oldVal: { a: "B" } },
     //         ]);
@@ -1663,7 +1672,7 @@ describe("Model", () => {
     //         const temp = model.obj.a;
     //         model.obj.a = model.obj.b;
     //         model.obj.c = temp;
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([
     //           {
     //             newVal: { a: [], b: [], c: "B" },
@@ -1673,7 +1682,7 @@ describe("Model", () => {
 
     //         logs = [];
     //         delete model.obj.a;
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([
     //           { newVal: { b: [], c: "B" }, oldVal: { a: [], b: [], c: "B" } },
     //         ]);
@@ -1682,7 +1691,7 @@ describe("Model", () => {
     //       it("should not infinitely digest when current value is NaN", () => {
     //         model.obj = { a: NaN };
     //         expect(() => {
-    //           model.$digest();
+    //
     //         }).not.toThrow();
     //       });
 
@@ -1690,13 +1699,13 @@ describe("Model", () => {
     //         model.obj = Object.create(null);
     //         model.obj.a = "a";
     //         model.obj.b = "b";
-    //         model.$digest();
+    //
     //         expect(logs[0].newVal).toEqual(
     //           extend(Object.create(null), { a: "a", b: "b" }),
     //         );
 
     //         delete model.obj.b;
-    //         model.$digest();
+    //
     //         expect(logs[0].newVal).toEqual(
     //           extend(Object.create(null), { a: "a" }),
     //         );
@@ -1722,7 +1731,7 @@ describe("Model", () => {
     //       it("should return oldCollection === newCollection only on the first listener call", () => {
     //         // first time should be identical
     //         model.obj = "a";
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([
     //           { newVal: ["a"], oldVal: ["a"], identical: true },
     //         ]);
@@ -1730,55 +1739,55 @@ describe("Model", () => {
 
     //         // second time should be different
     //         model.obj = "b";
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([{ newVal: ["b"], oldVal: ["a"] }]);
     //       });
 
     //       it("should trigger when property changes into array", () => {
     //         model.obj = "test";
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([
     //           { newVal: ["test"], oldVal: ["test"], identical: true },
     //         ]);
 
     //         logs = [];
     //         model.obj = [];
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([{ newVal: [[]], oldVal: ["test"] }]);
 
     //         logs = [];
     //         model.obj = {};
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([{ newVal: [{}], oldVal: [[]] }]);
 
     //         logs = [];
     //         model.obj = [];
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([{ newVal: [[]], oldVal: [{}] }]);
 
     //         logs = [];
     //         model.obj = undefined;
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([{ newVal: [undefined], oldVal: [[]] }]);
     //       });
 
     //       it("should not trigger change when object in collection changes", () => {
     //         model.obj = {};
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([
     //           { newVal: [{}], oldVal: [{}], identical: true },
     //         ]);
 
     //         logs = [];
     //         model.obj.name = "foo";
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([]);
     //       });
 
     //       it("should not infinitely digest when current value is NaN", () => {
     //         model.obj = NaN;
     //         expect(() => {
-    //           model.$digest();
+    //
     //         }).not.toThrow();
     //       });
     //     });
@@ -1800,7 +1809,7 @@ describe("Model", () => {
     //       it("should return oldCollection === newCollection only on the first listener call", () => {
     //         model.obj = "b";
     //         // first time should be identical
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([
     //           { newVal: { a: "b" }, oldVal: { a: "b" }, identical: true },
     //         ]);
@@ -1808,20 +1817,20 @@ describe("Model", () => {
     //         // second time not identical
     //         logs = [];
     //         model.obj = "c";
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([{ newVal: { a: "c" }, oldVal: { a: "b" } }]);
     //       });
 
     //       it("should trigger when property changes into object", () => {
     //         model.obj = "test";
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([
     //           { newVal: { a: "test" }, oldVal: { a: "test" }, identical: true },
     //         ]);
 
     //         logs = [];
     //         model.obj = {};
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([
     //           { newVal: { a: {} }, oldVal: { a: "test" } },
     //         ]);
@@ -1829,7 +1838,7 @@ describe("Model", () => {
 
     //       it("should not trigger change when object in collection changes", () => {
     //         model.obj = { name: "foo" };
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([
     //           {
     //             newVal: { a: { name: "foo" } },
@@ -1840,35 +1849,35 @@ describe("Model", () => {
 
     //         logs = [];
     //         model.obj.name = "bar";
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([]);
     //       });
 
     //       it("should watch object properties", () => {
     //         model.obj = {};
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([
     //           { newVal: { a: {} }, oldVal: { a: {} }, identical: true },
     //         ]);
 
     //         logs = [];
     //         model.obj = "A";
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([{ newVal: { a: "A" }, oldVal: { a: {} } }]);
 
     //         logs = [];
     //         model.obj = "B";
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([{ newVal: { a: "B" }, oldVal: { a: "A" } }]);
 
     //         logs = [];
     //         model.obj = [];
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([{ newVal: { a: [] }, oldVal: { a: "B" } }]);
 
     //         logs = [];
     //         delete model.obj;
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([
     //           { newVal: { a: undefined }, oldVal: { a: [] } },
     //         ]);
@@ -1877,7 +1886,7 @@ describe("Model", () => {
     //       it("should not infinitely digest when current value is NaN", () => {
     //         model.obj = NaN;
     //         expect(() => {
-    //           model.$digest();
+    //
     //         }).not.toThrow();
     //       });
     //     });
@@ -1898,7 +1907,7 @@ describe("Model", () => {
 
     //       it('should default to "undefined" key', () => {
     //         model.obj = "test";
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([
     //           {
     //             newVal: { undefined: "test" },
@@ -1911,21 +1920,21 @@ describe("Model", () => {
     //       it("should trigger when key changes", () => {
     //         model.key = "a";
     //         model.obj = "test";
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([
     //           { newVal: { a: "test" }, oldVal: { a: "test" }, identical: true },
     //         ]);
 
     //         logs = [];
     //         model.key = "b";
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([
     //           { newVal: { b: "test" }, oldVal: { a: "test" } },
     //         ]);
 
     //         logs = [];
     //         model.key = true;
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([
     //           { newVal: { true: "test" }, oldVal: { b: "test" } },
     //         ]);
@@ -1934,30 +1943,30 @@ describe("Model", () => {
     //       it("should not trigger when key changes but stringified key does not", () => {
     //         model.key = 1;
     //         model.obj = "test";
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([
     //           { newVal: { 1: "test" }, oldVal: { 1: "test" }, identical: true },
     //         ]);
 
     //         logs = [];
     //         model.key = "1";
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([]);
 
     //         model.key = true;
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([
     //           { newVal: { true: "test" }, oldVal: { 1: "test" } },
     //         ]);
 
     //         logs = [];
     //         model.key = "true";
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([]);
 
     //         logs = [];
     //         model.key = {};
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([
     //           {
     //             newVal: { "[object Object]": "test" },
@@ -1967,14 +1976,14 @@ describe("Model", () => {
 
     //         logs = [];
     //         model.key = {};
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([]);
     //       });
 
     //       it("should not trigger change when object in collection changes", () => {
     //         model.key = "a";
     //         model.obj = { name: "foo" };
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([
     //           {
     //             newVal: { a: { name: "foo" } },
@@ -1985,7 +1994,7 @@ describe("Model", () => {
     //         logs = [];
 
     //         model.obj.name = "bar";
-    //         model.$digest();
+    //
     //         expect(logs).toEqual([]);
     //       });
 
@@ -1993,7 +2002,7 @@ describe("Model", () => {
     //         model.key = NaN;
     //         model.obj = NaN;
     //         expect(() => {
-    //           model.$digest();
+    //
     //         }).not.toThrow();
     //       });
     //     });
@@ -2005,7 +2014,7 @@ describe("Model", () => {
     //     const watchSpy = jasmine.createSpy("watchSpy");
     //     model.$watch(watchSpy);
     //     model.$suspend();
-    //     model.$digest();
+    //
     //     expect(watchSpy).not.toHaveBeenCalled();
     //   });
 
@@ -2014,7 +2023,7 @@ describe("Model", () => {
     //     model.$watch(watchSpy);
     //     model.$suspend();
     //     model.$resume();
-    //     model.$digest();
+    //
     //     expect(watchSpy).toHaveBeenCalled();
     //   });
 
@@ -2023,7 +2032,7 @@ describe("Model", () => {
     //     const scope = model.$new(true);
     //     scope.$watch(watchSpy);
     //     model.$suspend();
-    //     model.$digest();
+    //
     //     expect(watchSpy).not.toHaveBeenCalled();
     //   });
 
@@ -2033,7 +2042,7 @@ describe("Model", () => {
     //     scope.$watch(watchSpy);
     //     model.$suspend();
     //     model.$resume();
-    //     model.$digest();
+    //
     //     expect(watchSpy).toHaveBeenCalled();
     //   });
 
@@ -2100,7 +2109,7 @@ describe("Model", () => {
     //     sibling.$watch(watchSpySibling);
 
     //     child.$suspend();
-    //     model.$digest();
+    //
     //     expect(watchSpyParent).toHaveBeenCalled();
     //     expect(watchSpyChild).not.toHaveBeenCalled();
     //     expect(watchSpySibling).toHaveBeenCalled();
@@ -2149,14 +2158,14 @@ describe("Model", () => {
     //   beforeEach(() => (logs = []));
     //   it("should check watches only once during an empty digest", () => {
     //     setupWatches(model, console.log);
-    //     model.$digest();
+    //
     //     expect(logs).toEqual(["w1", "w2", "w3"]);
     //   });
 
     //   it("should quit digest early after we check the last watch that was previously dirty", () => {
     //     setupWatches(model, console.log);
     //     model.w1 = "x";
-    //     model.$digest();
+    //
     //     expect(logs).toEqual(["w1", "w2", "w3", "w1"]);
     //   });
 
@@ -2178,7 +2187,7 @@ describe("Model", () => {
     //         );
     //       },
     //     );
-    //     model.$digest();
+    //
     //     expect(logs).toEqual([
     //       "w1",
     //       "w2",
@@ -2209,7 +2218,7 @@ describe("Model", () => {
     //         });
     //       },
     //     );
-    //     model.$digest();
+    //
     //     expect(logs).toEqual([
     //       "w1",
     //       "w2",
@@ -2237,12 +2246,12 @@ describe("Model", () => {
     //       },
     //     );
 
-    //     model.$digest();
+    //
     //     logs = [];
 
     //     model.w1 = "x";
     //     model.w4 = "x";
-    //     model.$digest();
+    //
     //     expect(logs).toEqual([
     //       "w1",
     //       "w2",
@@ -2353,7 +2362,7 @@ describe("Model", () => {
           model.counter++;
         },
       );
-      model.$digest();
+
       expect(model.counter).toBe(1);
       model.$apply(function (model) {
         model.aValue = "someOtherValue";
@@ -2412,7 +2421,7 @@ describe("Model", () => {
     //       model.$watch(() => {
     //         log += "$digest;";
     //       });
-    //       model.$digest();
+    //
     //       log = "";
     //     });
 
@@ -2562,14 +2571,14 @@ describe("Model", () => {
   //     const expression = jasmine.createSpy("expr");
 
   //     model.$applyAsync(expression);
-  //     model.$digest();
+  //
   //     expect(expression).toHaveBeenCalled();
   //     expect(cancel).toHaveBeenCalled();
   //     expression.calls.reset();
   //     cancel.calls.reset();
 
   //     // assert that another digest won't call the function again
-  //     model.$digest();
+  //
   //     expect(expression).not.toHaveBeenCalled();
   //     expect(cancel).not.toHaveBeenCalled();
   //   });
@@ -2596,7 +2605,7 @@ describe("Model", () => {
   //     });
 
   //     expect(signature).toBe("");
-  //     model.$digest();
+  //
   //     expect(signature).toBe("ABCD");
   //   });
 
@@ -2618,7 +2627,7 @@ describe("Model", () => {
   //     });
 
   //     expect(signature).toBe("");
-  //     model.$digest();
+  //
   //     expect(signature).toBe("ABCD");
   //   });
 
@@ -2640,7 +2649,7 @@ describe("Model", () => {
   //     });
 
   //     expect(count).toBe(0);
-  //     model.$digest();
+  //
   //     expect(count).toBe(3);
   //   });
 
@@ -2658,7 +2667,7 @@ describe("Model", () => {
   //     });
 
   //     expect(signature).toBe("");
-  //     model.$digest();
+  //
   //     expect(signature).toBe("AB");
   //   });
   // });
