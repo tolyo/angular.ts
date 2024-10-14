@@ -150,6 +150,7 @@ class Handler {
    * @returns {boolean} - Returns true to indicate success of the operation.
    */
   set(target, property, value) {
+    debugger;
     if (property === "getWatchFunction") {
       return true;
     }
@@ -393,22 +394,11 @@ class Handler {
   }
 
   /**
+   * @deprecated
    * Invokes all registered listener functions for any watched properties.
    */
   $digest() {
-    this.listeners.forEach((listenerList) => {
-      let index = 0;
-      while (index < listenerList.length) {
-        const { listenerFn } = listenerList[index];
-        listenerFn(this.$target);
-        index++;
-      }
-    });
-
-    while (this.$$asyncQueue.length) {
-      const x = this.$$asyncQueue.shift();
-      x.fn(x.handler, x.locals);
-    }
+    throw new Error("$Digest is deprecated");
   }
 
   $eval(expr, locals) {
@@ -416,37 +406,18 @@ class Handler {
   }
 
   $evalAsync(expr, locals) {
-    // if we are outside of an $digest loop and this is the first time we are scheduling async
-    // task also schedule async auto-flush
-    // let id;
-    // if (!$$asyncQueue.length) {
-    //   id = $browser.defer(
-    //     () => {
-    //       if ($$asyncQueue.length) {
-    //         this.$root.$digest();
-    //       }
-    //     },
-    //     null,
-    //     "$evalAsync",
-    //   );
-    // }
-
-    this.$$asyncQueue.push({
-      handler: this,
-      fn: $parse(expr),
-      locals,
-    });
-
-    //return id;
+    Promise.resolve().then(() => this.$eval(expr, locals));
   }
 
   $apply(expr) {
     try {
-      return this.$eval(expr);
+      const clone = structuredClone(this.target);
+      $parse(expr)(clone);
+      Object.entries(clone).forEach(([key, value]) => {
+        this.proxy[key] = value;
+      });
     } catch (e) {
       $exceptionHandler(e);
-    } finally {
-      this.retry();
     }
   }
 

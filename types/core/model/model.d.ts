@@ -131,12 +131,13 @@ declare class Handler {
     registerKey(key: any, listener: any): void;
     deregisterKey(key: any, id: any): boolean;
     /**
+     * @deprecated
      * Invokes all registered listener functions for any watched properties.
      */
     $digest(): void;
     $eval(expr: any, locals: any): any;
     $evalAsync(expr: any, locals: any): void;
-    $apply(expr: any): any;
+    $apply(expr: any): void;
     $applyAsync(expr: any): void;
     /**
      * @private
