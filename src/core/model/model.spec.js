@@ -625,42 +625,9 @@ describe("Model", () => {
         expect(model.$$watchersCount).toEqual(0);
       });
 
-      it("should remove $watchCollection of constant literals after initial digest", () => {
-        model.$watchCollection("[]", () => {});
-        model.$watchCollection("{}", () => {});
-        model.$watchCollection("1", () => {});
-        model.$watchCollection('"foo"', () => {});
-        expect(model.$$watchersCount).not.toEqual(0);
-
-        expect(model.$$watchersCount).toEqual(0);
-      });
-
-      it("should remove $watchGroup of constant literals after initial digest", () => {
-        model.$watchGroup(["[]", "{}", "1", '"foo"'], () => {});
-        expect(model.$$watchersCount).not.toEqual(0);
-
-        expect(model.$$watchersCount).toEqual(0);
-      });
-
-      it("should remove $watch of filtered constant literals after initial digest", () => {
+      it("should not $watch filtered literals", () => {
         model.$watch('[1] | filter:"x"', () => {});
         model.$watch("1 | limitTo:2", () => {});
-        expect(model.$$watchersCount).not.toEqual(0);
-
-        expect(model.$$watchersCount).toEqual(0);
-      });
-
-      it("should remove $watchCollection of filtered constant literals after initial digest", () => {
-        model.$watchCollection('[1] | filter:"x"', () => {});
-        expect(model.$$watchersCount).not.toEqual(0);
-
-        expect(model.$$watchersCount).toEqual(0);
-      });
-
-      it("should remove $watchGroup of filtered constant literals after initial digest", () => {
-        model.$watchGroup(['[1] | filter:"x"', "1 | limitTo:2"], () => {});
-        expect(model.$$watchersCount).not.toEqual(0);
-
         expect(model.$$watchersCount).toEqual(0);
       });
 

@@ -257,20 +257,20 @@ class Handler {
    * @param {*} newValue
    */
   scheduleListener(listeners, oldValue, newValue) {
-    //Promise.resolve().then(() => {
-    let index = 0;
-    while (index < listeners.length) {
-      const listener = listeners[index];
-      this.notifyListener(listener, oldValue, newValue);
-      if (
-        listener.oneTime &&
-        this.deregisterKey(listener.property, listener.id)
-      ) {
-        this.incrementWatchersCount(-1);
+    Promise.resolve().then(() => {
+      let index = 0;
+      while (index < listeners.length) {
+        const listener = listeners[index];
+        this.notifyListener(listener, oldValue, newValue);
+        if (
+          listener.oneTime &&
+          this.deregisterKey(listener.property, listener.id)
+        ) {
+          this.incrementWatchersCount(-1);
+        }
+        index++;
       }
-      index++;
-    }
-    //});
+    });
   }
 
   deleteProperty(target, property) {
