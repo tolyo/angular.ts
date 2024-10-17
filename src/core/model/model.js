@@ -101,7 +101,7 @@ class Handler {
    */
   constructor(target, context) {
     /** @type {Object} */
-    this.target = target;
+    this.$target = target;
 
     /** @type {Map<string, Array<Listener>>} */
     this.listeners = context ? context.listeners : new Map();
@@ -148,28 +148,25 @@ class Handler {
    * @param {*} value - The new value being assigned to the property.
    * @returns {boolean} - Returns true to indicate success of the operation.
    */
-  set(target, property, value) {
-    if (property === "getWatchFunction") {
-      return true;
-    }
+  set(target, property, value, proxy) {
+    this.proxy = proxy;
     const oldValue = target[property];
     if (oldValue && oldValue[isProxySymbol]) {
-      if (Array.isArray(value) || isObject(value)) {
+      if (Array.isArray(value)) {
         target[property] = value;
         return true;
       }
+      if (isObject(value)) {
+        if (Object.prototype.hasOwnProperty.call(target, property)) {
+          Object.keys(oldValue)
+            .filter((x) => !value[x])
+            .forEach((k) => {
+              delete oldValue[k];
+            });
+        }
 
-      if (value) {
-        const keys = Object.keys(value);
-        Object.keys(oldValue.$target).forEach((k) => {
-          if (!keys.includes(k)) {
-            delete oldValue[k];
-          }
-        });
-
-        keys.forEach((key) => {
-          oldValue[key] = value[key];
-        });
+        target[property] = createModel({}, this);
+        setDeepValue(target[property], value);
         return true;
       }
 
@@ -179,8 +176,6 @@ class Handler {
         });
         return true;
       }
-
-      return true;
     } else {
       if (
         oldValue !== undefined &&
@@ -191,6 +186,7 @@ class Handler {
       }
 
       target[property] = createModel(value, this);
+
       if (oldValue !== value) {
         const listeners = this.listeners.get(property);
 
@@ -198,13 +194,14 @@ class Handler {
           this.scheduleListener(listeners, oldValue, value);
         }
       }
+
       // Right now this is only for Arrays
       if (this.objectListeners.has(target) && property !== "length") {
         let keys = this.objectListeners.get(target);
         keys.forEach((key) => {
           const listeners = this.listeners.get(key);
           if (listeners) {
-            this.scheduleListener(listeners, oldValue, this.target);
+            this.scheduleListener(listeners, oldValue, this.$target);
           }
         });
       }
@@ -235,7 +232,7 @@ class Handler {
       $evalAsync: this.$evalAsync.bind(this),
       $postUpdate: this.$postUpdate.bind(this),
       $isRoot: this.isRoot.bind(this),
-      $target: this.$target(),
+      $target: this.$target,
       $digest: this.$digest.bind(this),
       $handler: this,
       $id: this.$id,
@@ -284,7 +281,7 @@ class Handler {
           this.scheduleListener(
             listeners,
             oldValue,
-            Array.isArray(this.target) ? this.target : undefined,
+            Array.isArray(this.$target) ? this.$target : undefined,
           );
         }
       });
@@ -298,14 +295,6 @@ class Handler {
   }
 
   /**
-   * Returns the underlying object being wrapped by the Proxy
-   * @returns {any}
-   */
-  $target() {
-    return this.target;
-  }
-
-  /**
    * Registers a watcher for a property along with a listener function. The listener
    * function is invoked when changes to that property are detected.
    *
@@ -315,7 +304,7 @@ class Handler {
   $watch(watchProp, listenerFn) {
     const get = $parse(watchProp);
     if (get.constant) {
-      Promise.resolve().then(listenerFn(this.target));
+      Promise.resolve().then(listenerFn(this.$target));
       return () => {};
     }
 
@@ -324,7 +313,7 @@ class Handler {
 
     /** @type {Listener} */
     const listener = {
-      originalTarget: this.target,
+      originalTarget: this.$target,
       listenerFn: listenerFn,
       id: nextUid(),
       oneTime: get.oneTime,
@@ -332,7 +321,7 @@ class Handler {
     };
 
     this.registerKey(key, listener);
-    let watchedValue = get(this.target);
+    let watchedValue = get(this.$target);
     const value =
       watchedValue && watchedValue[isProxySymbol]
         ? watchedValue.$target
@@ -364,7 +353,7 @@ class Handler {
     if (isIsolated) {
       child = Object.create(null);
     } else {
-      child = Object.create(this.target);
+      child = Object.create(this.$target);
       child.$$watchersCount = 0;
       child.$parent = parent ? parent.$handler : this.$parent;
     }
@@ -406,7 +395,7 @@ class Handler {
   }
 
   $eval(expr, locals) {
-    return $parse(expr)(this.target, locals);
+    return $parse(expr)(this.$target, locals);
   }
 
   async $evalAsync(expr, locals) {
@@ -502,4 +491,17 @@ function getProperty(fn) {
 
   fn(new Proxy({}, handler));
   return path.pop();
+}
+
+function setDeepValue(model, obj) {
+  for (const key in obj) {
+    if (isObject(obj[key]) && !Array.isArray(obj[key])) {
+      if (!isObject(model[key])) {
+        model[key] = {};
+      }
+      setDeepValue(model[key], obj[key]);
+    } else {
+      model[key] = obj[key];
+    }
+  }
 }

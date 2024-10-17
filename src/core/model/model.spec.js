@@ -122,14 +122,12 @@ describe("Model", () => {
 
     it("cannot override a parent models property", () => {
       const child = model.$new();
-
       model.aValue = [1, 2, 3];
       child.aValue = [1, 2, 3, 4];
       model.bValue = { a: 1 };
       child.bValue = { b: 2 };
       model.cValue = 1;
       child.cValue = 2;
-
       expect(model.aValue).toEqual([1, 2, 3]);
       expect(child.aValue).toEqual([1, 2, 3, 4]);
       expect(model.bValue).toEqual({ a: 1 });
@@ -230,14 +228,15 @@ describe("Model", () => {
   });
 
   describe("$watch", () => {
-    it("can register listeners via watch", () => {
+    it("can register listeners via watch", async () => {
       var listenerFn = jasmine.createSpy();
       model.$watch((o) => o.a, listenerFn);
       model.a = 1;
+      await wait();
       expect(listenerFn).toHaveBeenCalled();
     });
 
-    it("should return a deregistration function watch", async () => {
+    it("should return a deregistration function watch", () => {
       let fn = model.$watch(
         () => {},
         () => {},
@@ -342,7 +341,7 @@ describe("Model", () => {
       expect(model.counter).toBe(2);
     });
 
-    it("calls only the listeners registerred at the moment the watched value changes", () => {
+    it("calls only the listeners registerred at the moment the watched value changes", async () => {
       model.someValue = "a";
       model.counter = 0;
 
@@ -353,15 +352,17 @@ describe("Model", () => {
       expect(model.counter).toBe(0);
 
       model.someValue = "b";
+      await wait();
       expect(model.counter).toBe(1);
 
-      model.someValue = "b";
       model.$watch(
         (m) => m.someValue,
         () => {
           model.counter++;
         },
       );
+      model.someValue = "b";
+      await wait();
 
       expect(model.counter).toBe(1);
     });
@@ -506,7 +507,7 @@ describe("Model", () => {
       expect(watchFn).toHaveBeenCalledWith(model);
     });
 
-    it("calls the listener function when the watched value changes", function () {
+    it("calls the listener function when the watched value changes", async () => {
       model.someValue = "a";
       model.counter = 0;
       model.$watch(
@@ -520,13 +521,15 @@ describe("Model", () => {
       expect(model.counter).toBe(0);
 
       model.someValue = "1";
+      await wait();
       expect(model.counter).toBe(1);
 
       model.someValue = "2";
+      await wait();
       expect(model.counter).toBe(2);
     });
 
-    it("should watch and fire on simple property change", () => {
+    it("should watch and fire on simple property change", async () => {
       const spy = jasmine.createSpy();
       model.$watch("name", spy);
 
@@ -534,7 +537,7 @@ describe("Model", () => {
 
       expect(spy).not.toHaveBeenCalled();
       model.name = "misko";
-
+      await wait();
       expect(spy).toHaveBeenCalledWith("misko", undefined, model);
     });
 
@@ -939,7 +942,8 @@ describe("Model", () => {
         model.$watch("foo", watch1);
         model.$watch("foo", watch2);
       });
-
+      model.foo = "a";
+      await wait();
       expect(watch1).toHaveBeenCalled();
       expect(watch2).toHaveBeenCalled();
     });
@@ -1048,11 +1052,10 @@ describe("Model", () => {
         let listenerRemove;
 
         listenerRemove = model.$watch("foo", listener);
-        // init
-        expect(listener).toHaveBeenCalled();
+
+        expect(listener).not.toHaveBeenCalled();
         expect(listenerRemove).toBeDefined();
 
-        listener.calls.reset();
         model.foo = "bar";
         await wait();
         expect(listener).toHaveBeenCalled();
@@ -1230,7 +1233,7 @@ describe("Model", () => {
 
         model.$watch(
           (obj) => obj.someValue.b,
-          async () => {
+          () => {
             model.counter++;
           },
         );
@@ -1315,12 +1318,12 @@ describe("Model", () => {
 
         expect(model.counter).toBe(0);
 
-        model.someValue = { b: { c: { d: 2 } } };
+        model.someValue.b.c.d = 2;
         await wait();
 
         expect(model.counter).toBe(1);
 
-        model.someValue.b.c.d = 3;
+        model.someValue = { b: { c: { d: 3 } } };
         await wait();
 
         expect(model.counter).toBe(2);
@@ -2318,7 +2321,7 @@ describe("Model", () => {
       expect(model.a.b).toBeUndefined();
     });
 
-    it("executes $apply'ed function and starts the digest", function () {
+    it("executes $apply'ed function and starts the digest", async function () {
       model.aValue = "someValue";
       model.counter = 0;
       model.$watch(
@@ -2329,12 +2332,14 @@ describe("Model", () => {
           model.counter++;
         },
       );
+      expect(model.counter).toBe(0);
 
-      expect(model.counter).toBe(1);
       model.$apply(function (model) {
         model.aValue = "someOtherValue";
       });
-      expect(model.counter).toBe(2);
+      await wait();
+
+      expect(model.counter).toBe(1);
     });
 
     //   it("should apply expression with full lifecycle", () => {
@@ -3226,12 +3231,12 @@ describe("Model", () => {
   // });
 
   describe("doc examples", () => {
-    it("should properly fire off watch listeners upon scope changes", () => {
+    it("should properly fire off watch listeners upon scope changes", async () => {
       // <docs tag="docs1">
       const scope = model.$new();
       scope.salutation = "Hello";
       scope.name = "World";
-
+      await wait();
       expect(scope.greeting).toEqual(undefined);
 
       scope.$watch("name", () => {
@@ -3241,6 +3246,7 @@ describe("Model", () => {
       expect(scope.greeting).toEqual(undefined);
       expect(scope.greeting).toEqual(undefined);
       scope.name = "Misko";
+      await wait();
       expect(scope.greeting).toEqual("Hello Misko!");
     });
   });

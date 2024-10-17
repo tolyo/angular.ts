@@ -21,7 +21,7 @@ export const $postUpdateQueue: any[];
 export const $$applyAsyncQueue: Function[];
 export class RootModelProvider {
     rootModel: any;
-    $get: (string | ((exceptionHandler: import("../exception-handler").ErrorHandler, parse: import("../parser/parse").ParseService, browser: import("../../services/browser").Browser) => any))[];
+    $get: (string | ((exceptionHandler: import("../exception-handler").ErrorHandler, parse: import("../parser/parse").ParseService) => any))[];
 }
 export type AsyncQueueTask = {
     handler: Handler;
@@ -62,7 +62,7 @@ declare class Handler {
      */
     constructor(target: any, context?: Handler);
     /** @type {Object} */
-    target: any;
+    $target: any;
     /** @type {Map<string, Array<Listener>>} */
     listeners: Map<string, Array<Listener>>;
     /** @type {WeakMap<Object, Array<string>>} */
@@ -71,6 +71,10 @@ declare class Handler {
     listenerCache: number | null;
     /** @type {Proxy} */
     proxy: ProxyConstructor;
+    /**
+     * @type {Proxy[]}
+     */
+    children: ProxyConstructor[];
     /**
      * @type {number} Unique model ID (monotonically increasing) useful for debugging.
      */
@@ -93,7 +97,7 @@ declare class Handler {
      * @param {*} value - The new value being assigned to the property.
      * @returns {boolean} - Returns true to indicate success of the operation.
      */
-    set(target: any, property: string, value: any): boolean;
+    set(target: any, property: string, value: any, proxy: any): boolean;
     /**
      * Intercepts property access on the target object. It checks for specific
      * properties (`watch` and `sync`) and binds their methods. For other properties,
@@ -114,11 +118,6 @@ declare class Handler {
     private scheduleListener;
     deleteProperty(target: any, property: any): boolean;
     /**
-     * Returns the underlying object being wrapped by the Proxy
-     * @returns {any}
-     */
-    $target(): any;
-    /**
      * Registers a watcher for a property along with a listener function. The listener
      * function is invoked when changes to that property are detected.
      *
@@ -136,6 +135,11 @@ declare class Handler {
     $eval(expr: any, locals: any): any;
     $evalAsync(expr: any, locals: any): Promise<any>;
     $apply(expr: any): any;
+    /**
+     * @private
+     * @returns {boolean}
+     */
+    private isRoot;
     $applyAsync(expr: any): Promise<any>;
     /**
      * @private
