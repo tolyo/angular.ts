@@ -4,39 +4,40 @@
       <meta charset="utf-8">
       <title>AngularTS</title>
       <link rel="shortcut icon" type="image/png" href="images/favicon.ico">
-      <script src="./dist/angular-ts.umd.js"></script>
-      <script>
-        class Todo {
-          constructor(task) {
-            this.task = task;
-            this.done = false;
+      <script type="module" src="/src/index.js"></script>
+      <script> document.addEventListener("DOMContentLoaded", () => {
+          class Todo {
+            constructor(task) {
+              this.task = task;
+              this.done = false;
+            }
           }
-        }
-        class TodoController {
-          constructor() {
-            this.tasks = [
-              new Todo("Learn AngularTS"),
-              new Todo("Build an AngularTS app"),
-            ];
-          }
+          class TodoController {
+            constructor() {
+              this.tasks = [
+                new Todo("Learn AngularTS"),
+                new Todo("Build an AngularTS app"),
+              ];
+            }
 
-          /**
-           * @param {String} task
-           * @return {void}
-           */
-          add(task) {
-            this.tasks.push(new Todo(task));
-          }
+            /**
+             * @param {String} task
+             * @return {void}
+             */
+            add(task) {
+              this.tasks.push(new Todo(task));
+            }
 
-          /**
-           * Delete all finished tasks
-           * @return {void}
-           */
-          archive() {
-            this.tasks = this.tasks.filter((task) => !task.done);
+            /**
+             * Delete all finished tasks
+             * @return {void}
+             */
+            archive() {
+              this.tasks = this.tasks.filter((task) => !task.done);
+            }
           }
-        }
-        window.angular.module("todo", []).controller("TodoCtrl", TodoController);
+          window.angular.module("todo", []).controller("TodoCtrl", TodoController);
+        });
       </script>
     </head>
     <body ng-app="todo" ng-cloak>

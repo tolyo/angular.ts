@@ -225,6 +225,7 @@ class Handler {
     if (property === isProxySymbol) return true;
     const propertyMap = {
       $watch: this.$watch.bind(this),
+      $watchGroup: this.$watchGroup.bind(this),
       $new: this.$new.bind(this),
       $destroy: this.$destroy.bind(this),
       $eval: this.$eval.bind(this),
@@ -346,6 +347,10 @@ class Handler {
         this.incrementWatchersCount(-1);
       }
     };
+  }
+
+  $watchGroup(watchArray, listenerFn) {
+    watchArray.forEach((x) => this.$watch(x, listenerFn));
   }
 
   $new(isIsolated = false, parent) {

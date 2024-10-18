@@ -8,6 +8,7 @@ describe("Model", () => {
   let $parse;
   let logs;
   let $rootModel;
+  let injector;
 
   beforeEach(() => {
     logs = [];
@@ -22,7 +23,7 @@ describe("Model", () => {
         };
       });
 
-    let injector = createInjector(["myModule"]);
+    injector = createInjector(["myModule"]);
     $parse = injector.get("$parse");
     $rootModel = injector.get("$rootModel");
     model = $rootModel;
@@ -660,53 +661,57 @@ describe("Model", () => {
         expect(count).toEqual(1);
       });
 
-      // it("should clean up stable watches from $watchCollection", () => {
-      //   model.$watchCollection("::foo", () => {});
-      //   expect(model.$$watchersCount).toEqual(1);
+      it("should clean up stable watches from $watch collection", async () => {
+        let count = 0;
+        model.$watch("::foo", () => {
+          count++;
+        });
+        expect(model.$$watchersCount).toEqual(1);
 
-      //
-      //   expect(model.$$watchersCount).toEqual(1);
+        model.foo = [];
 
-      //   model.foo = [];
-      //
-      //   expect(model.$$watchersCount).toEqual(0);
-      // });
+        await wait();
+        expect(count).toEqual(1);
+        expect(model.$$watchersCount).toEqual(0);
+      });
 
-      // it("should clean up stable watches from $watchCollection literals", () => {
-      //   model.$watchCollection("::[foo, bar]", () => {});
-      //   expect(model.$$watchersCount).toEqual(1);
+      it("should clean up stable watches from $watch array literals", async () => {
+        let count = 0;
+        model.$watch("::[foo, bar]", () => {
+          count++;
+        });
+        expect(model.$$watchersCount).toEqual(1);
 
-      //
-      //   expect(model.$$watchersCount).toEqual(1);
+        expect(model.$$watchersCount).toEqual(1);
+        expect(count).toEqual(0);
 
-      //   model.foo = 1;
-      //
-      //   expect(model.$$watchersCount).toEqual(1);
+        model.foo = 1;
+        await wait();
+        expect(count).toEqual(0);
+        expect(model.$$watchersCount).toEqual(1);
 
-      //   model.foo = 2;
-      //
-      //   expect(model.$$watchersCount).toEqual(1);
+        model.foo = 2;
+        await wait();
+        expect(count).toEqual(0);
+        expect(model.$$watchersCount).toEqual(1);
 
-      //   model.bar = 3;
-      //
-      //   expect(model.$$watchersCount).toEqual(0);
-      // });
+        model.bar = 3;
+        await wait();
+        expect(count).toEqual(1);
+        expect(model.$$watchersCount).toEqual(0);
+      });
 
-      // it("should clean up stable watches from $watchGroup", () => {
-      //   model.$watchGroup(["::foo", "::bar"], () => {});
-      //   expect(model.$$watchersCount).toEqual(2);
+      it("should clean up stable watches from $watchGroup", async () => {
+        model.$watchGroup(["::foo", "::bar"], () => {});
+        expect(model.$$watchersCount).toEqual(2);
+        model.foo = "foo";
+        await wait();
+        expect(model.$$watchersCount).toEqual(1);
 
-      //
-      //   expect(model.$$watchersCount).toEqual(2);
-
-      //   model.foo = "foo";
-      //
-      //   expect(model.$$watchersCount).toEqual(1);
-
-      //   model.bar = "bar";
-      //
-      //   expect(model.$$watchersCount).toEqual(0);
-      // });
+        model.bar = "bar";
+        await wait();
+        expect(model.$$watchersCount).toEqual(0);
+      });
     });
 
     it("should delegate exceptions", async () => {
@@ -832,34 +837,6 @@ describe("Model", () => {
       expect(logs).toEqual("abab");
     });
 
-    // it("should prevent infinite loop when creating and resolving a promise in a watched expression", () => {
-    //   () => {
-    //     const d = $q.defer();
-
-    //     d.resolve("Hello, world.");
-    //     model.$watch(
-    //       () => {
-    //         const $d2 = $q.defer();
-    //         $d2.resolve("Goodbye.");
-    //         $d2.promise.then(() => {});
-    //         return d.promise;
-    //       },
-    //       () => 0,
-    //     );
-
-    //     expect(() => {
-    //
-    //     }).toThrow(
-    //       "model",
-    //       "infdig",
-    //       "10 $digest() iterations reached. Aborting!\n" +
-    //         "Watchers fired in the last 5 iterations: []",
-    //     );
-
-    //     expect(model.$$phase).toBeNull();
-    //   });
-    // });
-
     it("should not fire upon $watch registration on initial registeration", async () => {
       logs = "";
       model.a = 1;
@@ -911,7 +888,7 @@ describe("Model", () => {
       expect(logs).toEqual(["a", "b"]);
     });
 
-    it("should prevent $digest recursion", async () => {
+    it("should prevent $watch recursion", async () => {
       let callCount = 0;
       model.$watch("name", () => {
         callCount++;
@@ -961,90 +938,6 @@ describe("Model", () => {
       expect(watch2).toHaveBeenCalled();
     });
 
-    // it("should not run the current watcher twice when removing a watcher during digest", () => {
-    //   let removeWatcher3;
-
-    //   const watchFn3 = function () {
-    //     logs.push(3);
-    //   };
-    //   const watchFn2 = function () {
-    //     logs.push(2);
-    //   };
-    //   const watchFn1 = function () {
-    //     logs.push(1);
-    //   };
-    //   const removeWatcherOnce = function (newValue, oldValue) {
-    //     if (newValue === oldValue) {
-    //       removeWatcher3();
-    //     }
-    //   };
-
-    //   model.$watch(watchFn1, removeWatcherOnce);
-    //   model.$watch(watchFn2);
-    //   removeWatcher3 = model.$watch(watchFn3);
-
-    //
-
-    //   expect(logs).toEqual([1, 2, 1, 2]);
-    // });
-
-    // it("should not skip watchers when removing itself during digest", () => {
-    //   let removeWatcher1;
-
-    //   const watchFn3 = function () {
-    //     logs.push(3);
-    //   };
-    //   const watchFn2 = function () {
-    //     logs.push(2);
-    //   };
-    //   const watchFn1 = function () {
-    //     logs.push(1);
-    //   };
-    //   const removeItself = function () {
-    //     removeWatcher1();
-    //   };
-
-    //   removeWatcher1 = model.$watch(watchFn1, removeItself);
-    //   model.$watch(watchFn2);
-    //   model.$watch(watchFn3);
-
-    //
-
-    //   expect(logs).toEqual([1, 2, 3, 2, 3]);
-    // });
-
-    // it("should not infinitely digest when current value is NaN", () => {
-    //   model.$watch(() => NaN);
-
-    //   expect(() => {
-    //
-    //   }).not.toThrow();
-    // });
-
-    // it("should always call the watcher with newVal and oldVal equal on the first run", () => {
-    //   function logger(scope, newVal, oldVal) {
-    //     const val =
-    //       newVal === oldVal || (newVal !== oldVal && oldVal !== newVal)
-    //         ? newVal
-    //         : "xxx";
-    //     logs.push(val);
-    //   }
-
-    //   model.$watch(() => NaN, logger);
-    //   model.$watch(() => undefined, logger);
-    //   model.$watch(() => "", logger);
-    //   model.$watch(() => false, logger);
-    //   model.$watch(() => ({}), logger, true);
-    //   model.$watch(() => 23, logger);
-
-    //
-    //   expect(isNaN(logs.shift())).toBe(true); // jasmine's toBe and toEqual don't work well with NaNs
-    //   expect(logs).toEqual([undefined, "", false, {}, 23]);
-    //   logs = [];
-    //
-    //   expect(logs).toEqual([]);
-    // });
-
     describe("$watch deregistration", () => {
       beforeEach(() => (logs = []));
       it("should return a function that allows listeners to be deregistered", async () => {
@@ -1067,7 +960,7 @@ describe("Model", () => {
         expect(listener).not.toHaveBeenCalled();
       });
 
-      it("should allow a watch to be deregistered while in a digest", () => {
+      it("should allow a watch to be deregistered while in a digest", async () => {
         let remove1;
         let remove2;
         model.$watch("remove", () => {
@@ -1076,135 +969,11 @@ describe("Model", () => {
         });
         remove1 = model.$watch("thing", () => {});
         remove2 = model.$watch("thing", () => {});
-        expect(() => {
+        expect(async () => {
           model.$apply("remove = true");
+          await wait();
         }).not.toThrow();
       });
-
-      //   it("should not mess up the digest loop if deregistration happens during digest", () => {
-      //     // we are testing this due to regression #5525 which is related to how the digest loops lastDirtyWatch short-circuiting optimization works
-      //     // scenario: watch1 deregistering watch1
-      //     let scope = model.$new();
-      //     let deregWatch1 = scope.$watch(
-      //       () => {
-      //         logs.push("watch1");
-      //         return "watch1";
-      //       },
-      //       () => {
-      //         deregWatch1();
-      //         logs.push("watchAction1");
-      //       },
-      //     );
-      //     scope.$watch(
-      //       () => {
-      //         logs.push("watch2");
-      //         return "watch2";
-      //       },
-      //       () => logs.push("watchAction2"),
-      //     );
-      //     scope.$watch(
-      //       () => {
-      //         logs.push("watch3");
-      //         return "watch3";
-      //       },
-      //       () => logs.push("watchAction3"),
-      //     );
-
-      //
-
-      //     expect(logs).toEqual([
-      //       "watch1",
-      //       "watchAction1",
-      //       "watch2",
-      //       "watchAction2",
-      //       "watch3",
-      //       "watchAction3",
-      //       "watch2",
-      //       "watch3",
-      //     ]);
-      //     scope.$destroy();
-      //     logs = [];
-
-      //     // scenario: watch1 deregistering watch2
-      //     scope = model.$new();
-      //     scope.$watch(
-      //       () => {
-      //         logs.push("watch1");
-      //         return "watch1";
-      //       },
-      //       () => {
-      //         deregWatch2();
-      //         logs.push("watchAction1");
-      //       },
-      //     );
-      //     let deregWatch2 = scope.$watch(
-      //       () => {
-      //         logs.push("watch2");
-      //         return "watch2";
-      //       },
-      //       () => logs.push("watchAction2"),
-      //     );
-      //     scope.$watch(
-      //       () => {
-      //         logs.push("watch3");
-      //         return "watch3";
-      //       },
-      //       () => logs.push("watchAction3"),
-      //     );
-
-      //
-
-      //     expect(logs).toEqual([
-      //       "watch1",
-      //       "watchAction1",
-      //       "watch3",
-      //       "watchAction3",
-      //       "watch1",
-      //       "watch3",
-      //     ]);
-      //     scope.$destroy();
-      //     logs = [];
-
-      //     // scenario: watch2 deregistering watch1
-      //     scope = model.$new();
-      //     deregWatch1 = scope.$watch(
-      //       () => {
-      //         logs.push("watch1");
-      //         return "watch1";
-      //       },
-      //       () => logs.push("watchAction1"),
-      //     );
-      //     scope.$watch(
-      //       () => {
-      //         logs.push("watch2");
-      //         return "watch2";
-      //       },
-      //       () => {
-      //         deregWatch1();
-      //         logs.push("watchAction2");
-      //       },
-      //     );
-      //     scope.$watch(
-      //       () => {
-      //         logs.push("watch3");
-      //         return "watch3";
-      //       },
-      //       () => logs.push("watchAction3"),
-      //     );
-
-      //
-
-      //     expect(logs).toEqual([
-      //       "watch1",
-      //       "watchAction1",
-      //       "watch2",
-      //       "watchAction2",
-      //       "watch3",
-      //       "watchAction3",
-      //       "watch2",
-      //       "watch3",
-      //     ]);
-      //   });
     });
 
     describe("watching objects", () => {

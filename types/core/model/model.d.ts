@@ -125,6 +125,7 @@ declare class Handler {
      * @param {ListenerFunction} listenerFn - A function to execute when changes are detected.
      */
     $watch(watchProp: ((any: any) => any), listenerFn: ListenerFunction): () => void;
+    $watchGroup(watchArray: any, listenerFn: any): void;
     $new(isIsolated: boolean, parent: any): any;
     registerKey(key: any, listener: any): void;
     deregisterKey(key: any, id: any): boolean;
