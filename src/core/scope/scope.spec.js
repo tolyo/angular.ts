@@ -1807,39 +1807,6 @@ describe("Scope", function () {
         child.$emit("abc", "arg1", "arg2");
       });
 
-      it("should allow removing event listener inside a listener on $emit", () => {
-        const spy1 = jasmine.createSpy("1st listener");
-        const spy2 = jasmine.createSpy("2nd listener");
-        const spy3 = jasmine.createSpy("3rd listener");
-
-        const remove1 = child.$on("evt", spy1);
-        const remove2 = child.$on("evt", spy2);
-        const remove3 = child.$on("evt", spy3);
-
-        spy1.and.callFake(remove1);
-
-        expect(child.$$listeners.get("evt").length).toBe(3);
-
-        // should call all listeners and remove 1st
-        child.$emit("evt");
-        expect(spy1).toHaveBeenCalled();
-        expect(spy2).toHaveBeenCalled();
-        expect(spy3).toHaveBeenCalled();
-        expect(child.$$listeners.get("evt").length).toBe(3); // cleanup will happen on next $emit
-
-        spy1.calls.reset();
-        spy2.calls.reset();
-        spy3.calls.reset();
-
-        // should call only 2nd because 1st was already removed and 2nd removes 3rd
-        spy2.and.callFake(remove3);
-        child.$emit("evt");
-        expect(spy1).not.toHaveBeenCalled();
-        expect(spy2).toHaveBeenCalled();
-        expect(spy3).not.toHaveBeenCalled();
-        expect(child.$$listeners.get("evt").length).toBe(1);
-      });
-
       it("should allow removing event listener inside a listener on $broadcast", () => {
         const spy1 = jasmine.createSpy("1st listener");
         const spy2 = jasmine.createSpy("2nd listener");

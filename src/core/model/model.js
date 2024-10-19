@@ -450,11 +450,11 @@ class Handler {
   }
 
   $emit(name, ...args) {
-    this.eventHelper({ name: name, scope: undefined }, args);
+    this.eventHelper({ name: name, scope: undefined }, ...args);
   }
 
   $broadcast(name, ...args) {
-    this.eventHelper({ name: name, scope: undefined }, args);
+    this.eventHelper({ name: name, scope: undefined }, ...args);
   }
 
   eventHelper({ name, scope }, ...args) {
@@ -476,13 +476,21 @@ class Handler {
     };
     const listenerArgs = concat([event], [event].concat(args), 1);
     let listeners = this.$$listeners.get(name);
-    listeners.forEach((cb) => {
+    let length = listeners.length;
+    for (let i = 0; i < length; i++) {
       try {
+        let cb = listeners[i];
         cb.apply(null, listenerArgs);
+        if (listeners.length !== length) {
+          if (listeners.length < length) {
+            i--;
+          }
+          length = listeners.length;
+        }
       } catch (e) {
         $exceptionHandler(e);
       }
-    });
+    }
 
     // if any listener on the current scope stops propagation, prevent bubbling
     if (stopPropagation) {

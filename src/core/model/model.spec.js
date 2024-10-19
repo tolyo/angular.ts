@@ -2465,182 +2465,130 @@ describe("Model", () => {
         expect(logs).toEqual("XX");
       });
 
-      // describe("deregistration", () => {
-      //   it("should return a function that deregisters the listener", () => {
-      //     let log = "";
-      //     const child = model.$new();
-      //     let listenerRemove;
+      describe("deregistration", () => {
+        it("should return a function that deregisters the listener", () => {
+          let log = "";
+          const child = model.$new();
+          let listenerRemove;
 
-      //     function eventFn() {
-      //       log += "X";
-      //     }
+          function eventFn() {
+            log += "X";
+          }
 
-      //     listenerRemove = child.$on("abc", eventFn);
-      //     expect(log).toEqual("");
-      //     expect(listenerRemove).toBeDefined();
+          listenerRemove = child.$on("abc", eventFn);
+          expect(log).toEqual("");
+          expect(listenerRemove).toBeDefined();
 
-      //     child.$emit("abc");
-      //     child.$broadcast("abc");
-      //     expect(log).toEqual("XX");
-      //     expect(model.$$listenerCount.abc).toBe(1);
+          child.$emit("abc");
+          child.$broadcast("abc");
+          expect(log).toEqual("XX");
 
-      //     log = "";
-      //     listenerRemove();
-      //     child.$emit("abc");
-      //     child.$broadcast("abc");
-      //     expect(log).toEqual("");
-      //     expect(model.$$listenerCount.abc).toBeUndefined();
-      //   });
+          expect(child.$handler.$$listeners.get("abc").length).toBe(1);
 
-      //   // See issue https://github.com/angular/angular.js/issues/16135
-      //   it("should deallocate the listener array entry", () => {
-      //     const remove1 = model.$on("abc", () => {});
-      //     model.$on("abc", () => {});
+          log = "";
+          listenerRemove();
+          child.$emit("abc");
+          child.$broadcast("abc");
+          expect(log).toEqual("");
+          expect(model.$handler.$$listeners.get("abc")).toBeUndefined();
+        });
 
-      //     expect(model.$$listeners.get("abc").length).toBe(2);
-      //     expect(0 in model.$$listeners.get("abc")).toBe(true);
+        it("should deallocate the listener array entry", () => {
+          const remove1 = model.$on("abc", () => {});
+          model.$on("abc", () => {});
 
-      //     remove1();
+          expect(model.$handler.$$listeners.get("abc").length).toBe(2);
 
-      //     expect(model.$$listeners.get("abc").length).toBe(2);
-      //     expect(0 in model.$$listeners.get("abc")).toBe(false);
-      //   });
+          remove1();
 
-      //   it("should call next listener after removing the current listener via its own handler", () => {
-      //     const listener1 = jasmine.createSpy("listener1").and.callFake(() => {
-      //       remove1();
-      //     });
-      //     let remove1 = model.$on("abc", listener1);
+          expect(model.$handler.$$listeners.get("abc").length).toBe(1);
+        });
 
-      //     const listener2 = jasmine.createSpy("listener2");
-      //     const remove2 = model.$on("abc", listener2);
+        it("should call next listener after removing the current listener via its own handler", () => {
+          const listener1 = jasmine.createSpy("listener1").and.callFake(() => {
+            remove1();
+          });
+          let remove1 = model.$on("abc", listener1);
 
-      //     const listener3 = jasmine.createSpy("listener3");
-      //     const remove3 = model.$on("abc", listener3);
+          const listener2 = jasmine.createSpy("listener2");
+          const remove2 = model.$on("abc", listener2);
 
-      //     model.$broadcast("abc");
-      //     expect(listener1).toHaveBeenCalled();
-      //     expect(listener2).toHaveBeenCalled();
-      //     expect(listener3).toHaveBeenCalled();
+          const listener3 = jasmine.createSpy("listener3");
+          const remove3 = model.$on("abc", listener3);
 
-      //     listener1.calls.reset();
-      //     listener2.calls.reset();
-      //     listener3.calls.reset();
+          model.$broadcast("abc");
+          expect(listener1).toHaveBeenCalled();
+          expect(listener2).toHaveBeenCalled();
+          expect(listener3).toHaveBeenCalled();
 
-      //     model.$broadcast("abc");
-      //     expect(listener1).not.toHaveBeenCalled();
-      //     expect(listener2).toHaveBeenCalled();
-      //     expect(listener3).toHaveBeenCalled();
-      //   });
+          listener1.calls.reset();
+          listener2.calls.reset();
+          listener3.calls.reset();
 
-      //   it("should call all subsequent listeners when a previous listener is removed via a handler", () => {
-      //     const listener1 = jasmine.createSpy();
-      //     const remove1 = model.$on("abc", listener1);
+          model.$broadcast("abc");
+          expect(listener1).not.toHaveBeenCalled();
+          expect(listener2).toHaveBeenCalled();
+          expect(listener3).toHaveBeenCalled();
+        });
 
-      //     const listener2 = jasmine.createSpy().and.callFake(remove1);
-      //     const remove2 = model.$on("abc", listener2);
+        it("should call all subsequent listeners when a previous listener is removed via a handler", () => {
+          const listener1 = jasmine.createSpy();
+          const remove1 = model.$on("abc", listener1);
 
-      //     const listener3 = jasmine.createSpy();
-      //     const remove3 = model.$on("abc", listener3);
+          const listener2 = jasmine.createSpy().and.callFake(remove1);
+          const remove2 = model.$on("abc", listener2);
 
-      //     model.$broadcast("abc");
-      //     expect(listener1).toHaveBeenCalled();
-      //     expect(listener2).toHaveBeenCalled();
-      //     expect(listener3).toHaveBeenCalled();
+          const listener3 = jasmine.createSpy();
+          const remove3 = model.$on("abc", listener3);
 
-      //     listener1.calls.reset();
-      //     listener2.calls.reset();
-      //     listener3.calls.reset();
+          model.$broadcast("abc");
+          expect(listener1).toHaveBeenCalled();
+          expect(listener2).toHaveBeenCalled();
+          expect(listener3).toHaveBeenCalled();
 
-      //     model.$broadcast("abc");
-      //     expect(listener1).not.toHaveBeenCalled();
-      //     expect(listener2).toHaveBeenCalled();
-      //     expect(listener3).toHaveBeenCalled();
-      //   });
+          listener1.calls.reset();
+          listener2.calls.reset();
+          listener3.calls.reset();
 
-      //   it("should not call listener when removed by previous", () => {
-      //     const listener1 = jasmine.createSpy("listener1");
-      //     const remove1 = model.$on("abc", listener1);
+          model.$broadcast("abc");
+          expect(listener1).not.toHaveBeenCalled();
+          expect(listener2).toHaveBeenCalled();
+          expect(listener3).toHaveBeenCalled();
+        });
 
-      //     const listener2 = jasmine.createSpy("listener2").and.callFake(() => {
-      //       remove3();
-      //     });
-      //     const remove2 = model.$on("abc", listener2);
+        it("should not call listener when removed by previous", () => {
+          const listener1 = jasmine.createSpy("listener1");
+          const remove1 = model.$on("abc", listener1);
 
-      //     const listener3 = jasmine.createSpy("listener3");
-      //     let remove3 = model.$on("abc", listener3);
+          const listener2 = jasmine.createSpy("listener2").and.callFake(() => {
+            remove3();
+          });
+          const remove2 = model.$on("abc", listener2);
 
-      //     const listener4 = jasmine.createSpy("listener4");
-      //     const remove4 = model.$on("abc", listener4);
+          const listener3 = jasmine.createSpy("listener3");
+          let remove3 = model.$on("abc", listener3);
 
-      //     model.$broadcast("abc");
-      //     expect(listener1).toHaveBeenCalled();
-      //     expect(listener2).toHaveBeenCalled();
-      //     expect(listener3).not.toHaveBeenCalled();
-      //     expect(listener4).toHaveBeenCalled();
+          const listener4 = jasmine.createSpy("listener4");
+          const remove4 = model.$on("abc", listener4);
 
-      //     listener1.calls.reset();
-      //     listener2.calls.reset();
-      //     listener3.calls.reset();
-      //     listener4.calls.reset();
+          model.$broadcast("abc");
+          expect(listener1).toHaveBeenCalled();
+          expect(listener2).toHaveBeenCalled();
+          expect(listener3).not.toHaveBeenCalled();
+          expect(listener4).toHaveBeenCalled();
 
-      //     model.$broadcast("abc");
-      //     expect(listener1).toHaveBeenCalled();
-      //     expect(listener2).toHaveBeenCalled();
-      //     expect(listener3).not.toHaveBeenCalled();
-      //     expect(listener4).toHaveBeenCalled();
-      //   });
+          listener1.calls.reset();
+          listener2.calls.reset();
+          listener3.calls.reset();
+          listener4.calls.reset();
 
-      //   it("should decrement ancestor $$listenerCount entries", () => {
-      //     const child1 = model.$new();
-      //     const child2 = child1.$new();
-      //     const spy = jasmine.createSpy();
-
-      //     model.$on("event1", spy);
-      //     expect(model.$$listenerCount.event1).toEqual(1);
-
-      //     child1.$on("event1", spy);
-      //     expect(model.$$listenerCount.event1).toEqual(2);
-      //     expect(child1.$$listenerCount.event1).toEqual(1);
-
-      //     const deregisterEvent2Listener = child2.$on("event2", spy);
-      //     expect(model.$$listenerCount.event1).toEqual(2);
-      //     expect(model.$$listenerCount.event2).toEqual(1);
-      //     expect(child1.$$listenerCount.event1).toEqual(1);
-      //     expect(child1.$$listenerCount.event2).toEqual(1);
-      //     expect(child2.$$listenerCount.event2).toEqual(1);
-
-      //     deregisterEvent2Listener();
-
-      //     expect(model.$$listenerCount.event1).toEqual(2);
-      //     expect(child1.$$listenerCount.event1).toEqual(1);
-      //     expect(child2.$$listenerCount).toBeTruthy();
-      //   });
-
-      //   it("should not decrement $$listenerCount when called second time", () => {
-      //     const child = model.$new();
-      //     const listener1Spy = jasmine.createSpy();
-      //     const listener2Spy = jasmine.createSpy();
-
-      //     child.$on("abc", listener1Spy);
-      //     expect(model.$$listenerCount.abc).toEqual(1);
-      //     expect(child.$$listenerCount.abc).toEqual(1);
-
-      //     const deregisterEventListener = child.$on("abc", listener2Spy);
-      //     expect(model.$$listenerCount.abc).toEqual(2);
-      //     expect(child.$$listenerCount.abc).toEqual(2);
-
-      //     deregisterEventListener();
-
-      //     expect(model.$$listenerCount.abc).toEqual(1);
-      //     expect(child.$$listenerCount.abc).toEqual(1);
-
-      //     deregisterEventListener();
-
-      //     expect(model.$$listenerCount.abc).toEqual(1);
-      //     expect(child.$$listenerCount.abc).toEqual(1);
-      //   });
-      // });
+          model.$broadcast("abc");
+          expect(listener1).toHaveBeenCalled();
+          expect(listener2).toHaveBeenCalled();
+          expect(listener3).not.toHaveBeenCalled();
+          expect(listener4).toHaveBeenCalled();
+        });
+      });
     });
 
     describe("$emit", () => {
@@ -2692,108 +2640,108 @@ describe("Model", () => {
         expect(log).toEqual("2>1>0>");
       });
 
-      //     it("should allow all events on the same scope to run even if stopPropagation is called", () => {
-      //       child.$on("myEvent", logger);
-      //       grandChild.$on("myEvent", (e) => {
-      //         e.stopPropagation();
-      //       });
-      //       grandChild.$on("myEvent", logger);
-      //       grandChild.$on("myEvent", logger);
-      //       grandChild.$emit("myEvent");
-      //       expect(log).toEqual("2>2>2>");
-      //     });
+      it("should allow all events on the same scope to run even if stopPropagation is called", () => {
+        child.$on("myEvent", logger);
+        grandChild.$on("myEvent", (e) => {
+          e.stopPropagation();
+        });
+        grandChild.$on("myEvent", logger);
+        grandChild.$on("myEvent", logger);
+        grandChild.$emit("myEvent");
+        expect(log).toEqual("2>2>2>");
+      });
 
-      //     it("should dispatch exceptions to the $exceptionHandler", () => {
-      //       child.$on("myEvent", () => {
-      //         throw "bubbleException";
-      //       });
-      //       grandChild.$emit("myEvent");
-      //       expect(log).toEqual("2>1>0>");
-      //       expect(logs).toEqual(["bubbleException"]);
-      //     });
+      it("should dispatch exceptions to the $exceptionHandler", () => {
+        child.$on("myEvent", () => {
+          throw "bubbleException";
+        });
+        grandChild.$emit("myEvent");
+        expect(log).toEqual("2>1>0>");
+        expect(logs).toEqual(["bubbleException"]);
+      });
 
-      //     it("should allow stopping event propagation", () => {
-      //       child.$on("myEvent", (event) => {
-      //         event.stopPropagation();
-      //       });
-      //       grandChild.$emit("myEvent");
-      //       expect(log).toEqual("2>1>");
-      //     });
+      it("should allow stopping event propagation", () => {
+        child.$on("myEvent", (event) => {
+          event.stopPropagation();
+        });
+        grandChild.$emit("myEvent");
+        expect(log).toEqual("2>1>");
+      });
 
-      //     it("should forward method arguments", () => {
-      //       child.$on("abc", (event, arg1, arg2) => {
-      //         expect(event.name).toBe("abc");
-      //         expect(arg1).toBe("arg1");
-      //         expect(arg2).toBe("arg2");
-      //       });
-      //       child.$emit("abc", "arg1", "arg2");
-      //     });
+      it("should forward method arguments", () => {
+        child.$on("abc", (event, arg1, arg2) => {
+          expect(event.name).toBe("abc");
+          expect(arg1).toBe("arg1");
+          expect(arg2).toBe("arg2");
+        });
+        child.$emit("abc", "arg1", "arg2");
+      });
 
-      //     it("should allow removing event listener inside a listener on $emit", () => {
-      //       const spy1 = jasmine.createSpy("1st listener");
-      //       const spy2 = jasmine.createSpy("2nd listener");
-      //       const spy3 = jasmine.createSpy("3rd listener");
+      it("should allow removing event listener inside a listener on $emit", () => {
+        const spy1 = jasmine.createSpy("1st listener");
+        const spy2 = jasmine.createSpy("2nd listener");
+        const spy3 = jasmine.createSpy("3rd listener");
 
-      //       const remove1 = child.$on("evt", spy1);
-      //       const remove2 = child.$on("evt", spy2);
-      //       const remove3 = child.$on("evt", spy3);
+        const remove1 = child.$on("evt", spy1);
+        const remove2 = child.$on("evt", spy2);
+        const remove3 = child.$on("evt", spy3);
 
-      //       spy1.and.callFake(remove1);
+        spy1.and.callFake(remove1);
 
-      //       expect(child.$$listeners.get("evt").length).toBe(3);
+        expect(child.$handler.$$listeners.get("evt").length).toBe(3);
 
-      //       // should call all listeners and remove 1st
-      //       child.$emit("evt");
-      //       expect(spy1).toHaveBeenCalled();
-      //       expect(spy2).toHaveBeenCalled();
-      //       expect(spy3).toHaveBeenCalled();
-      //       expect(child.$$listeners.get("evt").length).toBe(3); // cleanup will happen on next $emit
+        // should call all listeners and remove 1st
+        child.$emit("evt");
+        expect(spy1).toHaveBeenCalled();
+        expect(spy2).toHaveBeenCalled();
+        expect(spy3).toHaveBeenCalled();
+        expect(child.$handler.$$listeners.get("evt").length).toBe(2);
 
-      //       spy1.calls.reset();
-      //       spy2.calls.reset();
-      //       spy3.calls.reset();
+        spy1.calls.reset();
+        spy2.calls.reset();
+        spy3.calls.reset();
 
-      //       // should call only 2nd because 1st was already removed and 2nd removes 3rd
-      //       spy2.and.callFake(remove3);
-      //       child.$emit("evt");
-      //       expect(spy1).not.toHaveBeenCalled();
-      //       expect(spy2).toHaveBeenCalled();
-      //       expect(spy3).not.toHaveBeenCalled();
-      //       expect(child.$$listeners.get("evt").length).toBe(1);
-      //     });
+        // // should call only 2nd because 1st was already removed and 2nd removes 3rd
+        spy2.and.callFake(remove3);
+        child.$emit("evt");
+        expect(spy1).not.toHaveBeenCalled();
+        expect(spy2).toHaveBeenCalled();
+        expect(spy3).not.toHaveBeenCalled();
+        expect(child.$handler.$$listeners.get("evt").length).toBe(1);
+      });
 
-      //     it("should allow removing event listener inside a listener on $broadcast", () => {
-      //       const spy1 = jasmine.createSpy("1st listener");
-      //       const spy2 = jasmine.createSpy("2nd listener");
-      //       const spy3 = jasmine.createSpy("3rd listener");
+      it("should allow removing event listener inside a listener on $broadcast", () => {
+        const spy1 = jasmine.createSpy("1st listener");
+        const spy2 = jasmine.createSpy("2nd listener");
+        const spy3 = jasmine.createSpy("3rd listener");
 
-      //       const remove1 = child.$on("evt", spy1);
-      //       const remove2 = child.$on("evt", spy2);
-      //       const remove3 = child.$on("evt", spy3);
+        const remove1 = child.$on("evt", spy1);
+        const remove2 = child.$on("evt", spy2);
+        const remove3 = child.$on("evt", spy3);
 
-      //       spy1.and.callFake(remove1);
+        spy1.and.callFake(remove1);
 
-      //       expect(child.$$listeners.get("evt").length).toBe(3);
+        expect(child.$handler.$$listeners.get("evt").length).toBe(3);
 
-      //       // should call all listeners and remove 1st
-      //       child.$broadcast("evt");
-      //       expect(spy1).toHaveBeenCalled();
-      //       expect(spy2).toHaveBeenCalled();
-      //       expect(spy3).toHaveBeenCalled();
-      //       expect(child.$$listeners.get("evt").length).toBe(3); // cleanup will happen on next $broadcast
+        // should call all listeners and remove 1st
+        child.$broadcast("evt");
+        expect(spy1).toHaveBeenCalled();
+        expect(spy2).toHaveBeenCalled();
+        expect(spy3).toHaveBeenCalled();
+        expect(child.$handler.$$listeners.get("evt").length).toBe(2);
 
-      //       spy1.calls.reset();
-      //       spy2.calls.reset();
-      //       spy3.calls.reset();
+        spy1.calls.reset();
+        spy2.calls.reset();
+        spy3.calls.reset();
 
-      //       // should call only 2nd because 1st was already removed and 2nd removes 3rd
-      //       spy2.and.callFake(remove3);
-      //       child.$broadcast("evt");
-      //       expect(spy1).not.toHaveBeenCalled();
-      //       expect(spy2).toHaveBeenCalled();
-      //       expect(spy3).not.toHaveBeenCalled();
-      //       expect(child.$$listeners.get("evt").length).toBe(1);
-      //     });
+        // should call only 2nd because 1st was already removed and 2nd removes 3rd
+        spy2.and.callFake(remove3);
+        child.$broadcast("evt");
+        expect(spy1).not.toHaveBeenCalled();
+        expect(spy2).toHaveBeenCalled();
+        expect(spy3).not.toHaveBeenCalled();
+        expect(child.$handler.$$listeners.get("evt").length).toBe(1);
+      });
 
       //     describe("event object", () => {
       //       it("should have methods/properties", () => {
