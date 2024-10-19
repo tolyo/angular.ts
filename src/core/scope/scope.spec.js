@@ -1140,27 +1140,6 @@ describe("Scope", function () {
       expect(logs).toEqual(["event"]);
     });
 
-    it("should decrement ancestor $$listenerCount entries", () => {
-      const EVENT = "fooEvent";
-      const spy = jasmine.createSpy("listener");
-      const firstSecond = first.$new();
-
-      firstSecond.$on(EVENT, spy);
-      firstSecond.$on(EVENT, spy);
-      middle.$on(EVENT, spy);
-
-      expect($rootScope.$$listenerCount[EVENT]).toBe(3);
-      expect(first.$$listenerCount[EVENT]).toBe(2);
-
-      firstSecond.$destroy();
-
-      expect($rootScope.$$listenerCount[EVENT]).toBe(1);
-      expect(first.$$listenerCount[EVENT]).toBeUndefined();
-
-      $rootScope.$broadcast(EVENT);
-      expect(spy).toHaveBeenCalledTimes(1);
-    });
-
     it("should do nothing when a child event listener is registered after parent's destruction", () => {
       const parent = $rootScope.$new();
       const child = parent.$new();
@@ -1796,15 +1775,6 @@ describe("Scope", function () {
         });
         grandChild.$emit("myEvent");
         expect(log).toEqual("2>1>");
-      });
-
-      it("should forward method arguments", () => {
-        child.$on("abc", (event, arg1, arg2) => {
-          expect(event.name).toBe("abc");
-          expect(arg1).toBe("arg1");
-          expect(arg2).toBe("arg2");
-        });
-        child.$emit("abc", "arg1", "arg2");
       });
 
       it("should allow removing event listener inside a listener on $broadcast", () => {

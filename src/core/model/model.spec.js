@@ -2598,7 +2598,6 @@ describe("Model", () => {
       let greatGrandChild;
 
       function logger(event) {
-        debugger;
         log += `${event.currentScope.id}>`;
       }
 
@@ -2609,10 +2608,10 @@ describe("Model", () => {
         grandChild = child.$new();
         greatGrandChild = grandChild.$new();
 
-        model.$handler.id = 0;
-        child.$handler.id = 1;
-        grandChild.$handler.id = 2;
-        greatGrandChild.$handler.id = 3;
+        model.id = 0;
+        child.id = 1;
+        grandChild.id = 2;
+        greatGrandChild.id = 3;
 
         model.$on("myEvent", logger);
         child.$on("myEvent", logger);
@@ -2743,45 +2742,47 @@ describe("Model", () => {
         expect(child.$handler.$$listeners.get("evt").length).toBe(1);
       });
 
-      //     describe("event object", () => {
-      //       it("should have methods/properties", () => {
-      //         let eventFired = false;
+      describe("event object", () => {
+        it("should have methods/properties", () => {
+          let eventFired = false;
 
-      //         child.$on("myEvent", (e) => {
-      //           expect(e.targetScope).toBe(grandChild);
-      //           expect(e.currentScope).toBe(child);
-      //           expect(e.name).toBe("myEvent");
-      //           eventFired = true;
-      //         });
-      //         grandChild.$emit("myEvent");
-      //         expect(eventFired).toBe(true);
-      //       });
+          child.$on("myEvent", (e) => {
+            expect(e.targetScope).toBe(grandChild.$handler.$target);
+            expect(e.currentScope).toBe(child.$handler.$target);
+            expect(e.name).toBe("myEvent");
+            eventFired = true;
+          });
+          grandChild.$emit("myEvent");
+          expect(eventFired).toBe(true);
+        });
 
-      //       it("should have its `currentScope` property set to null after emit", () => {
-      //         let event;
+        it("should have its `currentScope` property set to null after emit", () => {
+          let event;
 
-      //         child.$on("myEvent", (e) => {
-      //           event = e;
-      //         });
-      //         grandChild.$emit("myEvent");
+          child.$on("myEvent", (e) => {
+            event = e;
+          });
+          grandChild.$emit("myEvent");
 
-      //         expect(event.currentScope).toBe(null);
-      //         expect(event.targetScope).toBe(grandChild);
-      //         expect(event.name).toBe("myEvent");
-      //       });
+          expect(event.currentScope).toBe(null);
+          expect(event.targetScope).toBe(grandChild.$target);
+          expect(event.name).toBe("myEvent");
+        });
 
-      //       it("should have preventDefault method and defaultPrevented property", () => {
-      //         let event = grandChild.$emit("myEvent");
-      //         expect(event.defaultPrevented).toBe(false);
+        it("should have preventDefault method and defaultPrevented property", () => {
+          let event = grandChild.$emit("myEvent");
+          debugger;
+          expect(event.defaultPrevented).toBe(false);
 
-      //         child.$on("myEvent", (event) => {
-      //           event.preventDefault();
-      //         });
-      //         event = grandChild.$emit("myEvent");
-      //         expect(event.defaultPrevented).toBe(true);
-      //         expect(event.currentScope).toBe(null);
-      //       });
-      //     });
+          child.$on("myEvent", (event) => {
+            debugger;
+            event.preventDefault();
+          });
+          event = grandChild.$emit("myEvent");
+          expect(event.defaultPrevented).toBe(true);
+          expect(event.currentScope).toBe(null);
+        });
+      });
     });
 
     //   describe("$broadcast", () => {

@@ -78,7 +78,7 @@ declare class Handler {
     /**
      * @type {number} Unique model ID (monotonically increasing) useful for debugging.
      */
-    $id: number;
+    id: number;
     /**
      * @type {Handler}
      */
@@ -88,6 +88,8 @@ declare class Handler {
     $$watchersCount: number;
     /** @type {AsyncQueueTask[]} */
     $$asyncQueue: AsyncQueueTask[];
+    /** @type {Map<String, Function[]>} */
+    $$listeners: Map<string, Function[]>;
     /**
      * Intercepts and handles property assignments on the target object. If a new value is
      * an object, it will be recursively proxied.
@@ -126,6 +128,7 @@ declare class Handler {
      */
     $watch(watchProp: ((any: any) => any), listenerFn: ListenerFunction): () => void;
     $watchGroup(watchArray: any, listenerFn: any): void;
+    $watchCollection(): void;
     $new(isIsolated: boolean, parent: any): any;
     registerKey(key: any, listener: any): void;
     deregisterKey(key: any, id: any): boolean;
@@ -136,6 +139,13 @@ declare class Handler {
     $eval(expr: any, locals: any): any;
     $evalAsync(expr: any, locals: any): Promise<any>;
     $apply(expr: any): any;
+    $on(name: any, listener: any): () => void;
+    $emit(name: any, ...args: any[]): any;
+    $broadcast(name: any, ...args: any[]): any;
+    eventHelper({ name, event }: {
+        name: any;
+        event: any;
+    }, ...args: any[]): any;
     /**
      * @private
      * @returns {boolean}

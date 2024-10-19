@@ -450,30 +450,35 @@ class Handler {
   }
 
   $emit(name, ...args) {
-    this.eventHelper({ name: name, scope: undefined }, ...args);
+    return this.eventHelper({ name: name, event: undefined }, ...args);
   }
 
   $broadcast(name, ...args) {
-    this.eventHelper({ name: name, scope: undefined }, ...args);
+    return this.eventHelper({ name: name, event: undefined }, ...args);
   }
 
-  eventHelper({ name, scope }, ...args) {
+  eventHelper({ name, event }, ...args) {
     if (!this.$$listeners.has(name)) {
       return;
     }
-    let stopPropagation = false;
-    const event = {
-      name,
-      targetScope: scope || this,
-      currentScope: this,
-      stopPropagation() {
-        stopPropagation = true;
-      },
-      preventDefault() {
-        event.defaultPrevented = true;
-      },
-      defaultPrevented: false,
-    };
+    if (event) {
+      event.currentScope = this.$target;
+    } else {
+      event = event || {
+        name,
+        targetScope: this.$target,
+        currentScope: this.$target,
+        stopped: false,
+        stopPropagation() {
+          event.stopped = true;
+        },
+        preventDefault() {
+          event.defaultPrevented = true;
+        },
+        defaultPrevented: false,
+      };
+    }
+
     const listenerArgs = concat([event], [event].concat(args), 1);
     let listeners = this.$$listeners.get(name);
     let length = listeners.length;
@@ -492,12 +497,17 @@ class Handler {
       }
     }
 
-    // if any listener on the current scope stops propagation, prevent bubbling
-    if (stopPropagation) {
-      return;
+    event.currentScope = null;
+
+    if (event.stopped) {
+      return event;
     }
 
-    this.$parent?.eventHelper({ name: name, scope: this }, args);
+    if (this.$parent) {
+      return this.$parent?.eventHelper({ name: name, event: event }, args);
+    } else {
+      return event;
+    }
   }
 
   /**
