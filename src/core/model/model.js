@@ -1,4 +1,10 @@
-import { isUndefined, nextUid, minErr, isObject } from "../../shared/utils";
+import {
+  isUndefined,
+  nextUid,
+  minErr,
+  isObject,
+  concat,
+} from "../../shared/utils";
 
 /**
  * @type {import('../parser/parse').ParseService}
@@ -123,7 +129,7 @@ class Handler {
     /**
      * @type {number} Unique model ID (monotonically increasing) useful for debugging.
      */
-    this.$id = nextUid();
+    this.id = nextUid();
 
     /**
      * @type {Handler}
@@ -137,6 +143,9 @@ class Handler {
 
     /** @type {AsyncQueueTask[]} */
     this.$$asyncQueue = [];
+
+    /** @type {Map<String, Function[]>} */
+    this.$$listeners = new Map();
   }
 
   /**
@@ -226,6 +235,7 @@ class Handler {
     const propertyMap = {
       $watch: this.$watch.bind(this),
       $watchGroup: this.$watchGroup.bind(this),
+      $watchCollection: this.$watchCollection.bind(this),
       $new: this.$new.bind(this),
       $destroy: this.$destroy.bind(this),
       $eval: this.$eval.bind(this),
@@ -235,12 +245,15 @@ class Handler {
       $isRoot: this.isRoot.bind(this),
       $target: this.$target,
       $digest: this.$digest.bind(this),
+      $on: this.$on.bind(this),
+      $emit: this.$emit.bind(this),
+      $broadcast: this.$broadcast.bind(this),
       $handler: this,
-      $id: this.$id,
       $parent: this.$parent,
       $root: this.$root,
       $$watchersCount: this.$$watchersCount,
       $children: this.children,
+      id: this.id,
     };
 
     return Object.prototype.hasOwnProperty.call(propertyMap, property)
@@ -353,6 +366,8 @@ class Handler {
     watchArray.forEach((x) => this.$watch(x, listenerFn));
   }
 
+  $watchCollection() {}
+
   $new(isIsolated = false, parent) {
     let child;
     if (isIsolated) {
@@ -415,6 +430,68 @@ class Handler {
     }
   }
 
+  $on(name, listener) {
+    let namedListeners = this.$$listeners.get(name);
+    if (!namedListeners) {
+      namedListeners = [];
+      this.$$listeners.set(name, namedListeners);
+    }
+    namedListeners.push(listener);
+
+    return () => {
+      const indexOfListener = namedListeners.indexOf(listener);
+      if (indexOfListener !== -1) {
+        namedListeners.splice(indexOfListener, 1);
+        if (namedListeners.length == 0) {
+          this.$$listeners.delete(name);
+        }
+      }
+    };
+  }
+
+  $emit(name, ...args) {
+    this.eventHelper({ name: name, scope: undefined }, args);
+  }
+
+  $broadcast(name, ...args) {
+    this.eventHelper({ name: name, scope: undefined }, args);
+  }
+
+  eventHelper({ name, scope }, ...args) {
+    if (!this.$$listeners.has(name)) {
+      return;
+    }
+    let stopPropagation = false;
+    const event = {
+      name,
+      targetScope: scope || this,
+      currentScope: this,
+      stopPropagation() {
+        stopPropagation = true;
+      },
+      preventDefault() {
+        event.defaultPrevented = true;
+      },
+      defaultPrevented: false,
+    };
+    const listenerArgs = concat([event], [event].concat(args), 1);
+    let listeners = this.$$listeners.get(name);
+    listeners.forEach((cb) => {
+      try {
+        cb.apply(null, listenerArgs);
+      } catch (e) {
+        $exceptionHandler(e);
+      }
+    });
+
+    // if any listener on the current scope stops propagation, prevent bubbling
+    if (stopPropagation) {
+      return;
+    }
+
+    this.$parent?.eventHelper({ name: name, scope: this }, args);
+  }
+
   /**
    * @private
    * @returns {boolean}
@@ -475,7 +552,7 @@ class Handler {
     try {
       listenerFn(newValue, oldValue, originalTarget);
       this.$$asyncQueue.forEach((x) => {
-        if (x.handler.$id == this.$id) {
+        if (x.handler.id == this.id) {
           Promise.resolve().then(x.fn(x.handler, x.locals));
         }
       });
