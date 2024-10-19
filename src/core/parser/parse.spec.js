@@ -10,6 +10,7 @@ import {
 import { createInjector } from "../di/injector";
 import { ASTType } from "./ast-type";
 import { Angular } from "../../loader";
+import { wait } from "../../shared/test-utils";
 
 describe("parser", () => {
   let $rootScope;
@@ -2685,7 +2686,7 @@ describe("parser", () => {
       expect(logs.length).toEqual(1);
     });
 
-    it("should have a stable value if at the end of a $digest it has a defined value", () => {
+    it("should have a stable value if at the end of a $digest it has a defined value", async () => {
       const fn = $parse("::foo");
       $rootScope.$watch(fn, (value, old) => {
         if (value !== old) logs.push(value);
@@ -2695,18 +2696,22 @@ describe("parser", () => {
           $rootScope.foo = undefined;
         }
       });
+      expect($rootScope.$$watchersCount).toBe(2);
 
       $rootScope.foo = "bar";
-      expect($rootScope.$$watchers.length).toBe(2);
-      expect(logs[0]).toBeUndefined();
+      await wait();
+      expect($rootScope.$$watchersCount).toBe(1);
+      expect(logs.length).toEqual(1);
 
       $rootScope.foo = "man";
-      expect($rootScope.$$watchers.length).toBe(1);
-      expect(logs[1]).toEqual("man");
+      await wait();
+      expect($rootScope.$$watchersCount).toBe(1);
+      expect(logs.length).toEqual(1);
 
       $rootScope.foo = "shell";
-      expect($rootScope.$$watchers.length).toBe(1);
-      expect(logs.length).toEqual(2);
+      await wait();
+      expect($rootScope.$$watchersCount).toBe(1);
+      expect(logs.length).toEqual(1);
     });
 
     it("should not throw if the stable value is `null`", () => {
@@ -3396,7 +3401,7 @@ describe("parser", () => {
       logs = [];
     });
 
-    it("should not be reevaluated when passed literals", () => {
+    it("should not be reevaluated when passed literals", async () => {
       let filterCalls = 0;
       filterProvider.register(
         "foo",
@@ -3407,15 +3412,21 @@ describe("parser", () => {
       );
 
       let watcherCalls = 0;
+
       scope.$watch("[a] | foo", (input) => {
         watcherCalls++;
       });
 
+      expect(filterCalls).toBe(0);
+      expect(watcherCalls).toBe(0);
+
       scope.$apply("a = 1");
+      await wait();
       expect(filterCalls).toBe(1);
       expect(watcherCalls).toBe(1);
 
       scope.$apply("a = 2");
+      await wait();
       expect(filterCalls).toBe(2);
       expect(watcherCalls).toBe(2);
     });

@@ -4,6 +4,7 @@ import {
   minErr,
   isObject,
   concat,
+  isFunction,
 } from "../../shared/utils";
 
 /**
@@ -81,6 +82,7 @@ export function createModel(target = {}, context) {
  * @property {number} id
  * @property {boolean} oneTime
  * @property {string} property
+ * @property {(any) => any} [filter]
  */
 
 /**
@@ -146,6 +148,8 @@ class Handler {
 
     /** @type {Map<String, Function[]>} */
     this.$$listeners = new Map();
+
+    this.filters = [];
   }
 
   /**
@@ -252,6 +256,12 @@ class Handler {
       $parent: this.$parent,
       $root: this.$root,
       $$watchersCount: this.$$watchersCount,
+      $$watchers: Array.from(this.listeners.values()).reduce((acc, value) => {
+        if (Array.isArray(value)) {
+          return acc + value.length; // Add array length if value is an array
+        }
+        return acc;
+      }, 0),
       $children: this.children,
       id: this.id,
     };
@@ -322,8 +332,7 @@ class Handler {
       return () => {};
     }
 
-    /** @type {string} */
-    let key = getProperty(get);
+    let { key, filter } = getProperty(get);
 
     /** @type {Listener} */
     const listener = {
@@ -332,6 +341,7 @@ class Handler {
       id: nextUid(),
       oneTime: get.oneTime,
       property: key,
+      filter: filter,
     };
 
     this.registerKey(key, listener);
@@ -366,7 +376,9 @@ class Handler {
     watchArray.forEach((x) => this.$watch(x, listenerFn));
   }
 
-  $watchCollection() {}
+  $watchCollection(watchProp, listenerFn) {
+    return this.$watch(watchProp, listenerFn);
+  }
 
   $new(isIsolated = false, parent) {
     let child;
@@ -450,16 +462,24 @@ class Handler {
   }
 
   $emit(name, ...args) {
-    return this.eventHelper({ name: name, event: undefined }, ...args);
+    return this.eventHelper(
+      { name: name, event: undefined, broadcast: false },
+      ...args,
+    );
   }
 
   $broadcast(name, ...args) {
-    return this.eventHelper({ name: name, event: undefined }, ...args);
+    return this.eventHelper(
+      { name: name, event: undefined, broadcast: true },
+      ...args,
+    );
   }
 
-  eventHelper({ name, event }, ...args) {
-    if (!this.$$listeners.has(name)) {
-      return;
+  eventHelper({ name, event, broadcast }, ...args) {
+    if (!broadcast) {
+      if (!this.$$listeners.has(name)) {
+        return;
+      }
     }
     if (event) {
       event.currentScope = this.$target;
@@ -481,19 +501,21 @@ class Handler {
 
     const listenerArgs = concat([event], [event].concat(args), 1);
     let listeners = this.$$listeners.get(name);
-    let length = listeners.length;
-    for (let i = 0; i < length; i++) {
-      try {
-        let cb = listeners[i];
-        cb.apply(null, listenerArgs);
-        if (listeners.length !== length) {
-          if (listeners.length < length) {
-            i--;
+    if (listeners) {
+      let length = listeners.length;
+      for (let i = 0; i < length; i++) {
+        try {
+          let cb = listeners[i];
+          cb.apply(null, listenerArgs);
+          if (listeners.length !== length) {
+            if (listeners.length < length) {
+              i--;
+            }
+            length = listeners.length;
           }
-          length = listeners.length;
+        } catch (e) {
+          $exceptionHandler(e);
         }
-      } catch (e) {
-        $exceptionHandler(e);
       }
     }
 
@@ -503,10 +525,25 @@ class Handler {
       return event;
     }
 
-    if (this.$parent) {
-      return this.$parent?.eventHelper({ name: name, event: event }, args);
-    } else {
+    if (broadcast) {
+      if (this.children.length > 0) {
+        this.children.forEach((child) => {
+          event = child["$handler"].eventHelper(
+            { name: name, event: event, broadcast: broadcast },
+            ...args,
+          );
+        });
+      }
       return event;
+    } else {
+      if (this.$parent) {
+        return this.$parent?.eventHelper(
+          { name: name, event: event, broadcast: broadcast },
+          ...args,
+        );
+      } else {
+        return event;
+      }
     }
   }
 
@@ -566,9 +603,13 @@ class Handler {
    * @param {*} newValue - The new value of the property.
    */
   notifyListener(listener, oldValue, newValue) {
-    const { originalTarget, listenerFn } = listener;
+    const { originalTarget, listenerFn, filter } = listener;
     try {
-      listenerFn(newValue, oldValue, originalTarget);
+      listenerFn(
+        filter ? filter(newValue) : newValue,
+        oldValue,
+        originalTarget,
+      );
       this.$$asyncQueue.forEach((x) => {
         if (x.handler.id == this.id) {
           Promise.resolve().then(x.fn(x.handler, x.locals));
@@ -589,8 +630,12 @@ function getProperty(fn) {
     },
   };
 
-  fn(new Proxy({}, handler));
-  return path.pop();
+  const filter = fn(new Proxy({}, handler));
+  const prop = path.pop();
+  // if (isFunction(filter)) {
+
+  // }
+  return { filter: filter, key: prop };
 }
 
 function setDeepValue(model, obj) {

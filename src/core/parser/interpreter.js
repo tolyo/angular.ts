@@ -136,7 +136,7 @@ export class ASTInterpreter {
               for (let i = 0; i < args.length; ++i) {
                 values.push(args[i](scope, locals, assign));
               }
-              const value = right.apply(undefined, values);
+              const value = () => right.apply(undefined, values);
               return context
                 ? { context: undefined, name: undefined, value }
                 : value;
