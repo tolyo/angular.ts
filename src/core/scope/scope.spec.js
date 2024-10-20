@@ -82,29 +82,6 @@ describe("Scope", function () {
             expect(logs).toEqual([{ newVal: ["a", "c"], oldVal: ["a", "b"] }]);
           });
 
-          it("should trigger when property changes into array", () => {
-            $rootScope.obj = "test";
-            expect(logs).toEqual([
-              { newVal: "test", oldVal: "test", identical: true },
-            ]);
-
-            logs = [];
-            $rootScope.obj = [];
-            expect(logs).toEqual([{ newVal: [], oldVal: "test" }]);
-
-            logs = [];
-            $rootScope.obj = {};
-            expect(logs).toEqual([{ newVal: {}, oldVal: [] }]);
-
-            logs = [];
-            $rootScope.obj = [];
-            expect(logs).toEqual([{ newVal: [], oldVal: {} }]);
-
-            logs = [];
-            $rootScope.obj = undefined;
-            expect(logs).toEqual([{ newVal: undefined, oldVal: [] }]);
-          });
-
           it("should not trigger change when object in collection changes", () => {
             $rootScope.obj = [{}];
             expect(logs).toEqual([

@@ -155,10 +155,6 @@ declare class Handler {
      */
     private isRoot;
     $applyAsync(expr: any): Promise<any>;
-    /**
-     * @private
-     */
-    private retry;
     $postUpdate(fn: any): void;
     $destroy(): void;
     /**

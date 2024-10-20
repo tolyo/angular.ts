@@ -1238,36 +1238,43 @@ describe("Model", () => {
       it("should trigger when property changes into array", async () => {
         model.aValue = "test";
         model.counter = 0;
+        var newValue, oldValue;
         model.$watch(
           (model) => model.aValue,
-          function (newValue, oldValue, m) {
+          function (newV, oldV, m) {
             m.counter++;
+            newValue = newV;
+            oldValue = oldV;
           },
         );
 
         model.aValue = [];
-
         await wait();
         expect(model.counter).toBe(1);
-        debugger;
-        model.aValue = {};
+        expect(newValue).toEqual([]);
+        expect(oldValue).toEqual("test");
 
+        model.aValue = {};
         await wait();
         expect(model.counter).toBe(2);
-        // logs = [];
-        // model.obj = {};
+        expect(newValue).toEqual({});
+        expect(oldValue).toEqual([]);
 
-        // expect(logs).toEqual([{ newVal: {}, oldVal: [] }]);
+        model.aValue = [];
+        await wait();
+        expect(model.counter).toBe(3);
+        expect(newValue).toEqual([]);
+        expect(oldValue).toEqual({});
 
-        // logs = [];
-        // model.obj = [];
+        model.aValue = {};
+        await wait();
+        expect(model.counter).toBe(4);
 
-        // expect(logs).toEqual([{ newVal: [], oldVal: {} }]);
-
-        // logs = [];
-        // model.obj = undefined;
-
-        // expect(logs).toEqual([{ newVal: undefined, oldVal: [] }]);
+        model.aValue = undefined;
+        await wait();
+        expect(model.counter).toBe(5);
+        expect(newValue).toEqual(undefined);
+        expect(oldValue).toEqual({});
       });
 
       // it("should not trigger change when object in collection changes", () => {

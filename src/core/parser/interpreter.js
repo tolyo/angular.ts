@@ -1,4 +1,4 @@
-import { isDefined, isObject } from "../../shared/utils";
+import { isDefined, isFunction, isObject } from "../../shared/utils";
 import { ASTType } from "./ast-type";
 
 export const PURITY_ABSOLUTE = 1;
@@ -134,7 +134,8 @@ export class ASTInterpreter {
           ? function (scope, locals, assign) {
               const values = [];
               for (let i = 0; i < args.length; ++i) {
-                values.push(args[i](scope, locals, assign));
+                const res = args[i](scope, locals, assign);
+                values.push(isFunction(res) ? res() : res);
               }
               const value = () => right.apply(undefined, values);
               return context
@@ -147,7 +148,8 @@ export class ASTInterpreter {
               if (rhs.value != null) {
                 const values = [];
                 for (let i = 0; i < args.length; ++i) {
-                  values.push(args[i](scope, locals, assign));
+                  const res = args[i](scope, locals, assign);
+                  values.push(isFunction(res) ? res() : res);
                 }
                 value = rhs.value.apply(rhs.context, values);
               }

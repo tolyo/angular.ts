@@ -166,6 +166,13 @@ class Handler {
     const oldValue = target[property];
     if (oldValue && oldValue[isProxySymbol]) {
       if (Array.isArray(value)) {
+        if (oldValue !== value) {
+          const listeners = this.listeners.get(property);
+
+          if (listeners) {
+            this.scheduleListener(listeners, oldValue, value);
+          }
+        }
         target[property] = value;
         return true;
       }
@@ -195,6 +202,12 @@ class Handler {
         Object.keys(oldValue.$target).forEach((k) => {
           delete oldValue[k];
         });
+
+        const listeners = this.listeners.get(property);
+
+        if (listeners) {
+          this.scheduleListener(listeners, oldValue, value);
+        }
         return true;
       }
       return true;
@@ -432,9 +445,18 @@ class Handler {
   $eval(expr, locals) {
     const fn = $parse(expr);
     const res = fn(this.$target, locals);
+
+    if (isUndefined(res)) {
+      return res;
+    }
+
+    if (res["name"] === Object.hasOwnProperty["name"]) {
+      return res;
+    }
     if (isFunction(res)) {
       return res();
     }
+
     if (Number.isNaN(res)) {
       return 0;
     }
@@ -574,18 +596,6 @@ class Handler {
     } catch (error) {
       $exceptionHandler(error);
       throw error;
-    }
-  }
-
-  /**
-   * @private
-   */
-  retry() {
-    try {
-      this.$root.$digest();
-    } catch (e) {
-      $exceptionHandler(e);
-      throw e;
     }
   }
 

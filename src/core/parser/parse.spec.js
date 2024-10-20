@@ -1945,7 +1945,6 @@ describe("parser", () => {
         }).toThrowError();
 
         scope.offset = 3;
-        debugger;
         expect(scope.$eval("'abcd'|substring:1:offset")).toEqual("bc");
       });
 
