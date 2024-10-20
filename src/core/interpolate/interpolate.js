@@ -40,9 +40,13 @@ function interr(text, err) {
  * security bugs!
  * </div>
  */
-export function InterpolateProvider() {
-  let startSymbol = "{{";
-  let endSymbol = "}}";
+export class InterpolateProvider {
+  constructor() {
+    /** @type {string} */
+    this.start = "{{";
+    /** @type {string} */
+    this.end = "}}";
+  }
 
   /**
    * Symbol to denote start of expression in the interpolated string. Defaults to `{{`.
@@ -50,13 +54,13 @@ export function InterpolateProvider() {
    * @param {string=} value new value to set the starting symbol to.
    * @returns {string|InterpolateProvider} Returns the symbol when used as getter and self if used as setter.
    */
-  this.startSymbol = function (value) {
+  startSymbol(value) {
     if (value) {
-      startSymbol = value;
+      this.start = value;
       return this;
     }
-    return startSymbol;
-  };
+    return this.start;
+  }
 
   /**
    * Symbol to denote the end of expression in the interpolated string. Defaults to `}}`.
@@ -64,33 +68,36 @@ export function InterpolateProvider() {
    * @param {string=} value new value to set the ending symbol to.
    * @returns {string|InterpolateProvider} Returns the symbol when used as getter and self if used as setter.
    */
-  this.endSymbol = function (value) {
+  endSymbol(value) {
     if (value) {
-      endSymbol = value;
+      this.end = value;
       return this;
     }
-    return endSymbol;
-  };
+    return this.end;
+  }
 
-  this.$get = [
+  $get = [
     "$parse",
-    "$exceptionHandler",
     "$sce",
     /**
      *
      * @param {import("../parser/parse").ParseService} $parse
-     * @param {import('../exception-handler').ErrorHandler} $exceptionHandler
      * @param {*} $sce
      * @returns
      */
-    function ($parse, $exceptionHandler, $sce) {
-      const startSymbolLength = startSymbol.length;
-      const endSymbolLength = endSymbol.length;
+    function ($parse, $sce) {
+      /** @type {InterpolateProvider} */
+      const provider = this;
+      const startSymbolLength = provider.start.length;
+      const endSymbolLength = provider.end.length;
       const escapedStartRegexp = new RegExp(
-        startSymbol.replace(/./g, escape),
+        this.start.replace(/./g, escape),
         "g",
       );
-      const escapedEndRegexp = new RegExp(endSymbol.replace(/./g, escape), "g");
+      const escapedEndRegexp = new RegExp(
+        provider.end.replace(/./g, escape),
+        "g",
+      );
 
       function escape(ch) {
         return `\\\\\\${ch}`;
@@ -98,8 +105,8 @@ export function InterpolateProvider() {
 
       function unescapeText(text) {
         return text
-          .replace(escapedStartRegexp, startSymbol)
-          .replace(escapedEndRegexp, endSymbol);
+          .replace(escapedStartRegexp, provider.start)
+          .replace(escapedEndRegexp, provider.end);
       }
 
       /**
@@ -222,7 +229,7 @@ export function InterpolateProvider() {
           trustedContext === $sce.URL || trustedContext === $sce.MEDIA_URL;
 
         // Provide a quick exit and simplified result function for text with no interpolation
-        if (!text.length || text.indexOf(startSymbol) === -1) {
+        if (!text.length || text.indexOf(provider.start) === -1) {
           if (mustHaveExpression) return;
 
           let unescapedText = unescapeText(text);
@@ -255,9 +262,9 @@ export function InterpolateProvider() {
 
         while (index < textLength) {
           if (
-            (startIndex = text.indexOf(startSymbol, index)) !== -1 &&
+            (startIndex = text.indexOf(provider.start, index)) !== -1 &&
             (endIndex = text.indexOf(
-              endSymbol,
+              provider.end,
               startIndex + startSymbolLength,
             )) !== -1
           ) {
@@ -390,7 +397,7 @@ export function InterpolateProvider() {
        * @returns {string} start symbol.
        */
       $interpolate.startSymbol = function () {
-        return startSymbol;
+        return provider.start;
       };
 
       /**
@@ -402,7 +409,7 @@ export function InterpolateProvider() {
        * @returns {string} end symbol.
        */
       $interpolate.endSymbol = function () {
-        return endSymbol;
+        return provider.end;
       };
 
       return $interpolate;
