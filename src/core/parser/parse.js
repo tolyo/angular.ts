@@ -123,14 +123,24 @@ export function ParseProvider() {
           parsedExpression = parsedExpression.$$intercepted;
         }
 
-        var useInputs = false;
+        let useInputs = false;
 
-        var fn = function interceptedExpression(scope, locals, assign, inputs) {
-          var value =
+        const fn = function interceptedExpression(
+          scope,
+          locals,
+          assign,
+          inputs,
+        ) {
+          const value =
             useInputs && inputs
               ? inputs[0]
               : parsedExpression(scope, locals, assign, inputs);
-          return interceptorFn(value);
+          // Do not invoke for getters
+          if (scope.getter) {
+            return;
+          }
+          const res = isFunction(value) ? value() : value;
+          return interceptorFn(res);
         };
 
         // Maintain references to the interceptor/intercepted

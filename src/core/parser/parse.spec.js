@@ -2649,40 +2649,49 @@ describe("parser", () => {
       expect($parse("::foo")).toBe($parse("::foo"));
     });
 
-    it("should not affect calling the parseFn directly", () => {
+    it("should not affect calling the parseFn directly", async () => {
       const fn = $parse("::foo");
       $rootScope.$watch(fn);
+      expect($rootScope.$$watchersCount).toBe(1);
 
       $rootScope.foo = "bar";
-      expect($rootScope.$$watchers.length).toBe(1);
-      expect(fn($rootScope)).toEqual("bar");
+      await wait();
 
-      expect($rootScope.$$watchers.length).toBe(0);
+      const res = fn($rootScope);
+      expect(res).toEqual("bar");
+
+      expect($rootScope.$$watchersCount).toBe(0);
       expect(fn($rootScope)).toEqual("bar");
 
       $rootScope.foo = "man";
-      expect($rootScope.$$watchers.length).toBe(0);
+      await wait();
+
+      expect($rootScope.$$watchersCount).toBe(0);
       expect(fn($rootScope)).toEqual("man");
 
       $rootScope.foo = "shell";
-      expect($rootScope.$$watchers.length).toBe(0);
+
       expect(fn($rootScope)).toEqual("shell");
     });
 
-    it("should stay stable once the value defined", () => {
+    it("should stay stable once the value defined", async () => {
       const fn = $parse("::foo");
       $rootScope.$watch(fn, (value, old) => {
         if (value !== old) logs.push(value);
       });
 
-      expect($rootScope.$$watchers.length).toBe(1);
+      expect($rootScope.$$watchersCount).toBe(1);
 
       $rootScope.foo = "bar";
-      expect($rootScope.$$watchers.length).toBe(0);
+      await wait();
+
+      expect($rootScope.$$watchersCount).toBe(0);
       expect(logs[0]).toEqual("bar");
 
       $rootScope.foo = "man";
-      expect($rootScope.$$watchers.length).toBe(0);
+      await wait();
+
+      expect($rootScope.$$watchersCount).toBe(0);
       expect(logs.length).toEqual(1);
     });
 
@@ -2714,15 +2723,17 @@ describe("parser", () => {
       expect(logs.length).toEqual(1);
     });
 
-    it("should not throw if the stable value is `null`", () => {
+    it("should not throw if the stable value is `null`", async () => {
       const fn = $parse("::foo");
       $rootScope.$watch(fn);
       $rootScope.foo = null;
+      await wait();
       $rootScope.foo = "foo";
+      await wait();
       expect(fn()).toEqual(undefined);
     });
 
-    it("should invoke a stateless filter once when the parsed expression has an interceptor", () => {
+    it("should invoke a stateless filter once when the parsed expression has an interceptor", async () => {
       const countFilter = jasmine.createSpy();
       const interceptor = jasmine.createSpy();
       countFilter.and.returnValue(1);
@@ -2739,7 +2750,12 @@ describe("parser", () => {
       scope.foo = function () {
         return 1;
       };
-      scope.$watch($parse(":: foo() | count", interceptor));
+      await wait();
+      expect(countFilter.calls.count()).toBe(0);
+
+      const res = $parse(":: foo() | count", interceptor);
+      scope.$watch(res, () => {});
+      await wait();
       expect(countFilter.calls.count()).toBe(1);
     });
   });
@@ -2769,22 +2785,22 @@ describe("parser", () => {
           );
 
           expect(logs).toEqual([]);
-          expect($rootScope.$$watchers.length).toBe(1);
+          expect($rootScope.$$watchersCount).toBe(1);
 
-          expect($rootScope.$$watchers.length).toBe(1);
+          expect($rootScope.$$watchersCount).toBe(1);
           expect(logs[0]).toEqual({ foo: undefined, bar: undefined });
 
           $rootScope.foo = "foo";
-          expect($rootScope.$$watchers.length).toBe(1);
+          expect($rootScope.$$watchersCount).toBe(1);
           expect(logs[0]).toEqual({ foo: undefined, bar: undefined });
 
           $rootScope.foo = "foobar";
           $rootScope.bar = "bar";
-          expect($rootScope.$$watchers.length).toBe(0);
+          expect($rootScope.$$watchersCount).toBe(0);
           expect(logs[2]).toEqual({ foo: "foobar", bar: "bar" });
 
           $rootScope.foo = "baz";
-          expect($rootScope.$$watchers.length).toBe(0);
+          expect($rootScope.$$watchersCount).toBe(0);
           expect(logs[3]).toBeUndefined();
         });
 
@@ -2799,22 +2815,22 @@ describe("parser", () => {
           );
 
           expect(logs.length).toEqual(0);
-          expect($rootScope.$$watchers.length).toBe(1);
+          expect($rootScope.$$watchersCount).toBe(1);
 
-          expect($rootScope.$$watchers.length).toBe(1);
+          expect($rootScope.$$watchersCount).toBe(1);
           expect(logs[0]).toEqual([undefined, undefined]);
 
           $rootScope.foo = "foo";
-          expect($rootScope.$$watchers.length).toBe(1);
+          expect($rootScope.$$watchersCount).toBe(1);
           expect(logs[1]).toEqual(["foo", undefined]);
 
           $rootScope.foo = "foobar";
           $rootScope.bar = "bar";
-          expect($rootScope.$$watchers.length).toBe(0);
+          expect($rootScope.$$watchersCount).toBe(0);
           expect(logs[2]).toEqual(["foobar", "bar"]);
 
           $rootScope.foo = "baz";
-          expect($rootScope.$$watchers.length).toBe(0);
+          expect($rootScope.$$watchersCount).toBe(0);
           expect(logs[3]).toBeUndefined();
         });
 
@@ -2834,16 +2850,16 @@ describe("parser", () => {
           });
 
           $rootScope.foo = "bar";
-          expect($rootScope.$$watchers.length).toBe(2);
+          expect($rootScope.$$watchersCount).toBe(2);
           expect(logs[0]).toEqual(["bar"]);
           expect(logs[1]).toEqual([undefined]);
 
           $rootScope.foo = "baz";
-          expect($rootScope.$$watchers.length).toBe(1);
+          expect($rootScope.$$watchersCount).toBe(1);
           expect(logs[2]).toEqual(["baz"]);
 
           $rootScope.bar = "qux";
-          expect($rootScope.$$watchers.length).toBe(1);
+          expect($rootScope.$$watchersCount).toBe(1);
           expect(logs[3]).toBeUndefined();
         });
       });
@@ -4322,7 +4338,8 @@ describe("parser", () => {
       // simpleGetterFn1
       it("should return null for `a` where `a` is null", () => {
         $rootScope.a = null;
-        expect($rootScope.$eval("a")).toBe(null);
+        const res = $rootScope.$eval("a");
+        expect(res).toBe(null);
       });
 
       it("should return undefined for `a` where `a` is undefined", () => {

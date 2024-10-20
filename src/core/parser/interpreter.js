@@ -145,7 +145,7 @@ export class ASTInterpreter {
           : function (scope, locals, assign) {
               const rhs = right(scope, locals, assign);
               let value;
-              if (rhs.value != null) {
+              if (rhs.value != null && isFunction(rhs.value)) {
                 const values = [];
                 for (let i = 0; i < args.length; ++i) {
                   const res = args[i](scope, locals, assign);

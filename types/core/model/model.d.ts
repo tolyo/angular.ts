@@ -23,6 +23,11 @@ export class RootModelProvider {
     rootModel: any;
     $get: (string | ((exceptionHandler: import("../exception-handler").ErrorHandler, parse: import("../parser/parse").ParseService) => any))[];
 }
+export type ModelPhase = number;
+export namespace ModelPhase {
+    let NONE: number;
+    let WATCH: number;
+}
 export type AsyncQueueTask = {
     handler: Handler;
     fn: Function;
@@ -92,6 +97,8 @@ declare class Handler {
     /** @type {Map<String, Function[]>} */
     $$listeners: Map<string, Function[]>;
     filters: any[];
+    /** @type {ModelPhase} */
+    state: ModelPhase;
     /**
      * Intercepts and handles property assignments on the target object. If a new value is
      * an object, it will be recursively proxied.

@@ -96,6 +96,14 @@ export function createModel(target = {}, context) {
 const isProxySymbol = Symbol("isProxy");
 
 /**
+ * @enum {number}
+ */
+export const ModelPhase = {
+  NONE: 0,
+  WATCH: 1,
+};
+
+/**
  * Handler class for the Proxy. It intercepts operations like property access (get)
  * and property setting (set), and adds support for deep change tracking and
  * observer-like behavior.
@@ -150,6 +158,9 @@ class Handler {
     this.$$listeners = new Map();
 
     this.filters = [];
+
+    /** @type {ModelPhase} */
+    this.state = ModelPhase.NONE;
   }
 
   /**
@@ -280,6 +291,7 @@ class Handler {
       $$watchersCount: this.$$watchersCount,
       $children: this.children,
       id: this.id,
+      state: this.state,
     };
 
     return Object.prototype.hasOwnProperty.call(propertyMap, property)
@@ -342,6 +354,7 @@ class Handler {
    * @param {ListenerFunction} listenerFn - A function to execute when changes are detected.
    */
   $watch(watchProp, listenerFn) {
+    this.state = ModelPhase.WATCH;
     const get = $parse(watchProp);
     if (get.constant) {
       Promise.resolve().then(listenerFn(this.$target));
@@ -379,7 +392,7 @@ class Handler {
     }
 
     this.incrementWatchersCount(1);
-
+    this.state = ModelPhase.NONE;
     return () => {
       const res = this.deregisterKey(key, listener.id);
       if (res) {
@@ -446,7 +459,7 @@ class Handler {
     const fn = $parse(expr);
     const res = fn(this.$target, locals);
 
-    if (isUndefined(res)) {
+    if (isUndefined(res) || res === null) {
       return res;
     }
 
@@ -625,13 +638,18 @@ class Handler {
    * @param {*} newValue - The new value of the property.
    */
   notifyListener(listener, oldValue, newValue) {
-    const { originalTarget, listenerFn, filter } = listener;
+    const { originalTarget, listenerFn, filter, oneTime, property, id } =
+      listener;
     try {
       listenerFn(
         isFunction(filter) ? filter(newValue) : newValue,
         oldValue,
         originalTarget,
       );
+      // if (oneTime) {
+      //   this.deregisterKey(property, id)
+      // }
+
       this.$$asyncQueue.forEach((x) => {
         if (x.handler.id == this.id) {
           Promise.resolve().then(x.fn(x.handler, x.locals));
@@ -646,7 +664,11 @@ class Handler {
 function getProperty(fn) {
   const path = [];
   const handler = {
+    getter: true,
     get(_, prop) {
+      if (prop === "getter") {
+        return handler.getter;
+      }
       path.push(prop);
       return new Proxy({}, handler);
     },
