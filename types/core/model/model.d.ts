@@ -43,6 +43,7 @@ export type Listener = {
     id: number;
     oneTime: boolean;
     property: string;
+    filter?: (any: any) => any;
 };
 /**
  * Listener function type.
@@ -90,6 +91,7 @@ declare class Handler {
     $$asyncQueue: AsyncQueueTask[];
     /** @type {Map<String, Function[]>} */
     $$listeners: Map<string, Function[]>;
+    filters: any[];
     /**
      * Intercepts and handles property assignments on the target object. If a new value is
      * an object, it will be recursively proxied.
@@ -128,7 +130,7 @@ declare class Handler {
      */
     $watch(watchProp: ((any: any) => any), listenerFn: ListenerFunction): () => void;
     $watchGroup(watchArray: any, listenerFn: any): void;
-    $watchCollection(): void;
+    $watchCollection(watchProp: any, listenerFn: any): () => void;
     $new(isIsolated: boolean, parent: any): any;
     registerKey(key: any, listener: any): void;
     deregisterKey(key: any, id: any): boolean;
@@ -142,9 +144,10 @@ declare class Handler {
     $on(name: any, listener: any): () => void;
     $emit(name: any, ...args: any[]): any;
     $broadcast(name: any, ...args: any[]): any;
-    eventHelper({ name, event }: {
+    eventHelper({ name, event, broadcast }: {
         name: any;
         event: any;
+        broadcast: any;
     }, ...args: any[]): any;
     /**
      * @private

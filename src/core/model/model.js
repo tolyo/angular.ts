@@ -178,6 +178,14 @@ class Handler {
             });
         }
 
+        if (oldValue !== value) {
+          const listeners = this.listeners.get(property);
+
+          if (listeners) {
+            this.scheduleListener(listeners, oldValue, value);
+          }
+        }
+
         target[property] = createModel({}, this);
         setDeepValue(target[property], value);
         return true;
@@ -189,6 +197,7 @@ class Handler {
         });
         return true;
       }
+      return true;
     } else {
       if (
         oldValue !== undefined &&
@@ -256,12 +265,6 @@ class Handler {
       $parent: this.$parent,
       $root: this.$root,
       $$watchersCount: this.$$watchersCount,
-      $$watchers: Array.from(this.listeners.values()).reduce((acc, value) => {
-        if (Array.isArray(value)) {
-          return acc + value.length; // Add array length if value is an array
-        }
-        return acc;
-      }, 0),
       $children: this.children,
       id: this.id,
     };
@@ -427,7 +430,16 @@ class Handler {
   }
 
   $eval(expr, locals) {
-    return $parse(expr)(this.$target, locals);
+    const fn = $parse(expr);
+    const res = fn(this.$target, locals);
+    if (isFunction(res)) {
+      return res();
+    }
+    if (Number.isNaN(res)) {
+      return 0;
+    }
+
+    return res;
   }
 
   async $evalAsync(expr, locals) {
@@ -606,7 +618,7 @@ class Handler {
     const { originalTarget, listenerFn, filter } = listener;
     try {
       listenerFn(
-        filter ? filter(newValue) : newValue,
+        isFunction(filter) ? filter(newValue) : newValue,
         oldValue,
         originalTarget,
       );

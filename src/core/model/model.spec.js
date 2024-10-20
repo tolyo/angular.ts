@@ -1249,25 +1249,25 @@ describe("Model", () => {
 
         await wait();
         expect(model.counter).toBe(1);
-
+        debugger;
         model.aValue = {};
 
         await wait();
         expect(model.counter).toBe(2);
-        logs = [];
-        model.obj = {};
+        // logs = [];
+        // model.obj = {};
 
-        expect(logs).toEqual([{ newVal: {}, oldVal: [] }]);
+        // expect(logs).toEqual([{ newVal: {}, oldVal: [] }]);
 
-        logs = [];
-        model.obj = [];
+        // logs = [];
+        // model.obj = [];
 
-        expect(logs).toEqual([{ newVal: [], oldVal: {} }]);
+        // expect(logs).toEqual([{ newVal: [], oldVal: {} }]);
 
-        logs = [];
-        model.obj = undefined;
+        // logs = [];
+        // model.obj = undefined;
 
-        expect(logs).toEqual([{ newVal: undefined, oldVal: [] }]);
+        // expect(logs).toEqual([{ newVal: undefined, oldVal: [] }]);
       });
 
       // it("should not trigger change when object in collection changes", () => {

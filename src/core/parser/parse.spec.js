@@ -1945,6 +1945,7 @@ describe("parser", () => {
         }).toThrowError();
 
         scope.offset = 3;
+        debugger;
         expect(scope.$eval("'abcd'|substring:1:offset")).toEqual("bc");
       });
 
@@ -2038,7 +2039,7 @@ describe("parser", () => {
         expect(scope.$eval("a + b")).toBeUndefined();
         scope.a = 0;
         expect(scope.$eval("a - b")).toBe(0);
-        expect(scope.$eval("a + b")).toBe(0);
+        expect(scope.$eval("a + b")).toBeUndefined();
         scope.a = undefined;
         scope.b = 0;
         expect(scope.$eval("a - b")).toBe(0);

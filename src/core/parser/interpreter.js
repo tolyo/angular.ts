@@ -1,4 +1,4 @@
-import { isDefined } from "../../shared/utils";
+import { isDefined, isObject } from "../../shared/utils";
 import { ASTType } from "./ast-type";
 
 export const PURITY_ABSOLUTE = 1;
@@ -810,8 +810,8 @@ function assignableAST(ast) {
 }
 
 function plusFn(l, r) {
-  if (typeof l === "undefined") return r;
-  if (typeof r === "undefined") return l;
+  if (typeof l === "undefined" || isObject(l)) return r;
+  if (typeof r === "undefined" || isObject(r)) return l;
   return l + r;
 }
 
