@@ -87,7 +87,7 @@ export class NgModelController {
    * @param {import('../../core/exception-handler').ErrorHandler} $exceptionHandler
    * @param {import('../../core/compile/attributes').Attributes} $attr
    * @param {import('../../shared/jqlite/jqlite').JQLite} $element
-   * @param {import("../../core/parser/parse").ParseService} $parse
+   * @param {import("../../core/parse/parse").ParseService} $parse
    * @param {*} $animate
    * @param {*} $timeout
    * @param {import("../../core/q/q").QPromise<any>} $q
@@ -147,7 +147,7 @@ export class NgModelController {
     this.$$parsedNgModel = $parse($attr["ngModel"]);
     this.$$parsedNgModelAssign = this.$$parsedNgModel.assign;
 
-    /** @type {import("../../core/parser/parse").CompiledExpression|((Scope) => any)} */
+    /** @type {import("../../core/parse/parse").CompiledExpression|((Scope) => any)} */
     this.$$ngModelGet = this.$$parsedNgModel;
     this.$$ngModelSet = this.$$parsedNgModelAssign;
     this.$$pendingDebounce = null;

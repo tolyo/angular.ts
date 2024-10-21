@@ -1,8 +1,8 @@
 /**
- * @param {import("./ast").ASTNode} ast
+ * @param {import("./ast/ast").ASTNode} ast
  * @returns {boolean}
  */
-export function isAssignable(ast: import("./ast").ASTNode): boolean;
+export function isAssignable(ast: import("./ast/ast").ASTNode): boolean;
 export const PURITY_ABSOLUTE: 1;
 export const PURITY_RELATIVE: 2;
 export class ASTInterpreter {
@@ -13,18 +13,18 @@ export class ASTInterpreter {
     $filter: (arg0: any) => any;
     /**
      * Compiles the AST into a function.
-     * @param {import("./ast").ASTNode} ast - The AST to compile.
+     * @param {import("./ast/ast").ASTNode} ast - The AST to compile.
      * @returns {import("./parse").CompiledExpression}
      */
-    compile(ast: import("./ast").ASTNode): import("./parse").CompiledExpression;
+    compile(ast: import("./ast/ast").ASTNode): import("./parse").CompiledExpression;
     /**
      * Recurses the AST nodes.
-     * @param {import("./ast").ASTNode} ast - The AST node.
+     * @param {import("./ast/ast").ASTNode} ast - The AST node.
      * @param {Object} [context] - The context.
      * @param {boolean|1} [create] - The create flag.
      * @returns {import("./parse").CompiledExpressionFunction} The recursive function.
      */
-    recurse(ast: import("./ast").ASTNode, context?: any, create?: boolean | 1): import("./parse").CompiledExpressionFunction;
+    recurse(ast: import("./ast/ast").ASTNode, context?: any, create?: boolean | 1): import("./parse").CompiledExpressionFunction;
     /**
      * Unary plus operation.
      * @param {function} argument - The argument function.
@@ -204,7 +204,7 @@ export class ASTInterpreter {
      */
     nonComputedMember(left: Function, right: string, context?: any, create?: boolean | 1): Function;
 }
-export type DecoratedASTNode = import("./ast").ASTNode & {
+export type DecoratedASTNode = import("./ast/ast").ASTNode & {
     isPure: boolean | number;
     constant: boolean;
     toWatch: any[];

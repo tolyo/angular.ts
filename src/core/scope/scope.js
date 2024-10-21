@@ -69,7 +69,7 @@ let lastDirtyWatch = null;
 let applyAsyncId = null;
 
 /** Services required by each scope instance */
-/** @type {import('../parser/parse').ParseService} */
+/** @type {import('../parse/parse').ParseService} */
 let $parse;
 /** @type {import('../../services/browser').Browser} */
 let $browser;
@@ -98,7 +98,7 @@ export class RootScopeProvider {
     "$browser",
     /**
      * @param {import('../exception-handler').ErrorHandler} exceptionHandler
-     * @param {import('../parser/parse').ParseService} parse
+     * @param {import('../parse/parse').ParseService} parse
      * @param {import('../../services/browser').Browser} browser
      * @returns {Scope} root scope
      */
@@ -375,7 +375,7 @@ export class Scope {
  *
  *
  *
- * @param {string | ((scope: Scope) => any) | import("../parser/parse").CompiledExpression} watchExp Expression that is evaluated on each
+ * @param {string | ((scope: Scope) => any) | import("../parse/parse.js").CompiledExpression} watchExp Expression that is evaluated on each
  *    {@link ng.$rootScope.Scope#$digest $digest} cycle. A change in the return value triggers
  *    a call to the `listener`.
  *

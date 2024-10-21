@@ -74,7 +74,7 @@ export const $$applyAsyncQueue: Function[];
  */
 export class RootScopeProvider {
     rootScope: Scope;
-    $get: (string | ((exceptionHandler: import("../exception-handler").ErrorHandler, parse: import("../parser/parse").ParseService, browser: import("../../services/browser").Browser) => Scope))[];
+    $get: (string | ((exceptionHandler: import("../exception-handler").ErrorHandler, parse: import("../parse/parse").ParseService, browser: import("../../services/browser").Browser) => Scope))[];
 }
 /**
  * DESIGN NOTES
@@ -282,7 +282,7 @@ export class Scope {
    *
    *
    *
-   * @param {string | ((scope: Scope) => any) | import("../parser/parse").CompiledExpression} watchExp Expression that is evaluated on each
+   * @param {string | ((scope: Scope) => any) | import("../parse/parse.js").CompiledExpression} watchExp Expression that is evaluated on each
    *    {@link ng.$rootScope.Scope#$digest $digest} cycle. A change in the return value triggers
    *    a call to the `listener`.
    *
@@ -293,7 +293,7 @@ export class Scope {
    *     comparing for reference equality.
    * @returns {function()} Returns a deregistration function for this listener.
    */
-    $watch(watchExp: string | ((scope: Scope) => any) | import("../parser/parse").CompiledExpression, listener?: WatchListener, objectEquality?: boolean | undefined): () => any;
+    $watch(watchExp: string | ((scope: Scope) => any) | import("../parse/parse.js").CompiledExpression, listener?: WatchListener, objectEquality?: boolean | undefined): () => any;
     /**
      * A variant of {@link ng.$rootScope.Scope#$watch $watch()} where it watches an array of `watchExpressions`.
      * If any one expression in the collection changes the `listener` is executed.

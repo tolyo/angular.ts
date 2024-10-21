@@ -528,7 +528,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
      * @param {*} $interpolate
      * @param {import("../exception-handler").ErrorHandler} $exceptionHandler
      * @param {*} $templateRequest
-     * @param {import("../parser/parse").ParseService} $parse
+     * @param {import("../parse/parse").ParseService} $parse
      * @param {*} $controller
      * @param {import('../scope/scope').Scope} $rootScope
      * @param {*} $sce

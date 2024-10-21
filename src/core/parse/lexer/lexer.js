@@ -1,4 +1,4 @@
-import { isDefined, minErr } from "../../shared/utils";
+import { isDefined, minErr } from "../../../shared/utils.js";
 
 const $parseMinErr = minErr("$parse");
 

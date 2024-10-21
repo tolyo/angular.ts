@@ -1,6 +1,6 @@
-import { isAssignable } from "./interpreter";
-import { ASTType } from "./ast-type";
-import { minErr } from "../../shared/utils";
+import { isAssignable } from "../interpreter.js";
+import { ASTType } from "../ast-type.js";
+import { minErr } from "../../../shared/utils.js";
 
 const $parseMinErr = minErr("$parse");
 
@@ -48,10 +48,10 @@ export const literals = new Map(
  */
 export class AST {
   /**
-   * @param {import('./lexer').Lexer} lexer - The lexer instance for tokenizing input
+   * @param {import('../lexer/lexer.js').Lexer} lexer - The lexer instance for tokenizing input
    */
   constructor(lexer) {
-    /** @type {import('./lexer').Lexer} */
+    /** @type {import('../lexer/lexer.js').Lexer} */
     this.lexer = lexer;
     this.selfReferential = {
       this: { type: ASTType.ThisExpression },
@@ -202,7 +202,7 @@ export class AST {
     while ((token = this.expect("==", "!=", "===", "!=="))) {
       left = {
         type: ASTType.BinaryExpression,
-        operator: /** @type {import("./lexer").Token} */ (token).text,
+        operator: /** @type {import("../lexer/lexer.js").Token} */ (token).text,
         left,
         right: this.relational(),
       };
@@ -220,7 +220,7 @@ export class AST {
     while ((token = this.expect("<", ">", "<=", ">="))) {
       left = {
         type: ASTType.BinaryExpression,
-        operator: /** @type {import("./lexer").Token} */ (token).text,
+        operator: /** @type {import("../lexer/lexer.js").Token} */ (token).text,
         left,
         right: this.additive(),
       };
@@ -238,7 +238,7 @@ export class AST {
     while ((token = this.expect("+", "-"))) {
       left = {
         type: ASTType.BinaryExpression,
-        operator: /** @type {import("./lexer").Token} */ (token).text,
+        operator: /** @type {import("../lexer/lexer.js").Token} */ (token).text,
         left,
         right: this.multiplicative(),
       };
@@ -256,7 +256,7 @@ export class AST {
     while ((token = this.expect("*", "/", "%"))) {
       left = {
         type: ASTType.BinaryExpression,
-        operator: /** @type {import("./lexer").Token} */ (token).text,
+        operator: /** @type {import("../lexer/lexer.js").Token} */ (token).text,
         left,
         right: this.unary(),
       };
@@ -273,7 +273,7 @@ export class AST {
     if ((token = this.expect("+", "-", "!"))) {
       return {
         type: ASTType.UnaryExpression,
-        operator: /** @type {import("./lexer").Token} */ (token).text,
+        operator: /** @type {import("../lexer/lexer.js").Token} */ (token).text,
         prefix: true,
         argument: this.unary(),
       };
@@ -297,40 +297,48 @@ export class AST {
     } else if (
       Object.prototype.hasOwnProperty.call(
         this.selfReferential,
-        /** @type {import("./lexer").Token} */ (this.peek()).text,
+        /** @type {import("../lexer/lexer.js").Token} */ (this.peek()).text,
       )
     ) {
       primary = structuredClone(this.selfReferential[this.consume().text]);
     } else if (
-      literals.has(/** @type {import("./lexer").Token} */ (this.peek()).text)
+      literals.has(
+        /** @type {import("../lexer/lexer.js").Token} */ (this.peek()).text,
+      )
     ) {
       primary = {
         type: ASTType.Literal,
         value: literals.get(this.consume().text),
       };
     } else if (
-      /** @type {import("./lexer").Token} */ (this.peek()).identifier
+      /** @type {import("../lexer/lexer.js").Token} */ (this.peek()).identifier
     ) {
       primary = this.identifier();
-    } else if (/** @type {import("./lexer").Token} */ (this.peek()).constant) {
+    } else if (
+      /** @type {import("../lexer/lexer.js").Token} */ (this.peek()).constant
+    ) {
       primary = this.constant();
     } else {
       this.throwError(
         "not a primary expression",
-        /** @type {import("./lexer").Token} */ (this.peek()),
+        /** @type {import("../lexer/lexer.js").Token} */ (this.peek()),
       );
     }
 
     let next;
     while ((next = this.expect("(", "[", "."))) {
-      if (/** @type {import("./lexer").Token} */ (next).text === "(") {
+      if (
+        /** @type {import("../lexer/lexer.js").Token} */ (next).text === "("
+      ) {
         primary = {
           type: ASTType.CallExpression,
           callee: primary,
           arguments: this.parseArguments(),
         };
         this.consume(")");
-      } else if (/** @type {import("./lexer").Token} */ (next).text === "[") {
+      } else if (
+        /** @type {import("../lexer/lexer.js").Token} */ (next).text === "["
+      ) {
         primary = {
           type: ASTType.MemberExpression,
           object: primary,
@@ -338,7 +346,9 @@ export class AST {
           computed: true,
         };
         this.consume("]");
-      } else if (/** @type {import("./lexer").Token} */ (next).text === ".") {
+      } else if (
+        /** @type {import("../lexer/lexer.js").Token} */ (next).text === "."
+      ) {
         primary = {
           type: ASTType.MemberExpression,
           object: primary,
@@ -447,13 +457,17 @@ export class AST {
           break;
         }
         property = { type: ASTType.Property, kind: "init" };
-        if (/** @type {import("./lexer").Token} */ (this.peek()).constant) {
+        if (
+          /** @type {import("../lexer/lexer.js").Token} */ (this.peek())
+            .constant
+        ) {
           property.key = this.constant();
           property.computed = false;
           this.consume(":");
           property.value = this.assignment();
         } else if (
-          /** @type {import("./lexer").Token} */ (this.peek()).identifier
+          /** @type {import("../lexer/lexer.js").Token} */ (this.peek())
+            .identifier
         ) {
           property.key = this.identifier();
           property.computed = false;
@@ -473,7 +487,7 @@ export class AST {
         } else {
           this.throwError(
             "invalid key",
-            /** @type {import("./lexer").Token} */ (this.peek()),
+            /** @type {import("../lexer/lexer.js").Token} */ (this.peek()),
           );
         }
         properties.push(property);
@@ -487,7 +501,7 @@ export class AST {
   /**
    * Throws a syntax error.
    * @param {string} msg - The error message.
-   * @param {import("./lexer").Token} [token] - The token that caused the error.
+   * @param {import("../lexer/lexer.js").Token} [token] - The token that caused the error.
    */
   throwError(msg, token) {
     throw $parseMinErr(
@@ -504,7 +518,7 @@ export class AST {
   /**
    * Consumes a token if it matches the expected type.
    * @param {string} [e1] - The expected token type.
-   * @returns {import("./lexer").Token} The consumed token.
+   * @returns {import("../lexer/lexer.js").Token} The consumed token.
    */
   consume(e1) {
     if (this.tokens.length === 0) {
@@ -519,16 +533,16 @@ export class AST {
     if (!token) {
       this.throwError(
         `is unexpected, expecting [${e1}]`,
-        /** @type {import("./lexer").Token} */ (this.peek()),
+        /** @type {import("../lexer/lexer.js").Token} */ (this.peek()),
       );
     } else {
-      return /** @type  {import("./lexer").Token} */ (token);
+      return /** @type  {import("../lexer/lexer.js").Token} */ (token);
     }
   }
 
   /**
    * Returns the next token without consuming it.
-   * @returns {import("./lexer").Token} The next token.
+   * @returns {import("../lexer/lexer.js").Token} The next token.
    */
   peekToken() {
     if (this.tokens.length === 0) {
@@ -544,7 +558,7 @@ export class AST {
   /**
    * Checks if the next token matches any of the expected types.
    * @param {...string} [expected] - The expected token types.
-   * @returns {import('./lexer').Token|boolean} The next token if it matches, otherwise false.
+   * @returns {import('../lexer/lexer.js').Token|boolean} The next token if it matches, otherwise false.
    */
   peek(...expected) {
     return this.peekAhead(0, ...expected);
@@ -554,7 +568,7 @@ export class AST {
    * Checks if the token at the specified index matches any of the expected types.
    * @param {number} i - The index to check.
    * @param {...string} [expected] - The expected token types.
-   * @returns {import("./lexer").Token|boolean} The token at the specified index if it matches, otherwise false.
+   * @returns {import("../lexer/lexer.js").Token|boolean} The token at the specified index if it matches, otherwise false.
    */
   peekAhead(i, ...expected) {
     if (this.tokens.length > i) {
@@ -573,7 +587,7 @@ export class AST {
   /**
    * Consumes the next token if it matches any of the expected types.
    * @param {...string} [expected] - The expected token types.
-   * @returns {import("./lexer").Token|boolean} The consumed token if it matches, otherwise false.
+   * @returns {import("../lexer/lexer.js").Token|boolean} The consumed token if it matches, otherwise false.
    */
   expect(...expected) {
     const token = this.peek(...expected);

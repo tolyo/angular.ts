@@ -34,7 +34,7 @@ import { startingTag } from "../../shared/jqlite/jqlite";
 export const requiredDirective = [
   "$parse",
   /**
-   * @param {import("../../core/parser/parse.js").ParseService} $parse
+   * @param {import("../../core/parse/parse.js").ParseService} $parse
    * @returns {import("../../types.js").Directive}
    */
   ($parse) => ({
@@ -117,7 +117,7 @@ export const requiredDirective = [
 export const patternDirective = [
   "$parse",
   /**
-   * @param {import("../../core/parser/parse.js").ParseService} $parse
+   * @param {import("../../core/parse/parse.js").ParseService} $parse
    * @returns {import("../../types.js").Directive}
    */
   ($parse) => {
@@ -218,7 +218,7 @@ export const patternDirective = [
 export const maxlengthDirective = [
   "$parse",
   /**
-   * @param {import("../../core/parser/parse.js").ParseService} $parse
+   * @param {import("../../core/parse/parse.js").ParseService} $parse
    * @returns {import("../../types.js").Directive}
    */
   ($parse) => ({

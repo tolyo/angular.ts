@@ -32,11 +32,11 @@ export const literals: Map<string, any>;
  */
 export class AST {
     /**
-     * @param {import('./lexer').Lexer} lexer - The lexer instance for tokenizing input
+     * @param {import('../lexer/lexer.js').Lexer} lexer - The lexer instance for tokenizing input
      */
-    constructor(lexer: import("./lexer").Lexer);
-    /** @type {import('./lexer').Lexer} */
-    lexer: import("./lexer").Lexer;
+    constructor(lexer: import("../lexer/lexer.js").Lexer);
+    /** @type {import('../lexer/lexer.js').Lexer} */
+    lexer: import("../lexer/lexer.js").Lexer;
     selfReferential: {
         this: {
             type: 15;
@@ -52,7 +52,7 @@ export class AST {
      */
     ast(text: string): ASTNode;
     text: string;
-    tokens: import("./lexer").Token[];
+    tokens: import("../lexer/lexer.js").Token[];
     /**
      * Parses a program.
      * @returns {ASTNode} The program node.
@@ -152,39 +152,39 @@ export class AST {
     /**
      * Throws a syntax error.
      * @param {string} msg - The error message.
-     * @param {import("./lexer").Token} [token] - The token that caused the error.
+     * @param {import("../lexer/lexer.js").Token} [token] - The token that caused the error.
      */
-    throwError(msg: string, token?: import("./lexer").Token): void;
+    throwError(msg: string, token?: import("../lexer/lexer.js").Token): void;
     /**
      * Consumes a token if it matches the expected type.
      * @param {string} [e1] - The expected token type.
-     * @returns {import("./lexer").Token} The consumed token.
+     * @returns {import("../lexer/lexer.js").Token} The consumed token.
      */
-    consume(e1?: string): import("./lexer").Token;
+    consume(e1?: string): import("../lexer/lexer.js").Token;
     /**
      * Returns the next token without consuming it.
-     * @returns {import("./lexer").Token} The next token.
+     * @returns {import("../lexer/lexer.js").Token} The next token.
      */
-    peekToken(): import("./lexer").Token;
+    peekToken(): import("../lexer/lexer.js").Token;
     /**
      * Checks if the next token matches any of the expected types.
      * @param {...string} [expected] - The expected token types.
-     * @returns {import('./lexer').Token|boolean} The next token if it matches, otherwise false.
+     * @returns {import('../lexer/lexer.js').Token|boolean} The next token if it matches, otherwise false.
      */
-    peek(...expected?: string[]): import("./lexer").Token | boolean;
+    peek(...expected?: string[]): import("../lexer/lexer.js").Token | boolean;
     /**
      * Checks if the token at the specified index matches any of the expected types.
      * @param {number} i - The index to check.
      * @param {...string} [expected] - The expected token types.
-     * @returns {import("./lexer").Token|boolean} The token at the specified index if it matches, otherwise false.
+     * @returns {import("../lexer/lexer.js").Token|boolean} The token at the specified index if it matches, otherwise false.
      */
-    peekAhead(i: number, ...expected?: string[]): import("./lexer").Token | boolean;
+    peekAhead(i: number, ...expected?: string[]): import("../lexer/lexer.js").Token | boolean;
     /**
      * Consumes the next token if it matches any of the expected types.
      * @param {...string} [expected] - The expected token types.
-     * @returns {import("./lexer").Token|boolean} The consumed token if it matches, otherwise false.
+     * @returns {import("../lexer/lexer.js").Token|boolean} The consumed token if it matches, otherwise false.
      */
-    expect(...expected?: string[]): import("./lexer").Token | boolean;
+    expect(...expected?: string[]): import("../lexer/lexer.js").Token | boolean;
 }
 export type ASTNode = {
     /**

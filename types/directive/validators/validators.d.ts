@@ -21,7 +21,7 @@
  * custom controls, `$isEmpty()` can be overwritten to account for a $viewValue that is not string-based.
  *
  */
-export const requiredDirective: (string | (($parse: import("../../core/parser/parse.js").ParseService) => import("../../types.js").Directive))[];
+export const requiredDirective: (string | (($parse: import("../../core/parse/parse.js").ParseService) => import("../../types.js").Directive))[];
 /**
  * @param {String|RegExp} ngPattern AngularJS expression that must evaluate to a `RegExp` or a `String`
  *                                      parsable into a `RegExp`, or a `RegExp` literal. See above for
@@ -61,7 +61,7 @@ export const requiredDirective: (string | (($parse: import("../../core/parser/pa
  * </ol>
  * </div>
  */
-export const patternDirective: (string | (($parse: import("../../core/parser/parse.js").ParseService) => import("../../types.js").Directive))[];
+export const patternDirective: (string | (($parse: import("../../core/parse/parse.js").ParseService) => import("../../types.js").Directive))[];
 /**
  * @param {string} ngMaxlength AngularJS expression that must evaluate to a `Number` or `String`
  *                                 parsable into a `Number`. Used as value for the `maxlength`
@@ -92,7 +92,7 @@ export const patternDirective: (string | (($parse: import("../../core/parser/par
  * </div>
  *
  */
-export const maxlengthDirective: (string | (($parse: import("../../core/parser/parse.js").ParseService) => import("../../types.js").Directive))[];
+export const maxlengthDirective: (string | (($parse: import("../../core/parse/parse.js").ParseService) => import("../../types.js").Directive))[];
 /**
  *
  * @param {string} ngMinlength AngularJS expression that must evaluate to a `Number` or `String`

@@ -1,10 +1,10 @@
-import { AST } from "./ast";
-import { ASTType } from "./ast-type";
-import { ASTInterpreter } from "./interpreter";
+import { AST } from "../ast/ast.js";
+import { ASTType } from "../ast-type.js";
+import { ASTInterpreter } from "../interpreter.js";
 
 /**
  * @typedef {Object} ParsedAST
- * @property {import("./ast").ASTNode} ast - AST representation of expression
+ * @property {import("../ast/ast.js").ASTNode} ast - AST representation of expression
  * @property {boolean} oneTime - True if expression should be evaluated only once
  */
 
@@ -14,7 +14,7 @@ import { ASTInterpreter } from "./interpreter";
 export class Parser {
   /**
    *
-   * @param {import('./lexer').Lexer} lexer
+   * @param {import('../lexer/lexer.js').Lexer} lexer
    * @param {function(any):any} $filter
    */
   constructor(lexer, $filter) {
@@ -28,7 +28,7 @@ export class Parser {
   /**
    *
    * @param {string} exp - Expression to be parsed
-   * @returns {import("./parse").CompiledExpression}
+   * @returns {import("../parse.js").CompiledExpression}
    */
   parse(exp) {
     const { ast, oneTime } = this.getAst(exp);

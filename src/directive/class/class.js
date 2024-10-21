@@ -8,7 +8,7 @@ function classDirective(name, selector) {
     "$parse",
     /**
      *
-     * @param {import("../../core/parser/parse.js").ParseService} $parse
+     * @param {import("../../core/parse/parse.js").ParseService} $parse
      * @returns {import("../../types").Directive}
      */
     ($parse) => ({

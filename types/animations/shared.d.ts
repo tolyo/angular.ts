@@ -62,4 +62,4 @@ export const ANIMATION_DURATION_PROP: string;
 export const TRANSITION_DELAY_PROP: string;
 export const TRANSITION_DURATION_PROP: string;
 export const ngMinErr: (arg0: string, ...arg1: any[]) => Error;
-import { JQLite } from "../shared/jqlite/jqlite";
+import { JQLite } from "../shared/jqlite/jqlite.js";

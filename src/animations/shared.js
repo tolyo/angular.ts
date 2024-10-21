@@ -1,6 +1,6 @@
-import { forEach, isString, minErr, extend } from "../shared/utils";
-import { JQLite } from "../shared/jqlite/jqlite";
-import { ASTType } from "../core/parser/ast-type";
+import { forEach, isString, minErr, extend } from "../shared/utils.js";
+import { JQLite } from "../shared/jqlite/jqlite.js";
+import { ASTType } from "../core/parse/ast-type.js";
 
 export const ADD_CLASS_SUFFIX = "-add";
 export const REMOVE_CLASS_SUFFIX = "-remove";

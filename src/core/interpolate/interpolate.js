@@ -6,7 +6,7 @@ import {
   valueFn,
   extend,
 } from "../../shared/utils";
-import { constantWatchDelegate } from "../parser/parse";
+import { constantWatchDelegate } from "../parse/parse.js";
 
 const $interpolateMinErr = minErr("$interpolate");
 function throwNoconcat(text) {
@@ -81,7 +81,7 @@ export class InterpolateProvider {
     "$sce",
     /**
      *
-     * @param {import("../parser/parse").ParseService} $parse
+     * @param {import("../parse/parse").ParseService} $parse
      * @param {*} $sce
      * @returns
      */

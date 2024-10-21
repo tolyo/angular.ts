@@ -1,16 +1,15 @@
-import { AST } from "./ast";
-import { Lexer } from "./lexer";
+import { AST } from "./ast/ast.js";
+import { Lexer } from "./lexer/lexer.js";
 import {
   isFunction,
   sliceArgs,
   csp,
   valueFn,
   extend,
-} from "../../shared/utils";
-import { createInjector } from "../di/injector";
-import { ASTType } from "./ast-type";
-import { Angular } from "../../loader";
-import { wait } from "../../shared/test-utils";
+} from "../../shared/utils.js";
+import { createInjector } from "../di/injector.js";
+import { ASTType } from "./ast-type.js";
+import { Angular } from "../../loader.js";
 
 describe("parser", () => {
   let $rootScope;
@@ -31,1725 +30,6 @@ describe("parser", () => {
     let injector = createInjector(["myModule"]);
     $parse = injector.get("$parse");
     $rootScope = injector.get("$rootScope");
-  });
-
-  describe("lexer", () => {
-    let lex;
-
-    beforeEach(() => {
-      lex = function () {
-        const lexer = new Lexer({});
-        return lexer.lex.apply(lexer, arguments);
-      };
-    });
-
-    it("should only match number chars with isNumber", () => {
-      expect(Lexer.prototype.isNumber("0")).toBe(true);
-      expect(Lexer.prototype.isNumber("")).toBeFalsy();
-      expect(Lexer.prototype.isNumber(" ")).toBeFalsy();
-      expect(Lexer.prototype.isNumber(0)).toBeFalsy();
-      expect(Lexer.prototype.isNumber(false)).toBeFalsy();
-      expect(Lexer.prototype.isNumber(true)).toBeFalsy();
-      expect(Lexer.prototype.isNumber(undefined)).toBeFalsy();
-      expect(Lexer.prototype.isNumber(null)).toBeFalsy();
-    });
-
-    it("should tokenize a string", () => {
-      const tokens = lex("a.bc[22]+1.3|f:'a\\'c':\"d\\\"e\"");
-      let i = 0;
-      expect(tokens[i].index).toEqual(0);
-      expect(tokens[i].text).toEqual("a");
-
-      i++;
-      expect(tokens[i].index).toEqual(1);
-      expect(tokens[i].text).toEqual(".");
-
-      i++;
-      expect(tokens[i].index).toEqual(2);
-      expect(tokens[i].text).toEqual("bc");
-
-      i++;
-      expect(tokens[i].index).toEqual(4);
-      expect(tokens[i].text).toEqual("[");
-
-      i++;
-      expect(tokens[i].index).toEqual(5);
-      expect(tokens[i].text).toEqual("22");
-      expect(tokens[i].value).toEqual(22);
-      expect(tokens[i].constant).toEqual(true);
-
-      i++;
-      expect(tokens[i].index).toEqual(7);
-      expect(tokens[i].text).toEqual("]");
-
-      i++;
-      expect(tokens[i].index).toEqual(8);
-      expect(tokens[i].text).toEqual("+");
-
-      i++;
-      expect(tokens[i].index).toEqual(9);
-      expect(tokens[i].text).toEqual("1.3");
-      expect(tokens[i].value).toEqual(1.3);
-      expect(tokens[i].constant).toEqual(true);
-
-      i++;
-      expect(tokens[i].index).toEqual(12);
-      expect(tokens[i].text).toEqual("|");
-
-      i++;
-      expect(tokens[i].index).toEqual(13);
-      expect(tokens[i].text).toEqual("f");
-
-      i++;
-      expect(tokens[i].index).toEqual(14);
-      expect(tokens[i].text).toEqual(":");
-
-      i++;
-      expect(tokens[i].index).toEqual(15);
-      expect(tokens[i].value).toEqual("a'c");
-
-      i++;
-      expect(tokens[i].index).toEqual(21);
-      expect(tokens[i].text).toEqual(":");
-
-      i++;
-      expect(tokens[i].index).toEqual(22);
-      expect(tokens[i].value).toEqual('d"e');
-    });
-
-    it("should tokenize identifiers with spaces around dots the same as without spaces", () => {
-      function getText(t) {
-        return t.text;
-      }
-      const spaces = lex("foo. bar . baz").map(getText);
-      const noSpaces = lex("foo.bar.baz").map(getText);
-
-      expect(spaces).toEqual(noSpaces);
-    });
-
-    it("should use callback functions to know when an identifier is valid", () => {
-      function getText(t) {
-        return t.text;
-      }
-      const isIdentifierStart = jasmine.createSpy("start");
-      const isIdentifierContinue = jasmine.createSpy("continue");
-      isIdentifierStart.and.returnValue(true);
-      const lex = new Lexer({
-        isIdentifierStart,
-        isIdentifierContinue,
-      });
-
-      isIdentifierContinue.and.returnValue(true);
-      let tokens = lex.lex("πΣε").map(getText);
-      expect(tokens).toEqual(["πΣε"]);
-
-      isIdentifierContinue.and.returnValue(false);
-      tokens = lex.lex("πΣε").map(getText);
-      expect(tokens).toEqual(["π", "Σ", "ε"]);
-    });
-
-    it("should send the unicode characters and code points", () => {
-      function getText(t) {
-        return t.text;
-      }
-      const isIdentifierStart = jasmine.createSpy("start");
-      const isIdentifierContinue = jasmine.createSpy("continue");
-      isIdentifierStart.and.returnValue(true);
-      isIdentifierContinue.and.returnValue(true);
-      const lex = new Lexer({
-        isIdentifierStart,
-        isIdentifierContinue,
-      });
-      const tokens = lex.lex("\uD801\uDC37\uD852\uDF62\uDBFF\uDFFF");
-      expect(isIdentifierStart).toHaveBeenCalledTimes(1);
-      expect(isIdentifierStart.calls.argsFor(0)).toEqual([
-        "\uD801\uDC37",
-        0x10437,
-      ]);
-      expect(isIdentifierContinue).toHaveBeenCalledTimes(2);
-      expect(isIdentifierContinue.calls.argsFor(0)).toEqual([
-        "\uD852\uDF62",
-        0x24b62,
-      ]);
-      expect(isIdentifierContinue.calls.argsFor(1)).toEqual([
-        "\uDBFF\uDFFF",
-        0x10ffff,
-      ]);
-    });
-
-    it("should tokenize undefined", () => {
-      const tokens = lex("undefined");
-      const i = 0;
-      expect(tokens[i].index).toEqual(0);
-      expect(tokens[i].text).toEqual("undefined");
-    });
-
-    it("should tokenize quoted string", () => {
-      const str = "['\\'', \"\\\"\"]";
-      const tokens = lex(str);
-
-      expect(tokens[1].index).toEqual(1);
-      expect(tokens[1].value).toEqual("'");
-
-      expect(tokens[3].index).toEqual(7);
-      expect(tokens[3].value).toEqual('"');
-    });
-
-    it("should tokenize escaped quoted string", () => {
-      const str = '"\\"\\n\\f\\r\\t\\v\\u00A0"';
-      const tokens = lex(str);
-
-      expect(tokens[0].value).toEqual('"\n\f\r\t\v\u00A0');
-    });
-
-    it("should tokenize unicode", () => {
-      const tokens = lex('"\\u00A0"');
-      expect(tokens.length).toEqual(1);
-      expect(tokens[0].value).toEqual("\u00a0");
-    });
-
-    it("should ignore whitespace", () => {
-      const tokens = lex("a \t \n \r b");
-      expect(tokens[0].text).toEqual("a");
-      expect(tokens[1].text).toEqual("b");
-    });
-
-    it("should tokenize relation and equality", () => {
-      const tokens = lex("! == != < > <= >= === !==");
-      expect(tokens[0].text).toEqual("!");
-      expect(tokens[1].text).toEqual("==");
-      expect(tokens[2].text).toEqual("!=");
-      expect(tokens[3].text).toEqual("<");
-      expect(tokens[4].text).toEqual(">");
-      expect(tokens[5].text).toEqual("<=");
-      expect(tokens[6].text).toEqual(">=");
-      expect(tokens[7].text).toEqual("===");
-      expect(tokens[8].text).toEqual("!==");
-    });
-
-    it("should tokenize logical and ternary", () => {
-      const tokens = lex("&& || ? :");
-      expect(tokens[0].text).toEqual("&&");
-      expect(tokens[1].text).toEqual("||");
-      expect(tokens[2].text).toEqual("?");
-      expect(tokens[3].text).toEqual(":");
-    });
-
-    it("should tokenize statements", () => {
-      const tokens = lex("a;b;");
-      expect(tokens[0].text).toEqual("a");
-      expect(tokens[1].text).toEqual(";");
-      expect(tokens[2].text).toEqual("b");
-      expect(tokens[3].text).toEqual(";");
-    });
-
-    it("should tokenize function invocation", () => {
-      const tokens = lex("a()");
-      expect(tokens.map((t) => t.text)).toEqual(["a", "(", ")"]);
-    });
-
-    it("should tokenize method invocation", () => {
-      const tokens = lex("a.b.c (d) - e.f()");
-      expect(tokens.map((t) => t.text)).toEqual([
-        "a",
-        ".",
-        "b",
-        ".",
-        "c",
-        "(",
-        "d",
-        ")",
-        "-",
-        "e",
-        ".",
-        "f",
-        "(",
-        ")",
-      ]);
-    });
-
-    it("should tokenize number", () => {
-      const tokens = lex("0.5");
-      expect(tokens[0].value).toEqual(0.5);
-    });
-
-    it("should tokenize negative number", () => {
-      let value = $rootScope.$eval("-0.5");
-      expect(value).toEqual(-0.5);
-
-      value = $rootScope.$eval("{a:-0.5}");
-      expect(value).toEqual({ a: -0.5 });
-    });
-
-    it("should tokenize number with exponent", () => {
-      let tokens = lex("0.5E-10");
-      expect(tokens[0].value).toEqual(0.5e-10);
-      expect($rootScope.$eval("0.5E-10")).toEqual(0.5e-10);
-
-      tokens = lex("0.5E+10");
-      expect(tokens[0].value).toEqual(0.5e10);
-    });
-
-    it("should throws exception for invalid exponent", () => {
-      expect(() => {
-        lex("0.5E-");
-      }).toThrowError(/lexerr/);
-
-      expect(() => {
-        lex("0.5E-A");
-      }).toThrowError(/lexerr/);
-    });
-
-    it("should tokenize number starting with a dot", () => {
-      const tokens = lex(".5");
-      expect(tokens[0].value).toEqual(0.5);
-    });
-
-    it("should throw error on invalid unicode", () => {
-      expect(() => {
-        lex("'\\u1''bla'");
-      }).toThrowError(/lexerr/);
-    });
-  });
-
-  describe("ast", () => {
-    let createAst;
-
-    beforeEach(() => {
-      /* global AST: false */
-      createAst = function () {
-        const lexer = new Lexer({});
-        const ast = new AST(lexer, {
-          csp: false,
-          literals: {
-            true: true,
-            false: false,
-            undefined: undefined,
-            null: null,
-          },
-        });
-        return ast.ast.apply(ast, arguments);
-      };
-    });
-
-    it("should handle an empty list of tokens", () => {
-      expect(createAst("")).toEqual({ type: ASTType.Program, body: [] });
-    });
-
-    it("should understand identifiers", () => {
-      expect(createAst("foo")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: { type: ASTType.Identifier, name: "foo" },
-          },
-        ],
-      });
-    });
-
-    it("should understand non-computed member expressions", () => {
-      expect(createAst("foo.bar")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.MemberExpression,
-              object: { type: ASTType.Identifier, name: "foo" },
-              property: { type: ASTType.Identifier, name: "bar" },
-              computed: false,
-            },
-          },
-        ],
-      });
-    });
-
-    it("should associate non-computed member expressions left-to-right", () => {
-      expect(createAst("foo.bar.baz")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.MemberExpression,
-              object: {
-                type: ASTType.MemberExpression,
-                object: { type: ASTType.Identifier, name: "foo" },
-                property: { type: ASTType.Identifier, name: "bar" },
-                computed: false,
-              },
-              property: { type: ASTType.Identifier, name: "baz" },
-              computed: false,
-            },
-          },
-        ],
-      });
-    });
-
-    it("should understand computed member expressions", () => {
-      expect(createAst("foo[bar]")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.MemberExpression,
-              object: { type: ASTType.Identifier, name: "foo" },
-              property: { type: ASTType.Identifier, name: "bar" },
-              computed: true,
-            },
-          },
-        ],
-      });
-    });
-
-    it("should associate computed member expressions left-to-right", () => {
-      expect(createAst("foo[bar][baz]")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.MemberExpression,
-              object: {
-                type: ASTType.MemberExpression,
-                object: { type: ASTType.Identifier, name: "foo" },
-                property: { type: ASTType.Identifier, name: "bar" },
-                computed: true,
-              },
-              property: { type: ASTType.Identifier, name: "baz" },
-              computed: true,
-            },
-          },
-        ],
-      });
-    });
-
-    it("should understand call expressions", () => {
-      expect(createAst("foo()")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.CallExpression,
-              callee: { type: ASTType.Identifier, name: "foo" },
-              arguments: [],
-            },
-          },
-        ],
-      });
-    });
-
-    it("should parse call expression arguments", () => {
-      expect(createAst("foo(bar, baz)")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.CallExpression,
-              callee: { type: ASTType.Identifier, name: "foo" },
-              arguments: [
-                { type: ASTType.Identifier, name: "bar" },
-                { type: ASTType.Identifier, name: "baz" },
-              ],
-            },
-          },
-        ],
-      });
-    });
-
-    it("should parse call expression left-to-right", () => {
-      expect(createAst("foo(bar, baz)(man, shell)")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.CallExpression,
-              callee: {
-                type: ASTType.CallExpression,
-                callee: { type: ASTType.Identifier, name: "foo" },
-                arguments: [
-                  { type: ASTType.Identifier, name: "bar" },
-                  { type: ASTType.Identifier, name: "baz" },
-                ],
-              },
-              arguments: [
-                { type: ASTType.Identifier, name: "man" },
-                { type: ASTType.Identifier, name: "shell" },
-              ],
-            },
-          },
-        ],
-      });
-    });
-
-    it("should keep the context when having superfluous parenthesis", () => {
-      expect(createAst("(foo)(bar, baz)")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.CallExpression,
-              callee: { type: ASTType.Identifier, name: "foo" },
-              arguments: [
-                { type: ASTType.Identifier, name: "bar" },
-                { type: ASTType.Identifier, name: "baz" },
-              ],
-            },
-          },
-        ],
-      });
-    });
-
-    it("should treat member expressions and call expression with the same precedence", () => {
-      expect(createAst("foo.bar[baz]()")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.CallExpression,
-              callee: {
-                type: ASTType.MemberExpression,
-                object: {
-                  type: ASTType.MemberExpression,
-                  object: { type: ASTType.Identifier, name: "foo" },
-                  property: { type: ASTType.Identifier, name: "bar" },
-                  computed: false,
-                },
-                property: { type: ASTType.Identifier, name: "baz" },
-                computed: true,
-              },
-              arguments: [],
-            },
-          },
-        ],
-      });
-      expect(createAst("foo[bar]().baz")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.MemberExpression,
-              object: {
-                type: ASTType.CallExpression,
-                callee: {
-                  type: ASTType.MemberExpression,
-                  object: { type: ASTType.Identifier, name: "foo" },
-                  property: { type: ASTType.Identifier, name: "bar" },
-                  computed: true,
-                },
-                arguments: [],
-              },
-              property: { type: ASTType.Identifier, name: "baz" },
-              computed: false,
-            },
-          },
-        ],
-      });
-      expect(createAst("foo().bar[baz]")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.MemberExpression,
-              object: {
-                type: ASTType.MemberExpression,
-                object: {
-                  type: ASTType.CallExpression,
-                  callee: { type: ASTType.Identifier, name: "foo" },
-                  arguments: [],
-                },
-                property: { type: ASTType.Identifier, name: "bar" },
-                computed: false,
-              },
-              property: { type: ASTType.Identifier, name: "baz" },
-              computed: true,
-            },
-          },
-        ],
-      });
-    });
-
-    it("should understand literals", () => {
-      // In a strict sense, `undefined` is not a literal but an identifier
-      Object.entries({
-        123: 123,
-        '"123"': "123",
-        true: true,
-        false: false,
-        null: null,
-        undefined: undefined,
-      }).forEach(([expression, value]) => {
-        expect(createAst(expression)).toEqual({
-          type: ASTType.Program,
-          body: [
-            {
-              type: ASTType.ExpressionStatement,
-              expression: { type: ASTType.Literal, value },
-            },
-          ],
-        });
-      });
-    });
-
-    it("should understand the `this` expression", () => {
-      expect(createAst("this")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: { type: ASTType.ThisExpression },
-          },
-        ],
-      });
-    });
-
-    it("should understand the `$locals` expression", () => {
-      expect(createAst("$locals")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: { type: ASTType.LocalsExpression },
-          },
-        ],
-      });
-    });
-
-    it("should not confuse `this`, `$locals`, `undefined`, `true`, `false`, `null` when used as identifiers", () => {
-      ["this", "$locals", "undefined", "true", "false", "null"].forEach(
-        (identifier) => {
-          expect(createAst(`foo.${identifier}`)).toEqual({
-            type: ASTType.Program,
-            body: [
-              {
-                type: ASTType.ExpressionStatement,
-                expression: {
-                  type: ASTType.MemberExpression,
-                  object: { type: ASTType.Identifier, name: "foo" },
-                  property: { type: ASTType.Identifier, name: identifier },
-                  computed: false,
-                },
-              },
-            ],
-          });
-        },
-      );
-    });
-
-    it("should throw when trying to use non-identifiers as identifiers", () => {
-      expect(() => {
-        createAst("foo.)");
-      }).toThrowError(/syntax/);
-    });
-
-    it("should throw when all tokens are not consumed", () => {
-      expect(() => {
-        createAst("foo bar");
-      }).toThrowError(/syntax/);
-    });
-
-    it("should understand the unary operators `-`, `+` and `!`", () => {
-      ["-", "+", "!"].forEach((operator) => {
-        expect(createAst(`${operator}foo`)).toEqual({
-          type: ASTType.Program,
-          body: [
-            {
-              type: ASTType.ExpressionStatement,
-              expression: {
-                type: ASTType.UnaryExpression,
-                operator,
-                prefix: true,
-                argument: { type: ASTType.Identifier, name: "foo" },
-              },
-            },
-          ],
-        });
-      });
-    });
-
-    it("should handle all unary operators with the same precedence", () => {
-      [
-        ["+", "-", "!"],
-        ["-", "!", "+"],
-        ["!", "+", "-"],
-      ].forEach((operators) => {
-        expect(createAst(`${operators.join("")}foo`)).toEqual({
-          type: ASTType.Program,
-          body: [
-            {
-              type: ASTType.ExpressionStatement,
-              expression: {
-                type: ASTType.UnaryExpression,
-                operator: operators[0],
-                prefix: true,
-                argument: {
-                  type: ASTType.UnaryExpression,
-                  operator: operators[1],
-                  prefix: true,
-                  argument: {
-                    type: ASTType.UnaryExpression,
-                    operator: operators[2],
-                    prefix: true,
-                    argument: { type: ASTType.Identifier, name: "foo" },
-                  },
-                },
-              },
-            },
-          ],
-        });
-      });
-    });
-
-    it("should be able to understand binary operators", () => {
-      [
-        "*",
-        "/",
-        "%",
-        "+",
-        "-",
-        "<",
-        ">",
-        "<=",
-        ">=",
-        "==",
-        "!=",
-        "===",
-        "!==",
-      ].forEach((operator) => {
-        expect(createAst(`foo${operator}bar`)).toEqual({
-          type: ASTType.Program,
-          body: [
-            {
-              type: ASTType.ExpressionStatement,
-              expression: {
-                type: ASTType.BinaryExpression,
-                operator,
-                left: { type: ASTType.Identifier, name: "foo" },
-                right: { type: ASTType.Identifier, name: "bar" },
-              },
-            },
-          ],
-        });
-      });
-    });
-
-    it("should associate binary operators with the same precedence left-to-right", () => {
-      const operatorsByPrecedence = [
-        ["*", "/", "%"],
-        ["+", "-"],
-        ["<", ">", "<=", ">="],
-        ["==", "!=", "===", "!=="],
-      ];
-      operatorsByPrecedence.forEach((operators) => {
-        operators.forEach((op1) => {
-          operators.forEach((op2) => {
-            expect(createAst(`foo${op1}bar${op2}baz`)).toEqual({
-              type: ASTType.Program,
-              body: [
-                {
-                  type: ASTType.ExpressionStatement,
-                  expression: {
-                    type: ASTType.BinaryExpression,
-                    operator: op2,
-                    left: {
-                      type: ASTType.BinaryExpression,
-                      operator: op1,
-                      left: { type: ASTType.Identifier, name: "foo" },
-                      right: { type: ASTType.Identifier, name: "bar" },
-                    },
-                    right: { type: ASTType.Identifier, name: "baz" },
-                  },
-                },
-              ],
-            });
-          });
-        });
-      });
-    });
-
-    it("should give higher precedence to member calls than to unary expressions", () => {
-      ["!", "+", "-"].forEach((operator) => {
-        expect(createAst(`${operator}foo()`)).toEqual({
-          type: ASTType.Program,
-          body: [
-            {
-              type: ASTType.ExpressionStatement,
-              expression: {
-                type: ASTType.UnaryExpression,
-                operator,
-                prefix: true,
-                argument: {
-                  type: ASTType.CallExpression,
-                  callee: { type: ASTType.Identifier, name: "foo" },
-                  arguments: [],
-                },
-              },
-            },
-          ],
-        });
-        expect(createAst(`${operator}foo.bar`)).toEqual({
-          type: ASTType.Program,
-          body: [
-            {
-              type: ASTType.ExpressionStatement,
-              expression: {
-                type: ASTType.UnaryExpression,
-                operator,
-                prefix: true,
-                argument: {
-                  type: ASTType.MemberExpression,
-                  object: { type: ASTType.Identifier, name: "foo" },
-                  property: { type: ASTType.Identifier, name: "bar" },
-                  computed: false,
-                },
-              },
-            },
-          ],
-        });
-        expect(createAst(`${operator}foo[bar]`)).toEqual({
-          type: ASTType.Program,
-          body: [
-            {
-              type: ASTType.ExpressionStatement,
-              expression: {
-                type: ASTType.UnaryExpression,
-                operator,
-                prefix: true,
-                argument: {
-                  type: ASTType.MemberExpression,
-                  object: { type: ASTType.Identifier, name: "foo" },
-                  property: { type: ASTType.Identifier, name: "bar" },
-                  computed: true,
-                },
-              },
-            },
-          ],
-        });
-      });
-    });
-
-    it("should give higher precedence to unary operators over multiplicative operators", () => {
-      ["!", "+", "-"].forEach((op1) => {
-        ["*", "/", "%"].forEach((op2) => {
-          expect(createAst(`${op1}foo${op2}${op1}bar`)).toEqual({
-            type: ASTType.Program,
-            body: [
-              {
-                type: ASTType.ExpressionStatement,
-                expression: {
-                  type: ASTType.BinaryExpression,
-                  operator: op2,
-                  left: {
-                    type: ASTType.UnaryExpression,
-                    operator: op1,
-                    prefix: true,
-                    argument: { type: ASTType.Identifier, name: "foo" },
-                  },
-                  right: {
-                    type: ASTType.UnaryExpression,
-                    operator: op1,
-                    prefix: true,
-                    argument: { type: ASTType.Identifier, name: "bar" },
-                  },
-                },
-              },
-            ],
-          });
-        });
-      });
-    });
-
-    it("should give binary operators their right precedence", () => {
-      const operatorsByPrecedence = [
-        ["*", "/", "%"],
-        ["+", "-"],
-        ["<", ">", "<=", ">="],
-        ["==", "!=", "===", "!=="],
-      ];
-      for (let i = 0; i < operatorsByPrecedence.length - 1; ++i) {
-        operatorsByPrecedence[i].forEach((op1) => {
-          operatorsByPrecedence[i + 1].forEach((op2) => {
-            expect(createAst(`foo${op1}bar${op2}baz${op1}man`)).toEqual({
-              type: ASTType.Program,
-              body: [
-                {
-                  type: ASTType.ExpressionStatement,
-                  expression: {
-                    type: ASTType.BinaryExpression,
-                    operator: op2,
-                    left: {
-                      type: ASTType.BinaryExpression,
-                      operator: op1,
-                      left: { type: ASTType.Identifier, name: "foo" },
-                      right: { type: ASTType.Identifier, name: "bar" },
-                    },
-                    right: {
-                      type: ASTType.BinaryExpression,
-                      operator: op1,
-                      left: { type: ASTType.Identifier, name: "baz" },
-                      right: { type: ASTType.Identifier, name: "man" },
-                    },
-                  },
-                },
-              ],
-            });
-          });
-        });
-      }
-    });
-
-    it("should understand logical operators", () => {
-      ["||", "&&"].forEach((operator) => {
-        expect(createAst(`foo${operator}bar`)).toEqual({
-          type: ASTType.Program,
-          body: [
-            {
-              type: ASTType.ExpressionStatement,
-              expression: {
-                type: ASTType.LogicalExpression,
-                operator,
-                left: { type: ASTType.Identifier, name: "foo" },
-                right: { type: ASTType.Identifier, name: "bar" },
-              },
-            },
-          ],
-        });
-      });
-    });
-
-    it("should associate logical operators left-to-right", () => {
-      ["||", "&&"].forEach((op) => {
-        expect(createAst(`foo${op}bar${op}baz`)).toEqual({
-          type: ASTType.Program,
-          body: [
-            {
-              type: ASTType.ExpressionStatement,
-              expression: {
-                type: ASTType.LogicalExpression,
-                operator: op,
-                left: {
-                  type: ASTType.LogicalExpression,
-                  operator: op,
-                  left: { type: ASTType.Identifier, name: "foo" },
-                  right: { type: ASTType.Identifier, name: "bar" },
-                },
-                right: { type: ASTType.Identifier, name: "baz" },
-              },
-            },
-          ],
-        });
-      });
-    });
-
-    it("should understand ternary operators", () => {
-      expect(createAst("foo?bar:baz")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.ConditionalExpression,
-              test: { type: ASTType.Identifier, name: "foo" },
-              alternate: { type: ASTType.Identifier, name: "bar" },
-              consequent: { type: ASTType.Identifier, name: "baz" },
-            },
-          },
-        ],
-      });
-    });
-
-    it("should associate the conditional operator right-to-left", () => {
-      expect(createAst("foo0?foo1:foo2?bar0?bar1:bar2:man0?man1:man2")).toEqual(
-        {
-          type: ASTType.Program,
-          body: [
-            {
-              type: ASTType.ExpressionStatement,
-              expression: {
-                type: ASTType.ConditionalExpression,
-                test: { type: ASTType.Identifier, name: "foo0" },
-                alternate: { type: ASTType.Identifier, name: "foo1" },
-                consequent: {
-                  type: ASTType.ConditionalExpression,
-                  test: { type: ASTType.Identifier, name: "foo2" },
-                  alternate: {
-                    type: ASTType.ConditionalExpression,
-                    test: { type: ASTType.Identifier, name: "bar0" },
-                    alternate: { type: ASTType.Identifier, name: "bar1" },
-                    consequent: { type: ASTType.Identifier, name: "bar2" },
-                  },
-                  consequent: {
-                    type: ASTType.ConditionalExpression,
-                    test: { type: ASTType.Identifier, name: "man0" },
-                    alternate: { type: ASTType.Identifier, name: "man1" },
-                    consequent: { type: ASTType.Identifier, name: "man2" },
-                  },
-                },
-              },
-            },
-          ],
-        },
-      );
-    });
-
-    it("should understand assignment operator", () => {
-      // Currently, only `=` is supported
-      expect(createAst("foo=bar")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.AssignmentExpression,
-              left: { type: ASTType.Identifier, name: "foo" },
-              right: { type: ASTType.Identifier, name: "bar" },
-              operator: "=",
-            },
-          },
-        ],
-      });
-    });
-
-    it("should associate assignments right-to-left", () => {
-      // Currently, only `=` is supported
-      expect(createAst("foo=bar=man")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.AssignmentExpression,
-              left: { type: ASTType.Identifier, name: "foo" },
-              right: {
-                type: ASTType.AssignmentExpression,
-                left: { type: ASTType.Identifier, name: "bar" },
-                right: { type: ASTType.Identifier, name: "man" },
-                operator: "=",
-              },
-              operator: "=",
-            },
-          },
-        ],
-      });
-    });
-
-    it("should give higher precedence to equality than to the logical `and` operator", () => {
-      ["==", "!=", "===", "!=="].forEach((operator) => {
-        expect(createAst(`foo${operator}bar && man${operator}shell`)).toEqual({
-          type: ASTType.Program,
-          body: [
-            {
-              type: ASTType.ExpressionStatement,
-              expression: {
-                type: ASTType.LogicalExpression,
-                operator: "&&",
-                left: {
-                  type: ASTType.BinaryExpression,
-                  operator,
-                  left: { type: ASTType.Identifier, name: "foo" },
-                  right: { type: ASTType.Identifier, name: "bar" },
-                },
-                right: {
-                  type: ASTType.BinaryExpression,
-                  operator,
-                  left: { type: ASTType.Identifier, name: "man" },
-                  right: { type: ASTType.Identifier, name: "shell" },
-                },
-              },
-            },
-          ],
-        });
-      });
-    });
-
-    it("should give higher precedence to logical `and` than to logical `or`", () => {
-      expect(createAst("foo&&bar||man&&shell")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.LogicalExpression,
-              operator: "||",
-              left: {
-                type: ASTType.LogicalExpression,
-                operator: "&&",
-                left: { type: ASTType.Identifier, name: "foo" },
-                right: { type: ASTType.Identifier, name: "bar" },
-              },
-              right: {
-                type: ASTType.LogicalExpression,
-                operator: "&&",
-                left: { type: ASTType.Identifier, name: "man" },
-                right: { type: ASTType.Identifier, name: "shell" },
-              },
-            },
-          },
-        ],
-      });
-    });
-
-    it("should give higher precedence to the logical `or` than to the conditional operator", () => {
-      expect(createAst("foo||bar?man:shell")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.ConditionalExpression,
-              test: {
-                type: ASTType.LogicalExpression,
-                operator: "||",
-                left: { type: ASTType.Identifier, name: "foo" },
-                right: { type: ASTType.Identifier, name: "bar" },
-              },
-              alternate: { type: ASTType.Identifier, name: "man" },
-              consequent: { type: ASTType.Identifier, name: "shell" },
-            },
-          },
-        ],
-      });
-    });
-
-    it("should give higher precedence to the conditional operator than to assignment operators", () => {
-      expect(createAst("foo=bar?man:shell")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.AssignmentExpression,
-              left: { type: ASTType.Identifier, name: "foo" },
-              right: {
-                type: ASTType.ConditionalExpression,
-                test: { type: ASTType.Identifier, name: "bar" },
-                alternate: { type: ASTType.Identifier, name: "man" },
-                consequent: { type: ASTType.Identifier, name: "shell" },
-              },
-              operator: "=",
-            },
-          },
-        ],
-      });
-    });
-
-    it("should understand array literals", () => {
-      expect(createAst("[]")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.ArrayExpression,
-              elements: [],
-            },
-          },
-        ],
-      });
-      expect(createAst("[foo]")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.ArrayExpression,
-              elements: [{ type: ASTType.Identifier, name: "foo" }],
-            },
-          },
-        ],
-      });
-      expect(createAst("[foo,]")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.ArrayExpression,
-              elements: [{ type: ASTType.Identifier, name: "foo" }],
-            },
-          },
-        ],
-      });
-      expect(createAst("[foo,bar,man,shell]")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.ArrayExpression,
-              elements: [
-                { type: ASTType.Identifier, name: "foo" },
-                { type: ASTType.Identifier, name: "bar" },
-                { type: ASTType.Identifier, name: "man" },
-                { type: ASTType.Identifier, name: "shell" },
-              ],
-            },
-          },
-        ],
-      });
-      expect(createAst("[foo,bar,man,shell,]")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.ArrayExpression,
-              elements: [
-                { type: ASTType.Identifier, name: "foo" },
-                { type: ASTType.Identifier, name: "bar" },
-                { type: ASTType.Identifier, name: "man" },
-                { type: ASTType.Identifier, name: "shell" },
-              ],
-            },
-          },
-        ],
-      });
-    });
-
-    it("should understand objects", () => {
-      expect(createAst("{}")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.ObjectExpression,
-              properties: [],
-            },
-          },
-        ],
-      });
-      expect(createAst("{foo: bar}")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.ObjectExpression,
-              properties: [
-                {
-                  type: ASTType.Property,
-                  kind: "init",
-                  key: { type: ASTType.Identifier, name: "foo" },
-                  computed: false,
-                  value: { type: ASTType.Identifier, name: "bar" },
-                },
-              ],
-            },
-          },
-        ],
-      });
-      expect(createAst("{foo: bar,}")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.ObjectExpression,
-              properties: [
-                {
-                  type: ASTType.Property,
-                  kind: "init",
-                  key: { type: ASTType.Identifier, name: "foo" },
-                  computed: false,
-                  value: { type: ASTType.Identifier, name: "bar" },
-                },
-              ],
-            },
-          },
-        ],
-      });
-      expect(createAst('{foo: bar, "man": "shell", 42: 23}')).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.ObjectExpression,
-              properties: [
-                {
-                  type: ASTType.Property,
-                  kind: "init",
-                  key: { type: ASTType.Identifier, name: "foo" },
-                  computed: false,
-                  value: { type: ASTType.Identifier, name: "bar" },
-                },
-                {
-                  type: ASTType.Property,
-                  kind: "init",
-                  key: { type: ASTType.Literal, value: "man" },
-                  computed: false,
-                  value: { type: ASTType.Literal, value: "shell" },
-                },
-                {
-                  type: ASTType.Property,
-                  kind: "init",
-                  key: { type: ASTType.Literal, value: 42 },
-                  computed: false,
-                  value: { type: ASTType.Literal, value: 23 },
-                },
-              ],
-            },
-          },
-        ],
-      });
-      expect(createAst('{foo: bar, "man": "shell", 42: 23,}')).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.ObjectExpression,
-              properties: [
-                {
-                  type: ASTType.Property,
-                  kind: "init",
-                  key: { type: ASTType.Identifier, name: "foo" },
-                  computed: false,
-                  value: { type: ASTType.Identifier, name: "bar" },
-                },
-                {
-                  type: ASTType.Property,
-                  kind: "init",
-                  key: { type: ASTType.Literal, value: "man" },
-                  computed: false,
-                  value: { type: ASTType.Literal, value: "shell" },
-                },
-                {
-                  type: ASTType.Property,
-                  kind: "init",
-                  key: { type: ASTType.Literal, value: 42 },
-                  computed: false,
-                  value: { type: ASTType.Literal, value: 23 },
-                },
-              ],
-            },
-          },
-        ],
-      });
-    });
-
-    it("should understand ES6 object initializer", () => {
-      // Shorthand properties definitions.
-      expect(createAst("{x, y, z}")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.ObjectExpression,
-              properties: [
-                {
-                  type: ASTType.Property,
-                  kind: "init",
-                  key: { type: ASTType.Identifier, name: "x" },
-                  computed: false,
-                  value: { type: ASTType.Identifier, name: "x" },
-                },
-                {
-                  type: ASTType.Property,
-                  kind: "init",
-                  key: { type: ASTType.Identifier, name: "y" },
-                  computed: false,
-                  value: { type: ASTType.Identifier, name: "y" },
-                },
-                {
-                  type: ASTType.Property,
-                  kind: "init",
-                  key: { type: ASTType.Identifier, name: "z" },
-                  computed: false,
-                  value: { type: ASTType.Identifier, name: "z" },
-                },
-              ],
-            },
-          },
-        ],
-      });
-      expect(() => {
-        createAst('{"foo"}');
-      }).toThrow();
-
-      // Computed properties
-      expect(createAst("{[x]: x}")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.ObjectExpression,
-              properties: [
-                {
-                  type: ASTType.Property,
-                  kind: "init",
-                  key: { type: ASTType.Identifier, name: "x" },
-                  computed: true,
-                  value: { type: ASTType.Identifier, name: "x" },
-                },
-              ],
-            },
-          },
-        ],
-      });
-      expect(createAst("{[x + 1]: x}")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.ObjectExpression,
-              properties: [
-                {
-                  type: ASTType.Property,
-                  kind: "init",
-                  key: {
-                    type: ASTType.BinaryExpression,
-                    operator: "+",
-                    left: { type: ASTType.Identifier, name: "x" },
-                    right: { type: ASTType.Literal, value: 1 },
-                  },
-                  computed: true,
-                  value: { type: ASTType.Identifier, name: "x" },
-                },
-              ],
-            },
-          },
-        ],
-      });
-    });
-
-    it("should understand multiple expressions", () => {
-      expect(createAst("foo = bar; man = shell")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.AssignmentExpression,
-              left: { type: ASTType.Identifier, name: "foo" },
-              right: { type: ASTType.Identifier, name: "bar" },
-              operator: "=",
-            },
-          },
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.AssignmentExpression,
-              left: { type: ASTType.Identifier, name: "man" },
-              right: { type: ASTType.Identifier, name: "shell" },
-              operator: "=",
-            },
-          },
-        ],
-      });
-    });
-
-    // This is non-standard syntax
-    it("should understand filters", () => {
-      expect(createAst("foo | bar")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.CallExpression,
-              callee: { type: ASTType.Identifier, name: "bar" },
-              arguments: [{ type: ASTType.Identifier, name: "foo" }],
-              filter: true,
-            },
-          },
-        ],
-      });
-    });
-
-    it("should understand filters with extra parameters", () => {
-      expect(createAst("foo | bar:baz")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.CallExpression,
-              callee: { type: ASTType.Identifier, name: "bar" },
-              arguments: [
-                { type: ASTType.Identifier, name: "foo" },
-                { type: ASTType.Identifier, name: "baz" },
-              ],
-              filter: true,
-            },
-          },
-        ],
-      });
-    });
-
-    it("should associate filters right-to-left", () => {
-      expect(createAst("foo | bar:man | shell")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.CallExpression,
-              callee: { type: ASTType.Identifier, name: "shell" },
-              arguments: [
-                {
-                  type: ASTType.CallExpression,
-                  callee: { type: ASTType.Identifier, name: "bar" },
-                  arguments: [
-                    { type: ASTType.Identifier, name: "foo" },
-                    { type: ASTType.Identifier, name: "man" },
-                  ],
-                  filter: true,
-                },
-              ],
-              filter: true,
-            },
-          },
-        ],
-      });
-    });
-
-    it("should give higher precedence to assignments over filters", () => {
-      expect(createAst("foo=bar | man")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.CallExpression,
-              callee: { type: ASTType.Identifier, name: "man" },
-              arguments: [
-                {
-                  type: ASTType.AssignmentExpression,
-                  left: { type: ASTType.Identifier, name: "foo" },
-                  right: { type: ASTType.Identifier, name: "bar" },
-                  operator: "=",
-                },
-              ],
-              filter: true,
-            },
-          },
-        ],
-      });
-    });
-
-    it("should accept expression as filters parameters", () => {
-      expect(createAst("foo | bar:baz=man")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.CallExpression,
-              callee: { type: ASTType.Identifier, name: "bar" },
-              arguments: [
-                { type: ASTType.Identifier, name: "foo" },
-                {
-                  type: ASTType.AssignmentExpression,
-                  left: { type: ASTType.Identifier, name: "baz" },
-                  right: { type: ASTType.Identifier, name: "man" },
-                  operator: "=",
-                },
-              ],
-              filter: true,
-            },
-          },
-        ],
-      });
-    });
-
-    it("should accept expression as computer members", () => {
-      expect(createAst("foo[a = 1]")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.MemberExpression,
-              object: { type: ASTType.Identifier, name: "foo" },
-              property: {
-                type: ASTType.AssignmentExpression,
-                left: { type: ASTType.Identifier, name: "a" },
-                right: { type: ASTType.Literal, value: 1 },
-                operator: "=",
-              },
-              computed: true,
-            },
-          },
-        ],
-      });
-    });
-
-    it("should accept expression in function arguments", () => {
-      expect(createAst("foo(a = 1)")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.CallExpression,
-              callee: { type: ASTType.Identifier, name: "foo" },
-              arguments: [
-                {
-                  type: ASTType.AssignmentExpression,
-                  left: { type: ASTType.Identifier, name: "a" },
-                  right: { type: ASTType.Literal, value: 1 },
-                  operator: "=",
-                },
-              ],
-            },
-          },
-        ],
-      });
-    });
-
-    it("should accept expression as part of ternary operators", () => {
-      expect(createAst("foo || bar ? man = 1 : shell = 1")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.ConditionalExpression,
-              test: {
-                type: ASTType.LogicalExpression,
-                operator: "||",
-                left: { type: ASTType.Identifier, name: "foo" },
-                right: { type: ASTType.Identifier, name: "bar" },
-              },
-              alternate: {
-                type: ASTType.AssignmentExpression,
-                left: { type: ASTType.Identifier, name: "man" },
-                right: { type: ASTType.Literal, value: 1 },
-                operator: "=",
-              },
-              consequent: {
-                type: ASTType.AssignmentExpression,
-                left: { type: ASTType.Identifier, name: "shell" },
-                right: { type: ASTType.Literal, value: 1 },
-                operator: "=",
-              },
-            },
-          },
-        ],
-      });
-    });
-
-    it("should accept expression as part of array literals", () => {
-      expect(createAst("[foo = 1]")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.ArrayExpression,
-              elements: [
-                {
-                  type: ASTType.AssignmentExpression,
-                  left: { type: ASTType.Identifier, name: "foo" },
-                  right: { type: ASTType.Literal, value: 1 },
-                  operator: "=",
-                },
-              ],
-            },
-          },
-        ],
-      });
-    });
-
-    it("should accept expression as part of object literals", () => {
-      expect(createAst("{foo: bar = 1}")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.ObjectExpression,
-              properties: [
-                {
-                  type: ASTType.Property,
-                  kind: "init",
-                  key: { type: ASTType.Identifier, name: "foo" },
-                  computed: false,
-                  value: {
-                    type: ASTType.AssignmentExpression,
-                    left: { type: ASTType.Identifier, name: "bar" },
-                    right: { type: ASTType.Literal, value: 1 },
-                    operator: "=",
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      });
-    });
-
-    it("should be possible to use parenthesis to indicate precedence", () => {
-      expect(createAst("(foo + bar).man")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: {
-              type: ASTType.MemberExpression,
-              object: {
-                type: ASTType.BinaryExpression,
-                operator: "+",
-                left: { type: ASTType.Identifier, name: "foo" },
-                right: { type: ASTType.Identifier, name: "bar" },
-              },
-              property: { type: ASTType.Identifier, name: "man" },
-              computed: false,
-            },
-          },
-        ],
-      });
-    });
-
-    it("should skip empty expressions", () => {
-      expect(createAst("foo;;;;bar")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: { type: ASTType.Identifier, name: "foo" },
-          },
-          {
-            type: ASTType.ExpressionStatement,
-            expression: { type: ASTType.Identifier, name: "bar" },
-          },
-        ],
-      });
-      expect(createAst(";foo")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: { type: ASTType.Identifier, name: "foo" },
-          },
-        ],
-      });
-      expect(createAst("foo;")).toEqual({
-        type: ASTType.Program,
-        body: [
-          {
-            type: ASTType.ExpressionStatement,
-            expression: { type: ASTType.Identifier, name: "foo" },
-          },
-        ],
-      });
-      expect(createAst(";;;;")).toEqual({ type: ASTType.Program, body: [] });
-      expect(createAst("")).toEqual({ type: ASTType.Program, body: [] });
-    });
   });
 
   let filterProvider;
@@ -2038,7 +318,7 @@ describe("parser", () => {
         expect(scope.$eval("a + b")).toBeUndefined();
         scope.a = 0;
         expect(scope.$eval("a - b")).toBe(0);
-        expect(scope.$eval("a + b")).toBeUndefined();
+        expect(scope.$eval("a + b")).toBe(0);
         scope.a = undefined;
         scope.b = 0;
         expect(scope.$eval("a - b")).toBe(0);
@@ -2649,53 +929,50 @@ describe("parser", () => {
       expect($parse("::foo")).toBe($parse("::foo"));
     });
 
-    it("should not affect calling the parseFn directly", async () => {
+    it("should not affect calling the parseFn directly", () => {
       const fn = $parse("::foo");
       $rootScope.$watch(fn);
-      expect($rootScope.$$watchersCount).toBe(1);
 
       $rootScope.foo = "bar";
-      await wait();
+      expect($rootScope.$$watchers.length).toBe(1);
+      expect(fn($rootScope)).toEqual("bar");
 
-      const res = fn($rootScope);
-      expect(res).toEqual("bar");
-
-      expect($rootScope.$$watchersCount).toBe(0);
+      $rootScope.$digest();
+      expect($rootScope.$$watchers.length).toBe(0);
       expect(fn($rootScope)).toEqual("bar");
 
       $rootScope.foo = "man";
-      await wait();
-
-      expect($rootScope.$$watchersCount).toBe(0);
+      $rootScope.$digest();
+      expect($rootScope.$$watchers.length).toBe(0);
       expect(fn($rootScope)).toEqual("man");
 
       $rootScope.foo = "shell";
-
+      $rootScope.$digest();
+      expect($rootScope.$$watchers.length).toBe(0);
       expect(fn($rootScope)).toEqual("shell");
     });
 
-    it("should stay stable once the value defined", async () => {
+    it("should stay stable once the value defined", () => {
       const fn = $parse("::foo");
       $rootScope.$watch(fn, (value, old) => {
         if (value !== old) logs.push(value);
       });
 
-      expect($rootScope.$$watchersCount).toBe(1);
+      $rootScope.$digest();
+      expect($rootScope.$$watchers.length).toBe(1);
 
       $rootScope.foo = "bar";
-      await wait();
-
-      expect($rootScope.$$watchersCount).toBe(0);
+      $rootScope.$digest();
+      expect($rootScope.$$watchers.length).toBe(0);
       expect(logs[0]).toEqual("bar");
 
       $rootScope.foo = "man";
-      await wait();
-
-      expect($rootScope.$$watchersCount).toBe(0);
+      $rootScope.$digest();
+      expect($rootScope.$$watchers.length).toBe(0);
       expect(logs.length).toEqual(1);
     });
 
-    it("should have a stable value if at the end of a $digest it has a defined value", async () => {
+    it("should have a stable value if at the end of a $digest it has a defined value", () => {
       const fn = $parse("::foo");
       $rootScope.$watch(fn, (value, old) => {
         if (value !== old) logs.push(value);
@@ -2705,35 +982,34 @@ describe("parser", () => {
           $rootScope.foo = undefined;
         }
       });
-      expect($rootScope.$$watchersCount).toBe(2);
 
       $rootScope.foo = "bar";
-      await wait();
-      expect($rootScope.$$watchersCount).toBe(1);
-      expect(logs.length).toEqual(1);
+      $rootScope.$digest();
+      expect($rootScope.$$watchers.length).toBe(2);
+      expect(logs[0]).toBeUndefined();
 
       $rootScope.foo = "man";
-      await wait();
-      expect($rootScope.$$watchersCount).toBe(1);
-      expect(logs.length).toEqual(1);
+      $rootScope.$digest();
+      expect($rootScope.$$watchers.length).toBe(1);
+      expect(logs[1]).toEqual("man");
 
       $rootScope.foo = "shell";
-      await wait();
-      expect($rootScope.$$watchersCount).toBe(1);
-      expect(logs.length).toEqual(1);
+      $rootScope.$digest();
+      expect($rootScope.$$watchers.length).toBe(1);
+      expect(logs.length).toEqual(2);
     });
 
-    it("should not throw if the stable value is `null`", async () => {
+    it("should not throw if the stable value is `null`", () => {
       const fn = $parse("::foo");
       $rootScope.$watch(fn);
       $rootScope.foo = null;
-      await wait();
+      $rootScope.$digest();
       $rootScope.foo = "foo";
-      await wait();
+      $rootScope.$digest();
       expect(fn()).toEqual(undefined);
     });
 
-    it("should invoke a stateless filter once when the parsed expression has an interceptor", async () => {
+    it("should invoke a stateless filter once when the parsed expression has an interceptor", () => {
       const countFilter = jasmine.createSpy();
       const interceptor = jasmine.createSpy();
       countFilter.and.returnValue(1);
@@ -2750,12 +1026,8 @@ describe("parser", () => {
       scope.foo = function () {
         return 1;
       };
-      await wait();
-      expect(countFilter.calls.count()).toBe(0);
-
-      const res = $parse(":: foo() | count", interceptor);
-      scope.$watch(res, () => {});
-      await wait();
+      scope.$watch($parse(":: foo() | count", interceptor));
+      scope.$digest();
       expect(countFilter.calls.count()).toBe(1);
     });
   });
@@ -2785,22 +1057,26 @@ describe("parser", () => {
           );
 
           expect(logs).toEqual([]);
-          expect($rootScope.$$watchersCount).toBe(1);
+          expect($rootScope.$$watchers.length).toBe(1);
 
-          expect($rootScope.$$watchersCount).toBe(1);
+          $rootScope.$digest();
+          expect($rootScope.$$watchers.length).toBe(1);
           expect(logs[0]).toEqual({ foo: undefined, bar: undefined });
 
           $rootScope.foo = "foo";
-          expect($rootScope.$$watchersCount).toBe(1);
+          $rootScope.$digest();
+          expect($rootScope.$$watchers.length).toBe(1);
           expect(logs[0]).toEqual({ foo: undefined, bar: undefined });
 
           $rootScope.foo = "foobar";
           $rootScope.bar = "bar";
-          expect($rootScope.$$watchersCount).toBe(0);
+          $rootScope.$digest();
+          expect($rootScope.$$watchers.length).toBe(0);
           expect(logs[2]).toEqual({ foo: "foobar", bar: "bar" });
 
           $rootScope.foo = "baz";
-          expect($rootScope.$$watchersCount).toBe(0);
+          $rootScope.$digest();
+          expect($rootScope.$$watchers.length).toBe(0);
           expect(logs[3]).toBeUndefined();
         });
 
@@ -2815,22 +1091,26 @@ describe("parser", () => {
           );
 
           expect(logs.length).toEqual(0);
-          expect($rootScope.$$watchersCount).toBe(1);
+          expect($rootScope.$$watchers.length).toBe(1);
 
-          expect($rootScope.$$watchersCount).toBe(1);
+          $rootScope.$digest();
+          expect($rootScope.$$watchers.length).toBe(1);
           expect(logs[0]).toEqual([undefined, undefined]);
 
           $rootScope.foo = "foo";
-          expect($rootScope.$$watchersCount).toBe(1);
+          $rootScope.$digest();
+          expect($rootScope.$$watchers.length).toBe(1);
           expect(logs[1]).toEqual(["foo", undefined]);
 
           $rootScope.foo = "foobar";
           $rootScope.bar = "bar";
-          expect($rootScope.$$watchersCount).toBe(0);
+          $rootScope.$digest();
+          expect($rootScope.$$watchers.length).toBe(0);
           expect(logs[2]).toEqual(["foobar", "bar"]);
 
           $rootScope.foo = "baz";
-          expect($rootScope.$$watchersCount).toBe(0);
+          $rootScope.$digest();
+          expect($rootScope.$$watchers.length).toBe(0);
           expect(logs[3]).toBeUndefined();
         });
 
@@ -2850,16 +1130,19 @@ describe("parser", () => {
           });
 
           $rootScope.foo = "bar";
-          expect($rootScope.$$watchersCount).toBe(2);
+          $rootScope.$digest();
+          expect($rootScope.$$watchers.length).toBe(2);
           expect(logs[0]).toEqual(["bar"]);
           expect(logs[1]).toEqual([undefined]);
 
           $rootScope.foo = "baz";
-          expect($rootScope.$$watchersCount).toBe(1);
+          $rootScope.$digest();
+          expect($rootScope.$$watchers.length).toBe(1);
           expect(logs[2]).toEqual(["baz"]);
 
           $rootScope.bar = "qux";
-          expect($rootScope.$$watchersCount).toBe(1);
+          $rootScope.$digest();
+          expect($rootScope.$$watchers.length).toBe(1);
           expect(logs[3]).toBeUndefined();
         });
       });
@@ -2880,10 +1163,14 @@ describe("parser", () => {
       };
 
       scope.$watch("a && b()");
+      scope.$digest();
+      scope.$digest();
       expect(bCalled).toBe(0);
 
       scope.a = true;
+      scope.$digest();
       expect(bCalled).toBe(1);
+      scope.$digest();
       expect(bCalled).toBe(2);
     });
 
@@ -2894,10 +1181,12 @@ describe("parser", () => {
       };
 
       scope.$watch("a || b()");
+      scope.$digest();
       expect(bCalled).toBe(true);
 
       bCalled = false;
       scope.a = true;
+      scope.$digest();
       expect(bCalled).toBe(false);
     });
 
@@ -2908,9 +1197,11 @@ describe("parser", () => {
       };
 
       scope.$watch("a ? b() : 1");
+      scope.$digest();
       expect(bCalled).toBe(false);
 
       scope.a = true;
+      scope.$digest();
       expect(bCalled).toBe(true);
     });
   });
@@ -2941,12 +1232,15 @@ describe("parser", () => {
 
       scope.$watch("a | foo:b:1");
       scope.a = 0;
+      scope.$digest();
       expect(filterCalled).toBe(true);
 
       filterCalled = false;
+      scope.$digest();
       expect(filterCalled).toBe(false);
 
       scope.a++;
+      scope.$digest();
       expect(filterCalled).toBe(true);
     });
 
@@ -2962,11 +1256,14 @@ describe("parser", () => {
 
       scope.$watch("[(a | foo:b:1), undefined]");
       scope.a = 0;
+      scope.$digest();
       expect(filterCalls).toEqual([0]);
 
+      scope.$digest();
       expect(filterCalls).toEqual([0]);
 
       scope.a++;
+      scope.$digest();
       expect(filterCalls).toEqual([0, 1]);
     });
 
@@ -2982,11 +1279,14 @@ describe("parser", () => {
 
       scope.$watch("::[(a | foo:b:1), undefined]");
       scope.a = 0;
+      scope.$digest();
       expect(filterCalls).toEqual([0]);
 
+      scope.$digest();
       expect(filterCalls).toEqual([0]);
 
       scope.a++;
+      scope.$digest();
       expect(filterCalls).toEqual([0, 1]);
     });
 
@@ -3007,9 +1307,11 @@ describe("parser", () => {
 
       scope.$watch("a | foo:b:1");
       scope.a = 0;
+      scope.$digest();
       expect(filterCalled).toBe(true);
 
       filterCalled = false;
+      scope.$digest();
       expect(filterCalled).toBe(true);
     });
 
@@ -3033,9 +1335,11 @@ describe("parser", () => {
         watcherCalls++;
       });
 
+      scope.$digest();
       expect(filterCalls).toBe(1);
       expect(watcherCalls).toBe(1);
 
+      scope.$digest();
       expect(filterCalls).toBe(1);
       expect(watcherCalls).toBe(1);
     });
@@ -3046,17 +1350,22 @@ describe("parser", () => {
         watchCalls.push(a[0]);
       });
       scope.a = 0;
+      scope.$digest();
       expect(watchCalls).toEqual([0]);
 
+      scope.$digest();
       expect(watchCalls).toEqual([0]);
 
       scope.a++;
+      scope.$digest();
       expect(watchCalls).toEqual([0, 1]);
 
       scope.a = {};
+      scope.$digest();
       expect(watchCalls).toEqual([0, 1, {}]);
 
       scope.a.foo = 42;
+      scope.$digest();
       expect(watchCalls).toEqual([0, 1, { foo: 42 }]);
     });
 
@@ -3066,17 +1375,22 @@ describe("parser", () => {
         watchCalls.push(a[0]);
       });
       scope.a = 0;
+      scope.$digest();
       expect(watchCalls).toEqual([0]);
 
+      scope.$digest();
       expect(watchCalls).toEqual([0]);
 
       scope.a++;
+      scope.$digest();
       expect(watchCalls).toEqual([0, 1]);
 
       scope.a = {};
+      scope.$digest();
       expect(watchCalls).toEqual([0, 1, {}]);
 
       scope.a.foo = 42;
+      scope.$digest();
       expect(watchCalls).toEqual([0, 1, { foo: 42 }]);
     });
   });
@@ -3115,9 +1429,11 @@ describe("parser", () => {
           watcherCalls++;
         });
 
+        scope.$digest();
         expect(filterCalls).toBe(2);
         expect(watcherCalls).toBe(1);
 
+        scope.$digest();
         expect(filterCalls).toBe(3);
         expect(watcherCalls).toBe(1);
       });
@@ -3169,9 +1485,11 @@ describe("parser", () => {
           watcherCalls++;
         });
 
+        scope.$digest();
         expect(filterCalls).toBe(1);
         expect(watcherCalls).toBe(1);
 
+        scope.$digest();
         expect(filterCalls).toBe(1);
         expect(watcherCalls).toBe(1);
       });
@@ -3193,9 +1511,11 @@ describe("parser", () => {
           watcherCalls++;
         });
 
+        scope.$digest();
         expect(filterCalls).toBe(1);
         expect(watcherCalls).toBe(1);
 
+        scope.$digest();
         expect(filterCalls).toBe(1);
         expect(watcherCalls).toBe(1);
       });
@@ -3220,11 +1540,13 @@ describe("parser", () => {
           watcherCalls++;
         });
 
+        scope.$digest();
         expect(filterCalls).toBe(1);
         expect(watcherCalls).toBe(1);
 
         date.setYear(1901);
 
+        scope.$digest();
         expect(filterCalls).toBe(2);
         expect(watcherCalls).toBe(1);
       });
@@ -3246,11 +1568,13 @@ describe("parser", () => {
           watcherCalls++;
         });
 
+        scope.$digest();
         expect(filterCalls).toBe(1);
         expect(watcherCalls).toBe(1);
 
         scope.date.setTime(1234567890);
 
+        scope.$digest();
         expect(filterCalls).toBe(2);
         expect(watcherCalls).toBe(2);
       });
@@ -3272,10 +1596,12 @@ describe("parser", () => {
           watcherCalls++;
         });
 
+        scope.$digest();
         expect(watcherCalls).toBe(1);
         expect(filterCalls).toBe(1);
 
         scope.date = new Date(1234567890123);
+        scope.$digest();
         expect(watcherCalls).toBe(1);
         expect(filterCalls).toBe(1);
       });
@@ -3298,9 +1624,11 @@ describe("parser", () => {
         watcherCalls++;
       });
 
+      scope.$digest();
       expect(filterCalls).toBe(1);
       expect(watcherCalls).toBe(1);
 
+      scope.$digest();
       expect(filterCalls).toBe(1);
       expect(watcherCalls).toBe(1);
     });
@@ -3322,9 +1650,11 @@ describe("parser", () => {
         watcherCalls++;
       });
 
+      scope.$digest();
       expect(filterCalls).toBe(1);
       expect(watcherCalls).toBe(1);
 
+      scope.$digest();
       expect(filterCalls).toBe(1);
       expect(watcherCalls).toBe(1);
     });
@@ -3346,9 +1676,11 @@ describe("parser", () => {
         watcherCalls++;
       });
 
+      scope.$digest();
       expect(filterCalls).toBe(2);
       expect(watcherCalls).toBe(1);
 
+      scope.$digest();
       expect(filterCalls).toBe(3);
       expect(watcherCalls).toBe(1);
     });
@@ -3369,9 +1701,11 @@ describe("parser", () => {
         watcherCalls++;
       });
 
+      scope.$digest();
       expect(toStringCalls).toBe(2);
       expect(watcherCalls).toBe(1);
 
+      scope.$digest();
       expect(toStringCalls).toBe(3);
       expect(watcherCalls).toBe(1);
     });
@@ -3395,9 +1729,11 @@ describe("parser", () => {
         watcherCalls++;
       });
 
+      scope.$digest();
       expect(filterCalls).toBe(2);
       expect(watcherCalls).toBe(1);
 
+      scope.$digest();
       expect(filterCalls).toBe(3);
       expect(watcherCalls).toBe(1);
     });
@@ -3417,7 +1753,7 @@ describe("parser", () => {
       logs = [];
     });
 
-    it("should not be reevaluated when passed literals", async () => {
+    it("should not be reevaluated when passed literals", () => {
       let filterCalls = 0;
       filterProvider.register(
         "foo",
@@ -3428,21 +1764,15 @@ describe("parser", () => {
       );
 
       let watcherCalls = 0;
-
       scope.$watch("[a] | foo", (input) => {
         watcherCalls++;
       });
 
-      expect(filterCalls).toBe(0);
-      expect(watcherCalls).toBe(0);
-
       scope.$apply("a = 1");
-      await wait();
       expect(filterCalls).toBe(1);
       expect(watcherCalls).toBe(1);
 
       scope.$apply("a = 2");
-      await wait();
       expect(filterCalls).toBe(2);
       expect(watcherCalls).toBe(2);
     });
@@ -3464,9 +1794,11 @@ describe("parser", () => {
         watcherCalls++;
       });
 
+      scope.$digest();
       expect(filterCalls).toBe(1);
       expect(watcherCalls).toBe(1);
 
+      scope.$digest();
       expect(filterCalls).toBe(1);
       expect(watcherCalls).toBe(1);
     });
@@ -3496,6 +1828,7 @@ describe("parser", () => {
       scope.$watch($parse("a", interceptor));
 
       scope.a = 1;
+      scope.$digest();
       expect(args).toEqual([1]);
     });
 
@@ -3509,6 +1842,7 @@ describe("parser", () => {
       scope.$watch($parse("::a", interceptor));
 
       scope.a = 1;
+      scope.$digest();
       expect(args).toEqual([1]);
     });
 
@@ -3527,6 +1861,7 @@ describe("parser", () => {
       scope.$watch($parse($parse("a", int1), int2));
 
       scope.a = 1;
+      scope.$digest();
       expect(args1).toEqual([1]);
       expect(args2).toEqual([3]);
     });
@@ -3574,13 +1909,16 @@ describe("parser", () => {
 
       scope.$watch($parse("a", interceptor));
       scope.a = 0;
+      scope.$digest();
       expect(called).toBe(true);
 
       called = false;
+      scope.$digest();
       expect(called).toBe(true);
 
       scope.a++;
       called = false;
+      scope.$digest();
       expect(called).toBe(true);
     });
 
@@ -3595,9 +1933,11 @@ describe("parser", () => {
       scope.$watch($parse("::a", interceptor));
 
       interceptorCalls = 0;
+      scope.$digest();
       expect(interceptorCalls).not.toBe(0);
 
       interceptorCalls = 0;
+      scope.$digest();
       expect(interceptorCalls).not.toBe(0);
     });
 
@@ -3617,9 +1957,11 @@ describe("parser", () => {
       scope.$watch($parse("::a | identity", interceptor));
 
       interceptorCalls = 0;
+      scope.$digest();
       expect(interceptorCalls).not.toBe(0);
 
       interceptorCalls = 0;
+      scope.$digest();
       expect(interceptorCalls).not.toBe(0);
     });
 
@@ -3634,9 +1976,11 @@ describe("parser", () => {
       scope.$watch($parse("::[a]", interceptor));
 
       interceptorCalls = 0;
+      scope.$digest();
       expect(interceptorCalls).not.toBe(0);
 
       interceptorCalls = 0;
+      scope.$digest();
       expect(interceptorCalls).not.toBe(0);
     });
 
@@ -3649,12 +1993,15 @@ describe("parser", () => {
       scope.$watch($parse("a", interceptor));
       scope.$watch($parse("a + b", interceptor));
       scope.a = scope.b = 0;
+      scope.$digest();
       expect(called).toBe(true);
 
       called = false;
+      scope.$digest();
       expect(called).toBe(false);
 
       scope.a++;
+      scope.$digest();
       expect(called).toBe(true);
     });
 
@@ -3669,9 +2016,11 @@ describe("parser", () => {
       scope.o = { sub: 1 };
 
       called = false;
+      scope.$digest();
       expect(called).toBe(true);
 
       called = false;
+      scope.$digest();
       expect(called).toBe(true);
     });
 
@@ -3683,10 +2032,12 @@ describe("parser", () => {
       }
       scope.$watch($parse("a", interceptor));
       scope.a = new Date();
+      scope.$digest();
       expect(called).toBe(true);
 
       called = false;
       scope.a = new Date(scope.a.valueOf());
+      scope.$digest();
       expect(called).toBe(false);
     });
 
@@ -3698,10 +2049,12 @@ describe("parser", () => {
       }
       scope.$watch($parse("a", interceptor));
       scope.a = new Date();
+      scope.$digest();
       expect(called).toBe(true);
 
       called = false;
       scope.a.setTime(scope.a.getTime() + 1);
+      scope.$digest();
       expect(called).toBe(true);
     });
 
@@ -3712,6 +2065,7 @@ describe("parser", () => {
         return v;
       }
       scope.$watch($parse(undefined, interceptor));
+      scope.$digest();
       expect(called).toBe(true);
     });
 
@@ -3720,9 +2074,11 @@ describe("parser", () => {
       scope.$watch($parse("::x", (x) => x));
       scope.$watch($parse("::x", () => 1)); // interceptor that returns non-undefined
 
+      scope.$digest();
       expect(scope.$$watchersCount).toBe(3);
 
       scope.x = 1;
+      scope.$digest();
       expect(scope.$$watchersCount).toBe(0);
     });
 
@@ -3731,9 +2087,11 @@ describe("parser", () => {
       scope.$watch($parse("::[x]", (x) => x));
       scope.$watch($parse("::[x]", () => 1)); // interceptor that returns non-literal
 
+      scope.$digest();
       expect(scope.$$watchersCount).toBe(3);
 
       scope.x = 1;
+      scope.$digest();
       expect(scope.$$watchersCount).toBe(0);
     });
 
@@ -3940,8 +2298,10 @@ describe("parser", () => {
           watcherCalls++;
         });
 
+        scope.$digest();
         expect(watcherCalls).toBe(1);
 
+        scope.$digest();
         expect(watcherCalls).toBe(1);
       });
     });
@@ -3957,8 +2317,10 @@ describe("parser", () => {
           watcherCalls++;
         });
 
+        scope.$digest();
         expect(watcherCalls).toBe(1);
 
+        scope.$digest();
         expect(watcherCalls).toBe(1);
       });
 
@@ -3972,10 +2334,12 @@ describe("parser", () => {
           watcherCalls++;
         });
 
+        scope.$digest();
         expect(watcherCalls).toBe(1);
 
         date.setYear(1901);
 
+        scope.$digest();
         expect(watcherCalls).toBe(2);
       });
 
@@ -3988,9 +2352,11 @@ describe("parser", () => {
           watcherCalls++;
         });
 
+        scope.$digest();
         expect(watcherCalls).toBe(1);
 
         scope.date = new Date(1234567890123);
+        scope.$digest();
         expect(watcherCalls).toBe(1);
       });
 
@@ -4003,9 +2369,11 @@ describe("parser", () => {
           watcherCalls++;
         });
 
+        scope.$digest();
         expect(watcherCalls).toBe(1);
 
         scope.date.setTime(scope.date.getTime() + 1);
+        scope.$digest();
         expect(watcherCalls).toBe(2);
       });
     });
@@ -4017,9 +2385,12 @@ describe("parser", () => {
       spy.and.callFake(() => value);
       scope.foo = spy;
       scope.$watch("foo()");
+      scope.$digest();
       expect(spy).toHaveBeenCalledTimes(2);
+      scope.$digest();
       expect(spy).toHaveBeenCalledTimes(3);
       value = "bar";
+      scope.$digest();
       expect(spy).toHaveBeenCalledTimes(5);
     });
 
@@ -4037,12 +2408,15 @@ describe("parser", () => {
       };
       scope.$watch("foo(); bar + two", listener);
 
+      scope.$digest();
       expect(lastVal).toBe(2);
 
       scope.bar = 2;
+      scope.$digest();
       expect(lastVal).toBe(4);
 
       scope.setBarToOne = true;
+      scope.$digest();
       expect(lastVal).toBe(3);
     });
 
@@ -4059,12 +2433,15 @@ describe("parser", () => {
 
       scope.curObj = objA;
       scope.input = 1;
+      scope.$digest();
       expect(objA.value).toBe(scope.input);
 
       scope.curObj = objB;
+      scope.$digest();
       expect(objB.value).toBe(scope.input);
 
       scope.input = 2;
+      scope.$digest();
       expect(objB.value).toBe(scope.input);
     });
 
@@ -4077,21 +2454,26 @@ describe("parser", () => {
         lastValue = val;
       });
 
+      scope.$digest();
       expect(count).toBe(1);
       expect(lastValue).toEqual({ undefined: true });
 
+      scope.$digest();
       expect(count).toBe(1);
       expect(lastValue).toEqual({ undefined: true });
 
       scope.a = true;
+      scope.$digest();
       expect(count).toBe(2);
       expect(lastValue).toEqual({ true: true });
 
       scope.a = "abc";
+      scope.$digest();
       expect(count).toBe(3);
       expect(lastValue).toEqual({ abc: true });
 
       scope.a = undefined;
+      scope.$digest();
       expect(count).toBe(4);
       expect(lastValue).toEqual({ undefined: true });
     });
@@ -4338,8 +2720,7 @@ describe("parser", () => {
       // simpleGetterFn1
       it("should return null for `a` where `a` is null", () => {
         $rootScope.a = null;
-        const res = $rootScope.$eval("a");
-        expect(res).toBe(null);
+        expect($rootScope.$eval("a")).toBe(null);
       });
 
       it("should return undefined for `a` where `a` is undefined", () => {

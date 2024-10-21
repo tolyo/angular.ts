@@ -55,13 +55,13 @@ export class NgModelController {
      * @param {import('../../core/exception-handler').ErrorHandler} $exceptionHandler
      * @param {import('../../core/compile/attributes').Attributes} $attr
      * @param {import('../../shared/jqlite/jqlite').JQLite} $element
-     * @param {import("../../core/parser/parse").ParseService} $parse
+     * @param {import("../../core/parse/parse").ParseService} $parse
      * @param {*} $animate
      * @param {*} $timeout
      * @param {import("../../core/q/q").QPromise<any>} $q
      * @param {*} $interpolate
      */
-    constructor($scope: import("../../core/scope/scope").Scope, $exceptionHandler: import("../../core/exception-handler").ErrorHandler, $attr: import("../../core/compile/attributes").Attributes, $element: import("../../shared/jqlite/jqlite").JQLite, $parse: import("../../core/parser/parse").ParseService, $animate: any, $timeout: any, $q: import("../../core/q/q").QPromise<any>, $interpolate: any);
+    constructor($scope: import("../../core/scope/scope").Scope, $exceptionHandler: import("../../core/exception-handler").ErrorHandler, $attr: import("../../core/compile/attributes").Attributes, $element: import("../../shared/jqlite/jqlite").JQLite, $parse: import("../../core/parse/parse").ParseService, $animate: any, $timeout: any, $q: import("../../core/q/q").QPromise<any>, $interpolate: any);
     /** @type {any} The actual value from the control's view  */
     $viewValue: any;
     /** @type {any} The value in the model that the control is bound to. */
@@ -108,10 +108,10 @@ export class NgModelController {
     };
     $$updateEvents: string;
     $$updateEventHandler(ev: any): void;
-    $$parsedNgModel: import("../../core/parser/parse").CompiledExpression;
+    $$parsedNgModel: import("../../core/parse/parse").CompiledExpression;
     $$parsedNgModelAssign: (arg0: any, arg1: any) => any;
-    /** @type {import("../../core/parser/parse").CompiledExpression|((Scope) => any)} */
-    $$ngModelGet: import("../../core/parser/parse").CompiledExpression | ((Scope: any) => any);
+    /** @type {import("../../core/parse/parse").CompiledExpression|((Scope) => any)} */
+    $$ngModelGet: import("../../core/parse/parse").CompiledExpression | ((Scope: any) => any);
     $$ngModelSet: (arg0: any, arg1: any) => any;
     $$pendingDebounce: any;
     $$parserValid: boolean;
@@ -127,7 +127,7 @@ export class NgModelController {
     $$element: import("../../shared/jqlite/jqlite").JQLite;
     $$animate: any;
     $$timeout: any;
-    $$parse: import("../../core/parser/parse").ParseService;
+    $$parse: import("../../core/parse/parse").ParseService;
     $q: import("../../core/q/q").QPromise<any>;
     $$exceptionHandler: import("../../core/exception-handler").ErrorHandler;
     $$hasNativeValidators: boolean;

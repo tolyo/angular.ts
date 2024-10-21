@@ -73,7 +73,7 @@ import {
 import { HttpBackendProvider } from "./services/http-backend/http-backend";
 import { LocationProvider } from "./core/location/location";
 import { LogProvider } from "./services/log";
-import { ParseProvider } from "./core/parser/parse";
+import { ParseProvider } from "./core/parse/parse.js";
 import { RootModelProvider } from "./core/model/model.js";
 import { $QProvider } from "./core/q/q";
 import { SceProvider, SceDelegateProvider } from "./core/sce/sce";

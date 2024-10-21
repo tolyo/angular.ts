@@ -29,7 +29,7 @@ export class InterpolateProvider {
      * @returns {string|InterpolateProvider} Returns the symbol when used as getter and self if used as setter.
      */
     endSymbol(value?: string | undefined): string | InterpolateProvider;
-    $get: (string | (($parse: import("../parser/parse").ParseService, $sce: any) => {
+    $get: (string | (($parse: import("../parse/parse").ParseService, $sce: any) => {
         (text: string, mustHaveExpression?: boolean | undefined, trustedContext?: string | undefined, allOrNothing?: boolean | undefined): Function;
         /**
          * Symbol to denote the start of expression in the interpolated string. Defaults to `{{`.
