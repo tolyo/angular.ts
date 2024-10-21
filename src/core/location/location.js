@@ -13,7 +13,6 @@ import {
   toInt,
   toKeyValue,
 } from "../../shared/utils";
-import { ScopePhase } from "../scope/scope";
 
 /**
  * @typedef {Object} DefaultPorts
@@ -768,7 +767,6 @@ export function LocationProvider() {
             afterLocationChange(oldUrl, oldState);
           }
         });
-        if ($rootScope.$$phase === ScopePhase.NONE);
       });
 
       // update browser

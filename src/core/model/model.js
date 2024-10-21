@@ -1,25 +1,22 @@
 import {
   isUndefined,
   nextUid,
-  minErr,
   isObject,
   concat,
   isFunction,
 } from "../../shared/utils";
 
 /**
- * @type {import('../parser/parse').ParseService}
+ * @type {import('../parse/parse.js').ParseService}
  */
 let $parse;
 
 /**@type {import('../exception-handler').ErrorHandler} */
 let $exceptionHandler;
 
-const $rootModelErr = minErr("$rootModel");
-
 /**
  * @typedef {Object} AsyncQueueTask
- * @property {Handler} handler
+ * @property {Model} handler
  * @property {Function} fn
  * @property {Object} locals
  */
@@ -42,7 +39,7 @@ export class RootModelProvider {
     "$browser",
     /**
      * @param {import('../exception-handler').ErrorHandler} exceptionHandler
-     * @param {import('../parser/parse').ParseService} parse
+     * @param {import('../parse/parse.js').ParseService} parse
      */
     (exceptionHandler, parse) => {
       $exceptionHandler = exceptionHandler;
@@ -57,18 +54,18 @@ export class RootModelProvider {
  * and recursively applying proxies to nested objects.
  *
  * @param {Object} target - The object to be wrapped in a proxy.
- * @param {Handler} [context] - The context for the handler, used to track listeners.
- * @returns {Object | Proxy<Object>} - A proxy that intercepts operations on the target object,
+ * @param {Model} [context] - The context for the handler, used to track listeners.
+ * @returns {ProxyHandler<Object>} - A proxy that intercepts operations on the target object,
  *                                     or the original value if the target is not an object.
  */
 export function createModel(target = {}, context) {
   if (typeof target === "object" && target !== null) {
     for (const key in target) {
       if (Object.prototype.hasOwnProperty.call(target, key)) {
-        target[key] = createModel(target[key], new Handler(target, context));
+        target[key] = createModel(target[key], new Model(target, context));
       }
     }
-    return new Proxy(target, new Handler(target, context));
+    return new Proxy(target, new Model(target, context));
   } else {
     return target;
   }
@@ -104,16 +101,16 @@ export const ModelPhase = {
 };
 
 /**
- * Handler class for the Proxy. It intercepts operations like property access (get)
+ * Model class for the Proxy. It intercepts operations like property access (get)
  * and property setting (set), and adds support for deep change tracking and
  * observer-like behavior.
  */
-class Handler {
+class Model {
   /**
    * Initializes the handler with the target object and a context.
    *
    * @param {Object} target - The target object being proxied.
-   * @param {Handler} [context] - The context containing listeners.
+   * @param {Model} [context] - The context containing listeners.
    */
   constructor(target, context) {
     /** @type {Object} */
@@ -142,7 +139,7 @@ class Handler {
     this.id = nextUid();
 
     /**
-     * @type {Handler}
+     * @type {Model}
      */
     this.$root = context ? context.$root : this;
 
@@ -350,14 +347,16 @@ class Handler {
    * Registers a watcher for a property along with a listener function. The listener
    * function is invoked when changes to that property are detected.
    *
-   * @param {((any) => any)} watchProp - A property path (dot notation) to observe specific changes in the target.
-   * @param {ListenerFunction} listenerFn - A function to execute when changes are detected.
+   * @param {string} watchProp - An expression to be watched in the context of this model.
+   * @param {ListenerFunction} listenerFn - A function to execute when changes are detected on watched context.
    */
   $watch(watchProp, listenerFn) {
     this.state = ModelPhase.WATCH;
     const get = $parse(watchProp);
+
+    // Constant are immediately passed to listener function
     if (get.constant) {
-      Promise.resolve().then(listenerFn(this.$target));
+      Promise.resolve().then(listenerFn(get(), undefined, this.$target));
       return () => {};
     }
 
@@ -419,7 +418,7 @@ class Handler {
       child.$parent = parent ? parent.$handler : this.$parent;
     }
 
-    const proxy = new Proxy(child, new Handler(child, parent || this));
+    const proxy = new Proxy(child, new Model(child, parent || this));
     this.children.push(proxy);
     return proxy;
   }

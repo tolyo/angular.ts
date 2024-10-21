@@ -9,9 +9,19 @@ import { Parser } from "./parser/parser.js";
  * @property {boolean} constant - Indicates if the expression is constant.
  * @property {boolean} [isPure]
  * @property {boolean} oneTime
+ * @property {import("./interpreter.js").DecoratedASTNode} decoratedNode
  * @property {function(import('../scope/scope').Scope, import('../scope/scope').WatchListener, boolean, CompiledExpression, string | ((scope:  import('../scope/scope').Scope) => any) | CompiledExpression): any} [$$watchDelegate]
  * @property {any[]|Function} inputs
  * @property {function(any, any): any} [assign] - Assigns a value to a context. If value is not provided,
+ */
+
+/**
+ * @typedef {Object} CompiledExpressionHandlerMap
+ * @property {boolean} literal - Indicates if the expression is a literal.
+ * @property {boolean} constant - Indicates if the expression is constant.
+ * @property {boolean} [isPure]
+ * @property {boolean} oneTime
+ * @property {Map<string, Function>} keyMap - property keys to observe
  */
 
 /**
@@ -151,6 +161,7 @@ export function ParseProvider() {
         fn.literal = parsedExpression.literal;
         fn.oneTime = parsedExpression.oneTime;
         fn.constant = parsedExpression.constant;
+        fn.decoratedNode = parsedExpression.decoratedNode;
 
         // Treat the interceptor like filters.
         // If it is not $stateful then only watch its inputs.

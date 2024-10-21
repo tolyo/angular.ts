@@ -230,6 +230,36 @@ describe("Model", () => {
   });
 
   describe("$watch", () => {
+    describe("constants", () => {
+      it("does not watch constants", async () => {
+        model.$watch("1", () => {});
+        expect(model.$$watchersCount).toBe(0);
+        await wait();
+        expect(model.$$watchersCount).toBe(0);
+      });
+
+      const cases = [
+        { expression: "1", expected: 1 },
+        { expression: "'a'", expected: "a" },
+        { expression: "[1,2,3]", expected: [1, 2, 3] },
+        { expression: "false", expected: false },
+        { expression: "null", expected: null },
+        { expression: '{x: 1}["x"]', expected: 1 },
+      ];
+
+      cases.forEach(async ({ expression, expected }) => {
+        it("passes constants to listener cb " + expression, async () => {
+          let res;
+          model.$watch(expression, (val) => {
+            res = val;
+          });
+
+          await wait();
+          expect(res).toEqual(expected);
+        });
+      });
+    });
+
     it("can register listeners via watch", async () => {
       var listenerFn = jasmine.createSpy();
       model.$watch((o) => o.a, listenerFn);

@@ -66,6 +66,7 @@ export class ASTInterpreter {
     if (inputs) {
       fn.inputs = inputs;
     }
+    fn.decoratedNode = decoratedNode;
     return fn;
   }
 
