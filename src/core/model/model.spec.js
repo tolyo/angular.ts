@@ -311,14 +311,32 @@ describe("Model", () => {
       });
 
       it("applies a property change and continues watching the models", async () => {
+        expect(model.$$watchersCount).toBe(0);
         model.$watch("foo = 2", () => {});
 
         await wait();
+        expect(model.$$watchersCount).toBe(1);
         expect(model.foo).toBe(2);
 
         model.$watch("foo = 3", () => {});
 
         await wait();
+        expect(model.$$watchersCount).toBe(2);
+        expect(model.foo).toBe(3);
+      });
+
+      it("should apply a change and not increase watchers if no listener function", async () => {
+        expect(model.$$watchersCount).toBe(0);
+        model.$watch("foo = 2");
+
+        await wait();
+        expect(model.$$watchersCount).toBe(0);
+        expect(model.foo).toBe(2);
+
+        model.$watch("foo = 3");
+
+        await wait();
+        expect(model.$$watchersCount).toBe(0);
         expect(model.foo).toBe(3);
       });
     });

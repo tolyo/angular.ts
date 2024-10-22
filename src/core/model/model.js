@@ -4,7 +4,8 @@ import {
   isObject,
   concat,
   isFunction,
-} from "../../shared/utils";
+} from "../../shared/utils.js";
+import { ASTType } from "../parse/ast-type.js";
 
 /**
  * @type {import('../parse/parse.js').ParseService}
@@ -179,7 +180,7 @@ class Model {
           const listeners = this.listeners.get(property);
 
           if (listeners) {
-            this.scheduleListener(listeners, oldValue, value);
+            this.scheduleListener(listeners, oldValue);
           }
         }
         target[property] = value;
@@ -198,7 +199,7 @@ class Model {
           const listeners = this.listeners.get(property);
 
           if (listeners) {
-            this.scheduleListener(listeners, oldValue, value);
+            this.scheduleListener(listeners, oldValue);
           }
         }
 
@@ -215,7 +216,7 @@ class Model {
         const listeners = this.listeners.get(property);
 
         if (listeners) {
-          this.scheduleListener(listeners, oldValue, value);
+          this.scheduleListener(listeners, oldValue);
         }
         return true;
       }
@@ -235,7 +236,7 @@ class Model {
         const listeners = this.listeners.get(property);
 
         if (listeners) {
-          this.scheduleListener(listeners, oldValue, value);
+          this.scheduleListener(listeners, oldValue);
         }
       }
 
@@ -245,7 +246,7 @@ class Model {
         keys.forEach((key) => {
           const listeners = this.listeners.get(key);
           if (listeners) {
-            this.scheduleListener(listeners, oldValue, this.$target);
+            this.scheduleListener(listeners, oldValue);
           }
         });
       }
@@ -301,14 +302,13 @@ class Model {
    * @private
    * @param {Listener[]} listeners
    * @param {*} oldValue
-   * @param {*} newValue
    */
-  scheduleListener(listeners, oldValue, newValue) {
+  scheduleListener(listeners, oldValue) {
     Promise.resolve().then(() => {
       let index = 0;
       while (index < listeners.length) {
         const listener = listeners[index];
-        this.notifyListener(listener, oldValue, newValue);
+        this.notifyListener(listener, oldValue);
         if (
           listener.oneTime &&
           this.deregisterKey(listener.property, listener.id)
@@ -349,7 +349,7 @@ class Model {
    * function is invoked when changes to that property are detected.
    *
    * @param {string} watchProp - An expression to be watched in the context of this model.
-   * @param {ListenerFunction} listenerFn - A function to execute when changes are detected on watched context.
+   * @param {ListenerFunction} [listenerFn] - A function to execute when changes are detected on watched context.
    */
   $watch(watchProp, listenerFn) {
     this.state = ModelPhase.WATCH;
@@ -362,6 +362,16 @@ class Model {
 
     // simplest case
     let key = get.decoratedNode.body[0].expression.name;
+
+    switch (get.decoratedNode.body[0].expression.type) {
+      case ASTType.AssignmentExpression: {
+        // assignment calls without listener functions
+        if (!listenerFn) {
+          Promise.resolve().then(get(this.$target));
+          return () => {};
+        }
+      }
+    }
 
     // mock filter for now
     let filter = (a) => a;
@@ -641,14 +651,11 @@ class Model {
    *
    * @param {Listener} listener - The property path that was changed.
    * @param {*} oldValue - The old value of the property.
-   * @param {*} newValue - The new value of the property.
    */
-  notifyListener(listener, oldValue, newValue) {
+  notifyListener(listener, oldValue) {
     const { originalTarget, listenerFn, filter, watchFn } = listener;
     try {
-      debugger;
       const newVal = watchFn(this.$target);
-      debugger;
       listenerFn(
         isFunction(filter) ? filter(newVal) : newVal,
         oldValue,
