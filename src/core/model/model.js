@@ -76,6 +76,7 @@ export function createModel(target = {}, context) {
  * @typedef {Object} Listener
  * @property {Object} originalTarget - The original target object.
  * @property {ListenerFunction} listenerFn - The function invoked when changes are detected.
+ * @property {import("../parse/parse.js").CompiledExpression} watchFn
  * @property {number} id
  * @property {boolean} oneTime
  * @property {string} property
@@ -353,19 +354,25 @@ class Model {
   $watch(watchProp, listenerFn) {
     this.state = ModelPhase.WATCH;
     const get = $parse(watchProp);
-
     // Constant are immediately passed to listener function
     if (get.constant) {
       Promise.resolve().then(listenerFn(get(), undefined, this.$target));
       return () => {};
     }
 
-    let { key, filter } = getProperty(get);
+    // simplest case
+    let key = get.decoratedNode.body[0].expression.name;
+
+    // mock filter for now
+    let filter = (a) => a;
+
+    // let { key, filter } = getProperty(get);
 
     /** @type {Listener} */
     const listener = {
       originalTarget: this.$target,
       listenerFn: listenerFn,
+      watchFn: get,
       id: nextUid(),
       oneTime: get.oneTime,
       property: key,
@@ -637,11 +644,13 @@ class Model {
    * @param {*} newValue - The new value of the property.
    */
   notifyListener(listener, oldValue, newValue) {
-    const { originalTarget, listenerFn, filter, oneTime, property, id } =
-      listener;
+    const { originalTarget, listenerFn, filter, watchFn } = listener;
     try {
+      debugger;
+      const newVal = watchFn(this.$target);
+      debugger;
       listenerFn(
-        isFunction(filter) ? filter(newValue) : newValue,
+        isFunction(filter) ? filter(newVal) : newVal,
         oldValue,
         originalTarget,
       );

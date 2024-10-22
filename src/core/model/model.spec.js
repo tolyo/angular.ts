@@ -245,6 +245,10 @@ describe("Model", () => {
         { expression: "false", expected: false },
         { expression: "null", expected: null },
         { expression: '{x: 1}["x"]', expected: 1 },
+        { expression: "2 + 2", expected: 4 },
+        { expression: "2 / 0", expected: Infinity },
+        { expression: "false || 2", expected: 2 },
+        { expression: "false && 2", expected: false },
       ];
 
       cases.forEach(async ({ expression, expected }) => {
@@ -257,6 +261,65 @@ describe("Model", () => {
           await wait();
           expect(res).toEqual(expected);
         });
+      });
+    });
+
+    describe("expressions", () => {
+      it("adds watches expressions", async () => {
+        expect(model.$$watchersCount).toBe(0);
+        model.$watch("foo", () => {});
+
+        await wait();
+        expect(model.$$watchersCount).toBe(1);
+      });
+
+      it("invokes a callback on property change", async () => {
+        let newV, oldV, target;
+        model.$watch("foo", (a, b, c) => {
+          newV = a;
+          oldV = b;
+          target = c;
+        });
+
+        model.foo = 1;
+        await wait();
+        expect(newV).toEqual(1);
+        expect(oldV).toBeUndefined();
+        expect(target).toEqual(model.$target);
+
+        model.foo = 2;
+        await wait();
+        expect(newV).toEqual(2);
+        expect(oldV).toEqual(1);
+        expect(target).toEqual(model.$target);
+
+        model.foo = [];
+        await wait();
+        expect(newV).toEqual([]);
+        expect(oldV).toEqual(2);
+        expect(target).toEqual(model.$target);
+      });
+    });
+
+    describe("apply expression", () => {
+      it("adds watches expressions", async () => {
+        expect(model.$$watchersCount).toBe(0);
+        model.$watch("foo = 1", () => {});
+
+        await wait();
+        expect(model.$$watchersCount).toBe(1);
+      });
+
+      it("applies a property change and continues watching the models", async () => {
+        model.$watch("foo = 2", () => {});
+
+        await wait();
+        expect(model.foo).toBe(2);
+
+        model.$watch("foo = 3", () => {});
+
+        await wait();
+        expect(model.foo).toBe(3);
       });
     });
 
