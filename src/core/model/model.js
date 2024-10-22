@@ -81,7 +81,6 @@ export function createModel(target = {}, context) {
  * @property {number} id
  * @property {boolean} oneTime
  * @property {string} property
- * @property {(any) => any} [filter]
  */
 
 /**
@@ -354,11 +353,21 @@ class Model {
   $watch(watchProp, listenerFn) {
     this.state = ModelPhase.WATCH;
     const get = $parse(watchProp);
+
     // Constant are immediately passed to listener function
     if (get.constant) {
-      Promise.resolve().then(listenerFn(get(), undefined, this.$target));
+      if (listenerFn) {
+        Promise.resolve().then(() => {
+          let res = get();
+          while (isFunction(res)) {
+            res = res();
+          }
+          listenerFn(res, undefined, this.$target);
+        });
+      }
       return () => {};
     }
+    debugger;
 
     // simplest case
     let key = get.decoratedNode.body[0].expression.name;
@@ -367,14 +376,15 @@ class Model {
       case ASTType.AssignmentExpression: {
         // assignment calls without listener functions
         if (!listenerFn) {
-          Promise.resolve().then(get(this.$target));
+          let res = get(this.$target);
+          while (isFunction(res)) {
+            res = res(this.$target);
+          }
+          Promise.resolve().then(res);
           return () => {};
         }
       }
     }
-
-    // mock filter for now
-    let filter = (a) => a;
 
     // let { key, filter } = getProperty(get);
 
@@ -386,7 +396,6 @@ class Model {
       id: nextUid(),
       oneTime: get.oneTime,
       property: key,
-      filter: filter,
     };
 
     this.registerKey(key, listener);

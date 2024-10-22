@@ -262,6 +262,13 @@ describe("Model", () => {
           expect(res).toEqual(expected);
         });
       });
+
+      it("does not need a listener function", async () => {
+        model.$watch("1");
+
+        await wait();
+        expect(model.$$watchersCount).toBe(0);
+      });
     });
 
     describe("expressions", () => {
@@ -338,6 +345,44 @@ describe("Model", () => {
         await wait();
         expect(model.$$watchersCount).toBe(0);
         expect(model.foo).toBe(3);
+      });
+    });
+
+    fdescribe("filters", () => {
+      it("applies filters to constants", async () => {
+        expect(model.$$watchersCount).toBe(0);
+        let res;
+        model.$watch("'abcd'|limitTo:3", (val) => {
+          res = val;
+        });
+        await wait();
+        expect(res).toEqual("abc");
+
+        model.$watch("'abcd'|limitTo:3|limitTo:2", (val) => {
+          res = val;
+        });
+
+        await wait();
+        expect(res).toEqual("ab");
+
+        model.$watch("'abcd'|limitTo:3|limitTo:2|limitTo:1", (val) => {
+          res = val;
+        });
+
+        await wait();
+        expect(res).toEqual("a");
+      });
+
+      xit("should apply filters to expressions", async () => {
+        expect(model.$$watchersCount).toBe(0);
+        let res;
+        model.$watch("foo|limitTo:1", (val) => {
+          res = val;
+        });
+
+        model.foo = "abcd";
+        await wait();
+        expect(res).toEqual(1);
       });
     });
 
