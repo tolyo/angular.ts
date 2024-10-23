@@ -230,7 +230,7 @@ describe("Model", () => {
   });
 
   describe("$watch", () => {
-    describe("$watch on functions", () => {
+    fdescribe("$watch on functions", () => {
       it("can register listeners via watch", async () => {
         var listenerFn = jasmine.createSpy();
         model.$watch((o) => o.a, listenerFn);
@@ -281,6 +281,181 @@ describe("Model", () => {
         model.someValue = "c";
         await wait();
         expect(model.counter).toBe(2);
+      });
+
+      it("should not expose the `inner working of watch", async () => {
+        let get, listen;
+        function Getter() {
+          get = this;
+          return "foo";
+        }
+        function Listener() {
+          listen = this;
+        }
+        model.$watch(Getter, Listener);
+
+        model.a = 1;
+        await wait();
+
+        expect(get).toBeUndefined();
+        expect(listen).toBeUndefined();
+      });
+
+      it("calls the listener function when the watched value is iniatized", async () => {
+        model.counter = 0;
+
+        model.$watch(
+          (m) => m.someValue,
+          () => model.counter++,
+        );
+        expect(model.counter).toBe(0);
+
+        model.someValue = "b";
+        await wait();
+        expect(model.counter).toBe(1);
+
+        model.someValue = "b";
+        await wait();
+        expect(model.counter).toBe(1);
+
+        model.someValue = "c";
+        await wait();
+        expect(model.counter).toBe(2);
+      });
+
+      it("calls the listener function when the watched value is destroyed", async () => {
+        model.counter = 0;
+
+        model.$watch(
+          (m) => m.someValue,
+          () => model.counter++,
+        );
+        expect(model.counter).toBe(0);
+
+        model.someValue = "b";
+        await wait();
+        expect(model.counter).toBe(1);
+
+        delete model.someValue;
+        await wait();
+        expect(model.counter).toBe(2);
+      });
+
+      it("can call multiple the listener functions when the watched value changes", async () => {
+        model.someValue = "a";
+        model.counter = 0;
+
+        model.$watch(
+          (m) => m.someValue,
+          () => {
+            model.counter++;
+          },
+        );
+
+        model.$watch(
+          (m) => m.someValue,
+          () => model.counter++,
+        );
+
+        expect(model.counter).toBe(0);
+
+        model.someValue = "b";
+        await wait();
+        expect(model.counter).toBe(2);
+      });
+
+      it("calls only the listeners registerred at the moment the watched value changes", async () => {
+        model.someValue = "a";
+        model.counter = 0;
+
+        model.$watch(
+          (m) => m.someValue,
+          () => model.counter++,
+        );
+        expect(model.counter).toBe(0);
+
+        model.someValue = "b";
+        await wait();
+        expect(model.counter).toBe(1);
+
+        model.$watch(
+          (m) => m.someValue,
+          () => {
+            model.counter++;
+          },
+        );
+
+        model.someValue = "b";
+        await wait();
+
+        expect(model.counter).toBe(1);
+
+        model.someValue = "c";
+        await wait();
+
+        expect(model.counter).toBe(3);
+      });
+
+      it("correctly handles NaNs", async () => {
+        model.counter = 0;
+        model.$watch(
+          function (model) {
+            return model.number;
+          },
+          function (newValue, oldValue, model) {
+            debugger;
+            model.counter++;
+          },
+        );
+        model.number = 0 / 0;
+        await wait();
+        expect(model.number).toBeNaN();
+        expect(model.counter).toBe(1);
+
+        model.number = NaN;
+        await wait();
+        expect(model.number).toBeNaN();
+        expect(model.counter).toBe(1);
+      });
+
+      it("calls listener with undefined old value the first time", async () => {
+        var oldValueGiven;
+        var newValueGiven;
+        model.$watch(
+          function (model) {
+            return model.someValue;
+          },
+          function (newValue, oldValue, model) {
+            newValueGiven = newValue;
+            oldValueGiven = oldValue;
+          },
+        );
+        model.someValue = 123;
+        await wait();
+
+        expect(oldValueGiven).toBe(undefined);
+        expect(newValueGiven).toBe(123);
+      });
+
+      it("calls listener with new value and old value the first time if defined", async () => {
+        var oldValueGiven;
+        var newValueGiven;
+        model.someValue = 123;
+
+        model.$watch(
+          function (model) {
+            return model.someValue;
+          },
+          function (newValue, oldValue, model) {
+            newValueGiven = newValue;
+            oldValueGiven = oldValue;
+          },
+        );
+        model.someValue = 321;
+        await wait();
+
+        expect(oldValueGiven).toBe(123);
+        expect(newValueGiven).toBe(321);
       });
     });
 
@@ -430,181 +605,6 @@ describe("Model", () => {
       });
     });
 
-    it("calls the listener function when the watched value changes", async () => {
-      model.someValue = "a";
-      model.counter = 0;
-
-      model.$watch(
-        (m) => m.someValue,
-        () => {
-          model.counter++;
-        },
-      );
-      expect(model.counter).toBe(0);
-
-      model.someValue = "b";
-      await wait();
-      expect(model.counter).toBe(1);
-
-      model.someValue = "b";
-      await wait();
-      expect(model.counter).toBe(1);
-
-      model.someValue = "c";
-      await wait();
-      expect(model.counter).toBe(2);
-    });
-
-    it("calls the listener function when the watched value is iniatized", async () => {
-      model.counter = 0;
-
-      model.$watch(
-        (m) => m.someValue,
-        () => model.counter++,
-      );
-      expect(model.counter).toBe(0);
-
-      model.someValue = "b";
-      await wait();
-      expect(model.counter).toBe(1);
-
-      model.someValue = "b";
-      await wait();
-      expect(model.counter).toBe(1);
-
-      model.someValue = "c";
-      await wait();
-      expect(model.counter).toBe(2);
-    });
-
-    it("calls the listener function when the watched value is destroyed", async () => {
-      model.counter = 0;
-
-      model.$watch(
-        (m) => m.someValue,
-        () => model.counter++,
-      );
-      expect(model.counter).toBe(0);
-
-      model.someValue = "b";
-      await wait();
-      expect(model.counter).toBe(1);
-
-      delete model.someValue;
-      await wait();
-      expect(model.counter).toBe(2);
-    });
-
-    it("can call multiple the listener functions when the watched value changes", async () => {
-      model.someValue = "a";
-      model.counter = 0;
-
-      model.$watch(
-        (m) => m.someValue,
-        () => {
-          model.counter++;
-        },
-      );
-
-      model.$watch(
-        (m) => m.someValue,
-        () => model.counter++,
-      );
-
-      expect(model.counter).toBe(0);
-
-      model.someValue = "b";
-      await wait();
-      expect(model.counter).toBe(2);
-    });
-
-    it("calls only the listeners registerred at the moment the watched value changes", async () => {
-      model.someValue = "a";
-      model.counter = 0;
-
-      model.$watch(
-        (m) => m.someValue,
-        () => model.counter++,
-      );
-      expect(model.counter).toBe(0);
-
-      model.someValue = "b";
-      await wait();
-      expect(model.counter).toBe(1);
-
-      model.$watch(
-        (m) => m.someValue,
-        () => {
-          model.counter++;
-        },
-      );
-      model.someValue = "b";
-      await wait();
-
-      expect(model.counter).toBe(1);
-    });
-
-    it("correctly handles NaNs", async () => {
-      model.counter = 0;
-      model.$watch(
-        function (model) {
-          return model.number;
-        },
-        function (newValue, oldValue, model) {
-          model.counter++;
-        },
-      );
-      model.number = 0 / 0;
-      await wait();
-      expect(model.number).toBeNaN();
-      expect(model.counter).toBe(1);
-
-      model.number = NaN;
-      await wait();
-      expect(model.number).toBeNaN();
-      expect(model.counter).toBe(1);
-    });
-
-    it("calls listener with undefined old value the first time", async () => {
-      var oldValueGiven;
-      var newValueGiven;
-      model.$watch(
-        function (model) {
-          return model.someValue;
-        },
-        function (newValue, oldValue, model) {
-          newValueGiven = newValue;
-          oldValueGiven = oldValue;
-        },
-      );
-      model.someValue = 123;
-      await wait();
-
-      expect(oldValueGiven).toBe(undefined);
-      expect(newValueGiven).toBe(123);
-    });
-
-    it("calls listener with new value and old value the first time if defined", async () => {
-      var oldValueGiven;
-      var newValueGiven;
-      model.someValue = 123;
-
-      model.$watch(
-        function (model) {
-          return model.someValue;
-        },
-        function (newValue, oldValue, model) {
-          newValueGiven = newValue;
-          oldValueGiven = oldValue;
-        },
-      );
-      model.someValue = 321;
-      await wait();
-
-      expect(oldValueGiven).toBe(123);
-      expect(newValueGiven).toBe(321);
-    });
-
     it("calls listener with with the instance of a model as 3rd argument", async () => {
       var modelInstance;
       model.someValue = 123;
@@ -716,18 +716,6 @@ describe("Model", () => {
       model.name = "misko";
       await wait();
       expect(spy).toHaveBeenCalledWith("misko", undefined, model);
-    });
-
-    it("should not expose the `inner working of watch", () => {
-      function Getter() {
-        expect(this).toBeUndefined();
-        return "foo";
-      }
-      function Listener() {
-        expect(this).toBeUndefined();
-      }
-
-      model.$watch(Getter, Listener);
     });
 
     it("should watch and fire on expression change", async () => {

@@ -336,8 +336,9 @@ class Model {
       Array.from(this.functionListeners.entries()).forEach(([k, v]) => {
         const newV = k(this.$target);
         if (newV !== v.oldValue) {
+          const oldV = v.oldValue;
           v.oldValue = newV;
-          v.fn(newV);
+          v.fn.apply(undefined, [newV, oldV, this.$target]);
         }
       });
       this.state = ModelPhase.NONE;
@@ -352,19 +353,16 @@ class Model {
       keys.forEach((key) => {
         const listeners = this.listeners.get(key);
         if (listeners) {
-          this.scheduleListener(
-            listeners,
-            oldValue,
-            Array.isArray(this.$target) ? this.$target : undefined,
-          );
+          this.scheduleListener(listeners, oldValue);
         }
       });
     } else {
       const listeners = this.listeners.get(property);
       if (listeners) {
-        this.scheduleListener(listeners, target[property], this);
+        this.scheduleListener(listeners, target[property]);
       }
     }
+    this.notifyListenerFunctions();
     return true;
   }
 
@@ -381,7 +379,7 @@ class Model {
     if (isFunction(watchProp)) {
       this.functionListeners.set(/** @type {Function} */ (watchProp), {
         fn: listenerFn,
-        oldValue: undefined,
+        oldValue: watchProp(this.$target) ? watchProp(this.$target) : undefined,
       });
       this.state = ModelPhase.NONE;
       return () => {
