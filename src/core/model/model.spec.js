@@ -230,185 +230,204 @@ describe("Model", () => {
   });
 
   describe("$watch", () => {
-    describe("constants", () => {
-      it("does not watch constants", async () => {
-        model.$watch("1", () => {});
-        expect(model.$$watchersCount).toBe(0);
+    describe("$watch on functions", () => {
+      it("can register listeners via watch", async () => {
+        var listenerFn = jasmine.createSpy();
+        model.$watch((o) => o.a, listenerFn);
+        model.a = 1;
         await wait();
-        expect(model.$$watchersCount).toBe(0);
+        expect(listenerFn).toHaveBeenCalled();
       });
 
-      const cases = [
-        { expression: "1", expected: 1 },
-        { expression: "'a'", expected: "a" },
-        { expression: "[1,2,3]", expected: [1, 2, 3] },
-        { expression: "false", expected: false },
-        { expression: "null", expected: null },
-        { expression: '{x: 1}["x"]', expected: 1 },
-        { expression: "2 + 2", expected: 4 },
-        { expression: "2 / 0", expected: Infinity },
-        { expression: "false || 2", expected: 2 },
-        { expression: "false && 2", expected: false },
-      ];
+      it("should return a deregistration function watch", () => {
+        let fn = model.$watch(
+          () => {},
+          () => {},
+        );
+        expect(fn).toBeDefined();
+        expect(typeof fn).toEqual("function");
+      });
 
-      cases.forEach(async ({ expression, expected }) => {
-        it("passes constants to listener cb " + expression, async () => {
+      it("calls the watch function with the model as the argument", async () => {
+        var watchFn = jasmine.createSpy();
+        var listenerFn = () => {};
+        model.$watch(watchFn, listenerFn);
+
+        model.a = 1;
+        await wait();
+        expect(watchFn).toHaveBeenCalledWith(model);
+      });
+
+      it("calls the listener function when the watched value changes", async () => {
+        model.someValue = "a";
+        model.counter = 0;
+
+        model.$watch(
+          (m) => m.someValue,
+          () => {
+            model.counter++;
+          },
+        );
+        expect(model.counter).toBe(0);
+
+        model.someValue = "b";
+        await wait();
+        expect(model.counter).toBe(1);
+
+        model.someValue = "b";
+        await wait();
+        expect(model.counter).toBe(1);
+
+        model.someValue = "c";
+        await wait();
+        expect(model.counter).toBe(2);
+      });
+    });
+
+    describe("$watch on expressions", () => {
+      describe("constants", () => {
+        it("does not watch constants", async () => {
+          model.$watch("1", () => {});
+          expect(model.$$watchersCount).toBe(0);
+          await wait();
+          expect(model.$$watchersCount).toBe(0);
+        });
+
+        const cases = [
+          { expression: "1", expected: 1 },
+          { expression: "'a'", expected: "a" },
+          { expression: "[1,2,3]", expected: [1, 2, 3] },
+          { expression: "false", expected: false },
+          { expression: "null", expected: null },
+          { expression: '{x: 1}["x"]', expected: 1 },
+          { expression: "2 + 2", expected: 4 },
+          { expression: "2 / 0", expected: Infinity },
+          { expression: "false || 2", expected: 2 },
+          { expression: "false && 2", expected: false },
+        ];
+
+        cases.forEach(async ({ expression, expected }) => {
+          it("passes constants to listener cb " + expression, async () => {
+            let res;
+            model.$watch(expression, (val) => {
+              res = val;
+            });
+
+            await wait();
+            expect(res).toEqual(expected);
+          });
+        });
+
+        it("does not need a listener function", async () => {
+          model.$watch("1");
+
+          await wait();
+          expect(model.$$watchersCount).toBe(0);
+        });
+      });
+
+      describe("expressions", () => {
+        it("adds watches expressions", async () => {
+          expect(model.$$watchersCount).toBe(0);
+          model.$watch("foo", () => {});
+
+          await wait();
+          expect(model.$$watchersCount).toBe(1);
+        });
+
+        it("invokes a callback on property change", async () => {
+          let newV, oldV, target;
+          model.$watch("foo", (a, b, c) => {
+            newV = a;
+            oldV = b;
+            target = c;
+          });
+
+          model.foo = 1;
+          await wait();
+          expect(newV).toEqual(1);
+          expect(oldV).toBeUndefined();
+          expect(target).toEqual(model.$target);
+
+          model.foo = 2;
+          await wait();
+          expect(newV).toEqual(2);
+          expect(oldV).toEqual(1);
+          expect(target).toEqual(model.$target);
+
+          model.foo = [];
+          await wait();
+          expect(newV).toEqual([]);
+          expect(oldV).toEqual(2);
+          expect(target).toEqual(model.$target);
+        });
+      });
+
+      describe("apply expression", () => {
+        it("adds watches expressions", async () => {
+          expect(model.$$watchersCount).toBe(0);
+          model.$watch("foo = 1", () => {});
+
+          await wait();
+          expect(model.$$watchersCount).toBe(1);
+        });
+
+        it("applies a property change and continues watching the models", async () => {
+          expect(model.$$watchersCount).toBe(0);
+          model.$watch("foo = 2", () => {});
+
+          await wait();
+          expect(model.$$watchersCount).toBe(1);
+          expect(model.foo).toBe(2);
+
+          model.$watch("foo = 3", () => {});
+
+          await wait();
+          expect(model.$$watchersCount).toBe(2);
+          expect(model.foo).toBe(3);
+        });
+
+        it("should apply a change and not increase watchers if no listener function", async () => {
+          expect(model.$$watchersCount).toBe(0);
+          model.$watch("foo = 2");
+
+          await wait();
+          expect(model.$$watchersCount).toBe(0);
+          expect(model.foo).toBe(2);
+
+          model.$watch("foo = 3");
+
+          await wait();
+          expect(model.$$watchersCount).toBe(0);
+          expect(model.foo).toBe(3);
+        });
+      });
+
+      describe("filters", () => {
+        it("applies filters to constants", async () => {
+          expect(model.$$watchersCount).toBe(0);
           let res;
-          model.$watch(expression, (val) => {
+          model.$watch("'abcd'|limitTo:3", (val) => {
+            res = val;
+          });
+          await wait();
+          expect(res).toEqual("abc");
+
+          model.$watch("'abcd'|limitTo:3|limitTo:2", (val) => {
             res = val;
           });
 
           await wait();
-          expect(res).toEqual(expected);
+          expect(res).toEqual("ab");
+
+          model.$watch("'abcd'|limitTo:3|limitTo:2|limitTo:1", (val) => {
+            res = val;
+          });
+
+          await wait();
+          expect(res).toEqual("a");
         });
       });
-
-      it("does not need a listener function", async () => {
-        model.$watch("1");
-
-        await wait();
-        expect(model.$$watchersCount).toBe(0);
-      });
-    });
-
-    describe("expressions", () => {
-      it("adds watches expressions", async () => {
-        expect(model.$$watchersCount).toBe(0);
-        model.$watch("foo", () => {});
-
-        await wait();
-        expect(model.$$watchersCount).toBe(1);
-      });
-
-      it("invokes a callback on property change", async () => {
-        let newV, oldV, target;
-        model.$watch("foo", (a, b, c) => {
-          newV = a;
-          oldV = b;
-          target = c;
-        });
-
-        model.foo = 1;
-        await wait();
-        expect(newV).toEqual(1);
-        expect(oldV).toBeUndefined();
-        expect(target).toEqual(model.$target);
-
-        model.foo = 2;
-        await wait();
-        expect(newV).toEqual(2);
-        expect(oldV).toEqual(1);
-        expect(target).toEqual(model.$target);
-
-        model.foo = [];
-        await wait();
-        expect(newV).toEqual([]);
-        expect(oldV).toEqual(2);
-        expect(target).toEqual(model.$target);
-      });
-    });
-
-    describe("apply expression", () => {
-      it("adds watches expressions", async () => {
-        expect(model.$$watchersCount).toBe(0);
-        model.$watch("foo = 1", () => {});
-
-        await wait();
-        expect(model.$$watchersCount).toBe(1);
-      });
-
-      it("applies a property change and continues watching the models", async () => {
-        expect(model.$$watchersCount).toBe(0);
-        model.$watch("foo = 2", () => {});
-
-        await wait();
-        expect(model.$$watchersCount).toBe(1);
-        expect(model.foo).toBe(2);
-
-        model.$watch("foo = 3", () => {});
-
-        await wait();
-        expect(model.$$watchersCount).toBe(2);
-        expect(model.foo).toBe(3);
-      });
-
-      it("should apply a change and not increase watchers if no listener function", async () => {
-        expect(model.$$watchersCount).toBe(0);
-        model.$watch("foo = 2");
-
-        await wait();
-        expect(model.$$watchersCount).toBe(0);
-        expect(model.foo).toBe(2);
-
-        model.$watch("foo = 3");
-
-        await wait();
-        expect(model.$$watchersCount).toBe(0);
-        expect(model.foo).toBe(3);
-      });
-    });
-
-    fdescribe("filters", () => {
-      it("applies filters to constants", async () => {
-        expect(model.$$watchersCount).toBe(0);
-        let res;
-        model.$watch("'abcd'|limitTo:3", (val) => {
-          res = val;
-        });
-        await wait();
-        expect(res).toEqual("abc");
-
-        model.$watch("'abcd'|limitTo:3|limitTo:2", (val) => {
-          res = val;
-        });
-
-        await wait();
-        expect(res).toEqual("ab");
-
-        model.$watch("'abcd'|limitTo:3|limitTo:2|limitTo:1", (val) => {
-          res = val;
-        });
-
-        await wait();
-        expect(res).toEqual("a");
-      });
-
-      xit("should apply filters to expressions", async () => {
-        expect(model.$$watchersCount).toBe(0);
-        let res;
-        model.$watch("foo|limitTo:1", (val) => {
-          res = val;
-        });
-
-        model.foo = "abcd";
-        await wait();
-        expect(res).toEqual(1);
-      });
-    });
-
-    it("can register listeners via watch", async () => {
-      var listenerFn = jasmine.createSpy();
-      model.$watch((o) => o.a, listenerFn);
-      model.a = 1;
-      await wait();
-      expect(listenerFn).toHaveBeenCalled();
-    });
-
-    it("should return a deregistration function watch", () => {
-      let fn = model.$watch(
-        () => {},
-        () => {},
-      );
-      expect(fn).toBeDefined();
-      expect(typeof fn).toEqual("function");
-    });
-
-    it("calls the watch function with the model as the argument", async () => {
-      var watchFn = jasmine.createSpy();
-      var listenerFn = () => {};
-      model.$watch(watchFn, listenerFn);
-
-      expect(watchFn).toHaveBeenCalledWith(model);
     });
 
     it("calls the listener function when the watched value changes", async () => {

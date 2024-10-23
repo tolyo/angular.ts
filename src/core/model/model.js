@@ -99,6 +99,7 @@ const isProxySymbol = Symbol("isProxy");
 export const ModelPhase = {
   NONE: 0,
   WATCH: 1,
+  DIGEST: 2,
 };
 
 /**
@@ -122,6 +123,9 @@ class Model {
 
     /** @type {WeakMap<Object, Array<string>>} */
     this.objectListeners = context ? context.objectListeners : new WeakMap();
+
+    /** @type {Map<Function, {oldValue: any, fn: Function}>} */
+    this.functionListeners = new Map();
 
     /** @type {?number} */
     this.listenerCache = null;
@@ -183,6 +187,7 @@ class Model {
           }
         }
         target[property] = value;
+        this.notifyListenerFunctions();
         return true;
       }
       if (isObject(value)) {
@@ -204,6 +209,7 @@ class Model {
 
         target[property] = createModel({}, this);
         setDeepValue(target[property], value);
+        this.notifyListenerFunctions();
         return true;
       }
 
@@ -217,8 +223,10 @@ class Model {
         if (listeners) {
           this.scheduleListener(listeners, oldValue);
         }
+        this.notifyListenerFunctions();
         return true;
       }
+      this.notifyListenerFunctions();
       return true;
     } else {
       if (
@@ -249,6 +257,9 @@ class Model {
           }
         });
       }
+
+      this.notifyListenerFunctions();
+
       return true;
     }
   }
@@ -319,6 +330,20 @@ class Model {
     });
   }
 
+  notifyListenerFunctions() {
+    if (this.state == ModelPhase.NONE) {
+      this.state = ModelPhase.DIGEST;
+      Array.from(this.functionListeners.entries()).forEach(([k, v]) => {
+        const newV = k(this.$target);
+        if (newV !== v.oldValue) {
+          v.oldValue = newV;
+          v.fn(newV);
+        }
+      });
+      this.state = ModelPhase.NONE;
+    }
+  }
+
   deleteProperty(target, property) {
     var oldValue = structuredClone(target);
     delete target[property];
@@ -347,11 +372,23 @@ class Model {
    * Registers a watcher for a property along with a listener function. The listener
    * function is invoked when changes to that property are detected.
    *
-   * @param {string} watchProp - An expression to be watched in the context of this model.
+   * @param {string | function(any): any} watchProp - An expression to be watched in the context of this model.
    * @param {ListenerFunction} [listenerFn] - A function to execute when changes are detected on watched context.
    */
   $watch(watchProp, listenerFn) {
     this.state = ModelPhase.WATCH;
+
+    if (isFunction(watchProp)) {
+      this.functionListeners.set(/** @type {Function} */ (watchProp), {
+        fn: listenerFn,
+        oldValue: undefined,
+      });
+      this.state = ModelPhase.NONE;
+      return () => {
+        this.functionListeners.delete(/** @type {Function} */ (watchProp));
+      };
+    }
+
     const get = $parse(watchProp);
 
     // Constant are immediately passed to listener function
@@ -367,7 +404,6 @@ class Model {
       }
       return () => {};
     }
-    debugger;
 
     // simplest case
     let key = get.decoratedNode.body[0].expression.name;
@@ -662,14 +698,10 @@ class Model {
    * @param {*} oldValue - The old value of the property.
    */
   notifyListener(listener, oldValue) {
-    const { originalTarget, listenerFn, filter, watchFn } = listener;
+    const { originalTarget, listenerFn, watchFn } = listener;
     try {
       const newVal = watchFn(this.$target);
-      listenerFn(
-        isFunction(filter) ? filter(newVal) : newVal,
-        oldValue,
-        originalTarget,
-      );
+      listenerFn(newVal, oldValue, originalTarget);
       // if (oneTime) {
       //   this.deregisterKey(property, id)
       // }

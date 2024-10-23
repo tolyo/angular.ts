@@ -3,14 +3,14 @@
  * and recursively applying proxies to nested objects.
  *
  * @param {Object} target - The object to be wrapped in a proxy.
- * @param {Handler} [context] - The context for the handler, used to track listeners.
- * @returns {Object | Proxy<Object>} - A proxy that intercepts operations on the target object,
+ * @param {Model} [context] - The context for the handler, used to track listeners.
+ * @returns {ProxyHandler<Object>} - A proxy that intercepts operations on the target object,
  *                                     or the original value if the target is not an object.
  */
-export function createModel(target?: any, context?: Handler): any | ProxyConstructor;
+export function createModel(target?: any, context?: Model): ProxyHandler<any>;
 /**
  * @typedef {Object} AsyncQueueTask
- * @property {Handler} handler
+ * @property {Model} handler
  * @property {Function} fn
  * @property {Object} locals
  */
@@ -20,16 +20,17 @@ export const $postUpdateQueue: any[];
  */
 export const $$applyAsyncQueue: Function[];
 export class RootModelProvider {
-    rootModel: any;
-    $get: (string | ((exceptionHandler: import("../exception-handler").ErrorHandler, parse: import("../parser/parse").ParseService) => any))[];
+    rootModel: ProxyHandler<any>;
+    $get: (string | ((exceptionHandler: import("../exception-handler").ErrorHandler, parse: import("../parse/parse.js").ParseService) => ProxyHandler<any>))[];
 }
 export type ModelPhase = number;
 export namespace ModelPhase {
     let NONE: number;
     let WATCH: number;
+    let DIGEST: number;
 }
 export type AsyncQueueTask = {
-    handler: Handler;
+    handler: Model;
     fn: Function;
     locals: any;
 };
@@ -45,34 +46,39 @@ export type Listener = {
      * - The function invoked when changes are detected.
      */
     listenerFn: ListenerFunction;
+    watchFn: import("../parse/parse.js").CompiledExpression;
     id: number;
     oneTime: boolean;
     property: string;
-    filter?: (any: any) => any;
 };
 /**
  * Listener function type.
  */
 export type ListenerFunction = (newValue: any, oldValue: any, originalTarget: any) => any;
 /**
- * Handler class for the Proxy. It intercepts operations like property access (get)
+ * Model class for the Proxy. It intercepts operations like property access (get)
  * and property setting (set), and adds support for deep change tracking and
  * observer-like behavior.
  */
-declare class Handler {
+declare class Model {
     /**
      * Initializes the handler with the target object and a context.
      *
      * @param {Object} target - The target object being proxied.
-     * @param {Handler} [context] - The context containing listeners.
+     * @param {Model} [context] - The context containing listeners.
      */
-    constructor(target: any, context?: Handler);
+    constructor(target: any, context?: Model);
     /** @type {Object} */
     $target: any;
     /** @type {Map<string, Array<Listener>>} */
     listeners: Map<string, Array<Listener>>;
     /** @type {WeakMap<Object, Array<string>>} */
     objectListeners: WeakMap<any, Array<string>>;
+    /** @type {Map<Function, {oldValue: any, fn: Function}>} */
+    functionListeners: Map<Function, {
+        oldValue: any;
+        fn: Function;
+    }>;
     /** @type {?number} */
     listenerCache: number | null;
     /** @type {Proxy} */
@@ -86,10 +92,10 @@ declare class Handler {
      */
     id: number;
     /**
-     * @type {Handler}
+     * @type {Model}
      */
-    $root: Handler;
-    $parent: Handler;
+    $root: Model;
+    $parent: Model;
     /** @type {number} */
     $$watchersCount: number;
     /** @type {AsyncQueueTask[]} */
@@ -124,18 +130,18 @@ declare class Handler {
      * @private
      * @param {Listener[]} listeners
      * @param {*} oldValue
-     * @param {*} newValue
      */
     private scheduleListener;
+    notifyListenerFunctions(): void;
     deleteProperty(target: any, property: any): boolean;
     /**
      * Registers a watcher for a property along with a listener function. The listener
      * function is invoked when changes to that property are detected.
      *
-     * @param {((any) => any)} watchProp - A property path (dot notation) to observe specific changes in the target.
-     * @param {ListenerFunction} listenerFn - A function to execute when changes are detected.
+     * @param {string | function(any): any} watchProp - An expression to be watched in the context of this model.
+     * @param {ListenerFunction} [listenerFn] - A function to execute when changes are detected on watched context.
      */
-    $watch(watchProp: ((any: any) => any), listenerFn: ListenerFunction): () => void;
+    $watch(watchProp: string | ((arg0: any) => any), listenerFn?: ListenerFunction): () => void;
     $watchGroup(watchArray: any, listenerFn: any): void;
     $watchCollection(watchProp: any, listenerFn: any): () => void;
     $new(isIsolated: boolean, parent: any): any;
@@ -173,8 +179,7 @@ declare class Handler {
      *
      * @param {Listener} listener - The property path that was changed.
      * @param {*} oldValue - The old value of the property.
-     * @param {*} newValue - The new value of the property.
      */
-    notifyListener(listener: Listener, oldValue: any, newValue: any): void;
+    notifyListener(listener: Listener, oldValue: any): void;
 }
 export {};

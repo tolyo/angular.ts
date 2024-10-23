@@ -4,9 +4,18 @@
  * @property {boolean} constant - Indicates if the expression is constant.
  * @property {boolean} [isPure]
  * @property {boolean} oneTime
+ * @property {import("./interpreter.js").DecoratedASTNode} decoratedNode
  * @property {function(import('../scope/scope').Scope, import('../scope/scope').WatchListener, boolean, CompiledExpression, string | ((scope:  import('../scope/scope').Scope) => any) | CompiledExpression): any} [$$watchDelegate]
  * @property {any[]|Function} inputs
  * @property {function(any, any): any} [assign] - Assigns a value to a context. If value is not provided,
+ */
+/**
+ * @typedef {Object} CompiledExpressionHandlerMap
+ * @property {boolean} literal - Indicates if the expression is a literal.
+ * @property {boolean} constant - Indicates if the expression is constant.
+ * @property {boolean} [isPure]
+ * @property {boolean} oneTime
+ * @property {Map<string, Function>} keyMap - property keys to observe
  */
 /**
  * @typedef {Function} CompiledExpressionFunction
@@ -61,12 +70,29 @@ export type CompiledExpressionProps = {
     constant: boolean;
     isPure?: boolean;
     oneTime: boolean;
+    decoratedNode: import("./interpreter.js").DecoratedASTNode;
     $$watchDelegate?: (arg0: import("../scope/scope").Scope, arg1: import("../scope/scope").WatchListener, arg2: boolean, arg3: CompiledExpression, arg4: string | ((scope: import("../scope/scope").Scope) => any) | CompiledExpression) => any;
     inputs: any[] | Function;
     /**
      * - Assigns a value to a context. If value is not provided,
      */
     assign?: (arg0: any, arg1: any) => any;
+};
+export type CompiledExpressionHandlerMap = {
+    /**
+     * - Indicates if the expression is a literal.
+     */
+    literal: boolean;
+    /**
+     * - Indicates if the expression is constant.
+     */
+    constant: boolean;
+    isPure?: boolean;
+    oneTime: boolean;
+    /**
+     * - property keys to observe
+     */
+    keyMap: Map<string, Function>;
 };
 export type CompiledExpressionFunction = Function;
 export type CompiledExpression = CompiledExpressionFunction & CompiledExpressionProps;
