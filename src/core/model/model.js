@@ -4,6 +4,7 @@ import {
   isObject,
   concat,
   isFunction,
+  assert,
 } from "../../shared/utils.js";
 import { ASTType } from "../parse/ast-type.js";
 
@@ -119,7 +120,11 @@ class Model {
     /** @type {Object} */
     this.$target = target;
 
-    this.context = context;
+    this.context = context
+      ? context.context
+        ? context.context
+        : context
+      : undefined;
 
     /** @type {Map<string, Array<Listener>>} */
     this.listeners = context ? context.listeners : new Map();
@@ -245,7 +250,23 @@ class Model {
         const listeners = this.listeners.get(property);
 
         if (listeners) {
-          this.scheduleListener(listeners, oldValue);
+          assert(listeners.length !== 0);
+          // primitive only
+
+          let isValue =
+            listeners[0].watchFn(this.context?.$target) == value ||
+            (() => {
+              const res = listeners[0].watchFn(this.$target);
+              if (res && res[isProxySymbol]) {
+                return res.$target == value;
+              } else {
+                return res == value;
+              }
+            })();
+
+          if (isValue) {
+            this.scheduleListener(listeners, oldValue);
+          }
         }
       }
 
@@ -443,9 +464,12 @@ class Model {
 
       case ASTType.MemberExpression:
         key = get.decoratedNode.body[0].expression.property.name;
-        context = () =>
-          this.$target[get.decoratedNode.body[0].expression.object.name]
-            .$target;
+        context = () => {
+          const name = extractTarget(
+            get.decoratedNode.body[0].expression.object,
+          );
+          return this.$target[name].$target;
+        };
         break;
     }
 
@@ -727,10 +751,7 @@ class Model {
    * @param {*} currentContext - The current context in which change is detected.
    */
   notifyListener(listener, oldValue, currentContext) {
-    const { originalTarget, listenerFn, watchFn, context } = listener;
-    if (context && currentContext !== context()) {
-      return;
-    }
+    const { originalTarget, listenerFn, watchFn } = listener;
     try {
       const newVal = watchFn(listener.originalTarget);
       //const res  = watchFn(listener.originalTarget.$target).$target
@@ -760,5 +781,21 @@ function setDeepValue(model, obj) {
     } else {
       model[key] = obj[key];
     }
+  }
+}
+
+function extractTarget(object) {
+  if (!object.name) {
+    return extractTarget(object.object);
+  } else {
+    return object.name;
+  }
+}
+
+function deProxy(maybeProxy) {
+  if (maybeProxy[isProxySymbol]) {
+    return deProxy(maybeProxy);
+  } else {
+    return maybeProxy.$target;
   }
 }

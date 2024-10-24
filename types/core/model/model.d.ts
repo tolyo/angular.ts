@@ -50,6 +50,10 @@ export type Listener = {
     id: number;
     oneTime: boolean;
     property: string;
+    /**
+     * - The optional context in which a property exists
+     */
+    context?: any;
 };
 /**
  * Listener function type.
@@ -70,6 +74,7 @@ declare class Model {
     constructor(target: any, context?: Model);
     /** @type {Object} */
     $target: any;
+    context: Model;
     /** @type {Map<string, Array<Listener>>} */
     listeners: Map<string, Array<Listener>>;
     /** @type {WeakMap<Object, Array<string>>} */
@@ -179,7 +184,8 @@ declare class Model {
      *
      * @param {Listener} listener - The property path that was changed.
      * @param {*} oldValue - The old value of the property.
+     * @param {*} currentContext - The current context in which change is detected.
      */
-    notifyListener(listener: Listener, oldValue: any): void;
+    notifyListener(listener: Listener, oldValue: any, currentContext: any): void;
 }
 export {};

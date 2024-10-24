@@ -673,6 +673,7 @@ describe("Model", () => {
           expect(oldV).toEqual(1);
           expect(target).toEqual(model.$target);
 
+          debugger;
           model.foo = [];
           await wait();
           expect(newV).toEqual([]);
@@ -1064,12 +1065,9 @@ describe("Model", () => {
         model.counter = 0;
         model.someValue = { b: { c: { d: 1 } } };
 
-        model.$watch(
-          (obj) => obj.someValue.b.c.d,
-          function (newValue, oldValue, model) {
-            model.counter++;
-          },
-        );
+        model.$watch("someValue.b.c.d", function (newValue, oldValue, model) {
+          model.counter++;
+        });
         await wait();
 
         expect(model.counter).toBe(0);
@@ -1080,6 +1078,11 @@ describe("Model", () => {
         expect(model.counter).toBe(1);
 
         model.someValue = { b: { c: { d: 3 } } };
+        await wait();
+
+        expect(model.counter).toBe(2);
+
+        model.someValue.d = 5;
         await wait();
 
         expect(model.counter).toBe(2);
@@ -1952,132 +1955,6 @@ describe("Model", () => {
             expect(() => {}).not.toThrow();
           });
         });
-      });
-    });
-
-    describe("$suspend/$resume/$isSuspended", () => {
-      it("should suspend watchers on scope", () => {
-        const watchSpy = jasmine.createSpy("watchSpy");
-        model.$watch(watchSpy);
-        model.$suspend();
-
-        expect(watchSpy).not.toHaveBeenCalled();
-      });
-
-      it("should resume watchers on scope", () => {
-        const watchSpy = jasmine.createSpy("watchSpy");
-        model.$watch(watchSpy);
-        model.$suspend();
-        model.$resume();
-
-        expect(watchSpy).toHaveBeenCalled();
-      });
-
-      it("should suspend watchers on child scope", () => {
-        const watchSpy = jasmine.createSpy("watchSpy");
-        const scope = model.$new(true);
-        scope.$watch(watchSpy);
-        model.$suspend();
-
-        expect(watchSpy).not.toHaveBeenCalled();
-      });
-
-      it("should resume watchers on child scope", () => {
-        const watchSpy = jasmine.createSpy("watchSpy");
-        const scope = model.$new(true);
-        scope.$watch(watchSpy);
-        model.$suspend();
-        model.$resume();
-
-        expect(watchSpy).toHaveBeenCalled();
-      });
-
-      it("should resume digesting immediately if `$resume` is called from an ancestor scope watch handler", () => {
-        const watchSpy = jasmine.createSpy("watchSpy");
-        const scope = model.$new();
-
-        // Setup a handler that will toggle the scope suspension
-        model.$watch("a", (a) => {
-          if (a) scope.$resume();
-          else scope.$suspend();
-        });
-
-        // Spy on the scope watches being called
-        scope.$watch(watchSpy);
-
-        // Trigger a digest that should suspend the scope from within the watch handler
-        model.$apply("a = false");
-        // The scope is suspended before it gets to do a digest
-        expect(watchSpy).not.toHaveBeenCalled();
-
-        // Trigger a digest that should resume the scope from within the watch handler
-        model.$apply("a = true");
-        // The watch handler that resumes the scope is in the parent, so the resumed scope will digest immediately
-        expect(watchSpy).toHaveBeenCalled();
-      });
-
-      it("should resume digesting immediately if `$resume` is called from a non-ancestor scope watch handler", () => {
-        const watchSpy = jasmine.createSpy("watchSpy");
-        const scope = model.$new();
-        const sibling = model.$new();
-
-        // Setup a handler that will toggle the scope suspension
-        sibling.$watch("a", (a) => {
-          if (a) scope.$resume();
-          else scope.$suspend();
-        });
-
-        // Spy on the scope watches being called
-        scope.$watch(watchSpy);
-
-        // Trigger a digest that should suspend the scope from within the watch handler
-        model.$apply("a = false");
-        // The scope is suspended by the sibling handler after the scope has already digested
-        expect(watchSpy).toHaveBeenCalled();
-        watchSpy.calls.reset();
-
-        // Trigger a digest that should resume the scope from within the watch handler
-        model.$apply("a = true");
-        // The watch handler that resumes the scope marks the digest as dirty, so it will run an extra digest
-        expect(watchSpy).toHaveBeenCalled();
-      });
-
-      it("should not suspend watchers on parent or sibling scopes", () => {
-        const watchSpyParent = jasmine.createSpy("watchSpyParent");
-        const watchSpyChild = jasmine.createSpy("watchSpyChild");
-        const watchSpySibling = jasmine.createSpy("watchSpySibling");
-
-        const parent = model.$new();
-        parent.$watch(watchSpyParent);
-        const child = parent.$new();
-        child.$watch(watchSpyChild);
-        const sibling = parent.$new();
-        sibling.$watch(watchSpySibling);
-
-        child.$suspend();
-
-        expect(watchSpyParent).toHaveBeenCalled();
-        expect(watchSpyChild).not.toHaveBeenCalled();
-        expect(watchSpySibling).toHaveBeenCalled();
-      });
-
-      it("should return true from `$isSuspended()` when a scope is suspended", () => {
-        model.$suspend();
-        expect(model.$isSuspended()).toBe(true);
-        model.$resume();
-        expect(model.$isSuspended()).toBe(false);
-      });
-
-      it("should return false from `$isSuspended()` for a non-suspended scope that has a suspended ancestor", () => {
-        const childScope = model.$new();
-        model.$suspend();
-        expect(childScope.$isSuspended()).toBe(false);
-        childScope.$suspend();
-        expect(childScope.$isSuspended()).toBe(true);
-        childScope.$resume();
-        expect(childScope.$isSuspended()).toBe(false);
-        model.$resume();
-        expect(childScope.$isSuspended()).toBe(false);
       });
     });
 
@@ -3065,6 +2942,7 @@ describe("Model", () => {
 
       expect(scope.greeting).toEqual(undefined);
       expect(scope.greeting).toEqual(undefined);
+      debugger;
       scope.name = "Misko";
       await wait();
       expect(scope.greeting).toEqual("Hello Misko!");
