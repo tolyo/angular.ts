@@ -81,6 +81,7 @@ export function createModel(target = {}, context) {
  * @property {number} id
  * @property {boolean} oneTime
  * @property {string} property
+ * @property {Object} [context] - The optional context in which a property exists
  */
 
 /**
@@ -206,7 +207,6 @@ class Model {
             this.scheduleListener(listeners, oldValue);
           }
         }
-
         target[property] = createModel({}, this);
         setDeepValue(target[property], value);
         this.notifyListenerFunctions();
@@ -237,6 +237,7 @@ class Model {
         return true;
       }
 
+      debugger;
       target[property] = createModel(value, this);
 
       if (oldValue !== value) {
@@ -318,7 +319,7 @@ class Model {
       let index = 0;
       while (index < listeners.length) {
         const listener = listeners[index];
-        this.notifyListener(listener, oldValue);
+        this.notifyListener(listener, oldValue, this.$target);
         if (
           listener.oneTime &&
           this.deregisterKey(listener.property, listener.id)
@@ -329,19 +330,32 @@ class Model {
       }
     });
   }
-
   notifyListenerFunctions() {
-    if (this.state == ModelPhase.NONE) {
-      this.state = ModelPhase.DIGEST;
-      Array.from(this.functionListeners.entries()).forEach(([k, v]) => {
-        const newV = k(this.$target);
-        if (newV !== v.oldValue) {
-          const oldV = v.oldValue;
-          v.oldValue = newV;
-          v.fn.apply(undefined, [newV, oldV, this.$target]);
+    try {
+      let listeners = Array.from(this.functionListeners.entries());
+      let length = listeners.length;
+
+      for (let i = 0; i < length; i++) {
+        let [key, value] = listeners[i]; // Retrieve the key-value pair from the cached array
+        const newValue = key(this.$target);
+
+        if (newValue !== value.oldValue) {
+          const oldValue = value.oldValue;
+          value.oldValue = newValue;
+          value.fn.call(undefined, newValue, oldValue, this.$target);
         }
-      });
-      this.state = ModelPhase.NONE;
+
+        // Check if listeners have changed during the iteration
+        if (this.functionListeners.size !== length) {
+          if (this.functionListeners.size < length) {
+            i--;
+          }
+          listeners = Array.from(this.functionListeners.entries());
+          length = listeners.length;
+        }
+      }
+    } catch (e) {
+      $exceptionHandler(e);
     }
   }
 
@@ -379,7 +393,11 @@ class Model {
     if (isFunction(watchProp)) {
       this.functionListeners.set(/** @type {Function} */ (watchProp), {
         fn: listenerFn,
-        oldValue: watchProp(this.$target) ? watchProp(this.$target) : undefined,
+        oldValue: /** @type {Function} */ (watchProp)(this.$target)
+          ? /** @type {Function} */ /** @type {Function} */ (watchProp)(
+              this.$target,
+            )
+          : undefined,
       });
       this.state = ModelPhase.NONE;
       return () => {
@@ -405,9 +423,9 @@ class Model {
 
     // simplest case
     let key = get.decoratedNode.body[0].expression.name;
-
+    let context;
     switch (get.decoratedNode.body[0].expression.type) {
-      case ASTType.AssignmentExpression: {
+      case ASTType.AssignmentExpression:
         // assignment calls without listener functions
         if (!listenerFn) {
           let res = get(this.$target);
@@ -417,7 +435,14 @@ class Model {
           Promise.resolve().then(res);
           return () => {};
         }
-      }
+        break;
+
+      case ASTType.MemberExpression:
+        key = get.decoratedNode.body[0].expression.property.name;
+        context = () =>
+          this.$target[get.decoratedNode.body[0].expression.object.name]
+            .$target;
+        break;
     }
 
     // let { key, filter } = getProperty(get);
@@ -430,6 +455,7 @@ class Model {
       id: nextUid(),
       oneTime: get.oneTime,
       property: key,
+      context: context,
     };
 
     this.registerKey(key, listener);
@@ -694,11 +720,17 @@ class Model {
    *
    * @param {Listener} listener - The property path that was changed.
    * @param {*} oldValue - The old value of the property.
+   * @param {*} currentContext - The current context in which change is detected.
    */
-  notifyListener(listener, oldValue) {
-    const { originalTarget, listenerFn, watchFn } = listener;
+  notifyListener(listener, oldValue, currentContext) {
+    const { originalTarget, listenerFn, watchFn, context } = listener;
+    if (context && currentContext !== context()) {
+      return;
+    }
     try {
-      const newVal = watchFn(this.$target);
+      const newVal = watchFn(listener.originalTarget);
+      debugger;
+      //const res  = watchFn(listener.originalTarget.$target).$target
       listenerFn(newVal, oldValue, originalTarget);
       // if (oneTime) {
       //   this.deregisterKey(property, id)
@@ -713,27 +745,6 @@ class Model {
       $exceptionHandler(e);
     }
   }
-}
-
-function getProperty(fn) {
-  const path = [];
-  const handler = {
-    getter: true,
-    get(_, prop) {
-      if (prop === "getter") {
-        return handler.getter;
-      }
-      path.push(prop);
-      return new Proxy({}, handler);
-    },
-  };
-
-  const filter = fn(new Proxy({}, handler));
-  const prop = path.pop();
-  // if (isFunction(filter)) {
-
-  // }
-  return { filter: filter, key: prop };
 }
 
 function setDeepValue(model, obj) {
