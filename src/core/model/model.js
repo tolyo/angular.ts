@@ -119,6 +119,8 @@ class Model {
     /** @type {Object} */
     this.$target = target;
 
+    this.context = context;
+
     /** @type {Map<string, Array<Listener>>} */
     this.listeners = context ? context.listeners : new Map();
 
@@ -126,7 +128,7 @@ class Model {
     this.objectListeners = context ? context.objectListeners : new WeakMap();
 
     /** @type {Map<Function, {oldValue: any, fn: Function}>} */
-    this.functionListeners = new Map();
+    this.functionListeners = context ? context.functionListeners : new Map();
 
     /** @type {?number} */
     this.listenerCache = null;
@@ -237,7 +239,6 @@ class Model {
         return true;
       }
 
-      debugger;
       target[property] = createModel(value, this);
 
       if (oldValue !== value) {
@@ -332,12 +333,15 @@ class Model {
   }
   notifyListenerFunctions() {
     try {
-      let listeners = Array.from(this.functionListeners.entries());
+      let listeners = Array.from(this.functionListeners.keys());
       let length = listeners.length;
 
       for (let i = 0; i < length; i++) {
-        let [key, value] = listeners[i]; // Retrieve the key-value pair from the cached array
-        const newValue = key(this.$target);
+        let key = listeners[i]; // Retrieve the key-value pair from the cached array
+        let value = this.functionListeners.get(key);
+        const newValue = key(
+          this.context ? this.context.$target : this.$target,
+        );
 
         if (newValue !== value.oldValue) {
           const oldValue = value.oldValue;
@@ -350,7 +354,7 @@ class Model {
           if (this.functionListeners.size < length) {
             i--;
           }
-          listeners = Array.from(this.functionListeners.entries());
+          listeners = Array.from(this.functionListeners.keys());
           length = listeners.length;
         }
       }
@@ -729,7 +733,6 @@ class Model {
     }
     try {
       const newVal = watchFn(listener.originalTarget);
-      debugger;
       //const res  = watchFn(listener.originalTarget.$target).$target
       listenerFn(newVal, oldValue, originalTarget);
       // if (oneTime) {

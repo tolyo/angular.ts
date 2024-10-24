@@ -403,7 +403,6 @@ describe("Model", () => {
             return model.number;
           },
           function (newValue, oldValue, model) {
-            debugger;
             model.counter++;
           },
         );
@@ -482,7 +481,6 @@ describe("Model", () => {
           (model) => model.nameUpper,
           function (newValue) {
             if (newValue) {
-              debugger;
               model.initial = newValue.substring(0, 1) + ".";
             }
           },
@@ -490,7 +488,6 @@ describe("Model", () => {
         model.$watch(
           (model) => model.name,
           function (newValue) {
-            debugger;
             if (newValue) {
               model.nameUpper = newValue.toUpperCase();
             }
@@ -913,7 +910,7 @@ describe("Model", () => {
         expect(logs).toEqual("success");
       });
 
-      it("calls the listener function when a value is created as an object", async () => {
+      it("calls the listener function registered via function when a value is created as an object", async () => {
         model.counter = 0;
 
         model.$watch(
@@ -932,7 +929,23 @@ describe("Model", () => {
         expect(model.counter).toBe(1);
       });
 
-      it("can set watch functions that return nested properties", async () => {
+      it("calls the listener function registered via expression when a value is created as an object", async () => {
+        model.counter = 0;
+
+        model.$watch("someValue", () => {
+          model.counter++;
+        });
+        await wait();
+
+        expect(model.counter).toBe(0);
+
+        model.someValue = {};
+        await wait();
+
+        expect(model.counter).toBe(1);
+      });
+
+      it("calls the listener function registered via function when a value is created on a nested object", async () => {
         model.counter = 0;
         model.a = { someValue: 1 };
         model.$watch(
@@ -943,6 +956,25 @@ describe("Model", () => {
         );
 
         model.a.someValue = 2;
+
+        await wait();
+        expect(model.counter).toBe(1);
+
+        model.a.someValue = 3;
+        await wait();
+        expect(model.counter).toBe(2);
+      });
+
+      it("calls the listener function registered via expression when a value is created on a nested object", async () => {
+        model.counter = 0;
+        model.a = { someValue: 1 };
+
+        model.$watch("a.someValue", () => {
+          model.counter++;
+        });
+
+        model.a.someValue = 2;
+
         await wait();
         expect(model.counter).toBe(1);
 
