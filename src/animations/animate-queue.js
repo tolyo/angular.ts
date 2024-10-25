@@ -200,7 +200,7 @@ export function AnimateQueueProvider($animateProvider) {
       const deregisterWatch = $rootScope.$watch("$templateRequest.totalPendingRequests", (val) => {
         if (val === 0) {
           deregisterWatch();
-
+          $rootScope["$templateRequest"] = undefined;
           // Now that all templates have been downloaded, $animate will wait until
           // the post digest queue is empty before enabling animations. By having two
           // calls to $postDigest calls we can ensure that the flag is enabled at the
