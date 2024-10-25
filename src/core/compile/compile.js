@@ -2956,7 +2956,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
               removeWatchCollection.push(removeWatch);
               break;
 
-            case "<":
+            case "<": {
               if (!Object.hasOwnProperty.call(attrs, attrName)) {
                 if (optional) break;
                 strictBindingsCheck(attrName, directive.name);
@@ -2973,25 +2973,27 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                 destination[scopeName],
               );
 
-              removeWatch = scope[
-                definition.collection ? "$watchCollection" : "$watch"
-              ](parentGet, (newValue, oldValue) => {
-                if (oldValue === newValue) {
-                  if (
-                    oldValue === initialValue ||
-                    (isLiteral && equals(oldValue, initialValue))
-                  ) {
-                    return;
+              scope.attrs = attrs;
+              removeWatch = scope.$watch(
+                `attrs.${attrName}`,
+                (newValue, oldValue) => {
+                  if (oldValue === newValue) {
+                    if (
+                      oldValue === initialValue ||
+                      (isLiteral && equals(oldValue, initialValue))
+                    ) {
+                      return;
+                    }
+                    oldValue = initialValue;
                   }
-                  oldValue = initialValue;
-                }
-                recordChanges(scopeName, newValue, oldValue);
-                destination[scopeName] = newValue;
-              });
+                  recordChanges(scopeName, newValue, oldValue);
+                  destination[scopeName] = newValue;
+                },
+              );
 
               removeWatchCollection.push(removeWatch);
               break;
-
+            }
             case "&":
               if (!optional && !Object.hasOwnProperty.call(attrs, attrName)) {
                 strictBindingsCheck(attrName, directive.name);

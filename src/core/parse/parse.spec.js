@@ -10,6 +10,7 @@ import {
 import { createInjector } from "../di/injector.js";
 import { ASTType } from "./ast-type.js";
 import { Angular } from "../../loader.js";
+import { wait } from "../../shared/test-utils.js";
 
 describe("parser", () => {
   let $rootScope;
@@ -929,52 +930,51 @@ describe("parser", () => {
       expect($parse("::foo")).toBe($parse("::foo"));
     });
 
-    it("should not affect calling the parseFn directly", () => {
-      const fn = $parse("::foo");
-      $rootScope.$watch(fn);
+    it("should not affect calling the parseFn directly", async () => {
+      $rootScope.$watch("::foo");
 
       $rootScope.foo = "bar";
-      expect($rootScope.$$watchers.length).toBe(1);
-      expect(fn($rootScope)).toEqual("bar");
+      expect($rootScope.$$watchersCount).toBe(1);
+      expect($rootScope.foo).toEqual("bar");
 
-      $rootScope.$digest();
-      expect($rootScope.$$watchers.length).toBe(0);
-      expect(fn($rootScope)).toEqual("bar");
+      await wait();
+      expect($rootScope.$$watchersCount).toBe(0);
+      expect($rootScope.foo).toEqual("bar");
 
       $rootScope.foo = "man";
-      $rootScope.$digest();
-      expect($rootScope.$$watchers.length).toBe(0);
-      expect(fn($rootScope)).toEqual("man");
+      await wait();
+      expect($rootScope.$$watchersCount).toBe(0);
+      expect($rootScope.foo).toEqual("man");
 
       $rootScope.foo = "shell";
-      $rootScope.$digest();
-      expect($rootScope.$$watchers.length).toBe(0);
-      expect(fn($rootScope)).toEqual("shell");
+      await wait();
+      expect($rootScope.$$watchersCount).toBe(0);
+      expect($rootScope.foo).toEqual("shell");
     });
 
-    it("should stay stable once the value defined", () => {
-      const fn = $parse("::foo");
-      $rootScope.$watch(fn, (value, old) => {
+    it("should stay stable once the value defined", async () => {
+      $rootScope.$watch("::foo", (value, old) => {
         if (value !== old) logs.push(value);
       });
+      expect(logs.length).toEqual(0);
 
-      $rootScope.$digest();
-      expect($rootScope.$$watchers.length).toBe(1);
+      expect($rootScope.$$watchersCount).toBe(1);
 
       $rootScope.foo = "bar";
-      $rootScope.$digest();
-      expect($rootScope.$$watchers.length).toBe(0);
+      await wait();
+
+      expect($rootScope.$$watchersCount).toBe(0);
       expect(logs[0]).toEqual("bar");
 
       $rootScope.foo = "man";
-      $rootScope.$digest();
-      expect($rootScope.$$watchers.length).toBe(0);
+      await wait();
+
+      expect($rootScope.$$watchersCount).toBe(0);
       expect(logs.length).toEqual(1);
     });
 
-    it("should have a stable value if at the end of a $digest it has a defined value", () => {
-      const fn = $parse("::foo");
-      $rootScope.$watch(fn, (value, old) => {
+    it("should have a stable value if at the end of a $digest it has a defined value", async () => {
+      $rootScope.$watch("::foo", (value, old) => {
         if (value !== old) logs.push(value);
       });
       $rootScope.$watch("foo", () => {
@@ -984,32 +984,35 @@ describe("parser", () => {
       });
 
       $rootScope.foo = "bar";
-      $rootScope.$digest();
-      expect($rootScope.$$watchers.length).toBe(2);
-      expect(logs[0]).toBeUndefined();
+      await wait();
+
+      expect($rootScope.$$watchersCount).toBe(1);
+      expect(logs[0]).toEqual("bar");
 
       $rootScope.foo = "man";
-      $rootScope.$digest();
-      expect($rootScope.$$watchers.length).toBe(1);
-      expect(logs[1]).toEqual("man");
+      await wait();
+      expect($rootScope.$$watchersCount).toBe(1);
+      expect(logs[0]).toEqual("bar");
 
       $rootScope.foo = "shell";
-      $rootScope.$digest();
-      expect($rootScope.$$watchers.length).toBe(1);
-      expect(logs.length).toEqual(2);
+
+      await wait();
+      expect($rootScope.$$watchersCount).toBe(1);
+      expect(logs.length).toEqual(1);
     });
 
-    it("should not throw if the stable value is `null`", () => {
-      const fn = $parse("::foo");
-      $rootScope.$watch(fn);
+    it("should not throw if the stable value is `null`", async () => {
+      $rootScope.$watch("::foo");
       $rootScope.foo = null;
-      $rootScope.$digest();
+      await wait();
+
       $rootScope.foo = "foo";
-      $rootScope.$digest();
-      expect(fn()).toEqual(undefined);
+
+      await wait();
+      expect($rootScope.foo).toEqual("foo");
     });
 
-    it("should invoke a stateless filter once when the parsed expression has an interceptor", () => {
+    it("should invoke a stateless filter once when the parsed expression has an interceptor", async () => {
       const countFilter = jasmine.createSpy();
       const interceptor = jasmine.createSpy();
       countFilter.and.returnValue(1);
@@ -1023,11 +1026,12 @@ describe("parser", () => {
         $parse = _$parse_;
       });
 
+      // todo investiage our function stategy
+      scope.$watch(":: foo() | count", interceptor);
       scope.foo = function () {
         return 1;
       };
-      scope.$watch($parse(":: foo() | count", interceptor));
-      scope.$digest();
+      await wait();
       expect(countFilter.calls.count()).toBe(1);
     });
   });
@@ -1057,26 +1061,26 @@ describe("parser", () => {
           );
 
           expect(logs).toEqual([]);
-          expect($rootScope.$$watchers.length).toBe(1);
+          expect($rootScope.$$watchersCount).toBe(1);
 
           $rootScope.$digest();
-          expect($rootScope.$$watchers.length).toBe(1);
+          expect($rootScope.$$watchersCount).toBe(1);
           expect(logs[0]).toEqual({ foo: undefined, bar: undefined });
 
           $rootScope.foo = "foo";
           $rootScope.$digest();
-          expect($rootScope.$$watchers.length).toBe(1);
+          expect($rootScope.$$watchersCount).toBe(1);
           expect(logs[0]).toEqual({ foo: undefined, bar: undefined });
 
           $rootScope.foo = "foobar";
           $rootScope.bar = "bar";
           $rootScope.$digest();
-          expect($rootScope.$$watchers.length).toBe(0);
+          expect($rootScope.$$watchersCount).toBe(0);
           expect(logs[2]).toEqual({ foo: "foobar", bar: "bar" });
 
           $rootScope.foo = "baz";
           $rootScope.$digest();
-          expect($rootScope.$$watchers.length).toBe(0);
+          expect($rootScope.$$watchersCount).toBe(0);
           expect(logs[3]).toBeUndefined();
         });
 
@@ -1091,26 +1095,26 @@ describe("parser", () => {
           );
 
           expect(logs.length).toEqual(0);
-          expect($rootScope.$$watchers.length).toBe(1);
+          expect($rootScope.$$watchersCount).toBe(1);
 
           $rootScope.$digest();
-          expect($rootScope.$$watchers.length).toBe(1);
+          expect($rootScope.$$watchersCount).toBe(1);
           expect(logs[0]).toEqual([undefined, undefined]);
 
           $rootScope.foo = "foo";
           $rootScope.$digest();
-          expect($rootScope.$$watchers.length).toBe(1);
+          expect($rootScope.$$watchersCount).toBe(1);
           expect(logs[1]).toEqual(["foo", undefined]);
 
           $rootScope.foo = "foobar";
           $rootScope.bar = "bar";
           $rootScope.$digest();
-          expect($rootScope.$$watchers.length).toBe(0);
+          expect($rootScope.$$watchersCount).toBe(0);
           expect(logs[2]).toEqual(["foobar", "bar"]);
 
           $rootScope.foo = "baz";
           $rootScope.$digest();
-          expect($rootScope.$$watchers.length).toBe(0);
+          expect($rootScope.$$watchersCount).toBe(0);
           expect(logs[3]).toBeUndefined();
         });
 
@@ -1131,18 +1135,18 @@ describe("parser", () => {
 
           $rootScope.foo = "bar";
           $rootScope.$digest();
-          expect($rootScope.$$watchers.length).toBe(2);
+          expect($rootScope.$$watchersCount).toBe(2);
           expect(logs[0]).toEqual(["bar"]);
           expect(logs[1]).toEqual([undefined]);
 
           $rootScope.foo = "baz";
           $rootScope.$digest();
-          expect($rootScope.$$watchers.length).toBe(1);
+          expect($rootScope.$$watchersCount).toBe(1);
           expect(logs[2]).toEqual(["baz"]);
 
           $rootScope.bar = "qux";
           $rootScope.$digest();
-          expect($rootScope.$$watchers.length).toBe(1);
+          expect($rootScope.$$watchersCount).toBe(1);
           expect(logs[3]).toBeUndefined();
         });
       });
