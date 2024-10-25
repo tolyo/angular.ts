@@ -1944,17 +1944,10 @@ describe("Model", () => {
       expect(model.a.b).toBeUndefined();
     });
 
-    it("executes $apply'ed function and starts the digest", async function () {
+    it("executes $apply'ed function and starts the digest", async () => {
       model.aValue = "someValue";
       model.counter = 0;
-      model.$watch(
-        function (model) {
-          return model.aValue;
-        },
-        function () {
-          model.counter++;
-        },
-      );
+      model.$watch("aValue", () => model.counter++);
       expect(model.counter).toBe(0);
 
       model.$apply(function (model) {
@@ -1965,15 +1958,17 @@ describe("Model", () => {
       expect(model.counter).toBe(1);
     });
 
-    //   it("should apply expression with full lifecycle", () => {
-    //     let log = "";
-    //     const child = model.$new();
-    //     model.$watch("a", (a) => {
-    //       log += "1";
-    //     });
-    //     child.$apply("$parent.a=0");
-    //     expect(log).toEqual("1");
-    //   });
+    it("should apply expression with full lifecycle", async () => {
+      let log = "";
+      const child = model.$new();
+      model.$watch("a", (a) => {
+        log += "1";
+      });
+
+      child.$apply("a = 0");
+      await wait();
+      expect(log).toEqual("1");
+    });
 
     //   it("should catch exceptions", () => {
     //     let log = "";

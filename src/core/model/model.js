@@ -192,7 +192,7 @@ class Model {
           const listeners = this.listeners.get(property);
 
           if (listeners) {
-            this.scheduleListener(listeners, oldValue, value);
+            this.scheduleListener(listeners, oldValue);
           }
         }
         target[property] = value;
