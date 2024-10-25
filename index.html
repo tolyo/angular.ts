@@ -42,7 +42,7 @@
     </head>
     <body ng-app="todo" ng-cloak>
       <div ng-controller="TodoCtrl as $ctrl">
-        <h3>Todos</h3>
+        <h3>Todos</h3> {{ 2 + 2 }}
         <button ng-click="$ctrl.archive()">Archive</button>
         <ul>
           <li ng-repeat="todo in $ctrl.tasks" class="done-{{todo.done}}">

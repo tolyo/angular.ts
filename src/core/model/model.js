@@ -84,6 +84,7 @@ export function createModel(target = {}, context) {
  * @property {boolean} oneTime
  * @property {string} property
  * @property {Object} [context] - The optional context in which a property exists
+ * @property {Proxy} [foreignListener]
  */
 
 /**
@@ -127,8 +128,11 @@ class Model {
         : context
       : undefined;
 
-    /** @type {Map<string, Array<Listener>>} */
+    /** @type {Map<string, Array<Listener>>} Watch listeners */
     this.listeners = context ? context.listeners : new Map();
+
+    /** @type {Map<string, Array<Listener>>} Watch listeners from other proxies */
+    this.foreignListeners = context ? context.foreignListeners : new Map();
 
     /** @type {WeakMap<Object, Array<string>>} */
     this.objectListeners = context ? context.objectListeners : new WeakMap();
@@ -165,7 +169,7 @@ class Model {
     /** @type {AsyncQueueTask[]} */
     this.$$asyncQueue = [];
 
-    /** @type {Map<String, Function[]>} */
+    /** @type {Map<String, Function[]>} Event listeners */
     this.$$listeners = new Map();
 
     this.filters = [];
@@ -194,6 +198,12 @@ class Model {
           if (listeners) {
             this.scheduleListener(listeners, oldValue);
           }
+
+          const foreignListeners = this.foreignListeners.get(property);
+
+          if (foreignListeners) {
+            this.scheduleListener(foreignListeners, oldValue);
+          }
         }
         target[property] = value;
         return true;
@@ -212,6 +222,12 @@ class Model {
 
           if (listeners) {
             this.scheduleListener(listeners, oldValue);
+          }
+
+          const foreignListeners = this.foreignListeners.get(property);
+
+          if (foreignListeners) {
+            this.scheduleListener(foreignListeners, oldValue);
           }
         }
         target[property] = createModel({}, this);
@@ -265,6 +281,29 @@ class Model {
           if (isValue) {
             this.scheduleListener(listeners, oldValue);
           }
+        }
+
+        const foreignListeners = this.foreignListeners.get(property);
+
+        if (foreignListeners) {
+          assert(foreignListeners.length !== 0);
+          // primitive only
+
+          // let isValue =
+          //   Number.isNaN(value) ||
+          //   foreignListeners[0].watchFn(this.context?.$target) == value ||
+          //   (() => {
+          //     const res = foreignListeners[0].watchFn(this.$target);
+          //     if (res && res[isProxySymbol]) {
+          //       return res.$target == value;
+          //     } else {
+          //       return res == value;
+          //     }
+          //   })();
+
+          // if (isValue) {
+          this.scheduleListener(foreignListeners, oldValue);
+          //}
         }
       }
 
@@ -320,6 +359,8 @@ class Model {
       $children: this.children,
       id: this.id,
       state: this.state,
+      registerForeignKey: this.registerForeignKey.bind(this),
+      notifyListener: this.notifyListener.bind(this),
     };
 
     return Object.prototype.hasOwnProperty.call(propertyMap, property)
@@ -337,7 +378,17 @@ class Model {
       let index = 0;
       while (index < listeners.length) {
         const listener = listeners[index];
-        this.notifyListener(listener, oldValue, this.$target);
+        debugger;
+        if (listener.foreignListener) {
+          listener.foreignListener.notifyListener(
+            listener,
+            oldValue,
+            this.$target,
+          );
+        } else {
+          this.notifyListener(listener, oldValue, this.$target);
+        }
+
         if (
           listener.oneTime &&
           this.deregisterKey(listener.property, listener.id)
@@ -413,15 +464,16 @@ class Model {
         }
         break;
 
-      case ASTType.MemberExpression:
+      case ASTType.MemberExpression: {
         key = get.decoratedNode.body[0].expression.property.name;
-        context = () => {
-          const name = extractTarget(
-            get.decoratedNode.body[0].expression.object,
-          );
-          return this.$target[name].$target;
-        };
+        const name = extractTarget(get.decoratedNode.body[0].expression.object);
+        if (this.$target[name]) {
+          context = () => {
+            return this.$target[name].$target;
+          };
+        }
         break;
+      }
     }
 
     // let { key, filter } = getProperty(get);
@@ -437,7 +489,13 @@ class Model {
       context: context,
     };
 
-    this.registerKey(key, listener);
+    if (context && context()[isProxySymbol]) {
+      listener.foreignListener = this.proxy;
+      context().$handler.registerForeignKey(key, listener);
+    } else {
+      this.registerKey(key, listener);
+    }
+
     let watchedValue = get(this.$target);
     const value =
       watchedValue && watchedValue[isProxySymbol]
@@ -496,6 +554,14 @@ class Model {
     }
   }
 
+  registerForeignKey(key, listener) {
+    if (this.foreignListeners.has(key)) {
+      this.foreignListeners.get(key).push(listener);
+    } else {
+      this.foreignListeners.set(key, [listener]);
+    }
+  }
+
   deregisterKey(key, id) {
     const listenerList = this.listeners.get(key);
     if (!listenerList) return false;
@@ -508,6 +574,22 @@ class Model {
       this.listeners.set(key, listenerList);
     } else {
       this.listeners.delete(key);
+    }
+    return true;
+  }
+
+  deregisterForeignKey(key, id) {
+    const listenerList = this.foreignListeners.get(key);
+    if (!listenerList) return false;
+
+    const index = listenerList.findIndex((x) => x.id === id);
+    if (index === -1) return false;
+
+    listenerList.splice(index, 1);
+    if (listenerList.length) {
+      this.foreignListeners.set(key, listenerList);
+    } else {
+      this.foreignListeners.delete(key);
     }
     return true;
   }
@@ -709,9 +791,8 @@ class Model {
    *
    * @param {Listener} listener - The property path that was changed.
    * @param {*} oldValue - The old value of the property.
-   * @param {*} currentContext - The current context in which change is detected.
    */
-  notifyListener(listener, oldValue, currentContext) {
+  notifyListener(listener, oldValue) {
     const { originalTarget, listenerFn, watchFn } = listener;
     try {
       const newVal = watchFn(listener.originalTarget);

@@ -1419,6 +1419,28 @@ describe("Model", () => {
       // });
     });
 
+    describe("watching other proxies", () => {
+      it("should detect changes on another proxy", async () => {
+        let model1 = createModel();
+        let model2 = createModel({ b: 2 });
+        let count = 0;
+
+        model1.service = model2;
+        model1.$watch("service.b", () => {
+          count++;
+        });
+
+        model2.$watch("b", () => {
+          count++;
+        });
+
+        model2.b = 1;
+        await wait();
+
+        expect(count).toBe(2);
+      });
+    });
+
     describe("$watchCollection", () => {
       describe("constiable", () => {
         let deregister;

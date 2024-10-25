@@ -190,15 +190,15 @@ export function AnimateQueueProvider($animateProvider) {
           }
         };
       }
+      
 
       // Wait until all directive and route-related templates are downloaded and
       // compiled. The $templateRequest.totalPendingRequests variable keeps track of
       // all of the remote templates being currently downloaded. If there are no
       // templates currently downloading then the watcher will still fire anyway.
-      const deregisterWatch = $rootScope.$watch(
-        () => $templateRequest.totalPendingRequests === 0,
-        (isEmpty) => {
-          if (!isEmpty) return;
+      $rootScope['templateRequest'] = $templateRequest;
+      const deregisterWatch = $rootScope.$watch("$templateRequest.totalPendingRequests", (val) => {
+        if (val === 0) {
           deregisterWatch();
 
           // Now that all templates have been downloaded, $animate will wait until
@@ -217,8 +217,7 @@ export function AnimateQueueProvider($animateProvider) {
               }
             });
           });
-        },
-      );
+        }});
 
       const callbackRegistry = Object.create(null);
 

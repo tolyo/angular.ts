@@ -348,8 +348,7 @@ export function ngModelAriaDirective($aria) {
           }
 
           if (shouldAttachAttr("aria-invalid", "ariaInvalid", elem, true)) {
-            scope.$watch(
-              () => ngModel.$invalid,
+            scope.$watch("ngModel.$invalid",
               (newVal) => {
                 elem.attr("aria-invalid", (!!newVal).toString());
               },

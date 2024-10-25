@@ -1072,7 +1072,7 @@ function setupModelWatcher(ctrl) {
   //    -> scope value did not change since the last digest as
   //       ng-change executes in apply phase
   // 4. view should be changed back to 'a'
-  ctrl.$$scope.$watch((scope) => {
+  ctrl.$$scope.$watch("scope", (scope) => {
     const modelValue = ctrl.$$ngModelGet(scope);
 
     // if scope model value and ngModel value are out of sync
