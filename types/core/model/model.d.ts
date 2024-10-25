@@ -137,16 +137,15 @@ declare class Model {
      * @param {*} oldValue
      */
     private scheduleListener;
-    notifyListenerFunctions(): void;
     deleteProperty(target: any, property: any): boolean;
     /**
      * Registers a watcher for a property along with a listener function. The listener
      * function is invoked when changes to that property are detected.
      *
-     * @param {string | function(any): any} watchProp - An expression to be watched in the context of this model.
+     * @param {string} watchProp - An expression to be watched in the context of this model.
      * @param {ListenerFunction} [listenerFn] - A function to execute when changes are detected on watched context.
      */
-    $watch(watchProp: string | ((arg0: any) => any), listenerFn?: ListenerFunction): () => void;
+    $watch(watchProp: string, listenerFn?: ListenerFunction): () => void;
     $watchGroup(watchArray: any, listenerFn: any): void;
     $watchCollection(watchProp: any, listenerFn: any): () => void;
     $new(isIsolated: boolean, parent: any): any;

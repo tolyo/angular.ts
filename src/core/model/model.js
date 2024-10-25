@@ -5,6 +5,7 @@ import {
   concat,
   isFunction,
   assert,
+  isString,
 } from "../../shared/utils.js";
 import { ASTType } from "../parse/ast-type.js";
 
@@ -191,11 +192,10 @@ class Model {
           const listeners = this.listeners.get(property);
 
           if (listeners) {
-            this.scheduleListener(listeners, oldValue);
+            this.scheduleListener(listeners, oldValue, value);
           }
         }
         target[property] = value;
-        this.notifyListenerFunctions();
         return true;
       }
       if (isObject(value)) {
@@ -216,7 +216,6 @@ class Model {
         }
         target[property] = createModel({}, this);
         setDeepValue(target[property], value);
-        this.notifyListenerFunctions();
         return true;
       }
 
@@ -224,16 +223,14 @@ class Model {
         Object.keys(oldValue.$target).forEach((k) => {
           delete oldValue[k];
         });
-
+        target[property] = undefined;
         const listeners = this.listeners.get(property);
 
         if (listeners) {
           this.scheduleListener(listeners, oldValue);
         }
-        this.notifyListenerFunctions();
         return true;
       }
-      this.notifyListenerFunctions();
       return true;
     } else {
       if (
@@ -254,6 +251,7 @@ class Model {
           // primitive only
 
           let isValue =
+            Number.isNaN(value) ||
             listeners[0].watchFn(this.context?.$target) == value ||
             (() => {
               const res = listeners[0].watchFn(this.$target);
@@ -280,8 +278,6 @@ class Model {
           }
         });
       }
-
-      this.notifyListenerFunctions();
 
       return true;
     }
@@ -352,37 +348,6 @@ class Model {
       }
     });
   }
-  notifyListenerFunctions() {
-    try {
-      let listeners = Array.from(this.functionListeners.keys());
-      let length = listeners.length;
-
-      for (let i = 0; i < length; i++) {
-        let key = listeners[i]; // Retrieve the key-value pair from the cached array
-        let value = this.functionListeners.get(key);
-        const newValue = key(
-          this.context ? this.context.$target : this.$target,
-        );
-
-        if (newValue !== value.oldValue) {
-          const oldValue = value.oldValue;
-          value.oldValue = newValue;
-          value.fn.call(undefined, newValue, oldValue, this.$target);
-        }
-
-        // Check if listeners have changed during the iteration
-        if (this.functionListeners.size !== length) {
-          if (this.functionListeners.size < length) {
-            i--;
-          }
-          listeners = Array.from(this.functionListeners.keys());
-          length = listeners.length;
-        }
-      }
-    } catch (e) {
-      $exceptionHandler(e);
-    }
-  }
 
   deleteProperty(target, property) {
     var oldValue = structuredClone(target);
@@ -401,7 +366,7 @@ class Model {
         this.scheduleListener(listeners, target[property]);
       }
     }
-    this.notifyListenerFunctions();
+
     return true;
   }
 
@@ -409,26 +374,12 @@ class Model {
    * Registers a watcher for a property along with a listener function. The listener
    * function is invoked when changes to that property are detected.
    *
-   * @param {string | function(any): any} watchProp - An expression to be watched in the context of this model.
+   * @param {string} watchProp - An expression to be watched in the context of this model.
    * @param {ListenerFunction} [listenerFn] - A function to execute when changes are detected on watched context.
    */
   $watch(watchProp, listenerFn) {
+    assert(isString(watchProp), "Watched property required");
     this.state = ModelPhase.WATCH;
-
-    if (isFunction(watchProp)) {
-      this.functionListeners.set(/** @type {Function} */ (watchProp), {
-        fn: listenerFn,
-        oldValue: /** @type {Function} */ (watchProp)(this.$target)
-          ? /** @type {Function} */ /** @type {Function} */ (watchProp)(
-              this.$target,
-            )
-          : undefined,
-      });
-      this.state = ModelPhase.NONE;
-      return () => {
-        this.functionListeners.delete(/** @type {Function} */ (watchProp));
-      };
-    }
 
     const get = $parse(watchProp);
 
@@ -621,6 +572,11 @@ class Model {
     };
   }
 
+  /**
+   * @param {string} name
+   * @param  {...any} args
+   * @returns
+   */
   $emit(name, ...args) {
     return this.eventHelper(
       { name: name, event: undefined, broadcast: false },
@@ -628,6 +584,11 @@ class Model {
     );
   }
 
+  /**
+   * @param {string} name
+   * @param  {...any} args
+   * @returns
+   */
   $broadcast(name, ...args) {
     return this.eventHelper(
       { name: name, event: undefined, broadcast: true },
@@ -792,10 +753,10 @@ function extractTarget(object) {
   }
 }
 
-function deProxy(maybeProxy) {
-  if (maybeProxy[isProxySymbol]) {
-    return deProxy(maybeProxy);
-  } else {
-    return maybeProxy.$target;
-  }
-}
+// function deProxy(maybeProxy) {
+//   if (maybeProxy[isProxySymbol]) {
+//     return deProxy(maybeProxy);
+//   } else {
+//     return maybeProxy.$target;
+//   }
+// }
