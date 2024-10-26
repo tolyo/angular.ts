@@ -824,7 +824,7 @@ export function HttpProvider() {
             forEach(eventHandlers, (eventHandler, key) => {
               applyHandlers[key] = function (event) {
                 if (useApplyAsync) {
-                  $rootScope.$applyAsync(callEventHandler);
+                  setTimeout(() => $rootScope.$apply(callEventHandler));
                 } else if ($rootScope.$$phase !== ScopePhase.NONE) {
                   callEventHandler();
                 } else {

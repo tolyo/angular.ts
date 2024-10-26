@@ -378,7 +378,6 @@ class Model {
       let index = 0;
       while (index < listeners.length) {
         const listener = listeners[index];
-        debugger;
         if (listener.foreignListener) {
           listener.foreignListener.notifyListener(
             listener,
@@ -807,6 +806,10 @@ class Model {
           Promise.resolve().then(x.fn(x.handler, x.locals));
         }
       });
+
+      while ($postUpdateQueue.length) {
+        $postUpdateQueue.shift()();
+      }
     } catch (e) {
       $exceptionHandler(e);
     }

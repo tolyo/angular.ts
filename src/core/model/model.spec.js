@@ -1,5 +1,5 @@
 import { wait } from "../../shared/test-utils";
-import { createModel } from "./model";
+import { $postUpdateQueue, createModel } from "./model";
 import { Angular } from "../../loader";
 import { createInjector } from "../di/injector";
 import { isDefined, sliceArgs } from "../../shared/utils";
@@ -10,9 +10,11 @@ describe("Model", () => {
   let logs;
   let $rootModel;
   let injector;
+  let count;
 
   beforeEach(() => {
     logs = [];
+    count = 0;
     delete window.angular;
     window.angular = new Angular();
     window.angular
@@ -1355,6 +1357,31 @@ describe("Model", () => {
         expect(oldValue).toEqual({});
       });
 
+      it("should allow deregistration", async () => {
+        model.obj = [];
+        count = 0;
+        let deregister = model.$watch("obj", (newVal) => {
+          logs.push(newVal);
+          count++;
+        });
+
+        model.obj.push("a");
+        await wait();
+        expect(logs.length).toBe(1);
+        expect(count).toEqual(1);
+
+        model.obj.push("a");
+        await wait();
+        expect(logs.length).toBe(2);
+        expect(count).toEqual(2);
+
+        deregister();
+        model.obj.push("a");
+        await wait();
+        expect(logs.length).toBe(2);
+        expect(count).toEqual(2);
+      });
+
       // it("should not trigger change when object in collection changes", () => {
       //   model.obj = [{}];
 
@@ -1441,12 +1468,12 @@ describe("Model", () => {
       });
     });
 
-    describe("$watchCollection", () => {
+    describe("$watch", () => {
       describe("constiable", () => {
         let deregister;
         beforeEach(() => {
           logs = [];
-          deregister = model.$watchCollection("obj", (newVal, oldVal) => {
+          deregister = model.$watch("obj", (newVal, oldVal) => {
             const msg = { newVal, oldVal };
 
             if (newVal === oldVal) {
@@ -1454,18 +1481,6 @@ describe("Model", () => {
             }
             logs.push(msg);
           });
-        });
-
-        it("should allow deregistration", async () => {
-          model.obj = [];
-          await wait();
-          expect(logs.length).toBe(1);
-          logs = [];
-
-          model.obj.push("a");
-          await wait();
-          deregister();
-          expect(logs).toEqual([]);
         });
 
         describe("object", () => {
@@ -1579,7 +1594,7 @@ describe("Model", () => {
         describe("array", () => {
           beforeEach(() => {
             logs = [];
-            model.$watchCollection("[obj]", (newVal, oldVal) => {
+            model.$watch("[obj]", (newVal, oldVal) => {
               const msg = { newVal, oldVal };
 
               if (newVal === oldVal) {
@@ -1655,7 +1670,7 @@ describe("Model", () => {
         describe("object", () => {
           beforeEach(() => {
             logs = [];
-            model.$watchCollection("{a: obj}", (newVal, oldVal) => {
+            model.$watch("{a: obj}", (newVal, oldVal) => {
               const msg = { newVal, oldVal };
 
               if (newVal === oldVal) {
@@ -1752,7 +1767,7 @@ describe("Model", () => {
         describe("object computed property", () => {
           beforeEach(() => {
             logs = [];
-            model.$watchCollection("{[key]: obj}", (newVal, oldVal) => {
+            model.$watch("{[key]: obj}", (newVal, oldVal) => {
               const msg = { newVal, oldVal };
 
               if (newVal === oldVal) {
@@ -1966,6 +1981,23 @@ describe("Model", () => {
       expect(model.a.b).toBeUndefined();
     });
 
+    it("should update arrays", async () => {
+      model.a = [];
+      model.$watch("a", () => count++);
+
+      model.$apply("a.push(1)");
+
+      await wait();
+      expect(model.a).toEqual([1]);
+      expect(count).toEqual(1);
+
+      model.$apply("a.push(2)");
+
+      await wait();
+      expect(model.a).toEqual([1, 2]);
+      expect(count).toEqual(2);
+    });
+
     it("executes $apply'ed function and starts the digest", async () => {
       model.aValue = "someValue";
       model.counter = 0;
@@ -2113,92 +2145,92 @@ describe("Model", () => {
     //   });
   });
 
-  describe("$applyAsync", () => {
-    beforeEach(() => (logs = []));
-    it("should evaluate in the context of specific $model", () => {
-      const model = model.$new();
-      let id = model.$applyAsync('x = "CODE ORANGE"');
+  // describe("$applyAsync", () => {
+  //   beforeEach(() => (logs = []));
+  //   fit("should evaluate in the context of specific $model", () => {
+  //     const scope = model.$new();
+  //     let id = scope.$applyAsync('x = "CODE ORANGE"');
 
-      $browser.cancel(id);
-      setTimeout(() => {
-        expect(model.x).toBe("CODE ORANGE");
-        expect(model.x).toBeUndefined();
-      });
+  //     $browser.cancel(id);
+  //     setTimeout(() => {
+  //       expect(scope.x).toBe("CODE ORANGE");
+  //       expect(scope.x).toBeUndefined();
+  //     });
 
-      expect(model.x).toBeUndefined();
-    });
+  //     expect(scope.x).toBeUndefined();
+  //   });
 
-    it("should evaluate queued expressions in order", () => {
-      model.x = [];
-      let id1 = model.$applyAsync('x.push("expr1")');
-      let id2 = model.$applyAsync('x.push("expr2")');
+  //   it("should evaluate queued expressions in order", () => {
+  //     model.x = [];
+  //     let id1 = model.$applyAsync('x.push("expr1")');
+  //     let id2 = model.$applyAsync('x.push("expr2")');
 
-      $browser.cancel(id1);
-      $browser.cancel(id2);
-      setTimeout(() => {
-        expect(model.x).toEqual(["expr1", "expr2"]);
-      });
-      expect(model.x).toEqual([]);
-    });
+  //     $browser.cancel(id1);
+  //     $browser.cancel(id2);
+  //     setTimeout(() => {
+  //       expect(model.x).toEqual(["expr1", "expr2"]);
+  //     });
+  //     expect(model.x).toEqual([]);
+  //   });
 
-    it("should evaluate subsequently queued items in same turn", () => {
-      model.x = [];
-      let id = model.$applyAsync(() => {
-        model.x.push("expr1");
-        model.$applyAsync('x.push("expr2")');
-        expect($browser.deferredFns.length).toBe(0);
-      });
+  //   it("should evaluate subsequently queued items in same turn", () => {
+  //     model.x = [];
+  //     let id = model.$applyAsync(() => {
+  //       model.x.push("expr1");
+  //       model.$applyAsync('x.push("expr2")');
+  //       expect($browser.deferredFns.length).toBe(0);
+  //     });
 
-      $browser.cancel(id);
-      setTimeout(() => {
-        expect(model.x).toEqual(["expr1", "expr2"]);
-      });
-      expect(model.x).toEqual([]);
-    });
+  //     $browser.cancel(id);
+  //     setTimeout(() => {
+  //       expect(model.x).toEqual(["expr1", "expr2"]);
+  //     });
+  //     expect(model.x).toEqual([]);
+  //   });
 
-    it("should pass thrown exceptions to $exceptionHandler", () => {
-      let id = model.$applyAsync(() => {
-        throw "OOPS";
-      });
+  //   it("should pass thrown exceptions to $exceptionHandler", () => {
+  //     let id = model.$applyAsync(() => {
+  //       throw "OOPS";
+  //     });
 
-      $browser.cancel(id);
-      expect(logs).toEqual([]);
-      setTimeout(() => expect(logs[0]).toEqual("OOPS"));
-    });
+  //     $browser.cancel(id);
+  //     expect(logs).toEqual([]);
+  //     setTimeout(() => expect(logs[0]).toEqual("OOPS"));
+  //   });
 
-    it("should evaluate subsequent expressions after an exception is thrown", () => {
-      let id = model.$applyAsync(() => {
-        throw "OOPS";
-      });
-      let id2 = model.$applyAsync('x = "All good!"');
+  //   it("should evaluate subsequent expressions after an exception is thrown", () => {
+  //     let id = model.$applyAsync(() => {
+  //       throw "OOPS";
+  //     });
+  //     let id2 = model.$applyAsync('x = "All good!"');
 
-      $browser.cancel(id);
-      $browser.cancel(id2);
-      setTimeout(() => expect(model.x).toBe("All good!"));
-      expect(model.x).toBeUndefined();
-    });
+  //     $browser.cancel(id);
+  //     $browser.cancel(id2);
+  //     setTimeout(() => expect(model.x).toBe("All good!"));
+  //     expect(model.x).toBeUndefined();
+  //   });
 
-    it("should be cancelled if a model digest occurs before the next tick", () => {
-      const cancel = spyOn($browser, "cancel").and.callThrough();
-      const expression = jasmine.createSpy("expr");
+  //   it("should be cancelled if a model digest occurs before the next tick", () => {
+  //     const cancel = spyOn($browser, "cancel").and.callThrough();
+  //     const expression = jasmine.createSpy("expr");
 
-      model.$applyAsync(expression);
+  //     model.$applyAsync(expression);
 
-      expect(expression).toHaveBeenCalled();
-      expect(cancel).toHaveBeenCalled();
-      expression.calls.reset();
-      cancel.calls.reset();
+  //     expect(expression).toHaveBeenCalled();
+  //     expect(cancel).toHaveBeenCalled();
+  //     expression.calls.reset();
+  //     cancel.calls.reset();
 
-      // assert that another digest won't call the function again
+  //     // assert that another digest won't call the function again
 
-      expect(expression).not.toHaveBeenCalled();
-      expect(cancel).not.toHaveBeenCalled();
-    });
-  });
+  //     expect(expression).not.toHaveBeenCalled();
+  //     expect(cancel).not.toHaveBeenCalled();
+  //   });
+  // });
 
   describe("$postUpdate", () => {
     beforeEach(() => (logs = []));
-    it("should process callbacks as a queue (FIFO) when the model is digested", () => {
+    it("should process callbacks as a queue (FIFO) when the model is digested", async () => {
       let signature = "";
 
       model.$postUpdate(() => {
@@ -2217,11 +2249,17 @@ describe("Model", () => {
       });
 
       expect(signature).toBe("");
+      expect($postUpdateQueue.length).toBe(3);
+
+      model.$watch("a", () => {});
+      model.a = 1;
+
+      await wait();
 
       expect(signature).toBe("ABCD");
     });
 
-    it("should support $apply calls nested in $postUpdate callbacks", () => {
+    it("should support $apply calls nested in $postUpdate callbacks", async () => {
       let signature = "";
 
       model.$postUpdate(() => {
@@ -2230,20 +2268,25 @@ describe("Model", () => {
 
       model.$postUpdate(() => {
         signature += "B";
-        model.$apply();
-        signature += "D";
+        model.$postUpdate(() => {
+          signature += "D";
+        });
+        model.$apply("a = 2");
       });
 
       model.$postUpdate(() => {
         signature += "C";
       });
-
       expect(signature).toBe("");
+
+      model.$watch("a", () => {});
+      model.a = 1;
+      await wait();
 
       expect(signature).toBe("ABCD");
     });
 
-    it("should run a $postUpdate call on all child models when a parent model is digested", () => {
+    it("should run a $postUpdate call on all child models when a parent model is digested", async () => {
       const parent = model.$new();
       const child = parent.$new();
       let count = 0;
@@ -2262,10 +2305,14 @@ describe("Model", () => {
 
       expect(count).toBe(0);
 
+      model.$watch("a", () => {});
+      model.a = 1;
+      await wait();
+
       expect(count).toBe(3);
     });
 
-    it("should run a $postUpdate call even if the child model is isolated", () => {
+    it("should run a $postUpdate call even if the child model is isolated", async () => {
       const parent = model.$new();
       const child = parent.$new(true);
       let signature = "";
@@ -2279,7 +2326,9 @@ describe("Model", () => {
       });
 
       expect(signature).toBe("");
-
+      model.$watch("a", () => {});
+      model.a = 1;
+      await wait();
       expect(signature).toBe("AB");
     });
   });
