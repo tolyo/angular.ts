@@ -87,7 +87,7 @@ test.describe("animations", () => {
     await expect(animated).toHaveClass(/ng-enter-active/);
 
     // Wait for the transition to complete
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(100);
     await expect(animated).not.toHaveClass(/ng-enter/);
     await expect(animated).not.toHaveClass(/ng-enter-active/);
 
@@ -106,7 +106,6 @@ test.describe("animations", () => {
     await page.goto("src/directive/if/if-animate-css.html");
     await page.content();
     await page.click('button:has-text("Fade In!")');
-    await page.waitForTimeout(600);
     let animated = await page.locator("#circle");
     await expect(animated).not.toHaveClass(/ng-enter/);
     await expect(animated).not.toHaveClass(/ng-enter-active/);
