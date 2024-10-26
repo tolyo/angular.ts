@@ -269,18 +269,12 @@ describe("$interpolate", () => {
       expect(interp.$$watchDelegate).toBeDefined();
     });
 
-    it("correctly returns new and old value when watched", function () {
+    it("correctly returns new value", async () => {
       const interp = $interpolate("{{expr}}");
-      const listenerSpy = jasmine.createSpy();
-      $rootScope.$watch(interp, listenerSpy);
+      $rootScope.$watch("expr", () => {});
       $rootScope.expr = 42;
-      $rootScope.$apply();
-      expect(listenerSpy.calls.mostRecent().args[0]).toEqual("42");
-      expect(listenerSpy.calls.mostRecent().args[1]).toEqual("42");
-      $rootScope.expr++;
-      $rootScope.$apply();
-      expect(listenerSpy.calls.mostRecent().args[0]).toEqual("43");
-      expect(listenerSpy.calls.mostRecent().args[1]).toEqual("42");
+      await wait();
+      expect(interp($rootScope)).toEqual("42");
     });
 
     it("should support escaping interpolation signs", () => {
@@ -401,6 +395,61 @@ describe("$interpolate", () => {
       expect($interpolate("\\{\\{Hello, {{bar}}!\\}\\}")(obj)).toBe(
         "{{Hello, World!}}",
       );
+    });
+  });
+
+  describe("interpolation callbacks", () => {
+    it("does not require a callback", async () => {
+      let text;
+      $rootScope.expr = 42;
+      const interp = $interpolate("{{expr}}");
+
+      text = interp($rootScope);
+
+      expect(text).toEqual("42");
+    });
+
+    it("correctly invokes callback when interpolated value changes", async () => {
+      let counter = 0;
+
+      const interp = $interpolate("{{expr}}");
+
+      interp($rootScope, (val) => {
+        counter++;
+      });
+
+      $rootScope.expr = 42;
+      await wait();
+      expect(counter).toEqual(1);
+
+      $rootScope.expr++;
+      await wait();
+      expect(counter).toEqual(2);
+    });
+
+    it("returns currently interpolated text", async () => {
+      let text;
+      $rootScope.expr = 42;
+      const interp = $interpolate("{{expr}}");
+
+      text = interp($rootScope, (val) => {
+        text = val;
+      });
+
+      expect(text).toEqual("42");
+    });
+
+    it("invokes callback with newly interpolated text", async () => {
+      let text;
+      const interp = $interpolate("{{expr}}");
+
+      interp($rootScope, (val) => {
+        text = val;
+      });
+
+      $rootScope.expr = 42;
+      await wait();
+      expect(text).toEqual("42");
     });
   });
 

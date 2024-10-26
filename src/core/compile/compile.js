@@ -2446,7 +2446,9 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
           directives.push({
             priority: 0,
             compile: () => (scope, node) =>
-              (node[0].nodeValue = interpolateFn(scope)),
+              (node[0].nodeValue = interpolateFn(scope, (val) => {
+                node[0].nodeValue = val;
+              })),
           });
         }
       }

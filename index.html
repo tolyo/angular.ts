@@ -14,10 +14,19 @@
           }
           class TodoController {
             constructor() {
+              this.counter = 1
+              this.greeting = "Todos";
               this.tasks = [
                 new Todo("Learn AngularTS"),
                 new Todo("Build an AngularTS app"),
               ];
+
+              window.test = this
+            }
+
+            increase() {
+
+              this.counter++
             }
 
             /**
@@ -42,7 +51,9 @@
     </head>
     <body ng-app="todo" ng-cloak>
       <div ng-controller="TodoCtrl as $ctrl">
-        <h3>Todos</h3> {{ 2 + 2 }}
+        <h3>{{ $ctrl.greeting }}</h3> {{ 2 + 2 }} {{ $ctrl.counter }}
+        <button ng-click="$ctrl.increase()">Increase</button>
+
         <button ng-click="$ctrl.archive()">Archive</button>
         <ul>
           <li ng-repeat="todo in $ctrl.tasks" class="done-{{todo.done}}">

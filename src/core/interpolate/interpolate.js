@@ -332,13 +332,24 @@ export class InterpolateProvider {
           };
 
           return extend(
-            (context) => {
+            (context, cb) => {
               let i = 0;
               const ii = expressions.length;
               const values = new Array(ii);
 
               try {
                 for (; i < ii; i++) {
+                  if (cb) {
+                    context.$watch(expressions[i], () => {
+                      let vals = new Array(ii);
+                      let j = 0;
+                      for (; j < ii; j++) {
+                        vals[j] = parseFns[j](context);
+                      }
+                      cb(compute(vals));
+                    });
+                  }
+
                   values[i] = parseFns[i](context);
                 }
 
