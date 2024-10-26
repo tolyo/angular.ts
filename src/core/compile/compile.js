@@ -2445,17 +2445,8 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
         if (interpolateFn) {
           directives.push({
             priority: 0,
-            compile: function textInterpolateCompileFn() {
-              // When transcluding a template that has bindings in the root
-              // we don't have a parent and thus need to add the class during linking fn.
-
-              return function textInterpolateLinkFn(scope, node) {
-                scope[interpolateFn] = interpolateFn;
-                scope.$watch("interpolateFn", (value) => {
-                  node[0].nodeValue = value;
-                });
-              };
-            },
+            compile: () => (scope, node) =>
+              (node[0].nodeValue = interpolateFn(scope)),
           });
         }
       }

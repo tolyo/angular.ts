@@ -348,6 +348,7 @@ export class InterpolateProvider {
               }
             },
             {
+              // Most likely we would need to register watches during interpolation
               // all of these properties are undocumented for now
               exp: text, // just for compatibility with regular watchers created via $watch
               expressions,

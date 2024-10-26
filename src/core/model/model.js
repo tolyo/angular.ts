@@ -447,10 +447,31 @@ class Model {
       return () => {};
     }
 
+    /** @type {Listener} */
+    const listener = {
+      originalTarget: this.$target,
+      listenerFn: listenerFn,
+      watchFn: get,
+      id: nextUid(),
+      oneTime: get.oneTime,
+      property: undefined,
+    };
+
     // simplest case
     let key = get.decoratedNode.body[0].expression.name;
     let context;
-    switch (get.decoratedNode.body[0].expression.type) {
+    let type = get.decoratedNode.body[0].expression.type;
+    switch (type) {
+      // 1
+      case ASTType.Program: {
+        throw new Error("Unsupported type " + type);
+      }
+
+      // 2
+      case ASTType.ExpressionStatement: {
+        throw new Error("Unsupported type " + type);
+      }
+      // 3
       case ASTType.AssignmentExpression:
         // assignment calls without listener functions
         if (!listenerFn) {
@@ -462,35 +483,86 @@ class Model {
           return () => {};
         }
         break;
+      // 4
+      case ASTType.ConditionalExpression: {
+        throw new Error("Unsupported type " + type);
+      }
+      // 5
+      case ASTType.LogicalExpression: {
+        throw new Error("Unsupported type " + type);
+      }
+      // 6
+      case ASTType.BinaryExpression: {
+        throw new Error("Unsupported type " + type);
+      }
+
+      // 7
+      case ASTType.UnaryExpression: {
+        throw new Error("Unsupported type " + type);
+      }
+
+      // function
+      case ASTType.CallExpression: {
+        listener.property = get.decoratedNode.body[0].callee.name;
+        break;
+      }
 
       case ASTType.MemberExpression: {
-        key = get.decoratedNode.body[0].expression.property.name;
+        listener.property = get.decoratedNode.body[0].expression.property.name;
         const name = extractTarget(get.decoratedNode.body[0].expression.object);
         if (this.$target[name]) {
-          context = () => {
+          listener.context = () => {
             return this.$target[name].$target;
           };
         }
         break;
       }
+
+      // 10
+      case ASTType.Identifier: {
+        listener.property = get.decoratedNode.body[0].expression.name;
+        break;
+      }
+
+      // 11
+      case ASTType.Literal: {
+        throw new Error("Unsupported type " + type);
+      }
+
+      // 12
+      case ASTType.ArrayExpression: {
+        throw new Error("Unsupported type " + type);
+      }
+
+      // 13
+      case ASTType.Property: {
+        throw new Error("Unsupported type " + type);
+      }
+
+      // 14
+      case ASTType.ObjectExpression: {
+        throw new Error("Unsupported type " + type);
+      }
+
+      // 15
+      case ASTType.ThisExpression: {
+        throw new Error("Unsupported type " + type);
+      }
+
+      // 16
+      case ASTType.LocalsExpression: {
+        throw new Error("Unsupported type " + type);
+      }
+
+      // 17
+      case ASTType.NGValueParameter: {
+        throw new Error("Unsupported type " + type);
+      }
     }
 
-    // let { key, filter } = getProperty(get);
-
-    /** @type {Listener} */
-    const listener = {
-      originalTarget: this.$target,
-      listenerFn: listenerFn,
-      watchFn: get,
-      id: nextUid(),
-      oneTime: get.oneTime,
-      property: key,
-      context: context,
-    };
-
-    if (context && context()[isProxySymbol]) {
+    if (context && listener.context()[isProxySymbol]) {
       listener.foreignListener = this.proxy;
-      context().$handler.registerForeignKey(key, listener);
+      listener.context().$handler.registerForeignKey(key, listener);
     } else {
       this.registerKey(key, listener);
     }

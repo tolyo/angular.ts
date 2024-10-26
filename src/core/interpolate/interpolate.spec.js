@@ -1,5 +1,6 @@
 import { createInjector } from "../di/injector";
 import { Angular } from "../../loader";
+import { wait } from "../../shared/test-utils";
 
 describe("$interpolate", () => {
   let $interpolate, $injector, $rootScope, $sce;
@@ -234,16 +235,22 @@ describe("$interpolate", () => {
       expect(calls.pop()).toBeUndefined();
     });
 
-    it("should stop watching strings with no expressions after first execution", () => {
+    // TODO these tests shoudl be revereds
+    // Calling interpolation with scope should CREATE watches on scope
+    it("should stop watching strings with no expressions after first execution", async () => {
       const spy = jasmine.createSpy();
-      $rootScope.$watch($interpolate("foo"), spy);
-      expect(spy).toHaveBeenCalledWith("foo", "foo", $rootScope);
+      $rootScope.$watch($interpolate("foo")(), spy);
+      $rootScope.foo = "foo";
+      await wait();
+      expect(spy).toHaveBeenCalledWith("foo", undefined, $rootScope);
       expect(spy).toHaveBeenCalledTimes(1);
     });
 
     it("should stop watching strings with only constant expressions after first execution", () => {
       const spy = jasmine.createSpy();
-      $rootScope.$watch($interpolate("foo {{42}}"), spy);
+      let res = $interpolate("foo {{42}}")($rootScope);
+      $rootScope.$watch(res, spy);
+
       expect(spy).toHaveBeenCalledWith("foo 42", "foo 42", $rootScope);
       expect(spy).toHaveBeenCalledTimes(1);
     });

@@ -54,6 +54,7 @@ export type Listener = {
      * - The optional context in which a property exists
      */
     context?: any;
+    foreignListener?: ProxyConstructor;
 };
 /**
  * Listener function type.
@@ -75,8 +76,10 @@ declare class Model {
     /** @type {Object} */
     $target: any;
     context: Model;
-    /** @type {Map<string, Array<Listener>>} */
+    /** @type {Map<string, Array<Listener>>} Watch listeners */
     listeners: Map<string, Array<Listener>>;
+    /** @type {Map<string, Array<Listener>>} Watch listeners from other proxies */
+    foreignListeners: Map<string, Array<Listener>>;
     /** @type {WeakMap<Object, Array<string>>} */
     objectListeners: WeakMap<any, Array<string>>;
     /** @type {Map<Function, {oldValue: any, fn: Function}>} */
@@ -105,7 +108,7 @@ declare class Model {
     $$watchersCount: number;
     /** @type {AsyncQueueTask[]} */
     $$asyncQueue: AsyncQueueTask[];
-    /** @type {Map<String, Function[]>} */
+    /** @type {Map<String, Function[]>} Event listeners */
     $$listeners: Map<string, Function[]>;
     filters: any[];
     /** @type {ModelPhase} */
@@ -150,7 +153,9 @@ declare class Model {
     $watchCollection(watchProp: any, listenerFn: any): () => void;
     $new(isIsolated: boolean, parent: any): any;
     registerKey(key: any, listener: any): void;
+    registerForeignKey(key: any, listener: any): void;
     deregisterKey(key: any, id: any): boolean;
+    deregisterForeignKey(key: any, id: any): boolean;
     /**
      * @deprecated
      */
@@ -159,8 +164,18 @@ declare class Model {
     $evalAsync(expr: any, locals: any): Promise<any>;
     $apply(expr: any): any;
     $on(name: any, listener: any): () => void;
-    $emit(name: any, ...args: any[]): any;
-    $broadcast(name: any, ...args: any[]): any;
+    /**
+     * @param {string} name
+     * @param  {...any} args
+     * @returns
+     */
+    $emit(name: string, ...args: any[]): any;
+    /**
+     * @param {string} name
+     * @param  {...any} args
+     * @returns
+     */
+    $broadcast(name: string, ...args: any[]): any;
     eventHelper({ name, event, broadcast }: {
         name: any;
         event: any;
@@ -183,8 +198,7 @@ declare class Model {
      *
      * @param {Listener} listener - The property path that was changed.
      * @param {*} oldValue - The old value of the property.
-     * @param {*} currentContext - The current context in which change is detected.
      */
-    notifyListener(listener: Listener, oldValue: any, currentContext: any): void;
+    notifyListener(listener: Listener, oldValue: any): void;
 }
 export {};
