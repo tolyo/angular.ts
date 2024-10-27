@@ -13,14 +13,14 @@
             }
           }
           class TodoController {
-            constructor() {
+            constructor($rootScope) {
               this.counter = 1
+              setTimeout(() => this.counter++, 10)
               this.greeting = "Todos";
               this.tasks = [
                 new Todo("Learn AngularTS"),
                 new Todo("Build an AngularTS app"),
               ];
-
               window.test = this
             }
 
@@ -45,28 +45,28 @@
               this.tasks = this.tasks.filter((task) => !task.done);
             }
           }
-          window.angular.module("todo", []).controller("TodoCtrl", TodoController);
+
+          class Demo {
+            constructor() {
+              this.test = "DemoCtrl"
+            }
+          }
+          window.angular.module("todo", [])
+            .controller("TodoCtrl", TodoController).controller("DemoCtrl", Demo);
         });
       </script>
     </head>
-    <body ng-app="todo" ng-cloak>
-      <div ng-controller="TodoCtrl as $ctrl">
-        <h3>{{ $ctrl.greeting }}</h3> {{ 2 + 2 }} {{ $ctrl.counter }}
-        <button ng-click="$ctrl.increase()">Increase</button>
+    <body ng-app="todo" ng-init="demo = 2" ng-cloak>
+      {{ demo }}
+      <div id="1" ng-init="demo = 2" ng-controller="DemoCtrl as demo">
+        {{ test }} 
+        {{ demo }}
+        <div id="2" ng-controller="TodoCtrl">
+          {{ counter }} 
+          {{ counter2 }} 
+        </div>
 
-        <button ng-click="$ctrl.archive()">Archive</button>
-        <ul>
-          <li ng-repeat="todo in $ctrl.tasks" class="done-{{todo.done}}">
-            {{ todo.task }}
-            <input type="checkbox" ng-click="todo.done = !todo.done" />
-          </li>
-        </ul>
-  
-        <form ng-submit="$ctrl.add(newTodo)">
-          <input type="text" ng-model="newTodo" ng-required="true" />
-          <button type="submit">Add</button>
-        </form>
-      </div>
-      
+      {{ test }}
+    </div>
     </body>
 </html>

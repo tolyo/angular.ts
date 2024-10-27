@@ -2445,10 +2445,13 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
         if (interpolateFn) {
           directives.push({
             priority: 0,
-            compile: () => (scope, node) =>
-              (node[0].nodeValue = interpolateFn(scope, (val) => {
+            compile: () => (scope, node, arg1, arg3) => {
+              let current = JQLite(node).controller();
+
+              node[0].nodeValue = interpolateFn(current || scope, (val) => {
                 node[0].nodeValue = val;
-              })),
+              });
+            },
           });
         }
       }

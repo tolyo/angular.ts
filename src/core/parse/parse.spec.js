@@ -1052,7 +1052,6 @@ describe("parser", () => {
         });
 
         fit("should only become stable when all the properties of an object have defined values", async () => {
-          debugger;
           $rootScope.$watch("::{foo: foo, bar: bar}", (value) => {
             logs.push(value);
           });

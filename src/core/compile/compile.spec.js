@@ -1553,7 +1553,6 @@ describe("$compile", () => {
         },
       };
     });
-    debugger;
     reloadModules();
     var el = $('<div my-directive the-attr="42"></div>');
     $compile(el)($rootScope);

@@ -336,11 +336,12 @@ export class InterpolateProvider {
               let i = 0;
               const ii = expressions.length;
               const values = new Array(ii);
-
               try {
                 for (; i < ii; i++) {
                   if (cb) {
-                    context.$watch(expressions[i], () => {
+                    const watchProp = expressions[i].trim();
+                    console.log(watchProp);
+                    context.$watch(watchProp, () => {
                       let vals = new Array(ii);
                       let j = 0;
                       for (; j < ii; j++) {

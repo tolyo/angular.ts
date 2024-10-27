@@ -282,6 +282,83 @@ describe("Model", () => {
       expect(listen).toBeUndefined();
     });
 
+    it("can trigger watch from a class", async () => {
+      let called = false;
+      class Demo {
+        constructor() {
+          this.counter = 0;
+        }
+        test() {
+          this.counter++;
+        }
+      }
+
+      model = createModel(new Demo());
+
+      model.$watch("counter", () => {
+        called = true;
+      });
+
+      expect(model.counter).toEqual(0);
+      expect(called).toBeFalse();
+
+      model.test();
+      await wait();
+
+      expect(model.counter).toEqual(1);
+      expect(called).toBeTrue();
+    });
+
+    it("can trigger watch from a constuctor function", async () => {
+      let called = false;
+      function Demo() {
+        this.counter = 0;
+        this.test = function () {
+          this.counter++;
+        };
+      }
+
+      model = createModel(new Demo());
+
+      model.$watch("counter", () => {
+        called = true;
+      });
+
+      expect(model.counter).toEqual(0);
+      expect(called).toBeFalse();
+
+      model.test();
+      await wait();
+
+      expect(model.counter).toEqual(1);
+      expect(called).toBeTrue();
+    });
+
+    it("can trigger watch from an POJO object ", async () => {
+      let called = false;
+      const demo = {
+        counter: 0,
+        test: function () {
+          this.counter++;
+        },
+      };
+
+      model = createModel(demo);
+
+      model.$watch("counter", () => {
+        called = true;
+      });
+
+      expect(model.counter).toEqual(0);
+      expect(called).toBeFalse();
+
+      model.test();
+      await wait();
+
+      expect(model.counter).toEqual(1);
+      expect(called).toBeTrue();
+    });
+
     it("calls the listener function when the watched value is iniatized", async () => {
       model.counter = 0;
 
