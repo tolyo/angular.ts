@@ -12,8 +12,7 @@ describe("$state", () => {
   }
 
   async function initStateTo(state, params) {
-    const $state = $get("$state"),
-      $q = $get("$q");
+    const $state = $get("$state");
     return $state.transitionTo(state, params || {});
   }
 
@@ -241,7 +240,7 @@ describe("$state", () => {
             url: "/resolve-timeout/:foo",
             resolve: {
               value: function ($timeout) {
-                return $timeout(function () {
+                return setTimeout(function () {
                   log += "Success!";
                 }, 1);
               },

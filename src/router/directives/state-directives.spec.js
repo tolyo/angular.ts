@@ -50,10 +50,8 @@ describe("ngStateRef", () => {
     $injector = window.angular.bootstrap(document.getElementById("dummy"), [
       "defaultModule",
     ]);
-    $q = $injector.get("$q");
     $rootScope = $injector.get("$rootScope");
     $compile = $injector.get("$compile");
-    $timeout = $injector.get("$timeout");
     $state = $injector.get("$state");
     $stateParams = $injector.get("$stateParams");
     $urlService = $injector.get("$urlService");
@@ -703,10 +701,8 @@ describe("ngSrefActive", () => {
     $injector = window.angular.bootstrap(document.getElementById("dummy"), [
       "defaultModule",
     ]);
-    $q = $injector.get("$q");
     $rootScope = $injector.get("$rootScope");
     $compile = $injector.get("$compile");
-    $timeout = $injector.get("$timeout");
     $state = $injector.get("$state");
     $stateParams = $injector.get("$stateParams");
   });

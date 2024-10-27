@@ -382,7 +382,6 @@ export function HttpProvider() {
     "$browser",
     "$httpBackend",
     "$rootScope",
-    "$q",
     "$injector",
     "$sce",
     /**
@@ -390,12 +389,11 @@ export function HttpProvider() {
      * @param {*} $browser
      * @param {*} $httpBackend
      * @param {*} $rootScope
-     * @param {*} $q
      * @param {import("../../core/di/internal-injector").InjectorService} $injector
      * @param {*} $sce
      * @returns
      */
-    function ($browser, $httpBackend, $rootScope, $q, $injector, $sce) {
+    function ($browser, $httpBackend, $rootScope, $injector, $sce) {
       /**
        * @type {Map<string, string>}
        */
@@ -469,7 +467,7 @@ export function HttpProvider() {
 
         const requestInterceptors = [];
         const responseInterceptors = [];
-        let promise = $q.resolve(config);
+        let promise = Promise.resolve(config);
 
         // apply interceptors
         forEach(reversedInterceptors, (interceptor) => {
@@ -590,7 +588,7 @@ export function HttpProvider() {
             response.status,
             config.transformResponse,
           );
-          return isSuccess(response.status) ? resp : $q.reject(resp);
+          return isSuccess(response.status) ? resp : Promise.reject(resp);
         }
       }
 
@@ -733,8 +731,7 @@ export function HttpProvider() {
        * $httpBackend, defaults, $log, $rootScope, defaultCache, $http.pendingRequests
        */
       function sendReq(config, reqData) {
-        const deferred = $q.defer();
-        const { promise } = deferred;
+        const { promise, resolve, reject } = Promise.withResolvers();
         let cache;
         let cachedResp;
         const reqHeaders = config.headers;
@@ -893,7 +890,7 @@ export function HttpProvider() {
           // status: HTTP response status code, 0, -1 (aborted by timeout / promise)
           status = status >= -1 ? status : 0;
 
-          (isSuccess(status) ? deferred.resolve : deferred.reject)({
+          (isSuccess(status) ? resolve : reject)({
             data: response,
             status,
             headers: headersGetter(headers),

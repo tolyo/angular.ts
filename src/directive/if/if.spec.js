@@ -211,7 +211,6 @@ describe("ngIf", () => {
 
     it("should not trigger a digest when the element is removed", () => {
       const spy = spyOn($rootScope, "$digest").and.callThrough();
-      let $timeout = injector.get("$timeout");
       $scope.hello = true;
       makeIf("hello");
       expect(element.children().length).toBe(1);

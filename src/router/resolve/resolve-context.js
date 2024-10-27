@@ -119,7 +119,7 @@ export class ResolveContext {
    *
    * @param {string} when
    * @param trans
-   * @returns {import("../../core/q/q").QPromise<any>|any}
+   * @returns {Promise<any>|any}
    */
   resolvePath(when = "LAZY", trans) {
     // This option determines which 'when' policy Resolvables we are about to fetch.
@@ -153,7 +153,7 @@ export class ResolveContext {
       return acc.concat(wait.map(getResult));
     }, []);
     // Wait for all the "WAIT" resolvables
-    return services.$q.all(promises);
+    return Promise.all(promises);
   }
 
   injector() {

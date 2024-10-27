@@ -57,14 +57,12 @@ export function TemplateRequestProvider() {
     "$exceptionHandler",
     "$templateCache",
     "$http",
-    "$q",
     "$sce",
     /**
      *
      * @param {import('../core/exception-handler').ErrorHandler} $exceptionHandler
      * @param {import('../core/cache/cache-factory').TemplateCache} $templateCache
      * @param {*} $http
-     * @param {*} $q
      * @param {*} $sce
      * @returns
      */

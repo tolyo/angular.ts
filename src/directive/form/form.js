@@ -455,9 +455,8 @@ addSetValidityMethod({
  */
 const formDirectiveFactory = function (isNgForm) {
   return [
-    "$timeout",
     "$parse",
-    function ($timeout, $parse) {
+    function ($parse) {
       const formDirective = {
         name: "form",
         restrict: isNgForm ? "EA" : "E",
@@ -499,7 +498,7 @@ const formDirectiveFactory = function (isNgForm) {
                 // unregister the preventDefault listener so that we don't not leak memory but in a
                 // way that will achieve the prevention of the default action.
                 formElement.on("$destroy", () => {
-                  $timeout(
+                  setTimeout(
                     () => {
                       formElement[0].removeEventListener(
                         "submit",

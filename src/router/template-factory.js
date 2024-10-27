@@ -24,21 +24,18 @@ export class TemplateFactoryProvider {
     "$http",
     "$templateCache",
     "$templateRequest",
-    "$q",
     "$injector",
     /**
      * @param {any} $http
      * @param {import("../core/cache/cache-factory").TemplateCache} $templateCache
      * @param {any} $templateRequest
-     * @param {any} $q
      * @param {import("../core/di/internal-injector").InjectorService} $injector
      * @returns
      */
-    ($http, $templateCache, $templateRequest, $q, $injector) => {
+    ($http, $templateCache, $templateRequest, $injector) => {
       this.$templateRequest = $templateRequest;
       this.$http = $http;
       this.$templateCache = $templateCache;
-      this.$q = $q;
       this.$injector = $injector;
       return this;
     },
@@ -69,9 +66,9 @@ export class TemplateFactoryProvider {
   fromConfig(config, params, context) {
     const defaultTemplate = "<ui-view></ui-view>";
     const asTemplate = (result) =>
-      this.$q.resolve(result).then((str) => ({ template: str }));
+      Promise.resolve(result).then((str) => ({ template: str }));
     const asComponent = (result) =>
-      this.$q.resolve(result).then((str) => ({ component: str }));
+      Promise.resolve(result).then((str) => ({ component: str }));
 
     const getConfigType = (config) => {
       if (isDefined(config.template)) return "template";

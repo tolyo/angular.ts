@@ -13315,7 +13315,7 @@ describe("$compile", () => {
         //   module
         //     .controller("Leak", ($scope, $timeout) => {
         //       $scope.code = "red";
-        //       $timeout(() => {
+        //       setTimeout(() => {
         //         $scope.code = "blue";
         //       });
         //     })
@@ -14862,11 +14862,11 @@ describe("$compile", () => {
               });
             },
           }))
-          .directive("trans", ($timeout) => ({
+          .directive("trans", () => ({
             transclude: true,
             link(scope, element, attrs, ctrl, transclude) {
               // We use timeout here to simulate how ng-if works
-              $timeout(() => {
+              setTimeout(() => {
                 transclude((child) => {
                   element.append(child);
                 });

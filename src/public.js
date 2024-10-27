@@ -63,9 +63,7 @@ import { TemplateCacheProvider } from "./core/cache/cache-factory";
 import { ControllerProvider } from "./core/controller/controller";
 import { ExceptionHandlerProvider } from "./core/exception-handler";
 import { FilterProvider } from "./core/filter/filter";
-import { IntervalProvider } from "./core/interval/interval";
 import { InterpolateProvider } from "./core/interpolate/interpolate";
-import { $IntervalFactoryProvider } from "./core/interval/interval-factory";
 import {
   HttpProvider,
   HttpParamSerializerProvider,
@@ -75,11 +73,9 @@ import { LocationProvider } from "./core/location/location";
 import { LogProvider } from "./services/log";
 import { ParseProvider } from "./core/parse/parse.js";
 import { RootModelProvider } from "./core/model/model.js";
-import { $QProvider } from "./core/q/q";
 import { SceProvider, SceDelegateProvider } from "./core/sce/sce";
 import { TaskTrackerFactoryProvider } from "./core/task-tracker-factory";
 import { TemplateRequestProvider } from "./services/template-request";
-import { TimeoutProvider } from "./core/timeout/timeout";
 import { SanitizeUriProvider } from "./core/sanitize/sanitize-uri";
 import {
   ngMessageDefaultDirective,
@@ -249,8 +245,6 @@ export function publishExternalAPI(angular) {
             $exceptionHandler: ExceptionHandlerProvider,
             $filter: FilterProvider,
             $interpolate: InterpolateProvider,
-            $interval: IntervalProvider,
-            $$intervalFactory: $IntervalFactoryProvider,
             $http: HttpProvider,
             $httpParamSerializer: HttpParamSerializerProvider,
             $httpBackend: HttpBackendProvider,
@@ -261,13 +255,11 @@ export function publishExternalAPI(angular) {
             $rootModel: RootModelProvider,
             $rootScope: RootModelProvider,
             $routerGlobals: UIRouterGlobals,
-            $q: $QProvider,
             $sce: SceProvider,
             $sceDelegate: SceDelegateProvider,
             $$taskTrackerFactory: TaskTrackerFactoryProvider,
             $templateCache: TemplateCacheProvider,
             $templateRequest: TemplateRequestProvider,
-            $timeout: TimeoutProvider,
             $urlConfig: UrlConfigProvider,
             $view: ViewService,
             $transitions: TransitionProvider,

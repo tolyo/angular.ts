@@ -137,8 +137,7 @@ export let ngView = [
   "$animate",
   "$ngViewScroll",
   "$interpolate",
-  "$q",
-  function $ViewDirective($view, $animate, $ngViewScroll, $interpolate, $q) {
+  function $ViewDirective($view, $animate, $ngViewScroll, $interpolate) {
     function getRenderer() {
       return {
         enter: function (element, target, cb) {
@@ -237,6 +236,7 @@ export let ngView = [
           }
           function updateView(config) {
             const newScope = scope.$new();
+
             const animEnter = $q.defer(),
               animLeave = $q.defer();
             const $ngViewData = {
@@ -292,15 +292,8 @@ $ViewDirectiveFill.$inject = [
   "$controller",
   "$transitions",
   "$view",
-  "$q",
 ];
-export function $ViewDirectiveFill(
-  $compile,
-  $controller,
-  $transitions,
-  $view,
-  $q,
-) {
+export function $ViewDirectiveFill($compile, $controller, $transitions, $view) {
   const getControllerAs = parse("viewDecl.controllerAs");
   const getResolveAs = parse("viewDecl.resolveAs");
   return {
@@ -373,7 +366,6 @@ export function $ViewDirectiveFill(
             function (ctrlInstance) {
               if (!ctrlInstance) return;
               registerControllerCallbacks(
-                $q,
                 $transitions,
                 ctrlInstance,
                 scope,
@@ -393,7 +385,6 @@ export function $ViewDirectiveFill(
 let _uiCanExitId = 0;
 /** @ignore TODO: move these callbacks to $view and/or `/hooks/components.ts` or something */
 function registerControllerCallbacks(
-  $q,
   $transitions,
   controllerInstance,
   $scope,
@@ -470,7 +461,7 @@ function registerControllerCallbacks(
       let promise;
       const ids = (trans[cacheProp] = trans[cacheProp] || {});
       if (!prevTruthyAnswer(trans)) {
-        promise = $q.resolve(controllerInstance.uiCanExit(trans));
+        promise = Promise.resolve(controllerInstance.uiCanExit(trans));
         promise.then((val) => (ids[id] = val !== false));
       }
       return promise;

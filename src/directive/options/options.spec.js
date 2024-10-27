@@ -3399,7 +3399,6 @@ describe("ngOptions", () => {
     });
 
     it("should fail validation when $asyncValidators fail", () => {
-      let $q = injector.get("$q");
       let defer;
       createSelect({
         name: "select",
@@ -3424,7 +3423,6 @@ describe("ngOptions", () => {
     });
 
     it("should pass validation when $asyncValidators pass", () => {
-      let $q = injector.get("$q");
       let defer;
       createSelect({
         name: "select",

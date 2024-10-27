@@ -40,7 +40,6 @@ describe("ngModel", () => {
     element = JQLite("<form><input></form>");
     let $controller = injector.get("$controller");
     scope = injector.get("$rootScope");
-    $q = injector.get("$q");
     $rootScope = scope;
     ctrl = $controller(NgModelController, {
       $scope: scope,

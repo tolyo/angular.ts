@@ -9,22 +9,20 @@ export class ViewScrollProvider {
 
   $get = [
     "$anchorScroll",
-    "$timeout",
     /**
      * @param {import('../services/anchor-scroll').AnchorScrollObject} $anchorScroll
-     * @param {*} $timeout
      * @returns {import('../services/anchor-scroll').AnchorScrollObject|Function}
      */
-    ($anchorScroll, $timeout) => {
+    ($anchorScroll) => {
       if (this.enabled) {
         return $anchorScroll;
       }
       /**
        * @param {import('../shared/jqlite/jqlite').JQLite} $element
-       * @returns {import('../core/q/q').QPromise<any>}
+       * @returns {Promise<number>}
        */
-      return function ($element) {
-        return $timeout(
+      return async function ($element) {
+        return setTimeout(
           () => {
             $element[0].scrollIntoView();
           },

@@ -152,7 +152,6 @@ export class Angular {
         });
         // ng-route deps
         services.$injector = $injector;
-        services.$q = $injector.get("$q");
         // https://github.com/angular-ui/ui-router/issues/3678
         if (!Object.prototype.hasOwnProperty.call($injector, "strictDi")) {
           try {

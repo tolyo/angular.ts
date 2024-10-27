@@ -77,8 +77,6 @@ export class NgModelController {
     "$element",
     "$parse",
     "$animate",
-    "$timeout",
-    "$q",
     "$interpolate",
   ];
 
@@ -89,8 +87,6 @@ export class NgModelController {
    * @param {import('../../shared/jqlite/jqlite').JQLite} $element
    * @param {import("../../core/parse/parse").ParseService} $parse
    * @param {*} $animate
-   * @param {*} $timeout
-   * @param {import("../../core/q/q").QPromise<any>} $q
    * @param {*} $interpolate
    */
   constructor(
@@ -100,8 +96,6 @@ export class NgModelController {
     $element,
     $parse,
     $animate,
-    $timeout,
-    $q,
     $interpolate,
   ) {
     /** @type {any} The actual value from the control's view  */
@@ -167,9 +161,7 @@ export class NgModelController {
     this.$$attr = $attr;
     this.$$element = $element;
     this.$$animate = $animate;
-    this.$$timeout = $timeout;
     this.$$parse = $parse;
-    this.$q = $q;
     this.$$exceptionHandler = $exceptionHandler;
 
     this.$$hasNativeValidators = false;
@@ -525,7 +517,7 @@ export class NgModelController {
    * </example>
    */
   $rollbackViewValue() {
-    this.$$timeout.cancel(this.$$pendingDebounce);
+    clearTimeout(this.$$pendingDebounce);
     this.$viewValue = this.$$lastCommittedViewValue;
     this.$render();
   }
@@ -656,7 +648,7 @@ export class NgModelController {
       if (!validatorPromises.length) {
         validationDone(true);
       } else {
-        that.$q.all(validatorPromises).then(
+        Promise.all(validatorPromises).then(
           () => {
             validationDone(allValid);
           },
@@ -686,7 +678,7 @@ export class NgModelController {
    * usually handles calling this in response to input events.
    */
   $commitViewValue() {
-    this.$$timeout.cancel(this.$$pendingDebounce);
+    clearTimeout(this.$$pendingDebounce);
 
     // If the view value has not changed then we should just exit, except in the case where there is
     // a native validator on the element. In this case the validation state may have changed even though
@@ -859,13 +851,13 @@ export class NgModelController {
       debounceDelay = debounceDelay["*"];
     }
 
-    this.$$timeout.cancel(this.$$pendingDebounce);
+    clearTimeout(this.$$pendingDebounce);
     const that = this;
     if (/** @type {number} */ (debounceDelay) > 0) {
       // this fails if debounceDelay is an object
-      this.$$pendingDebounce = this.$$timeout(() => {
+      this.$$pendingDebounce = setTimeout(() => {
         that.$commitViewValue();
-      }, debounceDelay);
+      }, /** @type {number} */ (debounceDelay));
     } else if (this.$$rootScope.$$phase !== ScopePhase.NONE) {
       this.$commitViewValue();
     } else {

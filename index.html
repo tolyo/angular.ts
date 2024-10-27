@@ -13,20 +13,23 @@
             }
           }
           class TodoController {
-            constructor($rootScope) {
-              this.counter = 1
-              setTimeout(() => this.counter++, 10)
+            constructor($element) {
+              this.counter = 10
               this.greeting = "Todos";
               this.tasks = [
                 new Todo("Learn AngularTS"),
                 new Todo("Build an AngularTS app"),
               ];
               window.test = this
+              setInterval(() => { 
+                $element.controller().increase()
+              }, 1000);
             }
 
             increase() {
-
+              console.log(this)
               this.counter++
+              
             }
 
             /**
@@ -57,16 +60,9 @@
       </script>
     </head>
     <body ng-app="todo" ng-init="demo = 2" ng-cloak>
-      {{ demo }}
-      <div id="1" ng-init="demo = 2" ng-controller="DemoCtrl as demo">
-        {{ test }} 
-        {{ demo }}
-        <div id="2" ng-controller="TodoCtrl">
-          {{ counter }} 
-          {{ counter2 }} 
-        </div>
-
-      {{ test }}
-    </div>
+      <div id="2" ng-controller="TodoCtrl as fdsfs">
+        First
+        {{ counter }}  
+      </div>
     </body>
 </html>

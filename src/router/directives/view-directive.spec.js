@@ -390,7 +390,7 @@ describe("ngView", () => {
         name: "resolve",
         resolve: {
           user: function () {
-            return $timeout(() => {
+            return setTimeout(() => {
               return "joeschmoe";
             }, 100);
           },

@@ -43,7 +43,7 @@ function getTypeInfo(el) {
   };
 }
 /** @ignore */
-function clickHook(el, $state, $timeout, type, getDef) {
+function clickHook(el, $state, type, getDef) {
   return function (e) {
     const button = e.which || e.button,
       target = getDef();
@@ -57,7 +57,7 @@ function clickHook(el, $state, $timeout, type, getDef) {
       el.attr("target");
     if (!res) {
       // HACK: This is to allow ng-clicks to be processed before the transition is initiated:
-      const transition = $timeout(function () {
+      const transition = setTimeout(function () {
         if (!el.attr("disabled")) {
           $state.go(target.ngState, target.ngStateParams, target.ngStateOpts);
         }
@@ -66,7 +66,7 @@ function clickHook(el, $state, $timeout, type, getDef) {
       // if the state has no URL, ignore one preventDefault from the <a> directive.
       let ignorePreventDefaultCount = type.isAnchor && !target.href ? 1 : 0;
       e.preventDefault = function () {
-        if (ignorePreventDefaultCount-- <= 0) $timeout.cancel(transition);
+        if (ignorePreventDefaultCount-- <= 0) clearTimeout(transition);
       };
     } else {
       // ignored
@@ -106,15 +106,9 @@ function bindEvents(element, scope, hookFn, ngStateOpts) {
 
 // // TODO: SEPARATE THESE OUT
 
-$StateRefDirective.$inject = [
-  "$state",
-  "$timeout",
-  "$stateRegistry",
-  "$transitions",
-];
+$StateRefDirective.$inject = ["$state", "$stateRegistry", "$transitions"];
 export function $StateRefDirective(
   $stateService,
-  $timeout,
   $stateRegistry,
   $transitions,
 ) {
@@ -155,7 +149,7 @@ export function $StateRefDirective(
       scope.$on("$destroy", $stateRegistry.onStatesChanged(update));
       scope.$on("$destroy", $transitions.onSuccess({}, update));
       if (!type.clickable) return;
-      const hookFn = clickHook(element, $state, $timeout, type, getDef);
+      const hookFn = clickHook(element, $state, type, getDef);
       bindEvents(element, scope, hookFn, rawDef.ngStateOpts);
     },
   };
@@ -163,13 +157,11 @@ export function $StateRefDirective(
 
 $StateRefDynamicDirective.$inject = [
   "$state",
-  "$timeout",
   "$stateRegistry",
   "$transitions",
 ];
 export function $StateRefDynamicDirective(
   $state,
-  $timeout,
   $stateRegistry,
   $transitions,
 ) {
@@ -213,7 +205,7 @@ export function $StateRefDynamicDirective(
       scope.$on("$destroy", $stateRegistry.onStatesChanged(update));
       scope.$on("$destroy", $transitions.onSuccess({}, update));
       if (!type.clickable) return;
-      hookFn = clickHook(element, $state, $timeout, type, getDef);
+      hookFn = clickHook(element, $state, type, getDef);
       bindEvents(element, scope, hookFn, rawDef.ngStateOpts);
     },
   };

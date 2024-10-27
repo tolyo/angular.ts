@@ -140,7 +140,6 @@ function registerRestorableStyles(backup, node, properties) {
 export function AnimateCssProvider() {
   this.$get = [
     "$$AnimateRunner",
-    "$timeout",
     "$$animateCache",
     "$$rAFScheduler",
     "$$animateQueue",
@@ -148,19 +147,12 @@ export function AnimateCssProvider() {
     /**
      *
      * @param {*} $$AnimateRunner
-     * @param {*} $timeout
      * @param {*} $$animateCache
      * @param {import("./raf-scheduler").RafScheduler} $$rAFScheduler
      * @param {*} $$animateQueue
      * @returns
      */
-    function (
-      $$AnimateRunner,
-      $timeout,
-      $$animateCache,
-      $$rAFScheduler,
-      $$animateQueue,
-    ) {
+    function ($$AnimateRunner, $$animateCache, $$rAFScheduler, $$animateQueue) {
       const applyAnimationClasses = applyAnimationClassesFactory();
 
       function computeCachedCssStyles(
@@ -636,7 +628,7 @@ export function AnimateCssProvider() {
           // Cancel the fallback closing timeout and remove the timer data
           const animationTimerData = element.data(ANIMATE_TIMER_KEY);
           if (animationTimerData) {
-            $timeout.cancel(animationTimerData[0].timer);
+            clearTimeout(animationTimerData[0].timer);
             element.removeData(ANIMATE_TIMER_KEY);
           }
 
@@ -750,7 +742,7 @@ export function AnimateCssProvider() {
               (timings.animationDuration && stagger.animationDuration === 0)) &&
             Math.max(stagger.animationDelay, stagger.transitionDelay);
           if (maxStagger) {
-            $timeout(
+            setTimeout(
               triggerAnimationStart,
               Math.floor(maxStagger * itemIndex * ONE_SECOND),
               false,
@@ -858,14 +850,14 @@ export function AnimateCssProvider() {
               const currentTimerData = animationsData[0];
               setupFallbackTimer = endTime > currentTimerData.expectedEndTime;
               if (setupFallbackTimer) {
-                $timeout.cancel(currentTimerData.timer);
+                clearTimeout(currentTimerData.timer);
               } else {
                 animationsData.push(close);
               }
             }
 
             if (setupFallbackTimer) {
-              const timer = $timeout(onAnimationExpired, timerTime, false);
+              const timer = setTimeout(onAnimationExpired, timerTime, false);
               animationsData[0] = {
                 timer,
                 expectedEndTime: endTime,

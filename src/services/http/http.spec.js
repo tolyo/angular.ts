@@ -19,7 +19,6 @@ describe("$http", function () {
     $http = $injector.get("$http");
     $httpBackend = $injector.get("$httpBackend");
     $rootScope = $injector.get("$rootScope");
-    $q = $injector.get("$q");
   });
 
   it("is a function", function () {
@@ -3197,7 +3196,7 @@ describe("$http", function () {
 //         await $http({
 //           method: "GET",
 //           url: "/some",
-//           timeout: $timeout(() => {}, 10),
+//           timeout: setTimeout(() => {}, 10),
 //         }).then(onFulfilled, onRejected);
 
 //         $timeout.flush(100);

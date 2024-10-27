@@ -159,7 +159,7 @@ describe("$httpBackend", () => {
   //     null,
   //     callback,
   //     {},
-  //     $timeout(() => {}, 2000),
+  //     setTimeout(() => {}, 2000),
   //   );
   //   spyOn(xhr, "abort");
   //   expect(xhr.abort).toHaveBeenCalled();
@@ -179,7 +179,7 @@ describe("$httpBackend", () => {
   //     null,
   //     callback,
   //     {},
-  //     $timeout(() => {}, 2000),
+  //     setTimeout(() => {}, 2000),
   //   );
   //   xhr = MockXhr.$$lastInstance;
   //   spyOn(xhr, "abort");
@@ -244,7 +244,7 @@ describe("$httpBackend", () => {
   //     null,
   //     callback,
   //     {},
-  //     $timeout(() => {}, 2000),
+  //     setTimeout(() => {}, 2000),
   //   );
   //   spyOn(xhr, "abort").and.callThrough();
 

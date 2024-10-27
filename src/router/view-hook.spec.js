@@ -129,7 +129,7 @@ describe("view hooks", () => {
       $state.defaultErrorHandler(function () {});
       ctrl.prototype.uiCanExit = function () {
         log += "canexit;";
-        return $timeout(() => {
+        return setTimeout(() => {
           log += "delay;";
           return false;
         }, 1);
@@ -145,7 +145,7 @@ describe("view hooks", () => {
     it("can wait for a promise and then allow the transition", async () => {
       ctrl.prototype.uiCanExit = function () {
         log += "canexit;";
-        return $timeout(() => {
+        return setTimeout(() => {
           log += "delay;";
         }, 1);
       };

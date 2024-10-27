@@ -49,8 +49,6 @@ describe("ngModelOptions", () => {
         ]);
         $compile = injector.get("$compile");
         $rootScope = injector.get("$rootScope");
-        $q = injector.get("$q");
-        $timeout = injector.get("$timeout");
       });
 
       describe("should fall back to `defaultModelOptions`", () => {
