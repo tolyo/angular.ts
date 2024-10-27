@@ -49,7 +49,7 @@ export class Transition {
   constructor(fromPath, targetState, transitionService, globals) {
     this.globals = globals;
     this.transitionService = transitionService;
-    this._deferred = services.$q.defer();
+    this._deferred = Promise.defer();
     /**
      * This promise is resolved or rejected based on the outcome of the Transition.
      *

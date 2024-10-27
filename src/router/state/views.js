@@ -115,22 +115,19 @@ export class Ng1ViewConfig {
   }
 
   load() {
-    const $q = services.$q;
     const context = new ResolveContext(this.path);
     const params = this.path.reduce(
       (acc, node) => Object.assign(acc, node.paramValues),
       {},
     );
-    const promises = {
-      template: $q.resolve(
-        this.factory.fromConfig(this.viewDecl, params, context),
-      ),
-      controller: $q.resolve(this.getController(context)),
-    };
-    return $q.all(promises).then((results) => {
+    const promises = [
+      Promise.resolve(this.factory.fromConfig(this.viewDecl, params, context)),
+      Promise.resolve(this.getController(context)),
+    ];
+    return Promise.all(promises).then((results) => {
       trace.traceViewServiceEvent("Loaded", this);
-      this.controller = results.controller;
-      Object.assign(this, results.template); // Either { template: "tpl" } or { component: "cmpName" }
+      this.controller = results[0];
+      Object.assign(this, results[1]); // Either { template: "tpl" } or { component: "cmpName" }
       return this;
     });
   }

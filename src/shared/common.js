@@ -1,6 +1,5 @@
 import { isDate, isFunction, isRegExp, isString } from "./utils";
 import { all, curry } from "./hof";
-import { services } from "../router/common/coreservices";
 
 export function equals(o1, o2) {
   if (o1 === o2) return true;
@@ -466,4 +465,4 @@ function _arraysEq(a1, a2) {
 export const silenceUncaughtInPromise = (promise) =>
   promise.catch(() => 0) && promise;
 export const silentRejection = (error) =>
-  silenceUncaughtInPromise(services.$q.reject(error));
+  silenceUncaughtInPromise(Promise.reject(error));

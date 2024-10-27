@@ -1,4 +1,3 @@
-import { services } from "../common/coreservices";
 /**
  * A [[TransitionHookFn]] which waits for the views to load
  *
@@ -8,12 +7,11 @@ import { services } from "../common/coreservices";
  * In angular 1, this includes loading the templates.
  */
 const loadEnteringViews = (transition) => {
-  const $q = services.$q;
   const enteringViews = transition.views("entering");
   if (!enteringViews.length) return;
-  return $q
-    .all(enteringViews.map((view) => $q.resolve(view.load())))
-    .then(() => {});
+  return Promise.all(
+    enteringViews.map((view) => Promise.resolve(view.load())),
+  ).then(() => {});
 };
 export const registerLoadEnteringViews = (transitionService) =>
   transitionService.onFinish({}, loadEnteringViews);

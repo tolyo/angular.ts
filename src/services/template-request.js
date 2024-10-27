@@ -66,7 +66,7 @@ export function TemplateRequestProvider() {
      * @param {*} $sce
      * @returns
      */
-    function ($exceptionHandler, $templateCache, $http, $q, $sce) {
+    function ($exceptionHandler, $templateCache, $http, $sce) {
       function handleRequestFn(tpl, ignoreRequestError) {
         handleRequestFn.totalPendingRequests++;
 
@@ -122,7 +122,7 @@ export function TemplateRequestProvider() {
             $exceptionHandler(resp);
           }
 
-          return $q.reject(resp);
+          return Promise.reject(resp);
         }
       }
 

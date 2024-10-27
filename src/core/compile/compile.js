@@ -2983,7 +2983,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                 );
 
                 scope.attrs = attrs;
-              removeWatch = scope.$watch(
+                removeWatch = scope.$watch(
                   `attrs.${attrName}`,
                   (newValue, oldValue) => {
                     if (oldValue === newValue) {
@@ -2998,7 +2998,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                     recordChanges(scopeName, newValue, oldValue);
                     destination[scopeName] = newValue;
                   },
-              );
+                );
 
                 removeWatchCollection.push(removeWatch);
                 break;

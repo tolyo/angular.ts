@@ -20,8 +20,6 @@ describe("ngView", () => {
     app,
     $injector,
     $state,
-    $q,
-    $timeout,
     $ngViewScroll;
 
   const aState = {
@@ -167,11 +165,10 @@ describe("ngView", () => {
     ]);
 
     $injector.invoke(
-      (_$state_, _$q_, _$timeout_, $rootScope, _$compile_, _$ngViewScroll_) => {
+      (_$state_, _$timeout_, $rootScope, _$compile_, _$ngViewScroll_) => {
         scope = $rootScope.$new();
         $compile = _$compile_;
         $state = _$state_;
-        $q = _$q_;
         $timeout = _$timeout_;
         elem = JQLite("<div>");
         $ngViewScroll = _$ngViewScroll_;
@@ -1342,8 +1339,7 @@ describe("angular 1.5+ style .component()", () => {
       });
 
       const $state = svcs.$state,
-        $httpBackend = svcs.$httpBackend,
-        $q = svcs.$q;
+        $httpBackend = svcs.$httpBackend;
 
       $templateCache.set("/comp_tpl.html", "-{{ $ctrl.data }}-");
       $state.transitionTo("route2cmp");
@@ -1389,8 +1385,7 @@ describe("angular 1.5+ style .component()", () => {
       });
 
       const $state = svcs.$state,
-        $httpBackend = svcs.$httpBackend,
-        $q = svcs.$q;
+        $httpBackend = svcs.$httpBackend;
 
       $templateCache.set("/comp_tpl.html", "-{{ $ctrl.data }}-");
       $state.transitionTo("route2cmp");
@@ -1414,8 +1409,7 @@ describe("angular 1.5+ style .component()", () => {
       });
 
       const $state = svcs.$state,
-        $httpBackend = svcs.$httpBackend,
-        $q = svcs.$q;
+        $httpBackend = svcs.$httpBackend;
 
       $templateCache.set("/comp_tpl.html", "-{{ $ctrl.data }}-");
       $state.transitionTo("route2cmp");
@@ -1436,8 +1430,7 @@ describe("angular 1.5+ style .component()", () => {
       });
 
       const $state = svcs.$state,
-        $httpBackend = svcs.$httpBackend,
-        $q = svcs.$q;
+        $httpBackend = svcs.$httpBackend;
 
       $templateCache.set("/comp_tpl.html", "-{{ $ctrl.data }}-");
       $state.transitionTo("route2cmp");
@@ -1465,8 +1458,7 @@ describe("angular 1.5+ style .component()", () => {
       });
 
       const $state = svcs.$state,
-        $httpBackend = svcs.$httpBackend,
-        $q = svcs.$q;
+        $httpBackend = svcs.$httpBackend;
 
       $state.transitionTo("bindingtypes");
       await wait(100);
@@ -1521,8 +1513,7 @@ describe("angular 1.5+ style .component()", () => {
         component: "dataComponent",
       });
 
-      const $state = svcs.$state,
-        $q = svcs.$q;
+      const $state = svcs.$state;
       $state.transitionTo("data");
       await wait(100);
 
@@ -1537,8 +1528,7 @@ describe("angular 1.5+ style .component()", () => {
         resolve: { dataUser: () => "user" },
       });
 
-      const $state = svcs.$state,
-        $q = svcs.$q;
+      const $state = svcs.$state;
       $state.transitionTo("data");
       await wait(100);
 
@@ -1547,8 +1537,7 @@ describe("angular 1.5+ style .component()", () => {
 
     // Test for #3239
     it("should pass any bindings (wired from a parent component template via the ng-view) through to the child", async () => {
-      const $state = svcs.$state,
-        $q = svcs.$q;
+      const $state = svcs.$state;
 
       $stateProvider.state({
         name: "parent",
@@ -1572,8 +1561,7 @@ describe("angular 1.5+ style .component()", () => {
 
     // Test for #3239
     it("should prefer ng-view bindings over resolve data", async () => {
-      const $state = svcs.$state,
-        $q = svcs.$q;
+      const $state = svcs.$state;
 
       $stateProvider.state({
         name: "parent",
@@ -1602,8 +1590,7 @@ describe("angular 1.5+ style .component()", () => {
 
     // Test for #3239
     it("should prefer ng-view bindings over resolve data unless a bindings exists", async () => {
-      const $state = svcs.$state,
-        $q = svcs.$q;
+      const $state = svcs.$state;
 
       $stateProvider.state({
         name: "parent",
@@ -1633,8 +1620,7 @@ describe("angular 1.5+ style .component()", () => {
 
     // Test for #3239
     it("should pass & bindings (wired from a parent component via the ng-view) through to the child", async () => {
-      const $state = svcs.$state,
-        $q = svcs.$q;
+      const $state = svcs.$state;
       $rootScope.log = [];
 
       $stateProvider.state({
@@ -1667,9 +1653,8 @@ describe("angular 1.5+ style .component()", () => {
 
     // Test for #3111
     it("should bind & bindings to a resolve that returns a function", async () => {
-      const $state = svcs.$state,
-        $q = svcs.$q,
-        log = [];
+      const $state = svcs.$state;
+      log = [];
 
       $stateProvider.state({
         name: "resolve",
@@ -1691,9 +1676,8 @@ describe("angular 1.5+ style .component()", () => {
 
     // Test for #3111
     it("should bind & bindings to a resolve that returns an array-style function", async () => {
-      const $state = svcs.$state,
-        $q = svcs.$q,
-        log = [];
+      const $state = svcs.$state;
+      log = [];
 
       $stateProvider.state({
         name: "resolve",
@@ -1786,8 +1770,7 @@ describe("angular 1.5+ style .component()", () => {
       };
       $stateProvider.state(stateDef);
       const $state = svcs.$state,
-        $httpBackend = svcs.$httpBackend,
-        $q = svcs.$q;
+        $httpBackend = svcs.$httpBackend;
 
       $templateCache.set("/comp_tpl.html", "-{{ $ctrl.data }}-");
       $state.transitionTo("route2cmp");
@@ -1858,8 +1841,7 @@ describe("angular 1.5+ style .component()", () => {
       });
 
       const $state = svcs.$state,
-        $httpBackend = svcs.$httpBackend,
-        $q = svcs.$q;
+        $httpBackend = svcs.$httpBackend;
 
       $templateCache.set(
         "/comp_tpl.html",
@@ -1888,8 +1870,7 @@ describe("angular 1.5+ style .component()", () => {
         ],
       });
 
-      const $state = svcs.$state,
-        $q = svcs.$q;
+      const $state = svcs.$state;
 
       $state.transitionTo("ng12-dynamic-directive", {
         type: "ng12DynamicDirective",
@@ -1971,8 +1952,7 @@ describe("angular 1.5+ style .component()", () => {
     });
 
     it("should work with componentProvider", async () => {
-      const $state = svcs.$state,
-        $q = svcs.$q;
+      const $state = svcs.$state;
       $state.go("dynamic2", { param: "abc" });
       await wait(100);
       $state.go("dynamic2", { param: "def" });

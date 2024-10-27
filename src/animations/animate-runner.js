@@ -34,7 +34,7 @@ export function AnimateAsyncRunFactoryProvider() {
 const INITIAL_STATE = 0;
 const DONE_PENDING_STATE = 1;
 const DONE_COMPLETE_STATE = 2;
-let $q, $$animateAsyncRun;
+let $$animateAsyncRun;
 
 export function AnimateRunnerFactoryProvider() {
   this.$get = [
@@ -121,7 +121,7 @@ export class AnimateRunner {
   getPromise() {
     if (!this.promise) {
       const self = this;
-      this.promise = $q((resolve, reject) => {
+      this.promise = new Promise((resolve, reject) => {
         self.done((status) => {
           if (status === false) {
             reject();

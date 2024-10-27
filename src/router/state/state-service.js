@@ -244,7 +244,7 @@ export class StateProvider {
       const nextCallback = callbackQueue.dequeue();
       if (nextCallback === undefined)
         return Rejection.invalid(toState.error()).toPromise();
-      const callbackResult = services.$q.resolve(
+      const callbackResult = Promise.resolve(
         nextCallback(toState, fromState, injector),
       );
       return callbackResult
@@ -459,7 +459,7 @@ export class StateProvider {
         if (error.type === RejectType.IGNORED) {
           isLatest && this.urlService.update();
           // Consider ignored `Transition.run()` as a successful `transitionTo`
-          return services.$q.resolve(this.globals.current);
+          return Promise.resolve(this.globals.current);
         }
         const detail = error.detail;
         if (
@@ -474,12 +474,12 @@ export class StateProvider {
         }
         if (error.type === RejectType.ABORTED) {
           isLatest && this.urlService.update();
-          return services.$q.reject(error);
+          return Promise.reject(error);
         }
       }
       const errorHandler = this.defaultErrorHandler();
       errorHandler(error);
-      return services.$q.reject(error);
+      return Promise.reject(error);
     };
     const transition = this.transitionService.create(currentPath, ref);
     const transitionToPromise = transition

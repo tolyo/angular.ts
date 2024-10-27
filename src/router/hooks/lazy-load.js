@@ -61,7 +61,7 @@ export function registerLazyLoadHook(
         .entering()
         .filter((state) => !!state.$$state().lazyLoad)
         .map((state) => lazyLoadState(transition, state, stateRegistry));
-      return services.$q.all(promises).then(retryTransition);
+      return Promise.all(promises).then(retryTransition);
     },
   );
 }
@@ -86,7 +86,7 @@ export function lazyLoadState(transition, state, stateRegistry) {
     };
     const error = (err) => {
       delete lazyLoadFn["_promise"];
-      return services.$q.reject(err);
+      return Promise.reject(err);
     };
     promise = lazyLoadFn["_promise"] = services.$q
       .resolve(lazyLoadFn(transition, state))

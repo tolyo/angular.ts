@@ -310,7 +310,6 @@ describe("$state", () => {
           _$state_,
           _$stateParams_,
           _$transitions_,
-          _$q_,
           _$location_,
           _$compile_,
           _$stateRegistry_,
@@ -319,7 +318,6 @@ describe("$state", () => {
           $state = _$state_;
           $stateParams = _$stateParams_;
           $transitions = _$transitions_;
-          $q = _$q_;
           $location = _$location_;
           $compile = _$compile_;
           $stateRegistry = _$stateRegistry_;
