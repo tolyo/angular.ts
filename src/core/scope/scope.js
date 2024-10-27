@@ -1,6 +1,5 @@
 import {
   concat,
-  forEach,
   minErr,
   nextUid,
   isFunction,
@@ -473,7 +472,7 @@ export class Scope {
       });
     }
 
-    forEach(watchExpressions, (expr, i) => {
+    Object.entries(watchExpressions).forEach(([i, expr]) => {
       const unwatchFn = self.$watch(expr, (value) => {
         newValues[i] = value;
         if (!changeReactionScheduled) {

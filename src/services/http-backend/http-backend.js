@@ -1,10 +1,5 @@
 import { urlResolve } from "../../core/url-utils/url-utils";
-import {
-  forEach,
-  isDefined,
-  isPromiseLike,
-  isUndefined,
-} from "../../shared/utils";
+import { isDefined, isPromiseLike, isUndefined } from "../../shared/utils";
 
 /**
  * HTTP backend used by the {@link ng.$http service} that delegates to
@@ -51,7 +46,7 @@ export function createHttpBackend($browser) {
     let abortedByTimeout = false;
 
     xhr.open(method, url, true);
-    forEach(headers, (value, key) => {
+    Object.entries(headers).forEach(([key, value]) => {
       if (isDefined(value)) {
         xhr.setRequestHeader(key, value);
       }
@@ -105,11 +100,11 @@ export function createHttpBackend($browser) {
       );
     };
 
-    forEach(eventHandlers, (value, key) => {
+    Object.entries(eventHandlers).forEach(([key, value]) => {
       xhr.addEventListener(key, value);
     });
 
-    forEach(uploadEventHandlers, (value, key) => {
+    Object.entries(uploadEventHandlers).forEach(([key, value]) => {
       xhr.upload.addEventListener(key, value);
     });
 

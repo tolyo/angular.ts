@@ -1,4 +1,3 @@
-export function forEach(obj: any, cb: any, thisArg: any): void;
 export function equals(o1: any, o2: any): any;
 /**
  * Builds proxy functions on the `to` object which pass through to the `from` object.

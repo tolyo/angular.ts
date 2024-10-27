@@ -10,7 +10,6 @@ import {
 } from "../../shared/constants";
 import {
   minErr,
-  forEach,
   isNumber,
   isNumberNaN,
   isPromiseLike,
@@ -589,10 +588,10 @@ export class NgModelController {
         setValidity(errorKey, null);
       } else {
         if (!that.$$parserValid) {
-          forEach(that.$validators, (v, name) => {
+          Object.keys(that.$validators).forEach((name) => {
             setValidity(name, null);
           });
-          forEach(that.$asyncValidators, (v, name) => {
+          Object.keys(that.$asyncValidators).forEach((name) => {
             setValidity(name, null);
           });
         }
@@ -606,13 +605,13 @@ export class NgModelController {
 
     function processSyncValidators() {
       let syncValidatorsValid = true;
-      forEach(that.$validators, (validator, name) => {
+      Object.entries(that.$validators).forEach(([name, validator]) => {
         const result = Boolean(validator(modelValue, viewValue));
         syncValidatorsValid = syncValidatorsValid && result;
         setValidity(name, result);
       });
       if (!syncValidatorsValid) {
-        forEach(that.$asyncValidators, (v, name) => {
+        Object.keys(that.$asyncValidators).forEach((name) => {
           setValidity(name, null);
         });
         return false;
@@ -623,7 +622,7 @@ export class NgModelController {
     function processAsyncValidators() {
       const validatorPromises = [];
       let allValid = true;
-      forEach(that.$asyncValidators, (validator, name) => {
+      Object.entries(that.$asyncValidators).forEach(([name, validator]) => {
         const promise = validator(modelValue, viewValue);
         if (!isPromiseLike(promise)) {
           throw ngModelMinErr(
@@ -768,17 +767,13 @@ export class NgModelController {
 
   $$writeModelToScope() {
     this.$$ngModelSet(this.$$scope, this.$modelValue);
-    forEach(
-      this.$viewChangeListeners,
-      function (listener) {
-        try {
-          listener();
-        } catch (e) {
-          this.$$exceptionHandler(e);
-        }
-      },
-      this,
-    );
+    Object.values(this.$viewChangeListeners).forEach((listener) => {
+      try {
+        listener();
+      } catch (e) {
+        this.$$exceptionHandler(e);
+      }
+    }, this);
   }
 
   /**

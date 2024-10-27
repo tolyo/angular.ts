@@ -1,5 +1,5 @@
 import { JQLite } from "../shared/jqlite/jqlite";
-import { forEach, isString } from "../shared/utils";
+import { isString } from "../shared/utils";
 import { concatWithSpace, getDomNode } from "./shared";
 
 const NG_ANIMATE_SHIM_CLASS_NAME = "ng-animate-shim";
@@ -211,7 +211,7 @@ export function AnimateCssDriverProvider($$animationProvider) {
               animationRunners.push(toAnimation.start());
             }
 
-            forEach(anchorAnimations, (animation) => {
+            anchorAnimations.forEach((animation) => {
               animationRunners.push(animation.start());
             });
 

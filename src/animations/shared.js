@@ -1,4 +1,4 @@
-import { forEach, isString, minErr, extend } from "../shared/utils.js";
+import { isString, minErr, extend } from "../shared/utils.js";
 import { JQLite } from "../shared/jqlite/jqlite.js";
 import { ASTType } from "../core/parse/ast-type.js";
 
@@ -262,12 +262,12 @@ export function resolveElementClasses(existing, toAdd, toRemove) {
   existing = splitClassesToLookup(existing);
 
   toAdd = splitClassesToLookup(toAdd);
-  forEach(toAdd, (value, key) => {
+  Object.keys(toAdd).forEach((key) => {
     flags[key] = ADD_CLASS;
   });
 
   toRemove = splitClassesToLookup(toRemove);
-  forEach(toRemove, (value, key) => {
+  Object.keys(toRemove).forEach(toRemove, (key) => {
     flags[key] = flags[key] === ADD_CLASS ? null : REMOVE_CLASS;
   });
 
@@ -276,7 +276,7 @@ export function resolveElementClasses(existing, toAdd, toRemove) {
     removeClass: "",
   };
 
-  forEach(flags, function (val, klass) {
+  Object.entries(flags).forEach(([klass, val]) => {
     var prop, allow;
     if (val === ADD_CLASS) {
       prop = "addClass";
@@ -299,7 +299,7 @@ export function resolveElementClasses(existing, toAdd, toRemove) {
     }
 
     const obj = {};
-    forEach(classes, (klass) => {
+    classes.forEach((klass) => {
       // sometimes the split leaves empty string values
       // incase extra spaces were applied to the options
       if (klass.length) {

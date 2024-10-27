@@ -1,4 +1,4 @@
-import { forEach, tail, unnestR, uniqR, removeFrom } from "../../shared/common";
+import { tail, unnestR, uniqR, removeFrom } from "../../shared/common";
 import { isString, isObject } from "../../shared/utils";
 
 import { parse } from "../../shared/hof";
@@ -295,22 +295,24 @@ export function $StateRefActiveDirective(
       function setStatesFromDefinitionObject(statesDefinition) {
         if (isObject(statesDefinition)) {
           states = [];
-          forEach(statesDefinition, function (stateOrName, activeClass) {
-            // Helper function to abstract adding state.
-            const addStateForClass = function (stateOrName, activeClass) {
-              const ref = parseStateRef(stateOrName);
-              addState(ref.state, $scope.$eval(ref.paramExpr), activeClass);
-            };
-            if (isString(stateOrName)) {
-              // If state is string, just add it.
-              addStateForClass(stateOrName, activeClass);
-            } else if (Array.isArray(stateOrName)) {
-              // If state is an array, iterate over it and add each array item individually.
-              forEach(stateOrName, function (stateOrName) {
+          Object.entries(statesDefinition).forEach(
+            ([activeClass, stateOrName]) => {
+              // Helper function to abstract adding state.
+              const addStateForClass = function (stateOrName, activeClass) {
+                const ref = parseStateRef(stateOrName);
+                addState(ref.state, $scope.$eval(ref.paramExpr), activeClass);
+              };
+              if (isString(stateOrName)) {
+                // If state is string, just add it.
                 addStateForClass(stateOrName, activeClass);
-              });
-            }
-          });
+              } else if (Array.isArray(stateOrName)) {
+                // If state is an array, iterate over it and add each array item individually.
+                stateOrName.forEach((stateOrName) => {
+                  addStateForClass(stateOrName, activeClass);
+                });
+              }
+            },
+          );
         }
       }
       function addState(stateName, stateParams, activeClass) {

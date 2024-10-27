@@ -1,4 +1,4 @@
-import { forEach, isDefined, isFunction } from "../../shared/utils.js";
+import { isDefined, isFunction } from "../../shared/utils.js";
 import { PURITY_RELATIVE } from "./interpreter.js";
 import { Lexer } from "./lexer/lexer.js";
 import { Parser } from "./parser/parser.js";
@@ -403,7 +403,7 @@ function expressionInputDirtyCheck(
 
 function isAllDefined(value) {
   let allDefined = true;
-  forEach(value, (val) => {
+  Object.values(value).forEach((val) => {
     if (!isDefined(val)) allDefined = false;
   });
   return allDefined;

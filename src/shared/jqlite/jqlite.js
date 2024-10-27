@@ -3,7 +3,6 @@ import {
   arrayRemove,
   concat,
   extend,
-  forEach,
   isDefined,
   isFunction,
   isObject,
@@ -103,9 +102,9 @@ export function JQLite(element) {
 JQLite.prototype = {
   toString() {
     const value = [];
-    forEach(this, (e) => {
-      value.push(`${e}`);
-    });
+    for (var i = 0; i < this.length; i++) {
+      value.push(`${this[i]}`);
+    }
     return `[${value.join(", ")}]`;
   },
 
@@ -276,7 +275,7 @@ JQLite.prototype.off = function (type, fn) {
         }
       };
 
-      forEach(type.split(" "), (type) => {
+      type.split(" ").forEach((type) => {
         removeHandler(type);
         if (MOUSE_EVENT_MAP[type]) {
           removeHandler(MOUSE_EVENT_MAP[type]);
@@ -379,7 +378,7 @@ JQLite.prototype.val = function (value) {
       // read
       if (element.multiple && getNodeName(element) === "select") {
         const result = [];
-        forEach(element.options, (option) => {
+        Array.from(element.options).forEach((option) => {
           if (option.selected) {
             result.push(option.value || option.text);
           }
@@ -482,14 +481,16 @@ JQLite.prototype.replaceWith = function (arg1) {
     let index;
     const parent = element.parentNode;
     dealoc(element);
-    forEach(new JQLite(replaceNode), (node) => {
+    const nodes = new JQLite(replaceNode);
+    for (let i = 0; i < nodes.length; i++) {
+      const node = nodes[i];
       if (index) {
         parent.insertBefore(node, index.nextSibling);
       } else {
         parent.replaceChild(node, element);
       }
       index = node;
-    });
+    }
   };
   for (let i = 0; i < this.length; i++) {
     addNodes(value, fn(this[i], arg1));
@@ -542,9 +543,10 @@ JQLite.prototype.prepend = function (node) {
     const element = this[i];
     if (element.nodeType === Node.ELEMENT_NODE) {
       const index = element.firstChild;
-      forEach(new JQLite(node), (child) => {
-        element.insertBefore(child, index);
-      });
+      const el = new JQLite(node);
+      for (let i = 0; i < el.length; i++) {
+        element.insertBefore(el[i], index);
+      }
     }
   }
   return this;
@@ -683,7 +685,7 @@ JQLite.prototype.triggerHandler = function (event, extraParameters) {
         ? [dummyEvent].concat(extraParameters)
         : [dummyEvent];
 
-      forEach(eventFnsCopy, (fn) => {
+      eventFnsCopy.forEach((fn) => {
         if (!dummyEvent.isImmediatePropagationStopped()) {
           fn.apply(element, handlerArgs);
         }

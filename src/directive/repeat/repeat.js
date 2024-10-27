@@ -1,4 +1,4 @@
-import { forEach, minErr, hashKey, isArrayLike } from "../../shared/utils";
+import { minErr, hashKey, isArrayLike } from "../../shared/utils";
 import { getBlockNodes } from "../../shared/jqlite/jqlite";
 
 export const ngRepeatDirective = [
@@ -188,7 +188,7 @@ export const ngRepeatDirective = [
                 nextBlockOrder[index] = block;
               } else if (nextBlockMap[trackById]) {
                 // if collision detected. restore lastBlockMap and throw an error
-                forEach(nextBlockOrder, function (block) {
+                Object.values(nextBlockOrder).forEach((block) => {
                   if (block && block.scope) lastBlockMap[block.id] = block;
                 });
                 throw ngRepeatMinErr(

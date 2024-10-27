@@ -1,5 +1,3 @@
-import { forEach } from "../shared/utils";
-
 AnimateJsDriverProvider.$inject = ["$$animationProvider"];
 export function AnimateJsDriverProvider($$animationProvider) {
   $$animationProvider.drivers.push("$$animateJsDriver");
@@ -36,7 +34,7 @@ export function AnimateJsDriverProvider($$animationProvider) {
 
               function endFnFactory() {
                 return function () {
-                  forEach(animationRunners, (runner) => {
+                  animationRunners.forEach((runner) => {
                     // at this point we cannot cancel animations for groups just yet. 1.5+
                     runner.end();
                   });

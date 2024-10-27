@@ -1,10 +1,4 @@
-import {
-  forEach,
-  isFunction,
-  isDefined,
-  isObject,
-  isString,
-} from "../../shared/utils";
+import { isFunction, isDefined, isObject, isString } from "../../shared/utils";
 import { is, pattern } from "../../shared/hof";
 import { UrlRules } from "./url-rules";
 import { TargetState } from "../state/target-state";
@@ -454,7 +448,7 @@ export class UrlService {
     // TODO: typeof?
     if (!isObject(object)) return false;
     let result = true;
-    forEach(UrlMatcher.prototype, (val, name) => {
+    Object.entries(UrlMatcher.prototype).forEach(([name, val]) => {
       if (isFunction(val))
         result = result && isDefined(object[name]) && isFunction(object[name]);
     });

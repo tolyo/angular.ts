@@ -1,7 +1,6 @@
 import { JQLite, removeElement, startingTag } from "../../shared/jqlite/jqlite";
 import {
   equals,
-  forEach,
   hashKey,
   includes,
   isArrayLike,
@@ -328,8 +327,7 @@ export const ngOptionsDirective = [
         selectCtrl.readValue = function readNgOptionsMultiple() {
           const selectedValues = selectElement.val() || [];
           const selections = [];
-
-          forEach(selectedValues, (value) => {
+          selectedValues.forEach((value) => {
             const option = options.selectValueMap[value];
             if (option && !option.disabled)
               selections.push(options.getViewValueFromOption(option));

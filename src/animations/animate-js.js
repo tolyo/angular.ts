@@ -1,4 +1,4 @@
-import { forEach, isObject, isFunction } from "../shared/utils";
+import { isObject, isFunction } from "../shared/utils";
 import {
   applyAnimationClassesFactory,
   applyAnimationStyles,
@@ -218,7 +218,7 @@ export function AnimateJsProvider($animateProvider) {
           fnName,
         ) {
           const operations = [];
-          forEach(animations, (ani) => {
+          animations.forEach((ani) => {
             const animation = ani[fnName];
             if (!animation) return;
 
@@ -326,7 +326,7 @@ export function AnimateJsProvider($animateProvider) {
           return function startAnimation(callback) {
             const runners = [];
             if (operations.length) {
-              forEach(operations, (animateFn) => {
+              operations.forEach((animateFn) => {
                 runners.push(animateFn());
               });
             }
@@ -338,7 +338,7 @@ export function AnimateJsProvider($animateProvider) {
             }
 
             return function endFn(reject) {
-              forEach(runners, (runner) => {
+              runners.forEach((runner) => {
                 if (reject) {
                   runner.cancel();
                 } else {

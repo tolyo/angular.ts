@@ -15,7 +15,7 @@ export const ngIncludeDirective = [
    * @returns
    */
   ($templateRequest, $anchorScroll, $animate) => ({
-    restrict: "ECA",
+    restrict: "EA",
     priority: 400,
     terminal: true,
     transclude: "element",
@@ -129,7 +129,7 @@ export const ngIncludeDirective = [
 export const ngIncludeFillContentDirective = [
   "$compile",
   ($compile) => ({
-    restrict: "ECA",
+    restrict: "EA",
     priority: -400,
     require: "ngInclude",
     link(scope, $element, _$attr, ctrl) {

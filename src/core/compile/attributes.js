@@ -1,6 +1,5 @@
 import { getBooleanAttrName } from "../../shared/jqlite/jqlite";
 import {
-  forEach,
   isString,
   snakeCase,
   isUndefined,
@@ -179,8 +178,8 @@ export class Attributes {
 
     // fire observers
     const { $$observers } = this;
-    if ($$observers) {
-      forEach($$observers[observer], (fn) => {
+    if ($$observers && $$observers[observer]) {
+      $$observers[observer].forEach((fn) => {
         try {
           fn(value);
         } catch (e) {

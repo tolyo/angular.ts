@@ -1,4 +1,4 @@
-import { forEach, isDefined, trim } from "../../shared/utils";
+import { isDefined, trim } from "../../shared/utils";
 
 const DEFAULT_REGEXP = /(\s+|^)default(\s+|$)/;
 
@@ -70,33 +70,29 @@ class ModelOptions {
     options = Object.assign({}, options);
 
     // Inherit options from the parent if specified by the value `"$inherit"`
-    forEach(
-      options,
-      function (option, key) {
-        if (option === "$inherit") {
-          if (key === "*") {
-            inheritAll = true;
-          } else {
-            options[key] = this.$$options[key];
-            // `updateOn` is special so we must also inherit the `updateOnDefault` option
-            if (key === "updateOn") {
-              options.updateOnDefault = this.$$options.updateOnDefault;
-            }
+    Object.entries(options).forEach(([key, option]) => {
+      if (option === "$inherit") {
+        if (key === "*") {
+          inheritAll = true;
+        } else {
+          options[key] = this.$$options[key];
+          // `updateOn` is special so we must also inherit the `updateOnDefault` option
+          if (key === "updateOn") {
+            options.updateOnDefault = this.$$options.updateOnDefault;
           }
-        } else if (key === "updateOn") {
-          // If the `updateOn` property contains the `default` event then we have to remove
-          // it from the event list and set the `updateOnDefault` flag.
-          options.updateOnDefault = false;
-          options[key] = trim(
-            option.replace(DEFAULT_REGEXP, () => {
-              options.updateOnDefault = true;
-              return " ";
-            }),
-          );
         }
-      },
-      this,
-    );
+      } else if (key === "updateOn") {
+        // If the `updateOn` property contains the `default` event then we have to remove
+        // it from the event list and set the `updateOnDefault` flag.
+        options.updateOnDefault = false;
+        options[key] = trim(
+          /** @type {string} */ (option).replace(DEFAULT_REGEXP, () => {
+            options.updateOnDefault = true;
+            return " ";
+          }),
+        );
+      }
+    }, this);
 
     if (inheritAll) {
       // We have a property of the form: `"*": "$inherit"`

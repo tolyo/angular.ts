@@ -1,7 +1,6 @@
 import { getOrSetCacheData, JQLite } from "../shared/jqlite/jqlite";
 import {
   isUndefined,
-  forEach,
   isObject,
   isString,
   isElement,
@@ -719,7 +718,7 @@ export function AnimateQueueProvider($animateProvider) {
 
       function closeChildAnimations(node) {
         const children = node.querySelectorAll(`[${NG_ANIMATE_ATTR_NAME}]`);
-        forEach(children, (child) => {
+        children.forEach((child) => {
           const state = parseInt(child.getAttribute(NG_ANIMATE_ATTR_NAME), 10);
           const animationDetails = activeAnimationsLookup.get(child);
           if (animationDetails) {

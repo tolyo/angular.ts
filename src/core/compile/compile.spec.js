@@ -2,7 +2,6 @@ import { Angular } from "../../loader";
 import { createInjector } from "../di/injector";
 import { dealoc, JQLite, getOrSetCacheData } from "../../shared/jqlite/jqlite";
 import {
-  forEach,
   isFunction,
   valueFn,
   isElement,
@@ -435,42 +434,36 @@ describe("$compile", () => {
     expect(el.data("hasCompiled")).toBe(true);
   });
 
-  forEach(
-    {
-      E: { element: true, attribute: false },
-      A: { element: false, attribute: true },
-      EA: { element: true, attribute: true },
-    },
-    function (expected, restrict) {
-      describe("restricted to " + restrict, () => {
-        forEach(
-          {
-            element: "<my-directive></my-directive>",
-            attribute: "<div my-directive></div>",
-          },
-          function (dom, type) {
-            it(
-              (expected[type] ? "matches" : "does not match") + " on " + type,
-              () => {
-                var hasCompiled = false;
-                myModule.directive("myDirective", () => {
-                  return {
-                    restrict: restrict,
-                    compile: () => {
-                      hasCompiled = true;
-                    },
-                  };
-                });
-                reloadModules();
-                $compile(dom);
-                expect(hasCompiled).toBe(expected[type]);
-              },
-            );
+  Object.entries({
+    E: { element: true, attribute: false },
+    A: { element: false, attribute: true },
+    EA: { element: true, attribute: true },
+  }).forEach(([restrict, expected]) => {
+    describe("restricted to " + restrict, () => {
+      Object.entries({
+        element: "<my-directive></my-directive>",
+        attribute: "<div my-directive></div>",
+      }).forEach(([type, dom]) => {
+        it(
+          (expected[type] ? "matches" : "does not match") + " on " + type,
+          () => {
+            var hasCompiled = false;
+            myModule.directive("myDirective", () => {
+              return {
+                restrict: restrict,
+                compile: () => {
+                  hasCompiled = true;
+                },
+              };
+            });
+            reloadModules();
+            $compile(dom);
+            expect(hasCompiled).toBe(expected[type]);
           },
         );
       });
-    },
-  );
+    });
+  });
 
   it("applies to attributes when no restrict given", () => {
     var hasCompiled = false;
@@ -11192,9 +11185,9 @@ describe("$compile", () => {
           },
         ];
 
-        forEach(controllerOptions, (controllerOption) => {
-          forEach(scopeOptions, (scopeOption) => {
-            forEach(templateOptions, (templateOption) => {
+        controllerOptions.forEach((controllerOption) => {
+          Object.values(scopeOptions).forEach((scopeOption) => {
+            Object.values(templateOptions).forEach((templateOption) => {
               const description = [];
               const ddo = {
                 bindToController: {
@@ -11205,8 +11198,7 @@ describe("$compile", () => {
                 },
               };
 
-              forEach(
-                [controllerOption, scopeOption, templateOption],
+              [controllerOption, scopeOption, templateOption].forEach(
                 (option) => {
                   description.push(option.description);
                   delete option.description;
@@ -15723,7 +15715,7 @@ describe("$compile", () => {
           "http://example.com/image1.jpg?x=a2x,b 1x,http://example.com/ima,ge2.jpg 2x",
       };
 
-      forEach(testSet, (ref, url) => {
+      Object.entries(testSet).forEach(([url, ref]) => {
         $rootScope.testUrl = url;
         expect(element.attr("srcset")).toEqual(ref);
       });

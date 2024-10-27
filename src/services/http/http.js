@@ -7,7 +7,6 @@ import {
   toJson,
   isUndefined,
   isFunction,
-  forEach,
   encodeUriQuery,
   isString,
   fromJson,
@@ -147,7 +146,7 @@ function parseHeaders(headers) {
       },
     );
   } else if (isObject(headers)) {
-    forEach(headers, (headerVal, headerKey) => {
+    Object.entries(headers).forEach(([headerKey, headerVal]) => {
       fillInParsed(lowercase(headerKey), trim(headerVal));
     });
   }
@@ -470,7 +469,7 @@ export function HttpProvider() {
         let promise = Promise.resolve(config);
 
         // apply interceptors
-        forEach(reversedInterceptors, (interceptor) => {
+        reversedInterceptors.forEach((interceptor) => {
           if (interceptor.request || interceptor.requestError) {
             requestInterceptors.unshift(
               interceptor.request,
@@ -513,7 +512,7 @@ export function HttpProvider() {
           let headerContent;
           const processedHeaders = {};
 
-          forEach(headers, (headerFn, header) => {
+          Object.entries(headers).forEach(([header, headerFn]) => {
             if (isFunction(headerFn)) {
               headerContent = headerFn(config);
               if (headerContent != null) {
@@ -558,7 +557,7 @@ export function HttpProvider() {
 
           // strip content-type if data is undefined
           if (isUndefined(reqData)) {
-            forEach(headers, (value, header) => {
+            Object.keys(headers).forEach((header) => {
               if (lowercase(header) === "content-type") {
                 delete headers[header];
               }
@@ -818,7 +817,7 @@ export function HttpProvider() {
         function createApplyHandlers(eventHandlers) {
           if (eventHandlers) {
             const applyHandlers = {};
-            forEach(eventHandlers, (eventHandler, key) => {
+            Object.entries(eventHandlers).forEach(([key, eventHandler]) => {
               applyHandlers[key] = function (event) {
                 if (useApplyAsync) {
                   setTimeout(() => $rootScope.$apply(callEventHandler));

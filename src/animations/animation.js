@@ -1,5 +1,5 @@
 import { JQLite } from "../shared/jqlite/jqlite";
-import { forEach, mergeClasses } from "../shared/utils";
+import { mergeClasses } from "../shared/utils";
 import {
   NG_ANIMATE_CLASSNAME,
   PREPARE_CLASS_SUFFIX,
@@ -326,7 +326,7 @@ export function AnimationProvider() {
             ? [node]
             : node.querySelectorAll(SELECTOR);
           const anchors = [];
-          forEach(items, (node) => {
+          items.forEach((node) => {
             const attr = node.getAttribute(NG_ANIMATE_REF_ATTR);
             if (attr && attr.length) {
               anchors.push(node);
@@ -338,7 +338,7 @@ export function AnimationProvider() {
         function groupAnimations(animations) {
           const preparedAnimations = [];
           const refLookup = {};
-          forEach(animations, (animation, index) => {
+          animations.forEach(([index, animation]) => {
             const { element } = animation;
             const node = getDomNode(element);
             const { event } = animation;

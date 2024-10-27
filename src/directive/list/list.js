@@ -1,4 +1,4 @@
-import { forEach, isUndefined, trim } from "../../shared/utils";
+import { isUndefined, trim } from "../../shared/utils";
 
 /**
  * @returns {import('../../types').Directive}
@@ -20,7 +20,7 @@ export function ngListDirective() {
         const list = [];
 
         if (viewValue) {
-          forEach(viewValue.split(separator), (value) => {
+          viewValue.split(separator).forEach((value) => {
             if (value) list.push(trimValues ? trim(value) : value);
           });
         }

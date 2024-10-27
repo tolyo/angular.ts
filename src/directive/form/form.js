@@ -5,7 +5,6 @@ import {
   arrayRemove,
   isBoolean,
   snakeCase,
-  forEach,
   extend,
   isUndefined,
 } from "../../shared/utils";
@@ -215,31 +214,25 @@ FormController.prototype = {
     if (control.$name && this[control.$name] === control) {
       delete this[control.$name];
     }
-    forEach(
-      this.$pending,
-      function (value, name) {
+    this.$pending &&
+      Object.keys(this.$pending).forEach((name) => {
         this.$setValidity(name, null, control);
-      },
-      this,
-    );
-    forEach(
-      this.$error,
-      function (value, name) {
+      });
+    this.$error &&
+      Object.keys(this.$error).forEach((name) => {
         this.$setValidity(name, null, control);
-      },
-      this,
-    );
-    forEach(
-      this.$$success,
-      function (value, name) {
+      });
+    this.$$success &&
+      Object.keys(this.$$success).forEach((name) => {
         this.$setValidity(name, null, control);
-      },
-      this,
-    );
+      });
 
     arrayRemove(this.$$controls, control);
     control.$$parentForm = nullFormCtrl;
   },
+
+  // eslint-disable-next-line no-unused-vars
+  $setValidity: function (_a, _b, _c) {},
 
   /**
    * Sets the form to a dirty state.

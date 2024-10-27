@@ -2,11 +2,6 @@ import { isDate, isFunction, isRegExp, isString } from "./utils";
 import { all, curry } from "./hof";
 import { services } from "../router/common/coreservices";
 
-export function forEach(obj, cb, thisArg) {
-  if (Array.isArray(obj)) return obj.forEach(cb, thisArg);
-  Object.keys(obj).forEach((key) => cb(obj[key], key));
-}
-
 export function equals(o1, o2) {
   if (o1 === o2) return true;
   if (o1 === null || o2 === null) return false;
@@ -219,7 +214,7 @@ export function filter(collection, callback) {
   const arr = Array.isArray(collection),
     result = arr ? [] : {};
   const accept = arr ? (x) => result.push(x) : (x, key) => (result[key] = x);
-  forEach(collection, function (item, i) {
+  Object.entries(collection).forEach(([i, item]) => {
     if (callback(item, i)) accept(item, i);
   });
   return result;
@@ -228,7 +223,7 @@ export function filter(collection, callback) {
 /** Finds an object from an array, or a property of an object, that matches a predicate */
 export function find(collection, callback) {
   let result;
-  forEach(collection, function (item, i) {
+  Object.entries(collection).forEach(([i, item]) => {
     if (result) return;
     if (callback(item, i)) result = item;
   });
@@ -238,7 +233,9 @@ export function find(collection, callback) {
 /** Maps an array or object properties using a callback function */
 export function map(collection, callback, target) {
   target = target || (Array.isArray(collection) ? [] : {});
-  forEach(collection, (item, i) => (target[i] = callback(item, i)));
+  Object.entries(collection).forEach(
+    ([i, item]) => (target[i] = callback(item, i)),
+  );
   return target;
 }
 

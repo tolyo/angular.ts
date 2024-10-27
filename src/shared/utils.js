@@ -289,86 +289,6 @@ export function snakeCase(name, separator) {
 }
 
 /**
- * Invokes the `iterator` function once for each item in `obj` collection, which can be either an
- * object or an array. The `iterator` function is invoked with `iterator(value, key, obj)`, where `value`
- * is the value of an object property or an array element, `key` is the object property key or
- * array element index and obj is the `obj` itself. Specifying a `context` for the function is optional.
- *
- * It is worth noting that `.forEach` does not iterate over inherited properties because it filters
- * using the `hasOwnProperty` method.
- *
- * Unlike ES262's
- * [Array.prototype.forEach](http://www.ecma-international.org/ecma-262/5.1/#sec-15.4.4.18),
- * providing 'undefined' or 'null' values for `obj` will not throw a TypeError, but rather just
- * return the value provided.
- *
-   ```js
-     let values = {name: 'misko', gender: 'male'};
-     let log = [];
-     forEach(values, function(value, key) {
-       this.push(key + ': ' + value);
-     }, log);
-     expect(log).toEqual(['name: misko', 'gender: male']);
-   ```
- *
- * @param {Object|Array} obj Object to iterate over.
- * @param {Function} iterator Iterator function.
- * @param {Object=} context Object to become context (`this`) for the iterator function.
- * @returns {Object|Array} Reference to `obj`.
- */
-export function forEach(obj, iterator, context) {
-  let key;
-  let length;
-  if (obj) {
-    if (isFunction(obj)) {
-      for (key in obj) {
-        if (
-          key !== "prototype" &&
-          key !== "length" &&
-          key !== "name" &&
-          Object.prototype.hasOwnProperty.call(obj, key)
-        ) {
-          iterator.call(context, obj[key], key, obj);
-        }
-      }
-    } else if (Array.isArray(obj) || isArrayLike(obj)) {
-      const isPrimitive = typeof obj !== "object";
-      for (key = 0, length = obj.length; key < length; key++) {
-        if (isPrimitive || key in obj) {
-          iterator.call(context, obj[key], key, obj);
-        }
-      }
-    } else if (obj.forEach && obj.forEach !== forEach) {
-      obj.forEach(iterator, context, obj);
-    } else if (isBlankObject(obj)) {
-      // Object.create(null) fast path --- Safe to avoid hasOwnProperty check because prototype chain is empty
-      for (key in obj) {
-        iterator.call(context, obj[key], key, obj);
-      }
-    } else {
-      // Slow path for objects which do not have a method `hasOwnProperty`
-      for (key in obj) {
-        if (Object.hasOwnProperty.call(obj, key)) {
-          iterator.call(context, obj[key], key, obj);
-        }
-      }
-    }
-  }
-  return obj;
-}
-
-/**
- * when using forEach the params are value, key, but it is often useful to have key, value.
- * @param {function(string, *):any} iteratorFn
- * @returns {function(*, string)}
- */
-export function reverseParams(iteratorFn) {
-  return function (value, key) {
-    iteratorFn(key, value);
-  };
-}
-
-/**
  * Set or clear the hashkey for an object.
  * @param obj object
  * @param h the hashkey (!truthy to delete the hashkey)
@@ -923,21 +843,24 @@ export function parseKeyValue(keyValue) {
 
 export function toKeyValue(obj) {
   const parts = [];
-  forEach(obj, (value, key) => {
-    if (Array.isArray(value)) {
-      forEach(value, (arrayValue) => {
+  obj &&
+    Object.entries(obj).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        value.forEach((arrayValue) => {
+          parts.push(
+            encodeUriQuery(key, true) +
+              (arrayValue === true
+                ? ""
+                : `=${encodeUriQuery(arrayValue, true)}`),
+          );
+        });
+      } else {
         parts.push(
           encodeUriQuery(key, true) +
-            (arrayValue === true ? "" : `=${encodeUriQuery(arrayValue, true)}`),
+            (value === true ? "" : `=${encodeUriQuery(value, true)}`),
         );
-      });
-    } else {
-      parts.push(
-        encodeUriQuery(key, true) +
-          (value === true ? "" : `=${encodeUriQuery(value, true)}`),
-      );
-    }
-  });
+      }
+    });
   return parts.length ? parts.join("&") : "";
 }
 

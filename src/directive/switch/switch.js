@@ -1,4 +1,3 @@
-import { forEach } from "../../shared/utils";
 import { getBlockNodes } from "../../shared/jqlite/jqlite";
 
 export const ngSwitchDirective = [
@@ -53,7 +52,7 @@ export const ngSwitchDirective = [
             ngSwitchController.cases[`!${value}`] ||
             ngSwitchController.cases["?"])
         ) {
-          forEach(selectedTranscludes, (selectedTransclude) => {
+          Object.values(selectedTranscludes).forEach((selectedTransclude) => {
             selectedTransclude.transclude((caseElement, selectedScope) => {
               selectedScopes.push(selectedScope);
               const anchor = selectedTransclude.element;

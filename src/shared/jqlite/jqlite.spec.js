@@ -8,7 +8,7 @@ import {
 } from "./jqlite";
 import { Angular } from "../../loader";
 import { createInjector } from "../../core/di/injector";
-import { equals, forEach } from "../utils";
+import { equals } from "../utils";
 import { browserTrigger } from "../test-utils";
 import { CACHE, EXPANDO } from "../../core/cache/cache";
 
@@ -902,7 +902,7 @@ describe("jqLite", () => {
     });
 
     it("should not fail on elements without the getAttribute method", () => {
-      forEach([window, document], (node) => {
+      [window, document].forEach((node) => {
         expect(() => {
           const elem = JQLite(node);
           elem.attr("foo");

@@ -1,4 +1,4 @@
-import { pick, forEach, tail } from "../../shared/common";
+import { pick, tail } from "../../shared/common";
 import { isDefined, isString } from "../../shared/utils";
 import { isInjectable } from "../../shared/predicates";
 import { services } from "../common/coreservices";
@@ -60,7 +60,7 @@ export function ng1ViewsBuilder(state) {
   }
   const views = {},
     viewsObject = state.views || { $default: pick(state, allViewKeys) };
-  forEach(viewsObject, function (config, name) {
+  Object.entries(viewsObject).forEach(([name, config]) => {
     // Account for views: { "": { template... } }
     name = name || "$default";
     // Account for views: { header: "headerComponent" }

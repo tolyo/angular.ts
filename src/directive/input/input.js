@@ -8,7 +8,6 @@ import {
   isNumber,
   isNumberNaN,
   isDate,
-  forEach,
   convertTimezoneToLocal,
   addDateMinutes,
   timezoneToOffset,
@@ -286,7 +285,7 @@ export function createDateParser(regexp, mapping) {
           map = { yyyy: 1970, MM: 1, dd: 1, HH: 0, mm: 0, ss: 0, sss: 0 };
         }
 
-        forEach(parts, (part, index) => {
+        Object.entries(parts).forEach(([index, part]) => {
           if (index < mapping.length) {
             map[mapping[index]] = +part;
           }

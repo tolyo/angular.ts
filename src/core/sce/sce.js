@@ -4,7 +4,6 @@ import {
   urlResolve,
 } from "./../url-utils/url-utils";
 import {
-  forEach,
   isFunction,
   isRegExp,
   isString,
@@ -731,7 +730,7 @@ export function SceProvider() {
       const { getTrusted } = sce;
       const { trustAs } = sce;
 
-      forEach(SCE_CONTEXTS, (enumValue, name) => {
+      Object.entries(SCE_CONTEXTS).forEach(([name, enumValue]) => {
         const lName = lowercase(name);
         sce[snakeToCamel(`parse_as_${lName}`)] = function (expr) {
           return parse(enumValue, expr);

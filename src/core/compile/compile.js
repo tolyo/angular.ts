@@ -12,7 +12,6 @@ import {
   minErr,
   assertArg,
   assertNotHasOwnProperty,
-  forEach,
   isDefined,
   isFunction,
   isObject,
@@ -74,7 +73,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
 
     const bindings = Object.create(null);
 
-    forEach(scope, (definition, scopeName) => {
+    Object.entries(scope).forEach(([scopeName, definition]) => {
       definition = definition.trim();
 
       if (definition in bindingCache) {
@@ -337,7 +336,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
 
     // Copy any annotation properties (starting with $) over to the factory and controller constructor functions
     // These could be used by libraries such as the new component router
-    forEach(options, (val, key) => {
+    Object.entries(options).forEach(([key, val]) => {
       if (key.charAt(0) === "$") {
         factory[key] = val;
         // Don't try to copy over annotations to named controller
@@ -1352,51 +1351,57 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
           }
 
           // Bind the required controllers to the controller, if `require` is an object and `bindToController` is truthy
-          forEach(controllerDirectives, (controllerDirective, name) => {
-            const { require } = controllerDirective;
-            if (
-              controllerDirective.bindToController &&
-              !Array.isArray(require) &&
-              isObject(require)
-            ) {
-              extend(
-                elementControllers[name].instance,
-                getControllers(name, require, $element, elementControllers),
-              );
-            }
-          });
+          if (controllerDirectives) {
+            Object.entries(controllerDirectives).forEach(
+              ([name, controllerDirective]) => {
+                const { require } = controllerDirective;
+                if (
+                  controllerDirective.bindToController &&
+                  !Array.isArray(require) &&
+                  isObject(require)
+                ) {
+                  extend(
+                    elementControllers[name].instance,
+                    getControllers(name, require, $element, elementControllers),
+                  );
+                }
+              },
+            );
+          }
 
           // Handle the init and destroy lifecycle hooks on all controllers that have them
-          forEach(elementControllers, (controller) => {
-            const controllerInstance = controller.instance;
-            if (isFunction(controllerInstance.$onChanges)) {
-              try {
-                controllerInstance.$onChanges(
-                  controller.bindingInfo.initialChanges,
-                );
-              } catch (e) {
-                $exceptionHandler(e);
+          if (elementControllers) {
+            Object.values(elementControllers).forEach((controller) => {
+              const controllerInstance = controller.instance;
+              if (isFunction(controllerInstance.$onChanges)) {
+                try {
+                  controllerInstance.$onChanges(
+                    controller.bindingInfo.initialChanges,
+                  );
+                } catch (e) {
+                  $exceptionHandler(e);
+                }
               }
-            }
-            if (isFunction(controllerInstance.$onInit)) {
-              try {
-                controllerInstance.$onInit();
-              } catch (e) {
-                $exceptionHandler(e);
+              if (isFunction(controllerInstance.$onInit)) {
+                try {
+                  controllerInstance.$onInit();
+                } catch (e) {
+                  $exceptionHandler(e);
+                }
               }
-            }
-            if (isFunction(controllerInstance.$doCheck)) {
-              controllerScope.$watch(() => {
+              if (isFunction(controllerInstance.$doCheck)) {
+                controllerScope.$watch(() => {
+                  controllerInstance.$doCheck();
+                });
                 controllerInstance.$doCheck();
-              });
-              controllerInstance.$doCheck();
-            }
-            if (isFunction(controllerInstance.$onDestroy)) {
-              controllerScope.$on("$destroy", () => {
-                controllerInstance.$onDestroy();
-              });
-            }
-          });
+              }
+              if (isFunction(controllerInstance.$onDestroy)) {
+                controllerScope.$on("$destroy", () => {
+                  controllerInstance.$onDestroy();
+                });
+              }
+            });
+          }
 
           // PRELINKING
           for (i = 0, ii = preLinkFns.length; i < ii; i++) {
@@ -1456,13 +1461,15 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
             );
           }
 
-          // Trigger $postLink lifecycle hooks
-          forEach(elementControllers, (controller) => {
-            const controllerInstance = controller.instance;
-            if (isFunction(controllerInstance.$postLink)) {
-              controllerInstance.$postLink();
-            }
-          });
+          if (elementControllers) {
+            // Trigger $postLink lifecycle hooks
+            Object.values(elementControllers).forEach((controller) => {
+              const controllerInstance = controller.instance;
+              if (isFunction(controllerInstance.$postLink)) {
+                controllerInstance.$postLink();
+              }
+            });
+          }
 
           // This is the function that is injected as `$transclude`.
           // Note: all arguments are optional!
@@ -1683,42 +1690,45 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                 const filledSlots = Object.create(null);
 
                 // Parse the element selectors
-                forEach(directiveValue, (elementSelector, slotName) => {
-                  // If an element selector starts with a ? then it is optional
-                  const optional = elementSelector.charAt(0) === "?";
-                  elementSelector = optional
-                    ? elementSelector.substring(1)
-                    : elementSelector;
+                Object.entries(directiveValue).forEach(
+                  ([slotName, elementSelector]) => {
+                    // If an element selector starts with a ? then it is optional
+                    const optional = elementSelector.charAt(0) === "?";
+                    elementSelector = optional
+                      ? elementSelector.substring(1)
+                      : elementSelector;
 
-                  slotMap[elementSelector] = slotName;
+                    slotMap[elementSelector] = slotName;
 
-                  // We explicitly assign `null` since this implies that a slot was defined but not filled.
-                  // Later when calling boundTransclusion functions with a slot name we only error if the
-                  // slot is `undefined`
-                  slots[slotName] = null;
+                    // We explicitly assign `null` since this implies that a slot was defined but not filled.
+                    // Later when calling boundTransclusion functions with a slot name we only error if the
+                    // slot is `undefined`
+                    slots[slotName] = null;
 
-                  // filledSlots contains `true` for all slots that are either optional or have been
-                  // filled. This is used to check that we have not missed any required slots
-                  filledSlots[slotName] = optional;
-                });
+                    // filledSlots contains `true` for all slots that are either optional or have been
+                    // filled. This is used to check that we have not missed any required slots
+                    filledSlots[slotName] = optional;
+                  },
+                );
 
                 // Add the matching elements into their slot
-
-                forEach(JQLite($compileNode[0].childNodes), (node) => {
-                  const slotName =
-                    slotMap[directiveNormalize(getNodeName(node))];
-                  if (slotName) {
-                    filledSlots[slotName] = true;
-                    slots[slotName] =
-                      slots[slotName] || document.createDocumentFragment();
-                    slots[slotName].appendChild(node);
-                  } else {
-                    $template.appendChild(node);
-                  }
-                });
+                JQLite($compileNode[0].childNodes)
+                  .elements()
+                  .forEach((node) => {
+                    const slotName =
+                      slotMap[directiveNormalize(getNodeName(node))];
+                    if (slotName) {
+                      filledSlots[slotName] = true;
+                      slots[slotName] =
+                        slots[slotName] || document.createDocumentFragment();
+                      slots[slotName].appendChild(node);
+                    } else {
+                      $template.appendChild(node);
+                    }
+                  });
 
                 // Check for required slots that were not filled
-                forEach(filledSlots, (filled, slotName) => {
+                Object.entries(filledSlots).forEach(([slotName, filled]) => {
                   if (!filled) {
                     throw $compileMinErr(
                       "reqslot",
@@ -2009,7 +2019,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
           }
         } else if (isObject(require)) {
           value = {};
-          forEach(require, (controller, property) => {
+          Object.entries(require).forEach(([property, controller]) => {
             value[property] = getControllers(
               directiveName,
               controller,
@@ -2184,7 +2194,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
         const dstAttr = dst.$attr;
 
         // reapply the old attributes to the new element
-        forEach(dst, (value, key) => {
+        Object.entries(dst).forEach(([key, value]) => {
           if (key.charAt(0) !== "$") {
             if (src[key] && src[key] !== value) {
               if (value.length) {
@@ -2198,7 +2208,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
         });
 
         // copy the new attributes on the old attrs object
-        forEach(src, (value, key) => {
+        Object.entries(src).forEach(([key, value]) => {
           // Check if we already set this attribute in the loop above.
           // `dst` will never contain hasOwnProperty as DOM parser won't let it.
           // You will get an "InvalidCharacterError: DOM Exception 5" error if you
@@ -2309,11 +2319,13 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
               postLinkFns,
               previousCompileContext,
             );
-            forEach($rootElement, (node, i) => {
-              if (node === compileNode) {
-                $rootElement[i] = $compileNode[0];
-              }
-            });
+            if ($rootElement) {
+              Object.entries($rootElement).forEach(([i, node]) => {
+                if (node === compileNode) {
+                  $rootElement[i] = $compileNode[0];
+                }
+              });
+            }
             afterTemplateChildLinkFn = compileNodes(
               $compileNode[0].childNodes,
               childTranscludeFn,
@@ -2853,163 +2865,167 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
         const initialChanges = {};
         let changes;
 
-        forEach(bindings, (definition, scopeName) => {
-          const { attrName } = definition;
-          const { optional } = definition;
-          const { mode } = definition; // @, =, <, or &
-          let lastValue;
-          let parentGet;
-          let parentSet;
-          let compare;
-          let removeWatch;
+        if (bindings) {
+          Object.entries(bindings).forEach(([scopeName, definition]) => {
+            const { attrName } = definition;
+            const { optional } = definition;
+            const { mode } = definition; // @, =, <, or &
+            let lastValue;
+            let parentGet;
+            let parentSet;
+            let compare;
+            let removeWatch;
 
-          switch (mode) {
-            case "@":
-              if (!optional && !Object.hasOwnProperty.call(attrs, attrName)) {
-                strictBindingsCheck(attrName, directive.name);
-                destination[scopeName] = attrs[attrName] = undefined;
-              }
-              removeWatch = attrs.$observe(attrName, (value) => {
-                if (isString(value) || isBoolean(value)) {
-                  const oldValue = destination[scopeName];
-                  recordChanges(scopeName, value, oldValue);
-                  destination[scopeName] = value;
+            switch (mode) {
+              case "@":
+                if (!optional && !Object.hasOwnProperty.call(attrs, attrName)) {
+                  strictBindingsCheck(attrName, directive.name);
+                  destination[scopeName] = attrs[attrName] = undefined;
                 }
-              });
-              attrs.$$observers[attrName].$$scope = scope;
-              lastValue = attrs[attrName];
-              if (isString(lastValue)) {
-                // If the attribute has been provided then we trigger an interpolation to ensure
-                // the value is there for use in the link fn
-                destination[scopeName] = $interpolate(lastValue)(scope);
-              } else if (isBoolean(lastValue)) {
-                // If the attributes is one of the BOOLEAN_ATTR then AngularJS will have converted
-                // the value to boolean rather than a string, so we special case this situation
-                destination[scopeName] = lastValue;
-              }
-              initialChanges[scopeName] = new SimpleChange(
-                UNINITALIZED_VALIED,
-                destination[scopeName],
-              );
-              removeWatchCollection.push(removeWatch);
-              break;
-
-            case "=":
-              if (!Object.hasOwnProperty.call(attrs, attrName)) {
-                if (optional) break;
-                strictBindingsCheck(attrName, directive.name);
-                attrs[attrName] = undefined;
-              }
-              if (optional && !attrs[attrName]) break;
-
-              parentGet = $parse(attrs[attrName]);
-              if (parentGet.literal) {
-                compare = equals;
-              } else {
-                compare = simpleCompare;
-              }
-              parentSet =
-                parentGet.assign ||
-                function () {
-                  // reset the change, or we will throw this exception on every $digest
-                  lastValue = destination[scopeName] = parentGet(scope);
-                  throw $compileMinErr(
-                    "nonassign",
-                    "Expression '{0}' in attribute '{1}' used with directive '{2}' is non-assignable!",
-                    attrs[attrName],
-                    attrName,
-                    directive.name,
-                  );
-                };
-              lastValue = destination[scopeName] = parentGet(scope);
-              var parentValueWatch = function parentValueWatch(parentValue) {
-                if (!compare(parentValue, destination[scopeName])) {
-                  // we are out of sync and need to copy
-                  if (!compare(parentValue, lastValue)) {
-                    // parent changed and it has precedence
-                    destination[scopeName] = parentValue;
-                  } else {
-                    // if the parent can be assigned then do so
-                    parentSet(scope, (parentValue = destination[scopeName]));
+                removeWatch = attrs.$observe(attrName, (value) => {
+                  if (isString(value) || isBoolean(value)) {
+                    const oldValue = destination[scopeName];
+                    recordChanges(scopeName, value, oldValue);
+                    destination[scopeName] = value;
                   }
+                });
+                attrs.$$observers[attrName].$$scope = scope;
+                lastValue = attrs[attrName];
+                if (isString(lastValue)) {
+                  // If the attribute has been provided then we trigger an interpolation to ensure
+                  // the value is there for use in the link fn
+                  destination[scopeName] = $interpolate(lastValue)(scope);
+                } else if (isBoolean(lastValue)) {
+                  // If the attributes is one of the BOOLEAN_ATTR then AngularJS will have converted
+                  // the value to boolean rather than a string, so we special case this situation
+                  destination[scopeName] = lastValue;
                 }
-                lastValue = parentValue;
-                return lastValue;
-              };
-              parentValueWatch.$stateful = true;
-              if (definition.collection) {
-                removeWatch = scope.$watchCollection(
-                  attrs[attrName],
-                  parentValueWatch,
+                initialChanges[scopeName] = new SimpleChange(
+                  UNINITALIZED_VALIED,
+                  destination[scopeName],
                 );
-              } else {
-                removeWatch = scope.$watch(
-                  $parse(attrs[attrName], parentValueWatch),
-                  null,
-                  parentGet.literal,
-                );
-              }
-              removeWatchCollection.push(removeWatch);
-              break;
-
-            case "<": {
-              if (!Object.hasOwnProperty.call(attrs, attrName)) {
-                if (optional) break;
-                strictBindingsCheck(attrName, directive.name);
-                attrs[attrName] = undefined;
-              }
-              if (optional && !attrs[attrName]) break;
-
-              parentGet = $parse(attrs[attrName]);
-              var isLiteral = parentGet.literal;
-
-              var initialValue = (destination[scopeName] = parentGet(scope));
-              initialChanges[scopeName] = new SimpleChange(
-                UNINITALIZED_VALIED,
-                destination[scopeName],
-              );
-
-              scope.attrs = attrs;
-              removeWatch = scope.$watch(
-                `attrs.${attrName}`,
-                (newValue, oldValue) => {
-                  if (oldValue === newValue) {
-                    if (
-                      oldValue === initialValue ||
-                      (isLiteral && equals(oldValue, initialValue))
-                    ) {
-                      return;
-                    }
-                    oldValue = initialValue;
-                  }
-                  recordChanges(scopeName, newValue, oldValue);
-                  destination[scopeName] = newValue;
-                },
-              );
-
-              removeWatchCollection.push(removeWatch);
-              break;
-            }
-            case "&":
-              if (!optional && !Object.hasOwnProperty.call(attrs, attrName)) {
-                strictBindingsCheck(attrName, directive.name);
-              }
-              // Don't assign Object.prototype method to scope
-              parentGet = Object.prototype.hasOwnProperty.call(attrs, attrName)
-                ? $parse(attrs[attrName])
-                : () => {};
-
-              // Don't assign noop to destination if expression is not valid
-              if (parentGet.toString() === (() => {}).toString() && optional)
+                removeWatchCollection.push(removeWatch);
                 break;
 
-              destination[scopeName] = function (locals) {
-                return parentGet(scope, locals);
-              };
-              break;
-          }
-        });
+              case "=":
+                if (!Object.hasOwnProperty.call(attrs, attrName)) {
+                  if (optional) break;
+                  strictBindingsCheck(attrName, directive.name);
+                  attrs[attrName] = undefined;
+                }
+                if (optional && !attrs[attrName]) break;
 
+                parentGet = $parse(attrs[attrName]);
+                if (parentGet.literal) {
+                  compare = equals;
+                } else {
+                  compare = simpleCompare;
+                }
+                parentSet =
+                  parentGet.assign ||
+                  function () {
+                    // reset the change, or we will throw this exception on every $digest
+                    lastValue = destination[scopeName] = parentGet(scope);
+                    throw $compileMinErr(
+                      "nonassign",
+                      "Expression '{0}' in attribute '{1}' used with directive '{2}' is non-assignable!",
+                      attrs[attrName],
+                      attrName,
+                      directive.name,
+                    );
+                  };
+                lastValue = destination[scopeName] = parentGet(scope);
+                var parentValueWatch = function parentValueWatch(parentValue) {
+                  if (!compare(parentValue, destination[scopeName])) {
+                    // we are out of sync and need to copy
+                    if (!compare(parentValue, lastValue)) {
+                      // parent changed and it has precedence
+                      destination[scopeName] = parentValue;
+                    } else {
+                      // if the parent can be assigned then do so
+                      parentSet(scope, (parentValue = destination[scopeName]));
+                    }
+                  }
+                  lastValue = parentValue;
+                  return lastValue;
+                };
+                parentValueWatch.$stateful = true;
+                if (definition.collection) {
+                  removeWatch = scope.$watchCollection(
+                    attrs[attrName],
+                    parentValueWatch,
+                  );
+                } else {
+                  removeWatch = scope.$watch(
+                    $parse(attrs[attrName], parentValueWatch),
+                    null,
+                    parentGet.literal,
+                  );
+                }
+                removeWatchCollection.push(removeWatch);
+                break;
+
+              case "<":
+                if (!Object.hasOwnProperty.call(attrs, attrName)) {
+                  if (optional) break;
+                  strictBindingsCheck(attrName, directive.name);
+                  attrs[attrName] = undefined;
+                }
+                if (optional && !attrs[attrName]) break;
+
+                parentGet = $parse(attrs[attrName]);
+                var isLiteral = parentGet.literal;
+
+                var initialValue = (destination[scopeName] = parentGet(scope));
+                initialChanges[scopeName] = new SimpleChange(
+                  UNINITALIZED_VALIED,
+                  destination[scopeName],
+                );
+
+                scope.attrs = attrs;
+              removeWatch = scope.$watch(
+                  `attrs.${attrName}`,
+                  (newValue, oldValue) => {
+                    if (oldValue === newValue) {
+                      if (
+                        oldValue === initialValue ||
+                        (isLiteral && equals(oldValue, initialValue))
+                      ) {
+                        return;
+                      }
+                      oldValue = initialValue;
+                    }
+                    recordChanges(scopeName, newValue, oldValue);
+                    destination[scopeName] = newValue;
+                  },
+              );
+
+                removeWatchCollection.push(removeWatch);
+                break;
+
+              case "&":
+                if (!optional && !Object.hasOwnProperty.call(attrs, attrName)) {
+                  strictBindingsCheck(attrName, directive.name);
+                }
+                // Don't assign Object.prototype method to scope
+                parentGet = Object.prototype.hasOwnProperty.call(
+                  attrs,
+                  attrName,
+                )
+                  ? $parse(attrs[attrName])
+                  : () => {};
+
+                // Don't assign noop to destination if expression is not valid
+                if (parentGet.toString() === (() => {}).toString() && optional)
+                  break;
+
+                destination[scopeName] = function (locals) {
+                  return parentGet(scope, locals);
+                };
+                break;
+            }
+          });
+        }
         function recordChanges(key, currentValue, previousValue) {
           if (
             isFunction(destination.$onChanges) &&

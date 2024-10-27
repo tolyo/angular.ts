@@ -1,7 +1,6 @@
 import { dealoc, JQLite } from "../../shared/jqlite/jqlite";
-import { forEach, valueFn } from "../../shared/utils";
+import { valueFn } from "../../shared/utils";
 import { Angular } from "../../loader";
-import { createInjector } from "../../core/di/injector";
 import { wait } from "../../shared/test-utils";
 
 describe("ngIf", () => {
@@ -37,7 +36,7 @@ describe("ngIf", () => {
     });
 
     function makeIf() {
-      forEach(arguments, (expr) => {
+      arguments.forEach((expr) => {
         element.append(
           $compile(`<div class="my-class" ng-if="${expr}"><div>Hi</div></div>`)(
             $scope,

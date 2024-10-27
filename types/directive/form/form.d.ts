@@ -75,6 +75,7 @@ export class FormController {
      * may not mean that the form is still `$dirty`.
      */
     $removeControl(control: any): void;
+    $setValidity: (_a: any, _b: any, _c: any) => void;
     /**
      * Sets the form to a dirty state.
      *

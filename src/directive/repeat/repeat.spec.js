@@ -1,7 +1,6 @@
 import { Angular } from "../../loader";
-import { createInjector } from "../../core/di/injector";
 import { dealoc, JQLite } from "../../shared/jqlite/jqlite";
-import { forEach, valueFn } from "../../shared/utils";
+import { valueFn } from "../../shared/utils";
 
 describe("ngRepeat", () => {
   let element;
@@ -239,7 +238,7 @@ describe("ngRepeat", () => {
     it("should track using provided function when a filter is present", () => {
       scope.newArray = function (items) {
         const newArray = [];
-        forEach(items, (item) => {
+        items.forEach((item) => {
           newArray.push({
             id: item.id,
             name: item.name,
@@ -464,21 +463,17 @@ describe("ngRepeat", () => {
         { name: "orange" },
         { name: "blonde" },
       ];
-      forEach(
-        ["null2", "qthis", "qthisq", "fundefined", "$$parent"],
-        (name) => {
-          const expr = `item in items | filter:x as ${name} track by $index`;
-          element = $compile(`<div><div ng-repeat="${expr}"></div></div>`)(
-            scope,
-          );
-          expect(scope[name]).toEqual([
-            { name: "blue" },
-            { name: "black" },
-            { name: "blonde" },
-          ]);
-          dealoc(element);
-        },
-      );
+      ["null2", "qthis", "qthisq", "fundefined", "$$parent"].forEach((name) => {
+        const expr = `item in items | filter:x as ${name} track by $index`;
+        element = $compile(`<div><div ng-repeat="${expr}"></div></div>`)(scope);
+        scope.$digest();
+        expect(scope[name]).toEqual([
+          { name: "blue" },
+          { name: "black" },
+          { name: "blonde" },
+        ]);
+        dealoc(element);
+      });
     });
 
     it("should throw if alias identifier is not a simple identifier", () => {
@@ -492,42 +487,39 @@ describe("ngRepeat", () => {
         { name: "blonde" },
       ];
 
-      forEach(
-        [
-          "null",
-          "this",
-          "undefined",
-          "$parent",
-          "$root",
-          "$id",
-          "$index",
-          "$first",
-          "$middle",
-          "$last",
-          "$even",
-          "$odd",
-          "obj[key]",
-          'obj["key"]',
-          "obj['key']",
-          "obj.property",
-          "foo=6",
-        ],
-        (expr) => {
-          const expression =
-            `item in items | filter:x as ${expr} track by $index`.replace(
-              /"/g,
-              "&quot;",
-            );
-          element = $compile(
-            `<div>` +
-              `  <div ng-repeat="${expression}">{{item}}</div>` +
-              `</div>`,
-          )(scope);
-          expect(logs.shift().message).toMatch(/must be a valid JS identifier/);
+      [
+        "null",
+        "this",
+        "undefined",
+        "$parent",
+        "$root",
+        "$id",
+        "$index",
+        "$first",
+        "$middle",
+        "$last",
+        "$even",
+        "$odd",
+        "obj[key]",
+        'obj["key"]',
+        "obj['key']",
+        "obj.property",
+        "foo=6",
+      ].forEach((expr) => {
+        const expression =
+          `item in items | filter:x as ${expr} track by $index`.replace(
+            /"/g,
+            "&quot;",
+          );
+        element = $compile(
+          `<div>` +
+            `  <div ng-repeat="${expression}">{{item}}</div>` +
+            `</div>`,
+        )(scope);
+        expect(logs.shift().message).toMatch(/must be a valid JS identifier/);
 
-          dealoc(element);
-        },
-      );
+        dealoc(element);
+      });
     });
 
     it("should allow expressions over multiple lines", () => {
