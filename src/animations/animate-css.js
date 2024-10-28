@@ -67,7 +67,7 @@ function getCssDelayStyle(delay, isKeyframeAnimation) {
 function computeCssStyles(element, properties) {
   const styles = Object.create(null);
   const detectedStyles = window.getComputedStyle(element) || {};
-  properties.forEach(([actualStyleName, formalStyleName]) => {
+  Object.entries(properties).forEach(([actualStyleName, formalStyleName]) => {
     let val = detectedStyles[formalStyleName];
     if (val) {
       const c = val.charAt(0);

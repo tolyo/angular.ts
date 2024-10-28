@@ -46,11 +46,13 @@ export function createHttpBackend($browser) {
     let abortedByTimeout = false;
 
     xhr.open(method, url, true);
-    Object.entries(headers).forEach(([key, value]) => {
-      if (isDefined(value)) {
-        xhr.setRequestHeader(key, value);
-      }
-    });
+    if (headers) {
+      Object.entries(headers).forEach(([key, value]) => {
+        if (isDefined(value)) {
+          xhr.setRequestHeader(key, value);
+        }
+      });
+    }
 
     xhr.onload = function () {
       const statusText = xhr.statusText || "";
@@ -100,13 +102,18 @@ export function createHttpBackend($browser) {
       );
     };
 
-    Object.entries(eventHandlers).forEach(([key, value]) => {
-      xhr.addEventListener(key, value);
-    });
+    if (eventHandlers) {
+      eventHandlers &&
+        Object.entries(eventHandlers).forEach(([key, value]) => {
+          xhr.addEventListener(key, value);
+        });
+    }
 
-    Object.entries(uploadEventHandlers).forEach(([key, value]) => {
-      xhr.upload.addEventListener(key, value);
-    });
+    if (uploadEventHandlers) {
+      Object.entries(uploadEventHandlers).forEach(([key, value]) => {
+        xhr.upload.addEventListener(key, value);
+      });
+    }
 
     if (withCredentials) {
       xhr.withCredentials = true;

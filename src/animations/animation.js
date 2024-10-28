@@ -338,7 +338,7 @@ export function AnimationProvider() {
         function groupAnimations(animations) {
           const preparedAnimations = [];
           const refLookup = {};
-          animations.forEach(([index, animation]) => {
+          animations.forEach((animation, index) => {
             const { element } = animation;
             const node = getDomNode(element);
             const { event } = animation;

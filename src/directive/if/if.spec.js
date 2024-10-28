@@ -36,7 +36,7 @@ describe("ngIf", () => {
     });
 
     function makeIf() {
-      arguments.forEach((expr) => {
+      Array.from(arguments).forEach((expr) => {
         element.append(
           $compile(`<div class="my-class" ng-if="${expr}"><div>Hi</div></div>`)(
             $scope,

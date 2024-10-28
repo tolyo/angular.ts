@@ -267,7 +267,7 @@ export function resolveElementClasses(existing, toAdd, toRemove) {
   });
 
   toRemove = splitClassesToLookup(toRemove);
-  Object.keys(toRemove).forEach(toRemove, (key) => {
+  Object.keys(toRemove).forEach((key) => {
     flags[key] = flags[key] === ADD_CLASS ? null : REMOVE_CLASS;
   });
 
@@ -295,17 +295,19 @@ export function resolveElementClasses(existing, toAdd, toRemove) {
 
   function splitClassesToLookup(classes) {
     if (isString(classes)) {
-      classes = classes.split(" ");
+      classes = classes.trim().split(" ");
     }
 
     const obj = {};
-    classes.forEach((klass) => {
-      // sometimes the split leaves empty string values
-      // incase extra spaces were applied to the options
-      if (klass.length) {
-        obj[klass] = true;
-      }
-    });
+    if (classes) {
+      classes.forEach((klass) => {
+        // sometimes the split leaves empty string values
+        // incase extra spaces were applied to the options
+        if (klass.length) {
+          obj[klass] = true;
+        }
+      });
+    }
     return obj;
   }
 

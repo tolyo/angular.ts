@@ -1,89 +1,89 @@
-import { CompileProvider } from "./core/compile/compile";
+import { CompileProvider } from "./core/compile/compile.js";
 import {
   inputDirective,
   ngValueDirective,
   hiddenInputBrowserCacheDirective,
-} from "./directive/input/input";
-import { formDirective, ngFormDirective } from "./directive/form/form";
-import { scriptDirective } from "./directive/script/script";
-import { selectDirective, optionDirective } from "./directive/select/select";
+} from "./directive/input/input.js";
+import { formDirective, ngFormDirective } from "./directive/form/form.js";
+import { scriptDirective } from "./directive/script/script.js";
+import { selectDirective, optionDirective } from "./directive/select/select.js";
 import {
   ngBindDirective,
   ngBindHtmlDirective,
   ngBindTemplateDirective,
-} from "./directive/bind/bind";
+} from "./directive/bind/bind.js";
 import {
   ngClassDirective,
   ngClassEvenDirective,
   ngClassOddDirective,
-} from "./directive/class/class";
-import { ngCloakDirective } from "./directive/cloak/cloak";
-import { ngControllerDirective } from "./directive/controller/controller";
+} from "./directive/class/class.js";
+import { ngCloakDirective } from "./directive/cloak/cloak.js";
+import { ngControllerDirective } from "./directive/controller/controller.js";
 import {
   ngHideDirective,
   ngShowDirective,
-} from "./directive/show-hide/show-hide";
-import { ngIfDirective } from "./directive/if/if";
+} from "./directive/show-hide/show-hide.js";
+import { ngIfDirective } from "./directive/if/if.js";
 import {
   ngIncludeDirective,
   ngIncludeFillContentDirective,
-} from "./directive/include/include";
-import { ngInitDirective } from "./directive/init/init";
-import { ngNonBindableDirective } from "./directive/non-bindable/non-bindable";
-import { ngRefDirective } from "./directive/ref/ref";
-import { ngRepeatDirective } from "./directive/repeat/repeat";
-import { ngStyleDirective } from "./directive/style/style";
+} from "./directive/include/include.js";
+import { ngInitDirective } from "./directive/init/init.js";
+import { ngNonBindableDirective } from "./directive/non-bindable/non-bindable.js";
+import { ngRefDirective } from "./directive/ref/ref.js";
+import { ngRepeatDirective } from "./directive/repeat/repeat.js";
+import { ngStyleDirective } from "./directive/style/style.js";
 import {
   ngSwitchDirective,
   ngSwitchWhenDirective,
   ngSwitchDefaultDirective,
-} from "./directive/switch/switch";
-import { ngOptionsDirective } from "./directive/options/options";
-import { ngTranscludeDirective } from "./directive/transclude/transclude";
-import { ngModelDirective } from "./directive/model/model";
-import { ngListDirective } from "./directive/list/list";
-import { ngChangeDirective } from "./directive/change/change";
+} from "./directive/switch/switch.js";
+import { ngOptionsDirective } from "./directive/options/options.js";
+import { ngTranscludeDirective } from "./directive/transclude/transclude.js";
+import { ngModelDirective } from "./directive/model/model.js";
+import { ngListDirective } from "./directive/list/list.js";
+import { ngChangeDirective } from "./directive/change/change.js";
 import {
   maxlengthDirective,
   minlengthDirective,
   patternDirective,
   requiredDirective,
-} from "./directive/validators/validators";
-import { ngModelOptionsDirective } from "./directive/model-options/model-options";
-import { ngAttributeAliasDirectives } from "./directive/attrs/attrs";
-import { ngEventDirectives } from "./directive/events/events";
-import { AnchorScrollProvider } from "./services/anchor-scroll";
-import { AnimateProvider } from "./animations/animate";
-import { BrowserProvider } from "./services/browser";
+} from "./directive/validators/validators.js";
+import { ngModelOptionsDirective } from "./directive/model-options/model-options.js";
+import { ngAttributeAliasDirectives } from "./directive/attrs/attrs.js";
+import { ngEventDirectives } from "./directive/events/events.js";
+import { AnchorScrollProvider } from "./services/anchor-scroll.js";
+import { AnimateProvider } from "./animations/animate.js";
+import { BrowserProvider } from "./services/browser.js";
 import {
   AnimateAsyncRunFactoryProvider,
   AnimateRunnerFactoryProvider,
-} from "./animations/animate-runner";
-import { TemplateCacheProvider } from "./core/cache/cache-factory";
-import { ControllerProvider } from "./core/controller/controller";
-import { ExceptionHandlerProvider } from "./core/exception-handler";
-import { FilterProvider } from "./core/filter/filter";
-import { InterpolateProvider } from "./core/interpolate/interpolate";
+} from "./animations/animate-runner.js";
+import { TemplateCacheProvider } from "./core/cache/cache-factory.js";
+import { ControllerProvider } from "./core/controller/controller.js";
+import { ExceptionHandlerProvider } from "./core/exception-handler.js";
+import { FilterProvider } from "./core/filter/filter.js";
+import { InterpolateProvider } from "./core/interpolate/interpolate.js";
 import {
   HttpProvider,
   HttpParamSerializerProvider,
-} from "./services/http/http";
-import { HttpBackendProvider } from "./services/http-backend/http-backend";
-import { LocationProvider } from "./core/location/location";
-import { LogProvider } from "./services/log";
+} from "./services/http/http.js";
+import { HttpBackendProvider } from "./services/http-backend/http-backend.js";
+import { LocationProvider } from "./core/location/location.js";
+import { LogProvider } from "./services/log.js";
 import { ParseProvider } from "./core/parse/parse.js";
 import { RootModelProvider } from "./core/model/model.js";
-import { SceProvider, SceDelegateProvider } from "./core/sce/sce";
-import { TaskTrackerFactoryProvider } from "./core/task-tracker-factory";
-import { TemplateRequestProvider } from "./services/template-request";
-import { SanitizeUriProvider } from "./core/sanitize/sanitize-uri";
+import { SceProvider, SceDelegateProvider } from "./core/sce/sce.js";
+import { TaskTrackerFactoryProvider } from "./core/task-tracker-factory.js";
+import { TemplateRequestProvider } from "./services/template-request.js";
+import { SanitizeUriProvider } from "./core/sanitize/sanitize-uri.js";
 import {
   ngMessageDefaultDirective,
   ngMessageDirective,
   ngMessageExpDirective,
   ngMessagesDirective,
   ngMessagesIncludeDirective,
-} from "./directive/messages/messages";
+} from "./directive/messages/messages.js";
 import {
   AriaProvider,
   ngCheckedAriaDirective,
@@ -97,34 +97,38 @@ import {
   ngRequiredAriaDirective,
   ngShowAriaDirective,
   ngValueAriaDirective,
-} from "./directive/aria/aria";
-import { AnimateCssProvider } from "./animations/animate-css";
-import { AnimateQueueProvider } from "./animations/animate-queue";
-import { AnimateJsProvider } from "./animations/animate-js";
-import { AnimationProvider } from "./animations/animation";
-import { RafSchedulerProvider } from "./animations/raf-scheduler";
-import { AnimateCacheProvider } from "./animations/animate-cache";
-import { AnimateCssDriverProvider } from "./animations/animate-css-driver";
-import { AnimateJsDriverProvider } from "./animations/animate-js-driver";
-import { ngAnimateSwapDirective } from "./animations/animate-swap";
-import { $$AnimateChildrenDirective } from "./animations/animate-children-directive";
-import { UrlConfigProvider } from "./router/url/url-config";
-import { UIRouterGlobals } from "./router/globals";
-import { ViewService } from "./router/view/view";
-import { TransitionProvider } from "./router/transition/transition-service";
-import { StateProvider } from "./router/state/state-service";
-import { ViewScrollProvider } from "./router/view-scroll";
-import { TemplateFactoryProvider } from "./router/template-factory";
-import { UrlService } from "./router/url/url-service";
-import { StateRegistryProvider } from "./router/state/state-registry";
-import { trace } from "./router/common/trace";
+} from "./directive/aria/aria.js";
+import { AnimateCssProvider } from "./animations/animate-css.js";
+import { AnimateQueueProvider } from "./animations/animate-queue.js";
+import { AnimateJsProvider } from "./animations/animate-js.js";
+import { AnimationProvider } from "./animations/animation.js";
+import { RafSchedulerProvider } from "./animations/raf-scheduler.js";
+import { AnimateCacheProvider } from "./animations/animate-cache.js";
+import { AnimateCssDriverProvider } from "./animations/animate-css-driver.js";
+import { AnimateJsDriverProvider } from "./animations/animate-js-driver.js";
+import { ngAnimateSwapDirective } from "./animations/animate-swap.js";
+import { $$AnimateChildrenDirective } from "./animations/animate-children-directive.js";
+import { UrlConfigProvider } from "./router/url/url-config.js";
+import { UIRouterGlobals } from "./router/globals.js";
+import { ViewService } from "./router/view/view.js";
+import { TransitionProvider } from "./router/transition/transition-service.js";
+import { StateProvider } from "./router/state/state-service.js";
+import { ViewScrollProvider } from "./router/view-scroll.js";
+import { TemplateFactoryProvider } from "./router/template-factory.js";
+import { UrlService } from "./router/url/url-service.js";
+import { StateRegistryProvider } from "./router/state/state-registry.js";
+import { trace } from "./router/common/trace.js";
 import {
   $StateRefActiveDirective,
   $StateRefDirective,
   $StateRefDynamicDirective,
-} from "./router/directives/state-directives";
-import { $ViewDirectiveFill, ngView } from "./router/directives/view-directive";
-import { ngObserveDirective } from "./directive/observe/observe";
+} from "./router/directives/state-directives.js";
+import {
+  $ViewDirectiveFill,
+  ngView,
+} from "./router/directives/view-directive.js";
+import { ngObserveDirective } from "./directive/observe/observe.js";
+import { ngChannelDirective } from "./directive/channel/channel.js";
 
 /**
  * @type {string} `version` from `package.json`, injected by Rollup plugin
@@ -221,6 +225,7 @@ export function publishExternalAPI(angular) {
               ngSrefActiveEq: $StateRefActiveDirective,
               ngState: $StateRefDynamicDirective,
               ngView: ngView,
+              ngChannel: ngChannelDirective,
             })
             .directive({
               ngView: $ViewDirectiveFill,
@@ -252,7 +257,6 @@ export function publishExternalAPI(angular) {
             $log: LogProvider,
             $parse: ParseProvider,
             $$rAFScheduler: RafSchedulerProvider,
-            $rootModel: RootModelProvider,
             $rootScope: RootModelProvider,
             $routerGlobals: UIRouterGlobals,
             $sce: SceProvider,

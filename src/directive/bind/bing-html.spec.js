@@ -22,7 +22,7 @@ describe("ngBindHtml", () => {
   it("should reset html when value is null or undefined", () => {
     const element = $compile('<div ng-bind-html="html"></div>')($rootScope);
 
-    forEach([null, undefined, ""], (val) => {
+    [null, undefined, ""].forEach((val) => {
       $rootScope.html = "some val";
       expect(element.html()).toEqual("some val");
 

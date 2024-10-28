@@ -1,7 +1,6 @@
 import { Angular } from "../../loader";
 import { dealoc, JQLite } from "../../shared/jqlite/jqlite";
 import { EMAIL_REGEXP, ISO_DATE_REGEXP, URL_REGEXP } from "./input";
-import { forEach } from "../../shared/utils";
 
 describe("input", () => {
   let $compile;
@@ -2049,195 +2048,194 @@ describe("input", () => {
         });
       });
 
-      forEach(
-        {
-          step: 'step="{{step}}"',
-          ngStep: 'ng-step="step"',
-        },
-        (attrHtml, attrName) => {
-          describe(attrName, () => {
-            it("should validate", () => {
-              scope.step = 10;
-              scope.value = 20;
-              const formElm = $compile(
-                `<form name="form"><input type="number" ng-model="value" name="alias" ${attrHtml} /></form>`,
-              )(scope);
-              inputElm = formElm.find("input");
-              expect(inputElm.val()).toBe("20");
-              expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
-              expect(scope.value).toBe(20);
-              expect(scope.form.alias.$error.step).toBeFalsy();
+      Object.entries({
+        step: 'step="{{step}}"',
+        ngStep: 'ng-step="step"',
+      }).forEach(([attrName, attrHtml]) => {
+        describe(attrName, () => {
+          it("should validate", () => {
+            scope.step = 10;
+            scope.value = 20;
+            const formElm = $compile(
+              `<form name="form"><input type="number" ng-model="value" name="alias" ${attrHtml} /></form>`,
+            )(scope);
+            inputElm = formElm.find("input");
+            scope.$digest();
+            expect(inputElm.val()).toBe("20");
+            expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
+            expect(scope.value).toBe(20);
+            expect(scope.form.alias.$error.step).toBeFalsy();
 
-              inputElm[0].value = "18";
-              inputElm[0].dispatchEvent(new Event("change"));
-              expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
-              expect(inputElm.val()).toBe("18");
-              expect(scope.value).toBeUndefined();
-              expect(scope.form.alias.$error.step).toBeTruthy();
+            inputElm[0].value = "18";
+            inputElm[0].dispatchEvent(new Event("change"));
+            expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
+            expect(inputElm.val()).toBe("18");
+            expect(scope.value).toBeUndefined();
+            expect(scope.form.alias.$error.step).toBeTruthy();
 
-              inputElm[0].value = "10";
-              inputElm[0].dispatchEvent(new Event("change"));
-              expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
-              expect(inputElm.val()).toBe("10");
-              expect(scope.value).toBe(10);
-              expect(scope.form.alias.$error.step).toBeFalsy();
+            inputElm[0].value = "10";
+            inputElm[0].dispatchEvent(new Event("change"));
+            expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
+            expect(inputElm.val()).toBe("10");
+            expect(scope.value).toBe(10);
+            expect(scope.form.alias.$error.step).toBeFalsy();
 
-              scope.$apply("value = 12");
-              expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
-              expect(inputElm.val()).toBe("12");
-              expect(scope.value).toBe(12);
-              expect(scope.form.alias.$error.step).toBeTruthy();
-            });
-
-            it("should validate even if the step value changes on-the-fly", () => {
-              scope.step = 10;
-              const formElm = $compile(
-                `<form name="form"><input type="number" ng-model="value" name="alias" ${attrHtml} /></form>`,
-              )(scope);
-              inputElm = formElm.find("input");
-              inputElm[0].value = "10";
-              inputElm[0].dispatchEvent(new Event("change"));
-              expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
-              expect(scope.value).toBe(10);
-
-              // Step changes, but value matches
-              scope.$apply("step = 5");
-              expect(inputElm.val()).toBe("10");
-              expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
-              expect(scope.value).toBe(10);
-              expect(scope.form.alias.$error.step).toBeFalsy();
-
-              // Step changes, value does not match
-              scope.$apply("step = 6");
-              expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
-              expect(scope.value).toBeUndefined();
-              expect(inputElm.val()).toBe("10");
-              expect(scope.form.alias.$error.step).toBeTruthy();
-
-              // null = valid
-              scope.$apply("step = null");
-              expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
-              expect(scope.value).toBe(10);
-              expect(inputElm.val()).toBe("10");
-              expect(scope.form.alias.$error.step).toBeFalsy();
-
-              // Step val as string
-              scope.$apply('step = "7"');
-              expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
-              expect(scope.value).toBeUndefined();
-              expect(inputElm.val()).toBe("10");
-              expect(scope.form.alias.$error.step).toBeTruthy();
-
-              // unparsable string is ignored
-              scope.$apply('step = "abc"');
-              expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
-              expect(scope.value).toBe(10);
-              expect(inputElm.val()).toBe("10");
-              expect(scope.form.alias.$error.step).toBeFalsy();
-            });
-
-            it('should use the correct "step base" when `[min]` is specified', () => {
-              scope.min = 5;
-              scope.step = 10;
-              scope.value = 10;
-              inputElm = $compile(
-                `<input type="number" ng-model="value" min="{{min}}" ${attrHtml} />`,
-              )(scope);
-              const ngModel = inputElm.controller("ngModel");
-              expect(inputElm.val()).toBe("10");
-              expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
-              expect(ngModel.$error.step).toBe(true);
-              expect(scope.value).toBe(10); // an initially invalid value should not be changed
-
-              inputElm[0].value = "15";
-              inputElm[0].dispatchEvent(new Event("change"));
-              expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
-              expect(scope.value).toBe(15);
-
-              scope.$apply("step = 3");
-              expect(inputElm.val()).toBe("15");
-              expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
-              expect(ngModel.$error.step).toBe(true);
-              expect(scope.value).toBeUndefined();
-
-              inputElm[0].value = "8";
-              inputElm[0].dispatchEvent(new Event("change"));
-              expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
-              expect(scope.value).toBe(8);
-
-              scope.$apply("min = 10; step = 20");
-              inputElm[0].value = "30";
-              inputElm[0].dispatchEvent(new Event("change"));
-              expect(inputElm.val()).toBe("30");
-              expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
-              expect(scope.value).toBe(30);
-
-              scope.$apply("min = 5");
-              expect(inputElm.val()).toBe("30");
-              expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
-              expect(ngModel.$error.step).toBe(true);
-              expect(scope.value).toBeUndefined();
-
-              scope.$apply("step = 0.00000001");
-              expect(inputElm.val()).toBe("30");
-              expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
-              expect(scope.value).toBe(30);
-
-              // 0.3 - 0.2 === 0.09999999999999998
-              scope.$apply("min = 0.2; step = (0.3 - 0.2)");
-              inputElm[0].value = "0.3";
-              inputElm[0].dispatchEvent(new Event("change"));
-              expect(inputElm.val()).toBe("0.3");
-              expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
-              expect(ngModel.$error.step).toBe(true);
-              expect(scope.value).toBeUndefined();
-            });
-
-            it("should correctly validate even in cases where the JS floating point arithmetic fails", () => {
-              scope.step = 0.1;
-              inputElm = $compile(
-                `<input type="number" ng-model="value" ${attrHtml} />`,
-              )(scope);
-              const ngModel = inputElm.controller("ngModel");
-
-              expect(inputElm.val()).toBe("");
-              expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
-              expect(scope.value).toBeUndefined();
-
-              inputElm[0].value = "0.3";
-              inputElm[0].dispatchEvent(new Event("change"));
-              expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
-              expect(scope.value).toBe(0.3);
-
-              inputElm[0].value = "2.9999999999999996";
-              inputElm[0].dispatchEvent(new Event("change"));
-              expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
-              expect(ngModel.$error.step).toBe(true);
-              expect(scope.value).toBeUndefined();
-
-              // 0.5 % 0.1 === 0.09999999999999998
-              inputElm[0].value = "0.5";
-              inputElm[0].dispatchEvent(new Event("change"));
-              expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
-              expect(scope.value).toBe(0.5);
-
-              // // 3.5 % 0.1 === 0.09999999999999981
-              inputElm[0].value = "3.5";
-              inputElm[0].dispatchEvent(new Event("change"));
-              expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
-              expect(scope.value).toBe(3.5);
-
-              // 1.16 % 0.01 === 0.009999999999999896
-              // 1.16 * 100  === 115.99999999999999
-              scope.step = 0.01;
-              inputElm[0].value = "1.16";
-              inputElm[0].dispatchEvent(new Event("change"));
-              expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
-              expect(scope.value).toBe(1.16);
-            });
+            scope.$apply("value = 12");
+            expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
+            expect(inputElm.val()).toBe("12");
+            expect(scope.value).toBe(12);
+            expect(scope.form.alias.$error.step).toBeTruthy();
           });
-        },
-      );
+
+          it("should validate even if the step value changes on-the-fly", () => {
+            scope.step = 10;
+            const formElm = $compile(
+              `<form name="form"><input type="number" ng-model="value" name="alias" ${attrHtml} /></form>`,
+            )(scope);
+            inputElm = formElm.find("input");
+            inputElm[0].value = "10";
+            inputElm[0].dispatchEvent(new Event("change"));
+            expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
+            expect(scope.value).toBe(10);
+
+            // Step changes, but value matches
+            scope.$apply("step = 5");
+            expect(inputElm.val()).toBe("10");
+            expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
+            expect(scope.value).toBe(10);
+            expect(scope.form.alias.$error.step).toBeFalsy();
+
+            // Step changes, value does not match
+            scope.$apply("step = 6");
+            expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
+            expect(scope.value).toBeUndefined();
+            expect(inputElm.val()).toBe("10");
+            expect(scope.form.alias.$error.step).toBeTruthy();
+
+            // null = valid
+            scope.$apply("step = null");
+            expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
+            expect(scope.value).toBe(10);
+            expect(inputElm.val()).toBe("10");
+            expect(scope.form.alias.$error.step).toBeFalsy();
+
+            // Step val as string
+            scope.$apply('step = "7"');
+            expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
+            expect(scope.value).toBeUndefined();
+            expect(inputElm.val()).toBe("10");
+            expect(scope.form.alias.$error.step).toBeTruthy();
+
+            // unparsable string is ignored
+            scope.$apply('step = "abc"');
+            expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
+            expect(scope.value).toBe(10);
+            expect(inputElm.val()).toBe("10");
+            expect(scope.form.alias.$error.step).toBeFalsy();
+          });
+
+          it('should use the correct "step base" when `[min]` is specified', () => {
+            scope.min = 5;
+            scope.step = 10;
+            scope.value = 10;
+            inputElm = $compile(
+              `<input type="number" ng-model="value" min="{{min}}" ${attrHtml} />`,
+            )(scope);
+            const ngModel = inputElm.controller("ngModel");
+            scope.$digest();
+            expect(inputElm.val()).toBe("10");
+            expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
+            expect(ngModel.$error.step).toBe(true);
+            expect(scope.value).toBe(10); // an initially invalid value should not be changed
+
+            inputElm[0].value = "15";
+            inputElm[0].dispatchEvent(new Event("change"));
+            expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
+            expect(scope.value).toBe(15);
+
+            scope.$apply("step = 3");
+            expect(inputElm.val()).toBe("15");
+            expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
+            expect(ngModel.$error.step).toBe(true);
+            expect(scope.value).toBeUndefined();
+
+            inputElm[0].value = "8";
+            inputElm[0].dispatchEvent(new Event("change"));
+            expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
+            expect(scope.value).toBe(8);
+
+            scope.$apply("min = 10; step = 20");
+            inputElm[0].value = "30";
+            inputElm[0].dispatchEvent(new Event("change"));
+            expect(inputElm.val()).toBe("30");
+            expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
+            expect(scope.value).toBe(30);
+
+            scope.$apply("min = 5");
+            expect(inputElm.val()).toBe("30");
+            expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
+            expect(ngModel.$error.step).toBe(true);
+            expect(scope.value).toBeUndefined();
+
+            scope.$apply("step = 0.00000001");
+            expect(inputElm.val()).toBe("30");
+            expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
+            expect(scope.value).toBe(30);
+
+            // 0.3 - 0.2 === 0.09999999999999998
+            scope.$apply("min = 0.2; step = (0.3 - 0.2)");
+            inputElm[0].value = "0.3";
+            inputElm[0].dispatchEvent(new Event("change"));
+            expect(inputElm.val()).toBe("0.3");
+            expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
+            expect(ngModel.$error.step).toBe(true);
+            expect(scope.value).toBeUndefined();
+          });
+
+          it("should correctly validate even in cases where the JS floating point arithmetic fails", () => {
+            scope.step = 0.1;
+            inputElm = $compile(
+              `<input type="number" ng-model="value" ${attrHtml} />`,
+            )(scope);
+            const ngModel = inputElm.controller("ngModel");
+
+            expect(inputElm.val()).toBe("");
+            expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
+            expect(scope.value).toBeUndefined();
+
+            inputElm[0].value = "0.3";
+            inputElm[0].dispatchEvent(new Event("change"));
+            expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
+            expect(scope.value).toBe(0.3);
+
+            inputElm[0].value = "2.9999999999999996";
+            inputElm[0].dispatchEvent(new Event("change"));
+            expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
+            expect(ngModel.$error.step).toBe(true);
+            expect(scope.value).toBeUndefined();
+
+            // 0.5 % 0.1 === 0.09999999999999998
+            inputElm[0].value = "0.5";
+            inputElm[0].dispatchEvent(new Event("change"));
+            expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
+            expect(scope.value).toBe(0.5);
+
+            // // 3.5 % 0.1 === 0.09999999999999981
+            inputElm[0].value = "3.5";
+            inputElm[0].dispatchEvent(new Event("change"));
+            expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
+            expect(scope.value).toBe(3.5);
+
+            // 1.16 % 0.01 === 0.009999999999999896
+            // 1.16 * 100  === 115.99999999999999
+            scope.step = 0.01;
+            inputElm[0].value = "1.16";
+            inputElm[0].dispatchEvent(new Event("change"));
+            expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
+            expect(scope.value).toBe(1.16);
+          });
+        });
+      });
 
       describe("required", () => {
         it("should be valid even if value is 0", () => {

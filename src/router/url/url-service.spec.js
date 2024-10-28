@@ -1,7 +1,6 @@
 import { dealoc } from "../../shared/jqlite/jqlite";
 import { Angular } from "../../loader";
 import { map, find } from "../../shared/common";
-import { forEach } from "../../shared/utils";
 
 describe("UrlMatcher", () => {
   let $url;
@@ -244,7 +243,7 @@ describe("UrlMatcher", () => {
           "/url/someword/child/childParam",
       };
 
-      forEach(shouldPass, function (url, route) {
+      Object.entries(shouldPass).forEach(function ([route, url]) {
         expect($url.compile(route).exec(url, {})).toEqual({
           childParam: "childParam",
           matchedParam: "someword",
@@ -260,7 +259,7 @@ describe("UrlMatcher", () => {
           "/url/someword/child/childParam",
       };
 
-      forEach(shouldThrow, function (url, route) {
+      Object.entries(shouldThrow).forEach(function ([route, url]) {
         expect(() => {
           $url.compile(route).exec(url, {});
         }).toThrowError("Unbalanced capture group in route '" + route + "'");
@@ -273,7 +272,7 @@ describe("UrlMatcher", () => {
           "/url/someword/child/childParam",
       };
 
-      forEach(shouldPass, function (url, route) {
+      Object.entries(shouldPass).forEach(function ([route, url]) {
         expect(() => {
           $url.compile(route).exec(url, {});
         }).not.toThrow();

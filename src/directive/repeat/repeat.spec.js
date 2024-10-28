@@ -238,10 +238,10 @@ describe("ngRepeat", () => {
     it("should track using provided function when a filter is present", () => {
       scope.newArray = function (items) {
         const newArray = [];
-        items.forEach((item) => {
+        Object.entries(items).forEach(([id, name]) => {
           newArray.push({
-            id: item.id,
-            name: item.name,
+            id: id,
+            name: name,
           });
         });
         return newArray;
