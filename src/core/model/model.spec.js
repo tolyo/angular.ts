@@ -28,7 +28,7 @@ describe("Model", () => {
 
     injector = createInjector(["myModule"]);
     $parse = injector.get("$parse");
-    $rootModel = injector.get("$rootModel");
+    $rootModel = injector.get("$rootScope");
     model = $rootModel;
   });
 
