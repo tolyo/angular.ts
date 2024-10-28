@@ -1336,7 +1336,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
             const controller = elementControllers[name];
             const bindings = controllerDirective.$$bindings.bindToController;
 
-            controller.instance = controller();
+            controller.instance = controllerScope.$new(controller());
             $element.data(
               `$${controllerDirective.name}Controller`,
               controller.instance,

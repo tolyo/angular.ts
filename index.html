@@ -14,7 +14,6 @@
           }
           class TodoController {
             constructor($element) {
-              this.counter = 10
               this.greeting = "Todos";
               this.tasks = [
                 new Todo("Learn AngularTS"),
@@ -59,8 +58,8 @@
         });
       </script>
     </head>
-    <body ng-app="todo" ng-init="demo = 2" ng-cloak>
-      <div id="2" ng-controller="TodoCtrl as fdsfs">
+    <body ng-app="todo" ng-init="counter = 2" ng-cloak>
+      <div id="2" ng-controller="TodoCtrl">
         First
         {{ counter }}  
       </div>

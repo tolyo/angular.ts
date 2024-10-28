@@ -1,5 +1,4 @@
 import { assertArgFn, minErr } from "../../shared/utils";
-import { createModel } from "../model/model";
 import { INJECTOR_LITERAL } from "./ng-module";
 
 const ARROW_ARG = /^([^(]+?)=>/;
@@ -115,7 +114,8 @@ class AbstractInjector {
 
     if (isClass(/** @type {string} */ (fn))) {
       args.unshift(null);
-      const res = createModel(new (Function.prototype.bind.apply(fn, args))());
+      const res = new (Function.prototype.bind.apply(fn, args))();
+      debugger;
       return res;
     } else {
       return /** @type {Function} */ (fn).apply(self, args);
