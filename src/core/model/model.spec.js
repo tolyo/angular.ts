@@ -98,6 +98,16 @@ describe("Model", () => {
       expect(child.aValue).toEqual([1, 2, 3]);
     });
 
+    it("can create a scope from an existing object", () => {
+      let instance = { bValue: "child" };
+      const child = model.$new(instance);
+
+      model.aValue = [1, 2, 3];
+
+      expect(child.aValue).toEqual([1, 2, 3]);
+      expect(child.bValue).toEqual("child");
+    });
+
     it("can be nested at any depth", () => {
       const a = model;
       const aa = a.$new();
@@ -130,6 +140,32 @@ describe("Model", () => {
       expect(child.aValue).toEqual([1, 2, 3, 4]);
       expect(model.aValue).toEqual([1, 2, 3, 4]);
       expect(child.aValue).toEqual(model.aValue);
+    });
+
+    it("can manipulate a parent models property with functions", () => {
+      class Demo {
+        test() {
+          return "Test";
+        }
+        increase() {
+          this.counter++;
+        }
+      }
+
+      let instance = new Demo();
+      expect(instance.test()).toEqual("Test");
+      const child = model.$new(instance);
+
+      model.counter = 0;
+
+      expect(child.counter).toEqual(0);
+      expect(child.test()).toEqual("Test");
+
+      child.increase();
+      expect(child.counter).toEqual(1);
+
+      child.increase();
+      expect(child.counter).toEqual(2);
     });
 
     it("cannot override a parent models property", () => {

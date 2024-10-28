@@ -602,17 +602,18 @@ class Model {
     return this.$watch(watchProp, listenerFn);
   }
 
-  $new(isIsolated = false, parent) {
+  $new(childInstance) {
     let child;
-    if (isIsolated) {
-      child = Object.create(null);
+    if (childInstance) {
+      Object.setPrototypeOf(Object.getPrototypeOf(childInstance), this.$target);
+      child = childInstance;
     } else {
       child = Object.create(this.$target);
       child.$$watchersCount = 0;
-      child.$parent = parent ? parent.$handler : this.$parent;
+      child.$parent = this.$parent;
     }
 
-    const proxy = new Proxy(child, new Model(child, parent || this));
+    const proxy = new Proxy(child, new Model(child, this));
     this.children.push(proxy);
     return proxy;
   }
