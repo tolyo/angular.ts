@@ -208,11 +208,6 @@ export class Scope {
     /** @type {number} */
     this.$$watchersCount = 0;
     this.$$isolateBindings = null;
-
-    /**
-     * @type {?Scope}
-     */
-    this.$$ChildScope = null;
   }
 
   /**
@@ -230,16 +225,11 @@ export class Scope {
    *         When creating widgets, it is useful for the widget to not accidentally read parent
    *         state.
    *
-   * @param {?Scope} [parent=this] The {@link ng.$rootScope.Scope `Scope`} that will be the `$parent`
-   *                              of the newly created scope. Defaults to `this` scope if not provided.
-   *                              This is used when creating a transclude scope to correctly place it
-   *                              in the scope hierarchy while maintaining the correct prototypical
-   *                              inheritance.
    *
    * @returns {Scope} The newly created child scope.
    *
    */
-  $new(isolate, parent) {
+  $new(isolate) {
     let child = isolate ? new Scope() : Object.create(this);
 
     if (isolate) {
@@ -254,9 +244,52 @@ export class Scope {
       child.$$listeners = new Map();
       child.$$listenerCount = {};
       child.$$watchersCount = 0;
-      child.$$ChildScope = null;
       child.$$suspended = false;
     }
+
+    child.$parent = this;
+    child.$$prevSibling = child.$parent.$$childTail;
+
+    if (child.$parent.$$childHead) {
+      child.$parent.$$childTail.$$nextSibling = child;
+      child.$parent.$$childTail = child;
+    } else {
+      child.$parent.$$childHead = child;
+      child.$parent.$$childTail = child;
+    }
+
+    // Add a destroy listener if isolated or the parent differs from `this`
+    if (isolate) {
+      child.$on("$destroy", ($event) => {
+        $event.currentScope.$$destroyed = true;
+      });
+    }
+
+    return child;
+  }
+
+  /**
+   * Creates a transcluded scope
+   * @param {Scope} parent The {@link ng.$rootScope.Scope `Scope`} that will be the `$parent`
+   * of the newly created scope. This is used when creating a transclude scope to correctly place it
+   *  in the scope hierarchy while maintaining the correct prototypical inheritance.
+   *
+   * @returns {Scope} The newly created child scope.
+   *
+   */
+  $transcluded(parent) {
+    let child = Object.create(this);
+
+    // Initialize properties for a non-isolated child scope
+    child.$id = nextUid();
+    child.$$watchers = [];
+    child.$$nextSibling = null;
+    child.$$childHead = null;
+    child.$$childTail = null;
+    child.$$listeners = new Map();
+    child.$$listenerCount = {};
+    child.$$watchersCount = 0;
+    child.$$suspended = false;
 
     child.$parent = parent || this;
     child.$$prevSibling = child.$parent.$$childTail;
@@ -270,7 +303,7 @@ export class Scope {
     }
 
     // Add a destroy listener if isolated or the parent differs from `this`
-    if (isolate || parent !== this) {
+    if (parent !== this) {
       child.$on("$destroy", ($event) => {
         $event.currentScope.$$destroyed = true;
       });
@@ -278,7 +311,6 @@ export class Scope {
 
     return child;
   }
-
   /**
  * Registers a `listener` callback to be executed whenever the `watchExpression` changes.
  *

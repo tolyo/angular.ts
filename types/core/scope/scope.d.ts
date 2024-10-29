@@ -159,10 +159,6 @@ export class Scope {
     $$watchersCount: number;
     $$isolateBindings: any;
     /**
-     * @type {?Scope}
-     */
-    $$ChildScope: Scope | null;
-    /**
      * Creates a new child {@link Scope}.
      *
      * The parent scope will propagate the {@link ng.$rootScope.Scope#$digest $digest()} event.
@@ -177,16 +173,21 @@ export class Scope {
      *         When creating widgets, it is useful for the widget to not accidentally read parent
      *         state.
      *
-     * @param {?Scope} [parent=this] The {@link ng.$rootScope.Scope `Scope`} that will be the `$parent`
-     *                              of the newly created scope. Defaults to `this` scope if not provided.
-     *                              This is used when creating a transclude scope to correctly place it
-     *                              in the scope hierarchy while maintaining the correct prototypical
-     *                              inheritance.
      *
      * @returns {Scope} The newly created child scope.
      *
      */
-    $new(isolate: boolean | null, parent?: Scope | null): Scope;
+    $new(isolate: boolean | null): Scope;
+    /**
+     * Creates a transcluded scope
+     * @param {Scope} parent The {@link ng.$rootScope.Scope `Scope`} that will be the `$parent`
+     * of the newly created scope. This is used when creating a transclude scope to correctly place it
+     *  in the scope hierarchy while maintaining the correct prototypical inheritance.
+     *
+     * @returns {Scope} The newly created child scope.
+     *
+     */
+    $transcluded(parent: Scope): Scope;
     /**
    * Registers a `listener` callback to be executed whenever the `watchExpression` changes.
    *
