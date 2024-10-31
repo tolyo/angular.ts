@@ -1095,9 +1095,6 @@ function createEventHandler(element, events) {
     }
   };
 
-  // TODO: this is a hack for angularMocks/clearDataCache that makes it possible to deregister all
-  //       events on `element`
-  eventHandler.elem = element;
   return eventHandler;
 }
 

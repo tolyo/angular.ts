@@ -6,7 +6,7 @@
  * @property {?Function} handle
  *
  */
-export const EXPANDO: "ngId";
+export const EXPANDO: "ng";
 /**
  * Expando cache for adding properties to DOM nodes with JavaScript.
  * This used to be an Object in JQLite decorator, but swapped out for a Map
