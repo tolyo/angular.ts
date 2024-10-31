@@ -6,8 +6,12 @@ export function ngInitDirective() {
     priority: 450,
     compile() {
       return {
-        pre(scope, _element, attrs) {
-          scope.$eval(attrs.ngInit);
+        pre(scope, element, attrs) {
+          if (element.controller()) {
+            element.controller().$eval(attrs.ngInit);
+          } else {
+            scope.$eval(attrs.ngInit);
+          }
         },
       };
     },

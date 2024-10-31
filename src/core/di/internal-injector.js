@@ -115,7 +115,6 @@ class AbstractInjector {
     if (isClass(/** @type {string} */ (fn))) {
       args.unshift(null);
       const res = new (Function.prototype.bind.apply(fn, args))();
-      debugger;
       return res;
     } else {
       return /** @type {Function} */ (fn).apply(self, args);

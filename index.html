@@ -15,13 +15,14 @@
           class TodoController {
             constructor($element) {
               this.greeting = "Todos";
+              this.counter = 123
               this.tasks = [
                 new Todo("Learn AngularTS"),
                 new Todo("Build an AngularTS app"),
               ];
               window.test = this
               setInterval(() => { 
-                $element.controller().increase()
+                window.test = $element.controller()
               }, 1000);
             }
 
@@ -58,10 +59,24 @@
         });
       </script>
     </head>
-    <body ng-app="todo" ng-init="counter = 2" ng-cloak>
-      <div id="2" ng-controller="TodoCtrl">
+    <body ng-app="todo" ng-init="b = 1" ng-cloak>
+      <div id="2" ng-controller="TodoCtrl" >
         First
         {{ counter }}  
+        
+        <div ng-if="test">
+          VISIBLE
+        </div>
+        <input type="checkbox" ng-model="test">
+        {{ test }}
+        
       </div>
+      <div>
+        <input ng-model="b" />
+        {{ b }}
+      </div>
+
+      <input ng-model="b" />
+     
     </body>
 </html>

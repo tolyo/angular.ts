@@ -28,6 +28,7 @@ import {
 import { defaultModelOptions } from "../model-options/model-options";
 import { startingTag } from "../../shared/jqlite/jqlite";
 import { ScopePhase } from "../../core/scope/scope";
+import { isProxySymbol } from "../../core/model/model";
 
 export const ngModelMinErr = minErr("ngModel");
 
@@ -153,7 +154,7 @@ export class NgModelController {
     this.$$currentValidationRunId = 0;
 
     /** @type {import('../../core/scope/scope.js').Scope} */
-    this.$$scope = $scope;
+    this.$$scope = $element.controller() ? $element.controller() : $scope; // attempt to bind to nearest controller if present
 
     /** @type {import('../../core/scope/scope.js').Scope} */
     this.$$rootScope = $scope.$root;
@@ -728,9 +729,8 @@ export class NgModelController {
     }
     if (isNumberNaN(this.$modelValue)) {
       // this.$modelValue has not been touched yet...
-      this.$modelValue = /** @type {(Scope) => any} */ (this.$$ngModelGet)(
-        this.$$scope,
-      );
+      // @ts-ignore
+      this.$modelValue = this.$$ngModelGet(this.$$scope);
     }
     const prevModelValue = this.$modelValue;
     const allowInvalid = this.$options.getOption("allowInvalid");
@@ -752,6 +752,9 @@ export class NgModelController {
           // external validators (e.g. calculated on the server),
           // that just call $setValidity and need the model value
           // to calculate their validity.
+          if (that.$modelValue[isProxySymbol]) {
+            delete that.$modelValue;
+          }
           that.$modelValue = allValid ? modelValue : undefined;
           writeToModelIfNeeded();
         }
@@ -759,7 +762,8 @@ export class NgModelController {
     );
 
     function writeToModelIfNeeded() {
-      if (that.$modelValue !== prevModelValue) {
+      // intentional loose equality
+      if (that.$modelValue != prevModelValue) {
         that.$$writeModelToScope();
       }
     }
@@ -1092,6 +1096,7 @@ export function ngModelDirective($rootScope) {
       /** @param {import("../../shared/jqlite/jqlite.js").JQLite} element  */
       (element) => {
         // Setup initial state of the control
+
         element[0].classList.add(PRISTINE_CLASS, UNTOUCHED_CLASS, VALID_CLASS);
 
         return {
@@ -1130,11 +1135,7 @@ export function ngModelDirective($rootScope) {
             element.on("blur", () => {
               if (modelCtrl.$touched) return;
 
-              if ($rootScope.$$phase !== ScopePhase.NONE) {
-                scope.$evalAsync(setTouched);
-              } else {
-                scope.$apply(setTouched);
-              }
+              scope.$apply(setTouched);
             });
           },
         };

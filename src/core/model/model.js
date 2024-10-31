@@ -95,7 +95,7 @@ export function createModel(target = {}, context) {
  * @param {Object} originalTarget - The original target object.
  */
 
-const isProxySymbol = Symbol("isProxy");
+export const isProxySymbol = Symbol("isProxy");
 
 /**
  * @enum {number}
@@ -352,6 +352,7 @@ class Model {
       $on: this.$on.bind(this),
       $emit: this.$emit.bind(this),
       $broadcast: this.$broadcast.bind(this),
+      $transcluded: this.$transcluded.bind(this),
       $handler: this,
       $parent: this.$parent,
       $root: this.$root,
@@ -400,6 +401,12 @@ class Model {
   }
 
   deleteProperty(target, property) {
+    // Currently deletes $model
+    if (target[property] && target[property][isProxySymbol]) {
+      delete target[property];
+      return true;
+    }
+
     var oldValue = structuredClone(target);
     delete target[property];
     if (this.objectListeners.has(target)) {
@@ -613,6 +620,15 @@ class Model {
       child.$parent = this.$parent;
     }
 
+    const proxy = new Proxy(child, new Model(child, this));
+    this.children.push(proxy);
+    return proxy;
+  }
+
+  $transcluded(parentInstance) {
+    let child = Object.create(this.$target);
+    child.$$watchersCount = 0;
+    child.$parent = parentInstance;
     const proxy = new Proxy(child, new Model(child, this));
     this.children.push(proxy);
     return proxy;
@@ -864,10 +880,10 @@ class Model {
    * @param {Listener} listener - The property path that was changed.
    * @param {*} oldValue - The old value of the property.
    */
-  notifyListener(listener, oldValue) {
+  notifyListener(listener, oldValue, target) {
     const { originalTarget, listenerFn, watchFn } = listener;
     try {
-      const newVal = watchFn(listener.originalTarget);
+      const newVal = watchFn(target || listener.originalTarget);
       //const res  = watchFn(listener.originalTarget.$target).$target
       listenerFn(newVal, oldValue, originalTarget);
       // if (oneTime) {
