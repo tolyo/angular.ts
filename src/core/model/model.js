@@ -466,7 +466,7 @@ class Model {
 
     // simplest case
     let key = get.decoratedNode.body[0].expression.name;
-    let context;
+
     let type = get.decoratedNode.body[0].expression.type;
     switch (type) {
       // 1
@@ -567,8 +567,9 @@ class Model {
       }
     }
 
-    if (context && listener.context()[isProxySymbol]) {
+    if (listener.context && listener.context()[isProxySymbol]) {
       listener.foreignListener = this.proxy;
+      key = get.decoratedNode.body[0].expression.property.name;
       listener.context().$handler.registerForeignKey(key, listener);
     } else {
       this.registerKey(key, listener);
@@ -612,7 +613,15 @@ class Model {
   $new(childInstance) {
     let child;
     if (childInstance) {
-      Object.setPrototypeOf(Object.getPrototypeOf(childInstance), this.$target);
+      if (Object.getPrototypeOf(childInstance) === Object.prototype) {
+        Object.setPrototypeOf(childInstance, this.$target);
+      } else {
+        Object.setPrototypeOf(
+          Object.getPrototypeOf(childInstance),
+          this.$target,
+        );
+      }
+
       child = childInstance;
     } else {
       child = Object.create(this.$target);
