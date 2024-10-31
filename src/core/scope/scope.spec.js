@@ -32,6 +32,170 @@ describe("Scope", function () {
     scope = $rootScope;
   });
 
+  describe("class", () => {
+    it("can be constructed as a class", () => {
+      const scope = new Scope();
+      expect(scope).toBeDefined();
+      expect(scope.isRoot).toBeFalse();
+    });
+
+    it("can be constructed as a root scope", () => {
+      const scope = new Scope(true);
+      expect(scope).toBeDefined();
+      expect(scope.isRoot).toBeTrue();
+    });
+  });
+
+  describe("inheritance", () => {
+    it("can be constructed and used as an object", () => {
+      const scope = $rootScope.$new();
+      scope.aProperty = 1;
+
+      expect(scope.aProperty).toBe(1);
+    });
+
+    it("inherits the parents properties", () => {
+      $rootScope.aValue = [1, 2, 3];
+
+      const child = $rootScope.$new();
+
+      expect(child.aValue).toEqual([1, 2, 3]);
+    });
+
+    it("does not cause a parent to inherit its properties", () => {
+      const child = $rootScope.$new();
+      child.aValue = [1, 2, 3];
+
+      expect($rootScope.aValue).toBeUndefined();
+    });
+
+    it("inherits the parents properties whenever they are defined", () => {
+      const child = $rootScope.$new();
+
+      $rootScope.aValue = [1, 2, 3];
+
+      expect(child.aValue).toEqual([1, 2, 3]);
+    });
+
+    it("can be nested at any depth", () => {
+      const a = $rootScope;
+      const aa = a.$new();
+      const aaa = aa.$new();
+      const aab = aa.$new();
+      const ab = a.$new();
+      const abb = ab.$new();
+
+      a.value = 1;
+
+      expect(aa.value).toBe(1);
+      expect(aaa.value).toBe(1);
+      expect(aab.value).toBe(1);
+      expect(ab.value).toBe(1);
+      expect(abb.value).toBe(1);
+
+      ab.anotherValue = 2;
+
+      expect(abb.anotherValue).toBe(2);
+      expect(aa.anotherValue).toBeUndefined();
+      expect(aaa.anotherValue).toBeUndefined();
+    });
+
+    it("can manipulate a parent scopes property", () => {
+      const child = $rootScope.$new();
+
+      $rootScope.aValue = [1, 2, 3];
+      child.aValue.push(4);
+
+      expect(child.aValue).toEqual([1, 2, 3, 4]);
+      expect($rootScope.aValue).toEqual([1, 2, 3, 4]);
+      expect(child.aValue).toEqual($rootScope.aValue);
+    });
+  });
+
+  describe("$id", () => {
+    it("should have a unique id", () => {
+      expect($rootScope.$id < $rootScope.$new().$id).toBeTruthy();
+    });
+  });
+
+  describe("$new()", () => {
+    it("should create a child scope", () => {
+      const child = $rootScope.$new();
+      $rootScope.a = 123;
+      expect(child.a).toEqual(123);
+    });
+
+    it("should create a non prototypically inherited child scope", () => {
+      const child = $rootScope.$new(true);
+      $rootScope.a = 123;
+      expect(child.a).toBeUndefined();
+      expect(child.$parent).toEqual($rootScope);
+      expect(child.$new).toBe($rootScope.$new);
+      expect(child.$root).toBe($rootScope);
+    });
+
+    it("should attach the child scope to a specified parent", () => {
+      const isolated = $rootScope.$new(true);
+      const trans = $rootScope.$transcluded(isolated);
+      $rootScope.a = 123;
+      expect(isolated.a).toBeUndefined();
+      expect(trans.a).toEqual(123);
+      expect(trans.$root).toBe($rootScope);
+      expect(trans.$parent).toBe(isolated);
+    });
+  });
+
+  describe("$root", () => {
+    it("should point to itself", () => {
+      expect($rootScope.$root).toEqual($rootScope);
+      expect($rootScope.hasOwnProperty("$root")).toBeTruthy();
+    });
+
+    it("should expose the constructor", () => {
+      expect(Object.getPrototypeOf($rootScope)).toBe(
+        $rootScope.constructor.prototype,
+      );
+    });
+
+    it("should not have $root on children, but should inherit", () => {
+      const child = $rootScope.$new();
+      expect(child.$root).toEqual($rootScope);
+      expect(child.hasOwnProperty("$root")).toBeFalsy();
+    });
+  });
+
+  describe("$parent", () => {
+    it("should point to parent", () => {
+      const child = $rootScope.$new();
+      expect($rootScope.$parent).toEqual(null);
+      expect(child.$parent).toEqual($rootScope);
+      expect(child.$new().$parent).toEqual(child);
+    });
+  });
+
+  describe("this", () => {
+    it("should evaluate 'this' to be the scope", () => {
+      const child = $rootScope.$new();
+      expect($rootScope.$eval("this")).toEqual($rootScope);
+      expect(child.$eval("this")).toEqual(child);
+    });
+
+    it("'this' should not be recursive", () => {
+      expect($rootScope.$eval("this.this")).toBeUndefined();
+      expect($rootScope.$eval("$parent.this")).toBeUndefined();
+    });
+
+    it("should not be able to overwrite the 'this' keyword", () => {
+      $rootScope.this = 123;
+      expect($rootScope.$eval("this")).toEqual($rootScope);
+    });
+
+    it("should be able to access a constant variable named 'this'", () => {
+      $rootScope.this = 42;
+      expect($rootScope.$eval("this['this']")).toBe(42);
+    });
+  });
+
   describe("$watch/$digest", () => {
     describe("$watchCollection", () => {
       describe("constiable", () => {
