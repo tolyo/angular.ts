@@ -176,6 +176,8 @@ class Model {
 
     /** @type {ModelPhase} */
     this.state = ModelPhase.NONE;
+
+    this.$wrapperProxy = undefined;
   }
 
   /**
@@ -208,6 +210,7 @@ class Model {
         target[property] = value;
         return true;
       }
+
       if (isObject(value)) {
         if (Object.prototype.hasOwnProperty.call(target, property)) {
           Object.keys(oldValue)
@@ -260,10 +263,19 @@ class Model {
       target[property] = createModel(value, this);
 
       if (oldValue !== value) {
-        const listeners = this.listeners.get(property);
+        let listeners = this.listeners.get(property);
 
         if (listeners) {
           assert(listeners.length !== 0);
+
+          if (
+            isUndefined(oldValue) &&
+            isObject(target[property]) &&
+            target[property][isProxySymbol]
+          ) {
+            target[property].$handler.$wrapperProxy = this.proxy;
+          }
+
           // primitive only
 
           let isValue =
@@ -281,6 +293,18 @@ class Model {
           if (isValue) {
             this.scheduleListener(listeners, oldValue);
           }
+        }
+
+        if (this.$wrapperProxy) {
+          listeners = [];
+          Object.keys(this.$wrapperProxy.$target).forEach((v) => {
+            this.listeners.get(v).forEach((i) => {
+              listeners.push(i);
+            });
+          });
+          const oldObject = Object.create(null);
+          oldObject[property] = oldValue;
+          this.scheduleListener(listeners, oldObject);
         }
 
         const foreignListeners = this.foreignListeners.get(property);
@@ -341,6 +365,7 @@ class Model {
       $watchGroup: this.$watchGroup.bind(this),
       $watchCollection: this.$watchCollection.bind(this),
       $new: this.$new.bind(this),
+      $newIsolate: this.$newIsolate.bind(this),
       $destroy: this.$destroy.bind(this),
       $eval: this.$eval.bind(this),
       $apply: this.$apply.bind(this),
@@ -357,6 +382,7 @@ class Model {
       $parent: this.$parent,
       $root: this.$root,
       $$watchersCount: this.$$watchersCount,
+      $wrapperProxy: this.$wrapperProxy,
       $children: this.children,
       id: this.id,
       state: this.state,
@@ -517,6 +543,7 @@ class Model {
       case ASTType.MemberExpression: {
         listener.property = get.decoratedNode.body[0].expression.property.name;
         const name = extractTarget(get.decoratedNode.body[0].expression.object);
+        key = get.decoratedNode.body[0].expression.property.name;
         if (this.$target[name]) {
           listener.context = () => {
             return this.$target[name].$target;
@@ -566,10 +593,12 @@ class Model {
         throw new Error("Unsupported type " + type);
       }
     }
-
-    if (listener.context && listener.context()[isProxySymbol]) {
+    if (
+      listener.context &&
+      listener.context() &&
+      listener.context()[isProxySymbol]
+    ) {
       listener.foreignListener = this.proxy;
-      key = get.decoratedNode.body[0].expression.property.name;
       listener.context().$handler.registerForeignKey(key, listener);
     } else {
       this.registerKey(key, listener);
@@ -629,6 +658,14 @@ class Model {
       child.$parent = this.$parent;
     }
 
+    const proxy = new Proxy(child, new Model(child, this));
+    this.children.push(proxy);
+    return proxy;
+  }
+
+  $newIsolate(instance) {
+    let child = instance ? Object.create(instance) : Object.create(null);
+    child.$root = this.$root;
     const proxy = new Proxy(child, new Model(child, this));
     this.children.push(proxy);
     return proxy;
@@ -892,7 +929,7 @@ class Model {
   notifyListener(listener, oldValue, target) {
     const { originalTarget, listenerFn, watchFn } = listener;
     try {
-      const newVal = watchFn(target || listener.originalTarget);
+      const newVal = watchFn(target) || watchFn(listener.originalTarget);
       //const res  = watchFn(listener.originalTarget.$target).$target
       listenerFn(newVal, oldValue, originalTarget);
       // if (oneTime) {

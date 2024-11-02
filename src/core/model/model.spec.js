@@ -199,7 +199,7 @@ describe("Model", () => {
     });
 
     it("should create a non prototypically inherited child model", () => {
-      const child = model.$new(true);
+      const child = model.$newIsolate();
       model.a = 123;
       expect(child.a).toBeUndefined();
       expect(child.$parent).toBe(model.$root);
@@ -208,9 +208,8 @@ describe("Model", () => {
     });
 
     it("should attach the child model to a specified parent", () => {
-      const isolated = model.$new(true);
-
-      const trans = model.$new(false, isolated);
+      const isolated = model.$newIsolate();
+      const trans = model.$transcluded(isolated);
       model.a = 123;
       expect(isolated.a).toBeUndefined();
       expect(trans.a).toEqual(123);
@@ -977,7 +976,6 @@ describe("Model", () => {
         model.$watch("a.someValue", () => {
           model.counter++;
         });
-
         model.a.someValue = 2;
 
         await wait();
@@ -1586,29 +1584,22 @@ describe("Model", () => {
         let deregister;
         beforeEach(() => {
           logs = [];
+
           deregister = model.$watch("obj", (newVal, oldVal) => {
             const msg = { newVal, oldVal };
-
-            if (newVal === oldVal) {
-              msg.identical = true;
-            }
             logs.push(msg);
           });
         });
 
         describe("object", () => {
-          it("should return oldCollection === newCollection only on the first listener call", () => {
+          it("should return oldCollection === newCollection only on the first listener call", async () => {
             model.obj = { a: "b" };
-            // first time should be identical
-
-            expect(logs).toEqual([
-              { newVal: { a: "b" }, oldVal: { a: "b" }, identical: true },
-            ]);
+            await wait();
+            expect(logs).toEqual([{ newVal: { a: "b" }, oldVal: undefined }]);
             logs = [];
 
-            // second time not identical
             model.obj.a = "c";
-
+            await wait();
             expect(logs).toEqual([{ newVal: { a: "c" }, oldVal: { a: "b" } }]);
           });
 
@@ -2427,7 +2418,7 @@ describe("Model", () => {
 
     it("should run a $postUpdate call even if the child model is isolated", async () => {
       const parent = model.$new();
-      const child = parent.$new(true);
+      const child = parent.$newIsolate();
       let signature = "";
 
       parent.$postUpdate(() => {
