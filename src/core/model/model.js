@@ -6,6 +6,7 @@ import {
   isFunction,
   assert,
   isString,
+  isDefined,
 } from "../../shared/utils.js";
 import { ASTType } from "../parse/ast-type.js";
 
@@ -63,12 +64,16 @@ export class RootModelProvider {
  */
 export function createModel(target = {}, context) {
   if (typeof target === "object" && target !== null) {
+    const proxy = new Proxy(target, new Model(target, context));
     for (const key in target) {
       if (Object.prototype.hasOwnProperty.call(target, key)) {
         target[key] = createModel(target[key], new Model(target, context));
+        if (isDefined(target[key]) && target[key][isProxySymbol]) {
+          target[key].$handler.$wrapperProxy = proxy;
+        }
       }
     }
-    return new Proxy(target, new Model(target, context));
+    return proxy;
   } else {
     return target;
   }
@@ -238,16 +243,30 @@ class Model {
         return true;
       }
 
-      if (isUndefined(value)) {
+      if (isUndefined(value) || isDefined(value)) {
         Object.keys(oldValue.$target).forEach((k) => {
           delete oldValue[k];
         });
         target[property] = undefined;
-        const listeners = this.listeners.get(property);
+        let listeners = this.listeners.get(property);
 
         if (listeners) {
           this.scheduleListener(listeners, oldValue);
         }
+        listeners = [];
+        if (this.$wrapperProxy) {
+          Object.keys(this.$wrapperProxy.$target).forEach((v) => {
+            this.listeners.get(v).forEach((i) => {
+              listeners.push(i);
+            });
+          });
+          const oldObject = Object.create(null);
+
+          oldObject[property] = oldValue;
+
+          this.scheduleListener(listeners, oldObject);
+        }
+
         return true;
       }
       return true;
@@ -296,19 +315,23 @@ class Model {
         }
 
         if (this.$wrapperProxy) {
-          listeners = [];
-          Object.keys(this.$wrapperProxy.$target).forEach((v) => {
-            this.listeners.get(v).forEach((i) => {
-              listeners.push(i);
-            });
-          });
-          const oldObject = Object.create(null);
-          oldObject[property] = oldValue;
-          this.scheduleListener(listeners, oldObject);
+          listeners = this.$wrapperProxy.$handler.listeners.get(property);
+          if (listeners) {
+            const oldObject = Object.create(null);
+            oldObject[property] = oldValue;
+            this.scheduleListener(listeners, oldObject);
+          }
         }
 
-        const foreignListeners = this.foreignListeners.get(property);
+        let foreignListeners = this.foreignListeners.get(property);
 
+        console.log(this.$parent?.foreignListeners);
+
+        if (!foreignListeners && this.$parent?.foreignListeners) {
+          foreignListeners = this.$parent.foreignListeners.get(property);
+          console.log("foreign Listeners");
+          console.log(foreignListeners);
+        }
         if (foreignListeners) {
           assert(foreignListeners.length !== 0);
           // primitive only
@@ -401,8 +424,10 @@ class Model {
    * @param {*} oldValue
    */
   scheduleListener(listeners, oldValue) {
+    console.log("scheduleListener");
     Promise.resolve().then(() => {
       let index = 0;
+
       while (index < listeners.length) {
         const listener = listeners[index];
         if (listener.foreignListener) {
@@ -430,6 +455,20 @@ class Model {
     // Currently deletes $model
     if (target[property] && target[property][isProxySymbol]) {
       delete target[property];
+      return true;
+    }
+
+    if (this.$wrapperProxy) {
+      let listeners = [];
+      Object.keys(this.$wrapperProxy.$target).forEach((v) => {
+        this.listeners.get(v).forEach((i) => {
+          listeners.push(i);
+        });
+      });
+      const oldObject = Object.create(null);
+      oldObject[property] = undefined;
+
+      this.scheduleListener(listeners, oldObject);
       return true;
     }
 

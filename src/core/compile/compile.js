@@ -1336,6 +1336,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
             const controller = elementControllers[name];
             const bindings = controllerDirective.$$bindings.bindToController;
 
+            // Controller instance is bound to the scope
             controller.instance = controllerScope.$new(controller());
             $element.data(
               `$${controllerDirective.name}Controller`,
@@ -2457,7 +2458,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
         if (interpolateFn) {
           directives.push({
             priority: 0,
-            compile: () => (scope, node, arg1, arg3) => {
+            compile: () => (scope, node) => {
               let current = JQLite(node).controller();
 
               node[0].nodeValue = interpolateFn(current || scope, (val) => {
@@ -2702,6 +2703,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                   // we need to interpolate again since the attribute value has been updated
                   // (e.g. by another directive's compile function)
                   // ensure unset/empty values make interpolateFn falsy
+
                   interpolateFn =
                     newValue &&
                     $interpolate(newValue, true, trustedContext, allOrNothing);
@@ -2715,6 +2717,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                 // initialize attr object so that it's ready in case we need the value for isolate
                 // scope initialization, otherwise the value would not be available from isolate
                 // directive's linking fn during linking phase
+
                 attr[name] = interpolateFn(scope);
 
                 ($$observers[name] || ($$observers[name] = [])).$$inter = true;
@@ -2894,6 +2897,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                 if (isString(lastValue)) {
                   // If the attribute has been provided then we trigger an interpolation to ensure
                   // the value is there for use in the link fn
+
                   destination[scopeName] = $interpolate(lastValue)(scope);
                 } else if (isBoolean(lastValue)) {
                   // If the attributes is one of the BOOLEAN_ATTR then AngularJS will have converted

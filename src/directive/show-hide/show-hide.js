@@ -11,8 +11,8 @@ export function ngShowDirective($animate) {
   return {
     restrict: "A",
     multiElement: true,
-    link(scope, element, attr) {
-      scope.$watch(attr.ngShow, (value) => {
+    link(scope, element, $attr) {
+      scope.$watch($attr["ngShow"], (value) => {
         // we're adding a temporary, animation-specific class for ng-hide since this way
         // we can control when the element is actually displayed on screen without having
         // to have a global/greedy CSS selector that breaks when other animations are run.

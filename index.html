@@ -16,6 +16,11 @@
             constructor($element) {
               this.greeting = "Todos";
               this.counter = 123
+              this.name = "dfsf"
+              this.model = {
+                name: "John",
+                lastName: "Doe"
+              }
               this.tasks = [
                 new Todo("Learn AngularTS"),
                 new Todo("Build an AngularTS app"),
@@ -23,7 +28,7 @@
               window.test = this
               setInterval(() => { 
                 window.test = $element.controller()
-              }, 1000);
+              }, 100);
             }
 
             increase() {
@@ -59,24 +64,12 @@
         });
       </script>
     </head>
-    <body ng-app="todo" ng-init="b = 1" ng-cloak>
+    <body ng-app="todo">
       <div id="2" ng-controller="TodoCtrl" >
-        First
-        {{ counter }}  
-        
-        <div ng-if="test">
-          VISIBLE
-        </div>
-        <input type="checkbox" ng-model="test">
-        {{ test }}
+       <input type="text" ng-model="name" />
+        {{ name }}
         
       </div>
-      <div>
-        <input ng-model="b" />
-        {{ b }}
-      </div>
-
-      <input ng-model="b" />
      
     </body>
 </html>

@@ -3,6 +3,7 @@ import { $postUpdateQueue, createModel } from "./model";
 import { Angular } from "../../loader";
 import { createInjector } from "../di/injector";
 import { isDefined, sliceArgs } from "../../shared/utils";
+import exp from "constants";
 
 describe("Model", () => {
   let model;
@@ -743,7 +744,7 @@ describe("Model", () => {
         expect(spy).toHaveBeenCalledWith("misko", undefined, model);
       });
 
-      it("should watch and fire on corect expression change", async () => {
+      it("should watch and fire on correct expression change", async () => {
         const spy = jasmine.createSpy();
         model.$watch("name.first", spy);
 
@@ -1070,6 +1071,30 @@ describe("Model", () => {
         await wait();
 
         expect(model.counter).toBe(4);
+      });
+
+      it("call the listener function when a nested value is created from an instance", async () => {
+        let ctrl = createModel({ model: { name: "John" } });
+        let count = 0;
+        expect(ctrl.model.name).toEqual("John");
+        ctrl.$watch("model.name", () => {
+          count++;
+        });
+
+        ctrl.model.name = "Bob";
+        await wait();
+
+        expect(count).toEqual(1);
+
+        ctrl.model.name = "John";
+        await wait();
+
+        expect(count).toEqual(2);
+
+        ctrl.model.lastName = "NaN";
+        await wait();
+
+        expect(count).toEqual(2);
       });
 
       it("calls the listener function when a deeply nested watched value changes", async () => {
@@ -1592,7 +1617,7 @@ describe("Model", () => {
         });
 
         describe("object", () => {
-          it("should return oldCollection === newCollection only on the first listener call", async () => {
+          it("should return undefined for old value the first listener call", async () => {
             model.obj = { a: "b" };
             await wait();
             expect(logs).toEqual([{ newVal: { a: "b" }, oldVal: undefined }]);

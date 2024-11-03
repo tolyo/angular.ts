@@ -345,7 +345,9 @@ export class InterpolateProvider {
                       let vals = new Array(ii);
                       let j = 0;
                       for (; j < ii; j++) {
-                        vals[j] = parseFns[j](context);
+                        let fn = parseFns[j];
+                        let res = fn(context);
+                        vals[j] = res;
                       }
                       cb(compute(vals));
                     });
