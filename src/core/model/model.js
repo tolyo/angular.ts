@@ -63,11 +63,11 @@ export class RootModelProvider {
  *                                     or the original value if the target is not an object.
  */
 export function createModel(target = {}, context) {
-  if (typeof target === "object" && target !== null) {
-    const proxy = new Proxy(target, new Model(target, context));
+  if (typeof target === "object") {
+    const proxy = new Proxy(target, new Model(context));
     for (const key in target) {
       if (Object.prototype.hasOwnProperty.call(target, key)) {
-        target[key] = createModel(target[key], new Model(target, context));
+        target[key] = createModel(target[key], context);
         if (isDefined(target[key]) && target[key][isProxySymbol]) {
           target[key].$handler.$wrapperProxy = proxy;
         }
@@ -103,15 +103,6 @@ export function createModel(target = {}, context) {
 export const isProxySymbol = Symbol("isProxy");
 
 /**
- * @enum {number}
- */
-export const ModelPhase = {
-  NONE: 0,
-  WATCH: 1,
-  DIGEST: 2,
-};
-
-/**
  * Model class for the Proxy. It intercepts operations like property access (get)
  * and property setting (set), and adds support for deep change tracking and
  * observer-like behavior.
@@ -120,13 +111,9 @@ class Model {
   /**
    * Initializes the handler with the target object and a context.
    *
-   * @param {Object} target - The target object being proxied.
    * @param {Model} [context] - The context containing listeners.
    */
-  constructor(target, context) {
-    /** @type {Object} */
-    this.$target = target;
-
+  constructor(context) {
     this.context = context
       ? context.context
         ? context.context
@@ -148,11 +135,14 @@ class Model {
     /** @type {?number} */
     this.listenerCache = null;
 
-    /** @type {Proxy} */
-    this.proxy = null;
+    /** Current proxy being operated on */
+    this.$proxy = null;
+
+    /** @type {*} Current target wrapped by current proxy */
+    this.$target = null;
 
     /**
-     * @type {Proxy[]}
+     * @type {Model[]}
      */
     this.children = [];
 
@@ -179,9 +169,6 @@ class Model {
 
     this.filters = [];
 
-    /** @type {ModelPhase} */
-    this.state = ModelPhase.NONE;
-
     this.$wrapperProxy = undefined;
   }
 
@@ -196,7 +183,18 @@ class Model {
    */
   set(target, property, value, proxy) {
     this.proxy = proxy;
+    this.$target = target;
     const oldValue = target[property];
+
+    // Handle NaNs
+    if (
+      oldValue !== undefined &&
+      Number.isNaN(oldValue) &&
+      Number.isNaN(value)
+    ) {
+      return true;
+    }
+
     if (oldValue && oldValue[isProxySymbol]) {
       if (Array.isArray(value)) {
         if (oldValue !== value) {
@@ -271,14 +269,6 @@ class Model {
       }
       return true;
     } else {
-      if (
-        oldValue !== undefined &&
-        Number.isNaN(oldValue) &&
-        Number.isNaN(value)
-      ) {
-        return true;
-      }
-
       target[property] = createModel(value, this);
 
       if (oldValue !== value) {
@@ -380,7 +370,9 @@ class Model {
    * @returns {*} - The value of the property or a method if accessing `watch` or `sync`.
    */
   get(target, property, proxy) {
-    this.proxy = proxy;
+    // Sets current proxy and current targets
+    this.$proxy = proxy;
+    this.$target = target;
 
     if (property === isProxySymbol) return true;
     const propertyMap = {
@@ -396,6 +388,7 @@ class Model {
       $postUpdate: this.$postUpdate.bind(this),
       $isRoot: this.isRoot.bind(this),
       $target: this.$target,
+      $proxy: this.$proxy,
       $digest: this.$digest.bind(this),
       $on: this.$on.bind(this),
       $emit: this.$emit.bind(this),
@@ -408,7 +401,6 @@ class Model {
       $wrapperProxy: this.$wrapperProxy,
       $children: this.children,
       id: this.id,
-      state: this.state,
       registerForeignKey: this.registerForeignKey.bind(this),
       notifyListener: this.notifyListener.bind(this),
     };
@@ -501,8 +493,6 @@ class Model {
    */
   $watch(watchProp, listenerFn) {
     assert(isString(watchProp), "Watched property required");
-    this.state = ModelPhase.WATCH;
-
     const get = $parse(watchProp);
 
     // Constant are immediately passed to listener function
@@ -661,7 +651,6 @@ class Model {
     }
 
     this.incrementWatchersCount(1);
-    this.state = ModelPhase.NONE;
     return () => {
       const res = this.deregisterKey(key, listener.id);
       if (res) {
@@ -697,7 +686,7 @@ class Model {
       child.$parent = this.$parent;
     }
 
-    const proxy = new Proxy(child, new Model(child, this));
+    const proxy = new Proxy(child, new Model(this));
     this.children.push(proxy);
     return proxy;
   }
@@ -705,7 +694,7 @@ class Model {
   $newIsolate(instance) {
     let child = instance ? Object.create(instance) : Object.create(null);
     child.$root = this.$root;
-    const proxy = new Proxy(child, new Model(child, this));
+    const proxy = new Proxy(child, new Model(this));
     this.children.push(proxy);
     return proxy;
   }
@@ -714,7 +703,7 @@ class Model {
     let child = Object.create(this.$target);
     child.$$watchersCount = 0;
     child.$parent = parentInstance;
-    const proxy = new Proxy(child, new Model(child, this));
+    const proxy = new Proxy(child, new Model(this));
     this.children.push(proxy);
     return proxy;
   }
