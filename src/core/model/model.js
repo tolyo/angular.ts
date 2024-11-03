@@ -88,8 +88,9 @@ export function createModel(target = {}, context) {
  * @property {number} id
  * @property {boolean} oneTime
  * @property {string} property
- * @property {Object} [context] - The optional context in which a property exists
+ * @property {string} [watchProp] - The original property to watch if different from observed key
  * @property {Proxy} [foreignListener]
+ *
  */
 
 /**
@@ -121,7 +122,10 @@ class Model {
       : undefined;
 
     /** @type {Map<string, Array<Listener>>} Watch listeners */
-    this.listeners = context ? context.listeners : new Map();
+    this.watchers = context ? context.watchers : new Map();
+
+    /** @type {Map<String, Function[]>} Event listeners */
+    this.$$listeners = new Map();
 
     /** @type {Map<string, Array<Listener>>} Watch listeners from other proxies */
     this.foreignListeners = context ? context.foreignListeners : new Map();
@@ -131,9 +135,6 @@ class Model {
 
     /** @type {Map<Function, {oldValue: any, fn: Function}>} */
     this.functionListeners = context ? context.functionListeners : new Map();
-
-    /** @type {?number} */
-    this.listenerCache = null;
 
     /** Current proxy being operated on */
     this.$proxy = null;
@@ -158,14 +159,8 @@ class Model {
 
     this.$parent = this.$root === this ? null : context;
 
-    /** @type {number} */
-    this.$$watchersCount = 0;
-
     /** @type {AsyncQueueTask[]} */
     this.$$asyncQueue = [];
-
-    /** @type {Map<String, Function[]>} Event listeners */
-    this.$$listeners = new Map();
 
     this.filters = [];
 
@@ -182,7 +177,7 @@ class Model {
    * @returns {boolean} - Returns true to indicate success of the operation.
    */
   set(target, property, value, proxy) {
-    this.proxy = proxy;
+    this.$proxy = proxy;
     this.$target = target;
     const oldValue = target[property];
 
@@ -198,7 +193,7 @@ class Model {
     if (oldValue && oldValue[isProxySymbol]) {
       if (Array.isArray(value)) {
         if (oldValue !== value) {
-          const listeners = this.listeners.get(property);
+          const listeners = this.watchers.get(property);
 
           if (listeners) {
             this.scheduleListener(listeners, oldValue);
@@ -224,7 +219,7 @@ class Model {
         }
 
         if (oldValue !== value) {
-          const listeners = this.listeners.get(property);
+          const listeners = this.watchers.get(property);
 
           if (listeners) {
             this.scheduleListener(listeners, oldValue);
@@ -246,7 +241,7 @@ class Model {
           delete oldValue[k];
         });
         target[property] = undefined;
-        let listeners = this.listeners.get(property);
+        let listeners = this.watchers.get(property);
 
         if (listeners) {
           this.scheduleListener(listeners, oldValue);
@@ -254,7 +249,7 @@ class Model {
         listeners = [];
         if (this.$wrapperProxy) {
           Object.keys(this.$wrapperProxy.$target).forEach((v) => {
-            this.listeners.get(v).forEach((i) => {
+            this.watchers.get(v).forEach((i) => {
               listeners.push(i);
             });
           });
@@ -272,45 +267,21 @@ class Model {
       target[property] = createModel(value, this);
 
       if (oldValue !== value) {
-        let listeners = this.listeners.get(property);
-
+        let listeners = this.watchers.get(property);
         if (listeners) {
           assert(listeners.length !== 0);
-
-          if (
-            isUndefined(oldValue) &&
-            isObject(target[property]) &&
-            target[property][isProxySymbol]
-          ) {
-            target[property].$handler.$wrapperProxy = this.proxy;
-          }
-
-          // primitive only
-
-          let isValue =
-            Number.isNaN(value) ||
-            listeners[0].watchFn(this.context?.$target) == value ||
-            (() => {
-              const res = listeners[0].watchFn(this.$target);
-              if (res && res[isProxySymbol]) {
-                return res.$target == value;
-              } else {
-                return res == value;
-              }
-            })();
-
-          if (isValue) {
-            this.scheduleListener(listeners, oldValue);
-          }
-        }
-
-        if (this.$wrapperProxy) {
-          listeners = this.$wrapperProxy.$handler.listeners.get(property);
-          if (listeners) {
-            const oldObject = Object.create(null);
-            oldObject[property] = oldValue;
-            this.scheduleListener(listeners, oldObject);
-          }
+          // check if the listener actually appllies to this target
+          const ownListeners = listeners.filter((x) => {
+            if (!x.watchProp) return true;
+            // Compute the expected target based on `watchProp`
+            const wrapperExpr = x.watchProp.split(".").slice(0, -1).join(".");
+            const expectedTarget = $parse(wrapperExpr)(
+              x.originalTarget,
+            ).$target;
+            assert(isDefined(expectedTarget), "Proxy expected");
+            return expectedTarget === target;
+          });
+          this.scheduleListener(ownListeners, oldValue);
         }
 
         let foreignListeners = this.foreignListeners.get(property);
@@ -344,16 +315,26 @@ class Model {
         }
       }
 
-      // Right now this is only for Arrays
-      if (this.objectListeners.has(target) && property !== "length") {
-        let keys = this.objectListeners.get(target);
+      if (this.objectListeners.has(proxy)) {
+        let keys = this.objectListeners.get(proxy);
         keys.forEach((key) => {
-          const listeners = this.listeners.get(key);
+          const listeners = this.watchers.get(key);
           if (listeners) {
             this.scheduleListener(listeners, oldValue);
           }
         });
       }
+
+      // Right now this is only for Arrays
+      // if (this.objectListeners.has(target) && property !== "length") {
+      //   let keys = this.objectListeners.get(target);
+      //   keys.forEach((key) => {
+      //     const listeners = this.watchers.get(key);
+      //     if (listeners) {
+      //       this.scheduleListener(listeners, oldValue);
+      //     }
+      //   });
+      // }
 
       return true;
     }
@@ -397,7 +378,7 @@ class Model {
       $handler: this,
       $parent: this.$parent,
       $root: this.$root,
-      $$watchersCount: this.$$watchersCount,
+      $$watchersCount: this.watchers.size,
       $wrapperProxy: this.$wrapperProxy,
       $children: this.children,
       id: this.id,
@@ -432,11 +413,8 @@ class Model {
           this.notifyListener(listener, oldValue, this.$target);
         }
 
-        if (
-          listener.oneTime &&
-          this.deregisterKey(listener.property, listener.id)
-        ) {
-          this.incrementWatchersCount(-1);
+        if (listener.oneTime) {
+          this.deregisterKey(listener.property, listener.id);
         }
         index++;
       }
@@ -453,7 +431,7 @@ class Model {
     if (this.$wrapperProxy) {
       let listeners = [];
       Object.keys(this.$wrapperProxy.$target).forEach((v) => {
-        this.listeners.get(v).forEach((i) => {
+        this.watchers.get(v).forEach((i) => {
           listeners.push(i);
         });
       });
@@ -469,13 +447,13 @@ class Model {
     if (this.objectListeners.has(target)) {
       let keys = this.objectListeners.get(target);
       keys.forEach((key) => {
-        const listeners = this.listeners.get(key);
+        const listeners = this.watchers.get(key);
         if (listeners) {
           this.scheduleListener(listeners, oldValue);
         }
       });
     } else {
-      const listeners = this.listeners.get(property);
+      const listeners = this.watchers.get(property);
       if (listeners) {
         this.scheduleListener(listeners, target[property]);
       }
@@ -528,7 +506,6 @@ class Model {
       case ASTType.Program: {
         throw new Error("Unsupported type " + type);
       }
-
       // 2
       case ASTType.ExpressionStatement: {
         throw new Error("Unsupported type " + type);
@@ -557,27 +534,18 @@ class Model {
       case ASTType.BinaryExpression: {
         throw new Error("Unsupported type " + type);
       }
-
       // 7
       case ASTType.UnaryExpression: {
         throw new Error("Unsupported type " + type);
       }
-
       // function
       case ASTType.CallExpression: {
         listener.property = get.decoratedNode.body[0].callee.name;
         break;
       }
-
       case ASTType.MemberExpression: {
         listener.property = get.decoratedNode.body[0].expression.property.name;
-        const name = extractTarget(get.decoratedNode.body[0].expression.object);
         key = get.decoratedNode.body[0].expression.property.name;
-        if (this.$target[name]) {
-          listener.context = () => {
-            return this.$target[name].$target;
-          };
-        }
         break;
       }
 
@@ -622,40 +590,49 @@ class Model {
         throw new Error("Unsupported type " + type);
       }
     }
-    if (
-      listener.context &&
-      listener.context() &&
-      listener.context()[isProxySymbol]
-    ) {
-      listener.foreignListener = this.proxy;
-      listener.context().$handler.registerForeignKey(key, listener);
-    } else {
-      this.registerKey(key, listener);
+
+    if (watchProp !== key) {
+      // Handle nested expression call
+      listener.watchProp = watchProp;
     }
 
-    let watchedValue = get(this.$target);
-    const value =
-      watchedValue && watchedValue[isProxySymbol]
-        ? watchedValue.$target
-        : watchedValue;
-
-    const isArray = Array.isArray(value);
-    const isObject =
-      Object.prototype.toString.call(value) === "[object Object]";
-    if (isArray || isObject) {
-      if (this.objectListeners.has(value)) {
-        this.objectListeners.get(value).push(key);
-      } else {
-        this.objectListeners.set(value, [key]);
-      }
+    // if the target is an object, then start observing it
+    if (isObject(listener.watchFn(this.$target))) {
+      this.objectListeners.set(listener.watchFn(this.$target), [key]);
     }
 
-    this.incrementWatchersCount(1);
+    this.registerKey(key, listener);
+
+    // if (
+    //   listener.context &&
+    //   listener.context() &&
+    //   listener.context()[isProxySymbol]
+    // ) {
+    //   listener.foreignListener = this.proxy;
+    //   listener.context().$handler.registerForeignKey(key, listener);
+    // } else {
+
+    // }
+
+    // let watchedValue = get(this.$target);
+    // const value =
+    //   watchedValue && watchedValue[isProxySymbol]
+    //     ? watchedValue.$target
+    //     : watchedValue;
+
+    // const isArray = Array.isArray(value);
+    // const isObject =
+    //   Object.prototype.toString.call(value) === "[object Object]";
+    // if (isArray || isObject) {
+    //   if (this.objectListeners.has(value)) {
+    //     this.objectListeners.get(value).push(key);
+    //   } else {
+    //     this.objectListeners.set(value, [key]);
+    //   }
+    // }
+
     return () => {
-      const res = this.deregisterKey(key, listener.id);
-      if (res) {
-        this.incrementWatchersCount(-1);
-      }
+      this.deregisterKey(key, listener.id);
     };
   }
 
@@ -709,10 +686,10 @@ class Model {
   }
 
   registerKey(key, listener) {
-    if (this.listeners.has(key)) {
-      this.listeners.get(key).push(listener);
+    if (this.watchers.has(key)) {
+      this.watchers.get(key).push(listener);
     } else {
-      this.listeners.set(key, [listener]);
+      this.watchers.set(key, [listener]);
     }
   }
 
@@ -725,7 +702,7 @@ class Model {
   }
 
   deregisterKey(key, id) {
-    const listenerList = this.listeners.get(key);
+    const listenerList = this.watchers.get(key);
     if (!listenerList) return false;
 
     const index = listenerList.findIndex((x) => x.id === id);
@@ -733,9 +710,9 @@ class Model {
 
     listenerList.splice(index, 1);
     if (listenerList.length) {
-      this.listeners.set(key, listenerList);
+      this.watchers.set(key, listenerList);
     } else {
-      this.listeners.delete(key);
+      this.watchers.delete(key);
     }
     return true;
   }
@@ -934,19 +911,7 @@ class Model {
     $postUpdateQueue.push(fn);
   }
 
-  $destroy() {
-    this.incrementWatchersCount(-this.$$watchersCount);
-  }
-
-  /**
-   * @param {number} count
-   */
-  incrementWatchersCount(count) {
-    this.$$watchersCount += count;
-    if (this.$parent) {
-      this.$parent.incrementWatchersCount(count);
-    }
-  }
+  $destroy() {}
 
   /**
    * Invokes the registered listener function with watched property changes.

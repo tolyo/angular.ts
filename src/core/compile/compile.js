@@ -1287,7 +1287,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
 
           controllerScope = scope;
           if (newIsolateScopeDirective) {
-            isolateScope = scope.$new(true);
+            isolateScope = scope.$newIsolate();
           } else if (newScopeDirective) {
             controllerScope = scope.$parent;
           }
