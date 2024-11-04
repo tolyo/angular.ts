@@ -912,7 +912,7 @@ class Model {
 
   async $applyAsync(expr) {
     try {
-      const result = $parse(expr)(this.proxy);
+      const result = $parse(expr)(this.$proxy);
       return result;
     } catch (error) {
       $exceptionHandler(error);
@@ -982,14 +982,6 @@ function setDeepValue(model, obj) {
   }
 }
 
-function extractTarget(object) {
-  if (!object.name) {
-    return extractTarget(object.object);
-  } else {
-    return object.name;
-  }
-}
-
 /**
  * @param {Model} model
  * @returns {number}
@@ -1020,11 +1012,3 @@ function collectChildIds(child) {
   });
   return ids;
 }
-
-// function deProxy(maybeProxy) {
-//   if (maybeProxy[isProxySymbol]) {
-//     return deProxy(maybeProxy);
-//   } else {
-//     return maybeProxy.$target;
-//   }
-// }
