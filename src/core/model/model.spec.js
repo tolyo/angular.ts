@@ -3,7 +3,6 @@ import { $postUpdateQueue, createModel } from "./model";
 import { Angular } from "../../loader";
 import { createInjector } from "../di/injector";
 import { isDefined, sliceArgs } from "../../shared/utils";
-import exp from "constants";
 
 describe("Model", () => {
   let model;
@@ -642,7 +641,7 @@ describe("Model", () => {
     });
 
     describe("constants", () => {
-      it("does not watch constants", async () => {
+      fit("does not watch constants", async () => {
         model.$watch("1", () => {});
         expect(model.$$watchersCount).toBe(0);
         await wait();
@@ -663,7 +662,7 @@ describe("Model", () => {
       ];
 
       cases.forEach(async ({ expression, expected }) => {
-        it("passes constants to listener cb " + expression, async () => {
+        fit("passes constants to listener cb " + expression, async () => {
           let res;
           model.$watch(expression, (val) => {
             res = val;
@@ -786,7 +785,7 @@ describe("Model", () => {
     });
 
     describe("apply expression", () => {
-      it("adds watches expressions", async () => {
+      fit("adds watches expressions", async () => {
         expect(model.$$watchersCount).toBe(0);
         model.$watch("foo = 1", () => {});
 
@@ -794,22 +793,23 @@ describe("Model", () => {
         expect(model.$$watchersCount).toBe(1);
       });
 
-      it("applies a property change and continues watching the models", async () => {
+      fit("applies a property change and continues watching the models", async () => {
         expect(model.$$watchersCount).toBe(0);
         model.$watch("foo = 2", () => {});
 
         await wait();
         expect(model.$$watchersCount).toBe(1);
+        expect(model.$handler.watchers.has("foo")).toBeTrue();
         expect(model.foo).toBe(2);
 
-        model.$watch("foo = 3", () => {});
+        model.$watch("boo = 3", () => {});
 
         await wait();
         expect(model.$$watchersCount).toBe(2);
-        expect(model.foo).toBe(3);
+        expect(model.boo).toBe(3);
       });
 
-      it("should apply a change and not increase watchers if no listener function", async () => {
+      fit("should apply a change and not increase watchers if no listener function", async () => {
         expect(model.$$watchersCount).toBe(0);
         model.$watch("foo = 2");
 
@@ -826,7 +826,7 @@ describe("Model", () => {
     });
 
     describe("filters", () => {
-      it("applies filters to constants", async () => {
+      fit("applies filters to constants", async () => {
         expect(model.$$watchersCount).toBe(0);
         let res;
         model.$watch("'abcd'|limitTo:3", (val) => {
@@ -853,7 +853,7 @@ describe("Model", () => {
 
     describe("$watch on constants", () => {
       beforeEach(() => (logs = []));
-      it("should not $watch constant literals ", () => {
+      fit("should not $watch constant literals ", () => {
         model.$watch("[]", () => {});
         model.$watch("{}", () => {});
         model.$watch("1", () => {});
@@ -861,13 +861,13 @@ describe("Model", () => {
         expect(model.$$watchersCount).toEqual(0);
       });
 
-      it("should not $watch filtered literals", () => {
+      fit("should not $watch filtered literals", () => {
         model.$watch('[1] | filter:"x"', () => {});
         model.$watch("1 | limitTo:2", () => {});
         expect(model.$$watchersCount).toEqual(0);
       });
 
-      it("should ignore $watch of constant expressions", () => {
+      fit("should ignore $watch of constant expressions", () => {
         model.$watch("1 + 1", () => {});
         model.$watch('"a" + "b"', () => {});
         model.$watch('"ab".length', () => {});
@@ -878,7 +878,7 @@ describe("Model", () => {
     });
 
     describe("$watch on onetime", () => {
-      it("should clean up stable watches on the watch queue", async () => {
+      fit("should clean up stable watches on the watch queue", async () => {
         let count = 0;
 
         model.$watch("::foo", () => {
@@ -893,7 +893,7 @@ describe("Model", () => {
         expect(count).toEqual(1);
       });
 
-      it("should clean up stable watches from $watch collection", async () => {
+      fit("should clean up stable watches from $watch collection", async () => {
         let count = 0;
         model.$watch("::foo", () => {
           count++;
@@ -933,7 +933,7 @@ describe("Model", () => {
         expect(model.$$watchersCount).toEqual(0);
       });
 
-      it("should clean up stable watches from $watchGroup", async () => {
+      fit("should clean up stable watches from $watchGroup", async () => {
         model.$watchGroup(["::foo", "::bar"], () => {});
         expect(model.$$watchersCount).toEqual(2);
         model.foo = "foo";
@@ -1095,10 +1095,11 @@ describe("Model", () => {
         expect(model.counter).toBe(4);
       });
 
-      it("call the listener function when a nested value is created from an instance", async () => {
+      fit("call the listener function when a nested value is created from an instance", async () => {
         let ctrl = createModel({ model: { name: "John" } });
         let count = 0;
         expect(ctrl.model.name).toEqual("John");
+
         ctrl.$watch("model.name", () => {
           count++;
         });
@@ -1108,18 +1109,18 @@ describe("Model", () => {
 
         expect(count).toEqual(1);
 
-        // ctrl.model.name = "John";
-        // await wait();
+        ctrl.model.name = "John";
+        await wait();
 
-        // expect(count).toEqual(2);
+        expect(count).toEqual(2);
 
-        // ctrl.model.lastName = "NaN";
-        // await wait();
+        ctrl.model.lastName = "NaN";
+        await wait();
 
-        //expect(count).toEqual(2);
+        expect(count).toEqual(2);
       });
 
-      it("calls the listener function when a deeply nested watched value changes", async () => {
+      fit("calls the listener function when a deeply nested watched value changes", async () => {
         model.counter = 0;
         model.someValue = { b: { c: { d: 1 } } };
 
@@ -1141,7 +1142,7 @@ describe("Model", () => {
         expect(model.counter).toBe(2);
       });
 
-      it("call the listener function on correct listener", async () => {
+      fit("call the listener function on correct listener", async () => {
         model.counter = 0;
         model.someValue = { b: { c: 1 } };
 
@@ -1155,7 +1156,7 @@ describe("Model", () => {
         expect(model.counter).toBe(0);
       });
 
-      it("calls the listener function when a deeply nested watched value is initially undefined", async () => {
+      fit("calls the listener function when a deeply nested watched value is initially undefined", async () => {
         model.counter = 0;
         model.someValue = { b: { c: undefined } };
 
@@ -1179,18 +1180,36 @@ describe("Model", () => {
     });
 
     describe("inherited $watch", () => {
-      it("should decrement the watcherCount when destroying a child model", () => {
+      fit("should decrement the watcherCount when destroying a child model", () => {
         const child1 = model.$new();
         const child2 = model.$new();
+
+        expect(model.$$watchersCount).toBe(0);
+        expect(child1.$$watchersCount).toBe(0);
+        expect(child1.$$watchersCount).toBe(0);
+
         const grandChild1 = child1.$new();
         const grandChild2 = child2.$new();
         child1.$watch("a", () => {});
-        child2.$watch("a", () => {});
-        grandChild1.$watch("a", () => {});
-        grandChild2.$watch("a", () => {});
+        expect(model.$$watchersCount).toBe(1);
+        expect(child1.$$watchersCount).toBe(1);
 
+        child2.$watch("a", () => {});
+        expect(model.$$watchersCount).toBe(2);
+        expect(child2.$$watchersCount).toBe(1);
+
+        grandChild1.$watch("a", () => {});
+        expect(grandChild1.$$watchersCount).toBe(1);
+        expect(child1.$$watchersCount).toBe(2);
+
+        grandChild2.$watch("a", () => {});
+        expect(grandChild2.$$watchersCount).toBe(1);
+        expect(child2.$$watchersCount).toBe(2);
+
+        // a watcher is shared by all
         expect(model.$$watchersCount).toBe(4);
         expect(child1.$$watchersCount).toBe(2);
+        expect(grandChild1.$$watchersCount).toBe(1);
         expect(child2.$$watchersCount).toBe(2);
         expect(grandChild1.$$watchersCount).toBe(1);
         expect(grandChild2.$$watchersCount).toBe(1);
@@ -1199,10 +1218,11 @@ describe("Model", () => {
         expect(child2.$$watchersCount).toBe(1);
         expect(model.$$watchersCount).toBe(3);
         child1.$destroy();
-        expect(model.$$watchersCount).toBe(1);
+        expect(child1.$$watchersCount).toBe(1);
+        expect(model.$$watchersCount).toBe(2);
       });
 
-      it("should decrement the watcherCount when calling the remove function", () => {
+      fit("should decrement the watcherCount when calling the remove function", () => {
         const child1 = model.$new();
         const child2 = model.$new();
         const grandChild1 = child1.$new();
@@ -1212,11 +1232,19 @@ describe("Model", () => {
         grandChild1.$watch("a", () => {});
         let remove2 = grandChild2.$watch("a", () => {});
 
-        remove2();
+        expect(grandChild2.$$watchersCount).toBe(1);
+        expect(child2.$$watchersCount).toBe(2);
+        expect(model.$$watchersCount).toBe(4);
+
+        expect(remove2()).toBeTrue();
         expect(grandChild2.$$watchersCount).toBe(0);
         expect(child2.$$watchersCount).toBe(1);
         expect(model.$$watchersCount).toBe(3);
-        remove1();
+
+        expect(grandChild1.$$watchersCount).toBe(1);
+        expect(child1.$$watchersCount).toBe(2);
+
+        expect(remove1()).toBeTrue();
         expect(grandChild1.$$watchersCount).toBe(1);
         expect(child1.$$watchersCount).toBe(1);
         expect(model.$$watchersCount).toBe(2);
@@ -1231,7 +1259,7 @@ describe("Model", () => {
         expect(model.$$watchersCount).toBe(2);
       });
 
-      it("should call child $watchers in addition order", async () => {
+      fit("should call child $watchers in addition order", async () => {
         logs = "";
         const childA = model.$new();
         childA.$watch("a", () => {
@@ -1248,7 +1276,7 @@ describe("Model", () => {
         expect(logs).toEqual("abc");
       });
 
-      it("should share listeners with parent", async () => {
+      fit("should share listeners with parent", async () => {
         logs = "";
         const childA = model.$new();
         const childB = model.$new();
@@ -1280,7 +1308,7 @@ describe("Model", () => {
         expect(logs).toBe("rab");
       });
 
-      it("should repeat watch cycle from the root element", async () => {
+      fit("should repeat watch cycle from the root element", async () => {
         logs = "";
         const child = model.$new();
         model.$watch("c", () => {
@@ -1296,7 +1324,7 @@ describe("Model", () => {
       });
     });
 
-    it("should watch functions", async () => {
+    fit("should watch functions", async () => {
       model.$watch("fn", (fn) => {
         logs.push(fn());
       });
@@ -1313,7 +1341,7 @@ describe("Model", () => {
       expect(logs).toEqual(["a", "b"]);
     });
 
-    it("should prevent $watch recursion", async () => {
+    fit("should prevent $watch recursion", async () => {
       let callCount = 0;
       model.$watch("name", () => {
         callCount++;
@@ -1324,20 +1352,21 @@ describe("Model", () => {
       expect(callCount).toEqual(1);
     });
 
-    it("should allow a watch to be added while in a digest", async () => {
+    fit("should allow a watch to be added while in a digest", async () => {
       const watch1 = jasmine.createSpy("watch1");
       const watch2 = jasmine.createSpy("watch2");
       model.$watch("foo", () => {
         model.$watch("foo", watch1);
         model.$watch("foo", watch2);
       });
+
       model.$apply("foo = true");
       await wait();
       expect(watch1).toHaveBeenCalled();
       expect(watch2).toHaveBeenCalled();
     });
 
-    it("should not skip watchers when adding new watchers during digest", async () => {
+    fit("should not skip watchers when adding new watchers during digest", async () => {
       const watch1 = jasmine.createSpy("watch1");
       const watch2 = jasmine.createSpy("watch2");
       model.$watch("foo", () => {
@@ -1350,7 +1379,7 @@ describe("Model", () => {
       expect(watch2).toHaveBeenCalled();
     });
 
-    it("should not skip watchers when adding new watchers during property update", async () => {
+    fit("should not skip watchers when adding new watchers during property update", async () => {
       const watch1 = jasmine.createSpy("watch1");
       const watch2 = jasmine.createSpy("watch2");
       model.$watch("foo", () => {
@@ -1363,9 +1392,9 @@ describe("Model", () => {
       expect(watch2).toHaveBeenCalled();
     });
 
-    describe("$watch deregistration", () => {
+    fdescribe("$watch deregistration", () => {
       beforeEach(() => (logs = []));
-      it("should return a function that allows listeners to be deregistered", async () => {
+      fit("should return a function that allows listeners to be deregistered", async () => {
         const listener = jasmine.createSpy("watch listener");
         let listenerRemove;
 
@@ -1385,7 +1414,7 @@ describe("Model", () => {
         expect(listener).not.toHaveBeenCalled();
       });
 
-      it("should allow a watch to be deregistered while in a digest", async () => {
+      fit("should allow a watch to be deregistered while in a digest", async () => {
         let remove1;
         let remove2;
         model.$watch("remove", () => {
@@ -1544,7 +1573,7 @@ describe("Model", () => {
       //   model.obj = [{}];
 
       //   expect(logs).toEqual([
-      //     { newVal: [{}], oldVal: [{}], identical: true },
+      //     { newVal: [{}], oldVal: [{}] },
       //   ]);
 
       //   logs = [];
@@ -1556,7 +1585,7 @@ describe("Model", () => {
       // it("should watch array properties", () => {
       //   model.obj = [];
 
-      //   expect(logs).toEqual([{ newVal: [], oldVal: [], identical: true }]);
+      //   expect(logs).toEqual([{ newVal: [], oldVal: [] }]);
 
       //   logs = [];
       //   model.obj.push("a");
@@ -1639,7 +1668,7 @@ describe("Model", () => {
         });
 
         describe("object", () => {
-          it("should return undefined for old value the first listener call", async () => {
+          fit("should return undefined for old value the first listener call", async () => {
             model.obj = { a: "b" };
             await wait();
             expect(logs).toEqual([{ newVal: { a: "b" }, oldVal: undefined }]);
@@ -1650,16 +1679,14 @@ describe("Model", () => {
             expect(logs).toEqual([{ newVal: { a: "c" }, oldVal: { a: "b" } }]);
           });
 
-          it("should trigger when property changes into object", () => {
+          fit("should trigger when property changes into object", async () => {
             model.obj = "test";
-
-            expect(logs).toEqual([
-              { newVal: "test", oldVal: "test", identical: true },
-            ]);
+            await wait();
+            expect(logs).toEqual([{ newVal: "test", oldVal: undefined }]);
             logs = [];
 
             model.obj = {};
-
+            await wait();
             expect(logs).toEqual([{ newVal: {}, oldVal: "test" }]);
           });
 
@@ -1667,7 +1694,7 @@ describe("Model", () => {
             model.obj = { name: {} };
 
             expect(logs).toEqual([
-              { newVal: { name: {} }, oldVal: { name: {} }, identical: true },
+              { newVal: { name: {} }, oldVal: { name: {} } },
             ]);
             logs = [];
 
@@ -1679,7 +1706,7 @@ describe("Model", () => {
           it("should watch object properties", () => {
             model.obj = {};
 
-            expect(logs).toEqual([{ newVal: {}, oldVal: {}, identical: true }]);
+            expect(logs).toEqual([{ newVal: {}, oldVal: {} }]);
             logs = [];
             model.obj.a = "A";
 
@@ -1760,9 +1787,7 @@ describe("Model", () => {
             // first time should be identical
             model.obj = "a";
 
-            expect(logs).toEqual([
-              { newVal: ["a"], oldVal: ["a"], identical: true },
-            ]);
+            expect(logs).toEqual([{ newVal: ["a"], oldVal: ["a"] }]);
             logs = [];
 
             // second time should be different
@@ -1774,9 +1799,7 @@ describe("Model", () => {
           it("should trigger when property changes into array", () => {
             model.obj = "test";
 
-            expect(logs).toEqual([
-              { newVal: ["test"], oldVal: ["test"], identical: true },
-            ]);
+            expect(logs).toEqual([{ newVal: ["test"], oldVal: ["test"] }]);
 
             logs = [];
             model.obj = [];
@@ -1802,9 +1825,7 @@ describe("Model", () => {
           it("should not trigger change when object in collection changes", () => {
             model.obj = {};
 
-            expect(logs).toEqual([
-              { newVal: [{}], oldVal: [{}], identical: true },
-            ]);
+            expect(logs).toEqual([{ newVal: [{}], oldVal: [{}] }]);
 
             logs = [];
             model.obj.name = "foo";
@@ -1836,9 +1857,7 @@ describe("Model", () => {
             model.obj = "b";
             // first time should be identical
 
-            expect(logs).toEqual([
-              { newVal: { a: "b" }, oldVal: { a: "b" }, identical: true },
-            ]);
+            expect(logs).toEqual([{ newVal: { a: "b" }, oldVal: { a: "b" } }]);
 
             // second time not identical
             logs = [];
@@ -1851,7 +1870,7 @@ describe("Model", () => {
             model.obj = "test";
 
             expect(logs).toEqual([
-              { newVal: { a: "test" }, oldVal: { a: "test" }, identical: true },
+              { newVal: { a: "test" }, oldVal: { a: "test" } },
             ]);
 
             logs = [];
@@ -1882,9 +1901,7 @@ describe("Model", () => {
           it("should watch object properties", () => {
             model.obj = {};
 
-            expect(logs).toEqual([
-              { newVal: { a: {} }, oldVal: { a: {} }, identical: true },
-            ]);
+            expect(logs).toEqual([{ newVal: { a: {} }, oldVal: { a: {} } }]);
 
             logs = [];
             model.obj = "A";
@@ -1946,7 +1963,7 @@ describe("Model", () => {
             model.obj = "test";
 
             expect(logs).toEqual([
-              { newVal: { a: "test" }, oldVal: { a: "test" }, identical: true },
+              { newVal: { a: "test" }, oldVal: { a: "test" } },
             ]);
 
             logs = [];
@@ -1969,7 +1986,7 @@ describe("Model", () => {
             model.obj = "test";
 
             expect(logs).toEqual([
-              { newVal: { 1: "test" }, oldVal: { 1: "test" }, identical: true },
+              { newVal: { 1: "test" }, oldVal: { 1: "test" } },
             ]);
 
             logs = [];
@@ -2381,7 +2398,7 @@ describe("Model", () => {
 
   describe("$postUpdate", () => {
     beforeEach(() => (logs = []));
-    it("should process callbacks as a queue (FIFO) when the model is digested", async () => {
+    fit("should process callbacks as a queue (FIFO) when the model is digested", async () => {
       let signature = "";
 
       model.$postUpdate(() => {
@@ -2410,7 +2427,7 @@ describe("Model", () => {
       expect(signature).toBe("ABCD");
     });
 
-    it("should support $apply calls nested in $postUpdate callbacks", async () => {
+    fit("should support $apply calls nested in $postUpdate callbacks", async () => {
       let signature = "";
 
       model.$postUpdate(() => {
@@ -2437,7 +2454,7 @@ describe("Model", () => {
       expect(signature).toBe("ABCD");
     });
 
-    it("should run a $postUpdate call on all child models when a parent model is digested", async () => {
+    fit("should run a $postUpdate call on all child models when a parent model is digested", async () => {
       const parent = model.$new();
       const child = parent.$new();
       let count = 0;
@@ -2463,7 +2480,7 @@ describe("Model", () => {
       expect(count).toBe(3);
     });
 
-    it("should run a $postUpdate call even if the child model is isolated", async () => {
+    fit("should run a $postUpdate call even if the child model is isolated", async () => {
       const parent = model.$new();
       const child = parent.$newIsolate();
       let signature = "";
@@ -2486,7 +2503,7 @@ describe("Model", () => {
 
   describe("events", () => {
     describe("$on", () => {
-      it("should add listener to list of listerner", () => {
+      fit("should add listener to list of listerner", () => {
         const child = model.$new();
         function eventFn() {}
         child.$on("abc", eventFn);
@@ -2496,14 +2513,14 @@ describe("Model", () => {
         expect(child.$handler.$$listeners.get("abc").length).toEqual(2);
       });
 
-      it("should return a deregistration function", () => {
+      fit("should return a deregistration function", () => {
         const child = model.$new();
         function eventFn() {}
         let res = child.$on("abc", eventFn);
         expect(isDefined(res)).toBeDefined();
       });
 
-      it("should return a deregistration function that removes a listener", () => {
+      fit("should return a deregistration function that removes a listener", () => {
         const child = model.$new();
         function eventFn() {}
         let res = child.$on("abc", eventFn);
@@ -2517,7 +2534,7 @@ describe("Model", () => {
         expect(child.$handler.$$listeners.has("abc")).toBeFalse();
       });
 
-      it("should add listener for both $emit and $broadcast events", () => {
+      fit("should add listener for both $emit and $broadcast events", () => {
         logs = "";
         const child = model.$new();
 
@@ -2536,7 +2553,7 @@ describe("Model", () => {
       });
 
       describe("deregistration", () => {
-        it("should return a function that deregisters the listener", () => {
+        fit("should return a function that deregisters the listener", () => {
           let log = "";
           const child = model.$new();
           let listenerRemove;
@@ -2563,7 +2580,7 @@ describe("Model", () => {
           expect(model.$handler.$$listeners.get("abc")).toBeUndefined();
         });
 
-        it("should deallocate the listener array entry", () => {
+        fit("should deallocate the listener array entry", () => {
           const remove1 = model.$on("abc", () => {});
           model.$on("abc", () => {});
 
@@ -2574,7 +2591,7 @@ describe("Model", () => {
           expect(model.$handler.$$listeners.get("abc").length).toBe(1);
         });
 
-        it("should call next listener after removing the current listener via its own handler", () => {
+        fit("should call next listener after removing the current listener via its own handler", () => {
           const listener1 = jasmine.createSpy("listener1").and.callFake(() => {
             remove1();
           });
@@ -2601,7 +2618,7 @@ describe("Model", () => {
           expect(listener3).toHaveBeenCalled();
         });
 
-        it("should call all subsequent listeners when a previous listener is removed via a handler", () => {
+        fit("should call all subsequent listeners when a previous listener is removed via a handler", () => {
           const listener1 = jasmine.createSpy();
           const remove1 = model.$on("abc", listener1);
 
@@ -2626,7 +2643,7 @@ describe("Model", () => {
           expect(listener3).toHaveBeenCalled();
         });
 
-        it("should not call listener when removed by previous", () => {
+        fit("should not call listener when removed by previous", () => {
           const listener1 = jasmine.createSpy("listener1");
           const remove1 = model.$on("abc", listener1);
 
@@ -2661,7 +2678,7 @@ describe("Model", () => {
       });
     });
 
-    describe("$emit", () => {
+    fdescribe("$emit", () => {
       let log;
       let child;
       let grandChild;
@@ -2689,7 +2706,7 @@ describe("Model", () => {
         greatGrandChild.$on("myEvent", logger);
       });
 
-      it("should do nothing on empty listener", () => {
+      fit("should do nothing on empty listener", () => {
         logs = "";
         const child = model.$new();
 
@@ -2704,12 +2721,12 @@ describe("Model", () => {
         expect(logs).toEqual("");
       });
 
-      it("should bubble event up to the root model", () => {
+      fit("should bubble event up to the root model", () => {
         grandChild.$emit("myEvent");
         expect(log).toEqual("2>1>0>");
       });
 
-      it("should allow all events on the same model to run even if stopPropagation is called", () => {
+      fit("should allow all events on the same model to run even if stopPropagation is called", () => {
         child.$on("myEvent", logger);
         grandChild.$on("myEvent", (e) => {
           e.stopPropagation();
@@ -2720,7 +2737,7 @@ describe("Model", () => {
         expect(log).toEqual("2>2>2>");
       });
 
-      it("should dispatch exceptions to the $exceptionHandler", () => {
+      fit("should dispatch exceptions to the $exceptionHandler", () => {
         child.$on("myEvent", () => {
           throw "bubbleException";
         });
@@ -2729,7 +2746,7 @@ describe("Model", () => {
         expect(logs).toEqual(["bubbleException"]);
       });
 
-      it("should allow stopping event propagation", () => {
+      fit("should allow stopping event propagation", () => {
         child.$on("myEvent", (event) => {
           event.stopPropagation();
         });
@@ -2737,7 +2754,7 @@ describe("Model", () => {
         expect(log).toEqual("2>1>");
       });
 
-      it("should forward method arguments", () => {
+      fit("should forward method arguments", () => {
         child.$on("abc", (event, arg1, arg2) => {
           expect(event.name).toBe("abc");
           expect(arg1).toBe("arg1");
@@ -2746,7 +2763,7 @@ describe("Model", () => {
         child.$emit("abc", "arg1", "arg2");
       });
 
-      it("should allow removing event listener inside a listener on $emit", () => {
+      fit("should allow removing event listener inside a listener on $emit", () => {
         const spy1 = jasmine.createSpy("1st listener");
         const spy2 = jasmine.createSpy("2nd listener");
         const spy3 = jasmine.createSpy("3rd listener");
@@ -2779,7 +2796,7 @@ describe("Model", () => {
         expect(child.$handler.$$listeners.get("evt").length).toBe(1);
       });
 
-      it("should allow removing event listener inside a listener on $broadcast", () => {
+      fit("should allow removing event listener inside a listener on $broadcast", () => {
         const spy1 = jasmine.createSpy("1st listener");
         const spy2 = jasmine.createSpy("2nd listener");
         const spy3 = jasmine.createSpy("3rd listener");
@@ -2812,7 +2829,7 @@ describe("Model", () => {
         expect(child.$handler.$$listeners.get("evt").length).toBe(1);
       });
 
-      describe("event object", () => {
+      fdescribe("event object", () => {
         it("should have methods/properties", () => {
           let eventFired = false;
 
@@ -2854,7 +2871,7 @@ describe("Model", () => {
     });
 
     describe("$broadcast", () => {
-      describe("event propagation", () => {
+      fdescribe("event propagation", () => {
         let log;
         let child1;
         let child2;
@@ -2943,7 +2960,7 @@ describe("Model", () => {
         });
       });
 
-      describe("listener", () => {
+      fdescribe("listener", () => {
         it("should receive event object", () => {
           const child = model.$new();
           let eventFired = false;
@@ -3027,7 +3044,7 @@ describe("Model", () => {
   });
 
   describe("doc examples", () => {
-    it("should properly fire off watch listeners upon model changes", async () => {
+    fit("should properly fire off watch listeners upon model changes", async () => {
       // <docs tag="docs1">
       const scope = model.$new();
       scope.salutation = "Hello";

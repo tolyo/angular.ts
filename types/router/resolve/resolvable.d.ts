@@ -17,7 +17,7 @@ export namespace defaultResolvePolicy {
 export class Resolvable {
     constructor(arg1: any, resolveFn: any, deps: any, policy: any, data: any);
     resolved: boolean;
-    promise: any;
+    promise: Promise<any>;
     token: any;
     policy: any;
     resolveFn: any;
@@ -34,14 +34,14 @@ export class Resolvable {
      * Wait for this Resolvable's dependencies, then invoke this Resolvable's function
      * and update the Resolvable's state
      */
-    resolve(resolveContext: any, trans: any): any;
+    resolve(resolveContext: any, trans: any): Promise<any>;
     /**
      * Gets a promise for this Resolvable's data.
      *
      * Fetches the data and returns a promise.
      * Returns the existing promise if it has already been fetched once.
      */
-    get(resolveContext: any, trans: any): any;
+    get(resolveContext: any, trans: any): Promise<any>;
     toString(): string;
     clone(): Resolvable;
 }

@@ -52,8 +52,8 @@ export class HttpProvider {
     useApplyAsync: (value?: boolean | undefined) => boolean | any;
     interceptors: any[];
     xsrfTrustedOrigins: any[];
-    $get: (string | (($browser: any, $httpBackend: any, $rootScope: any, $q: any, $injector: import("../../core/di/internal-injector").InjectorService, $sce: any) => {
-        (requestConfig: any): any;
+    $get: (string | (($browser: any, $httpBackend: any, $rootScope: any, $injector: import("../../core/di/internal-injector").InjectorService, $sce: any) => {
+        (requestConfig: any): Promise<any>;
         pendingRequests: any[];
         /**
          * Runtime equivalent of the `$httpProvider.defaults` property. Allows configuration of

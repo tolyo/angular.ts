@@ -77,9 +77,9 @@ export class ResolveContext {
      *
      * @param {string} when
      * @param trans
-     * @returns {import("../../core/q/q").QPromise<any>|any}
+     * @returns {Promise<any>|any}
      */
-    resolvePath(when: string, trans: any): import("../../core/q/q").QPromise<any> | any;
+    resolvePath(when: string, trans: any): Promise<any> | any;
     injector(): UIInjectorImpl;
     _injector: UIInjectorImpl;
     findNode(resolvable: any): undefined;

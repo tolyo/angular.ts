@@ -7,7 +7,7 @@ export function isNumberInteger(num: any): boolean;
 export function countDecimals(num: any): number;
 export function isValidForStep(viewValue: any, stepBase: any, step: any): boolean;
 export function numberInputType(scope: any, element: any, attr: any, ctrl: any, $browser: any, $filter: any, $parse: any): void;
-export function rangeInputType(scope: any, element: any, attr: any, ctrl: any, $browser: any): void;
+export function rangeInputType(scope: any, element: any, attr: any, ctrl: any): void;
 /**
  * @param {import('../../services/browser').Browser} $browser
  * @param {*} $filter

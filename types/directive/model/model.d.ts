@@ -57,11 +57,9 @@ export class NgModelController {
      * @param {import('../../shared/jqlite/jqlite').JQLite} $element
      * @param {import("../../core/parse/parse").ParseService} $parse
      * @param {*} $animate
-     * @param {*} $timeout
-     * @param {import("../../core/q/q").QPromise<any>} $q
      * @param {*} $interpolate
      */
-    constructor($scope: import("../../core/scope/scope").Scope, $exceptionHandler: import("../../core/exception-handler").ErrorHandler, $attr: import("../../core/compile/attributes").Attributes, $element: import("../../shared/jqlite/jqlite").JQLite, $parse: import("../../core/parse/parse").ParseService, $animate: any, $timeout: any, $q: import("../../core/q/q").QPromise<any>, $interpolate: any);
+    constructor($scope: import("../../core/scope/scope").Scope, $exceptionHandler: import("../../core/exception-handler").ErrorHandler, $attr: import("../../core/compile/attributes").Attributes, $element: import("../../shared/jqlite/jqlite").JQLite, $parse: import("../../core/parse/parse").ParseService, $animate: any, $interpolate: any);
     /** @type {any} The actual value from the control's view  */
     $viewValue: any;
     /** @type {any} The value in the model that the control is bound to. */
@@ -113,7 +111,7 @@ export class NgModelController {
     /** @type {import("../../core/parse/parse").CompiledExpression|((Scope) => any)} */
     $$ngModelGet: import("../../core/parse/parse").CompiledExpression | ((Scope: any) => any);
     $$ngModelSet: (arg0: any, arg1: any) => any;
-    $$pendingDebounce: any;
+    $$pendingDebounce: NodeJS.Timeout;
     $$parserValid: boolean;
     /** @type {string} */
     $$parserName: string;
@@ -126,9 +124,7 @@ export class NgModelController {
     $$attr: import("../../core/compile/attributes").Attributes;
     $$element: import("../../shared/jqlite/jqlite").JQLite;
     $$animate: any;
-    $$timeout: any;
     $$parse: import("../../core/parse/parse").ParseService;
-    $q: import("../../core/q/q").QPromise<any>;
     $$exceptionHandler: import("../../core/exception-handler").ErrorHandler;
     $$hasNativeValidators: boolean;
     set(object: any, property: any): void;

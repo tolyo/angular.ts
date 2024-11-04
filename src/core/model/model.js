@@ -64,13 +64,10 @@ export class RootModelProvider {
  */
 export function createModel(target = {}, context) {
   if (typeof target === "object") {
-    const proxy = new Proxy(target, new Model(context));
+    const proxy = new Proxy(target, context || new Model());
     for (const key in target) {
       if (Object.prototype.hasOwnProperty.call(target, key)) {
-        target[key] = createModel(target[key], context);
-        if (isDefined(target[key]) && target[key][isProxySymbol]) {
-          target[key].$handler.$wrapperProxy = proxy;
-        }
+        target[key] = createModel(target[key], proxy.$handler);
       }
     }
     return proxy;
@@ -85,7 +82,8 @@ export function createModel(target = {}, context) {
  * @property {Object} originalTarget - The original target object.
  * @property {ListenerFunction} listenerFn - The function invoked when changes are detected.
  * @property {import("../parse/parse.js").CompiledExpression} watchFn
- * @property {number} id
+ * @property {number} id - Deregistration id
+ * @property {number} scopeId - The scope that created the Listener
  * @property {boolean} oneTime
  * @property {string} property
  * @property {string} [watchProp] - The original property to watch if different from observed key
@@ -145,7 +143,7 @@ class Model {
     /**
      * @type {Model[]}
      */
-    this.children = [];
+    this.$children = [];
 
     /**
      * @type {number} Unique model ID (monotonically increasing) useful for debugging.
@@ -267,21 +265,29 @@ class Model {
       target[property] = createModel(value, this);
 
       if (oldValue !== value) {
+        // Handle the case where we need to start observing object after a watcher has been set
+        if (isUndefined(oldValue) && isObject(target[property])) {
+          if (!this.objectListeners.has(target[property])) {
+            this.objectListeners.set(target[property], [property]);
+          }
+        }
+
         let listeners = this.watchers.get(property);
         if (listeners) {
           assert(listeners.length !== 0);
           // check if the listener actually appllies to this target
-          const ownListeners = listeners.filter((x) => {
-            if (!x.watchProp) return true;
-            // Compute the expected target based on `watchProp`
-            const wrapperExpr = x.watchProp.split(".").slice(0, -1).join(".");
-            const expectedTarget = $parse(wrapperExpr)(
-              x.originalTarget,
-            ).$target;
-            assert(isDefined(expectedTarget), "Proxy expected");
-            return expectedTarget === target;
+          this.scheduleListener(listeners, oldValue, (x) => {
+            return x.filter((x) => {
+              if (!x.watchProp) return true;
+              // Compute the expected target based on `watchProp`
+              const wrapperExpr = x.watchProp.split(".").slice(0, -1).join(".");
+              const expectedTarget = $parse(wrapperExpr)(
+                x.originalTarget,
+              ).$target;
+              assert(isDefined(expectedTarget), "Proxy expected");
+              return expectedTarget === target;
+            });
           });
-          this.scheduleListener(ownListeners, oldValue);
         }
 
         let foreignListeners = this.foreignListeners.get(property);
@@ -320,7 +326,9 @@ class Model {
         keys.forEach((key) => {
           const listeners = this.watchers.get(key);
           if (listeners) {
-            this.scheduleListener(listeners, oldValue);
+            let oldObject = structuredClone(target);
+            oldObject[property] = oldValue;
+            this.scheduleListener(listeners, oldObject);
           }
         });
       }
@@ -378,9 +386,9 @@ class Model {
       $handler: this,
       $parent: this.$parent,
       $root: this.$root,
-      $$watchersCount: this.watchers.size,
+      $$watchersCount: calculateWatcherCount(this),
       $wrapperProxy: this.$wrapperProxy,
-      $children: this.children,
+      $children: this.$children,
       id: this.id,
       registerForeignKey: this.registerForeignKey.bind(this),
       notifyListener: this.notifyListener.bind(this),
@@ -396,13 +404,13 @@ class Model {
    * @param {Listener[]} listeners
    * @param {*} oldValue
    */
-  scheduleListener(listeners, oldValue) {
+  scheduleListener(listeners, oldValue, filter = (val) => val) {
     console.log("scheduleListener");
     Promise.resolve().then(() => {
       let index = 0;
 
-      while (index < listeners.length) {
-        const listener = listeners[index];
+      while (index < filter(listeners).length) {
+        const listener = filter(listeners)[index];
         if (listener.foreignListener) {
           listener.foreignListener.notifyListener(
             listener,
@@ -492,6 +500,7 @@ class Model {
       originalTarget: this.$target,
       listenerFn: listenerFn,
       watchFn: get,
+      scopeId: this.id,
       id: nextUid(),
       oneTime: get.oneTime,
       property: undefined,
@@ -521,6 +530,7 @@ class Model {
           Promise.resolve().then(res);
           return () => {};
         }
+        key = get.decoratedNode.body[0].expression.left.name;
         break;
       // 4
       case ASTType.ConditionalExpression: {
@@ -546,6 +556,10 @@ class Model {
       case ASTType.MemberExpression: {
         listener.property = get.decoratedNode.body[0].expression.property.name;
         key = get.decoratedNode.body[0].expression.property.name;
+        if (watchProp !== key) {
+          // Handle nested expression call
+          listener.watchProp = watchProp;
+        }
         break;
       }
 
@@ -591,11 +605,6 @@ class Model {
       }
     }
 
-    if (watchProp !== key) {
-      // Handle nested expression call
-      listener.watchProp = watchProp;
-    }
-
     // if the target is an object, then start observing it
     if (isObject(listener.watchFn(this.$target))) {
       this.objectListeners.set(listener.watchFn(this.$target), [key]);
@@ -632,7 +641,7 @@ class Model {
     // }
 
     return () => {
-      this.deregisterKey(key, listener.id);
+      return this.deregisterKey(key, listener.id);
     };
   }
 
@@ -659,12 +668,11 @@ class Model {
       child = childInstance;
     } else {
       child = Object.create(this.$target);
-      child.$$watchersCount = 0;
       child.$parent = this.$parent;
     }
 
     const proxy = new Proxy(child, new Model(this));
-    this.children.push(proxy);
+    this.$children.push(proxy);
     return proxy;
   }
 
@@ -672,16 +680,15 @@ class Model {
     let child = instance ? Object.create(instance) : Object.create(null);
     child.$root = this.$root;
     const proxy = new Proxy(child, new Model(this));
-    this.children.push(proxy);
+    this.$children.push(proxy);
     return proxy;
   }
 
   $transcluded(parentInstance) {
     let child = Object.create(this.$target);
-    child.$$watchersCount = 0;
     child.$parent = parentInstance;
     const proxy = new Proxy(child, new Model(this));
-    this.children.push(proxy);
+    this.$children.push(proxy);
     return proxy;
   }
 
@@ -768,7 +775,7 @@ class Model {
 
   $apply(expr) {
     try {
-      return $parse(expr)(this.proxy);
+      return $parse(expr)(this.$proxy);
     } catch (e) {
       $exceptionHandler(e);
     }
@@ -868,8 +875,8 @@ class Model {
     }
 
     if (broadcast) {
-      if (this.children.length > 0) {
-        this.children.forEach((child) => {
+      if (this.$children.length > 0) {
+        this.$children.forEach((child) => {
           event = child["$handler"].eventHelper(
             { name: name, event: event, broadcast: broadcast },
             ...args,
@@ -911,7 +918,14 @@ class Model {
     $postUpdateQueue.push(fn);
   }
 
-  $destroy() {}
+  $destroy() {
+    Array.from(this.watchers.entries()).forEach(([key, val]) => {
+      this.watchers.set(
+        key,
+        val.filter((x) => x.scopeId !== this.id),
+      );
+    });
+  }
 
   /**
    * Invokes the registered listener function with watched property changes.
@@ -963,6 +977,37 @@ function extractTarget(object) {
   } else {
     return object.name;
   }
+}
+
+/**
+ * @param {Model} model
+ * @returns {number}
+ */
+function calculateWatcherCount(model) {
+  const childIds = collectChildIds(model).add(model.id);
+
+  return Array.from(model.watchers.values()).reduce(
+    (count, watcherArray) =>
+      count +
+      watcherArray.reduce(
+        (subCount, watcher) =>
+          subCount + (childIds.has(watcher.scopeId) ? 1 : 0),
+        0,
+      ),
+    0,
+  );
+}
+
+/**
+ * @param {Model} child
+ * @returns {Set<number>}
+ */
+function collectChildIds(child) {
+  const ids = new Set([child.id]);
+  child.$children?.forEach((c) => {
+    collectChildIds(c).forEach((id) => ids.add(id));
+  });
+  return ids;
 }
 
 // function deProxy(maybeProxy) {

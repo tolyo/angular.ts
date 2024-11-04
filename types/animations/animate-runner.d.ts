@@ -4,7 +4,7 @@ export class AnimateAsyncRunFactoryProvider {
 }
 export function AnimateRunnerFactoryProvider(): void;
 export class AnimateRunnerFactoryProvider {
-    $get: (string | ((q: any, animateAsyncRun: any, timeout: any) => typeof AnimateRunner))[];
+    $get: (string | ((animateAsyncRun: any) => typeof AnimateRunner))[];
 }
 export class AnimateRunner {
     static chain(chain: any, callback: any): void;
@@ -17,11 +17,11 @@ export class AnimateRunner {
     host: any;
     done(fn: any): void;
     progress(): void;
-    getPromise(): any;
-    promise: any;
-    then(resolveHandler: any, rejectHandler: any): any;
-    catch(handler: any): any;
-    finally(handler: any): any;
+    getPromise(): Promise<any>;
+    promise: Promise<any>;
+    then(resolveHandler: any, rejectHandler: any): Promise<any>;
+    catch(handler: any): Promise<any>;
+    finally(handler: any): Promise<any>;
     pause(): void;
     resume(): void;
     end(): void;

@@ -1,4 +1,4 @@
-export function $StateRefDirective($stateService: any, $timeout: any, $stateRegistry: any, $transitions: any): {
+export function $StateRefDirective($stateService: any, $stateRegistry: any, $transitions: any): {
     restrict: string;
     require: string[];
     link: (scope: any, element: any, attrs: any, ngSrefActive: any) => void;
@@ -6,7 +6,7 @@ export function $StateRefDirective($stateService: any, $timeout: any, $stateRegi
 export namespace $StateRefDirective {
     let $inject: string[];
 }
-export function $StateRefDynamicDirective($state: any, $timeout: any, $stateRegistry: any, $transitions: any): {
+export function $StateRefDynamicDirective($state: any, $stateRegistry: any, $transitions: any): {
     restrict: string;
     require: string[];
     link: (scope: any, element: any, attrs: any, ngSrefActive: any) => void;

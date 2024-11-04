@@ -106,12 +106,12 @@ function stringBasedInputType(ctrl) {
   );
 }
 
-function textInputType(scope, element, attr, ctrl, $browser) {
-  baseInputType(scope, element, attr, ctrl, $browser);
+function textInputType(scope, element, attr, ctrl) {
+  baseInputType(scope, element, attr, ctrl);
   stringBasedInputType(ctrl);
 }
 
-function baseInputType(scope, element, attr, ctrl, $browser) {
+function baseInputType(scope, element, attr, ctrl) {
   const type = element[0].type.toLowerCase();
   let composing = false;
   // In composition mode, users are still inputting intermediate text buffer,
@@ -130,7 +130,7 @@ function baseInputType(scope, element, attr, ctrl, $browser) {
 
   let listener = function (ev) {
     if (timeout) {
-      $browser.cancel(timeout);
+      clearTimeout(timeout);
       timeout = null;
     }
     if (composing) return;
@@ -173,7 +173,7 @@ function baseInputType(scope, element, attr, ctrl, $browser) {
         const validity = this[VALIDITY_STATE_PROPERTY];
         const origBadInput = validity.badInput;
         const origTypeMismatch = validity.typeMismatch;
-        timeout = $browser.defer(() => {
+        timeout = setTimeout(() => {
           timeout = null;
           if (
             validity.badInput !== origBadInput ||
@@ -326,8 +326,9 @@ export function createDateInputType(type, regexp, parseDate) {
     $filter,
     $parse,
   ) {
+    console.error("Unused ", $browser);
     badInputChecker(scope, element, attr, ctrl, type);
-    baseInputType(scope, element, attr, ctrl, $browser);
+    baseInputType(scope, element, attr, ctrl);
     let previousDate;
     let previousTimezone;
 
@@ -616,7 +617,7 @@ export function numberInputType(
 ) {
   badInputChecker(scope, element, attr, ctrl, "number");
   numberFormatterParser(ctrl);
-  baseInputType(scope, element, attr, ctrl, $browser);
+  baseInputType(scope, element, attr, ctrl);
 
   let parsedMinVal;
 
@@ -687,10 +688,10 @@ export function numberInputType(
   }
 }
 
-export function rangeInputType(scope, element, attr, ctrl, $browser) {
+export function rangeInputType(scope, element, attr, ctrl) {
   badInputChecker(scope, element, attr, ctrl, "range");
   numberFormatterParser(ctrl);
-  baseInputType(scope, element, attr, ctrl, $browser);
+  baseInputType(scope, element, attr, ctrl);
 
   const supportsRange =
     ctrl.$$hasNativeValidators && element[0].type === "range";
@@ -852,10 +853,10 @@ export function rangeInputType(scope, element, attr, ctrl, $browser) {
   }
 }
 
-function urlInputType(scope, element, attr, ctrl, $browser) {
+function urlInputType(scope, element, attr, ctrl) {
   // Note: no badInputChecker here by purpose as `url` is only a validation
   // in browsers, i.e. we can always read out input.value even if it is not valid!
-  baseInputType(scope, element, attr, ctrl, $browser);
+  baseInputType(scope, element, attr, ctrl);
   stringBasedInputType(ctrl);
 
   ctrl.$validators.url = function (modelValue, viewValue) {
@@ -864,10 +865,10 @@ function urlInputType(scope, element, attr, ctrl, $browser) {
   };
 }
 
-function emailInputType(scope, element, attr, ctrl, $browser) {
+function emailInputType(scope, element, attr, ctrl) {
   // Note: no badInputChecker here by purpose as `url` is only a validation
   // in browsers, i.e. we can always read out input.value even if it is not valid!
-  baseInputType(scope, element, attr, ctrl, $browser);
+  baseInputType(scope, element, attr, ctrl);
   stringBasedInputType(ctrl);
 
   ctrl.$validators.email = function (modelValue, viewValue) {

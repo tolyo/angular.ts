@@ -23,12 +23,28 @@ export class RootModelProvider {
     rootModel: ProxyHandler<any>;
     $get: (string | ((exceptionHandler: import("../exception-handler").ErrorHandler, parse: import("../parse/parse.js").ParseService) => ProxyHandler<any>))[];
 }
-export type ModelPhase = number;
-export namespace ModelPhase {
-    let NONE: number;
-    let WATCH: number;
-    let DIGEST: number;
-}
+/**
+ * Listener function definition.
+ * @typedef {Object} Listener
+ * @property {Object} originalTarget - The original target object.
+ * @property {ListenerFunction} listenerFn - The function invoked when changes are detected.
+ * @property {import("../parse/parse.js").CompiledExpression} watchFn
+ * @property {number} id - Deregistration id
+ * @property {number} scopeId - The scope that created the Listener
+ * @property {boolean} oneTime
+ * @property {string} property
+ * @property {string} [watchProp] - The original property to watch if different from observed key
+ * @property {Proxy} [foreignListener]
+ *
+ */
+/**
+ * Listener function type.
+ * @callback ListenerFunction
+ * @param {*} newValue - The new value of the changed property.
+ * @param {*} oldValue - The old value of the changed property.
+ * @param {Object} originalTarget - The original target object.
+ */
+export const isProxySymbol: unique symbol;
 export type AsyncQueueTask = {
     handler: Model;
     fn: Function;
@@ -47,13 +63,20 @@ export type Listener = {
      */
     listenerFn: ListenerFunction;
     watchFn: import("../parse/parse.js").CompiledExpression;
+    /**
+     * - Deregistration id
+     */
     id: number;
+    /**
+     * - The scope that created the Listener
+     */
+    scopeId: number;
     oneTime: boolean;
     property: string;
     /**
-     * - The optional context in which a property exists
+     * - The original property to watch if different from observed key
      */
-    context?: any;
+    watchProp?: string;
     foreignListener?: ProxyConstructor;
 };
 /**
@@ -69,15 +92,14 @@ declare class Model {
     /**
      * Initializes the handler with the target object and a context.
      *
-     * @param {Object} target - The target object being proxied.
      * @param {Model} [context] - The context containing listeners.
      */
-    constructor(target: any, context?: Model);
-    /** @type {Object} */
-    $target: any;
+    constructor(context?: Model);
     context: Model;
     /** @type {Map<string, Array<Listener>>} Watch listeners */
-    listeners: Map<string, Array<Listener>>;
+    watchers: Map<string, Array<Listener>>;
+    /** @type {Map<String, Function[]>} Event listeners */
+    $$listeners: Map<string, Function[]>;
     /** @type {Map<string, Array<Listener>>} Watch listeners from other proxies */
     foreignListeners: Map<string, Array<Listener>>;
     /** @type {WeakMap<Object, Array<string>>} */
@@ -87,14 +109,14 @@ declare class Model {
         oldValue: any;
         fn: Function;
     }>;
-    /** @type {?number} */
-    listenerCache: number | null;
-    /** @type {Proxy} */
-    proxy: ProxyConstructor;
+    /** Current proxy being operated on */
+    $proxy: any;
+    /** @type {*} Current target wrapped by current proxy */
+    $target: any;
     /**
-     * @type {Proxy[]}
+     * @type {Model[]}
      */
-    children: ProxyConstructor[];
+    $children: Model[];
     /**
      * @type {number} Unique model ID (monotonically increasing) useful for debugging.
      */
@@ -104,15 +126,10 @@ declare class Model {
      */
     $root: Model;
     $parent: Model;
-    /** @type {number} */
-    $$watchersCount: number;
     /** @type {AsyncQueueTask[]} */
     $$asyncQueue: AsyncQueueTask[];
-    /** @type {Map<String, Function[]>} Event listeners */
-    $$listeners: Map<string, Function[]>;
     filters: any[];
-    /** @type {ModelPhase} */
-    state: ModelPhase;
+    $wrapperProxy: any;
     /**
      * Intercepts and handles property assignments on the target object. If a new value is
      * an object, it will be recursively proxied.
@@ -151,7 +168,9 @@ declare class Model {
     $watch(watchProp: string, listenerFn?: ListenerFunction): () => void;
     $watchGroup(watchArray: any, listenerFn: any): void;
     $watchCollection(watchProp: any, listenerFn: any): () => void;
-    $new(isIsolated: boolean, parent: any): any;
+    $new(childInstance: any): any;
+    $newIsolate(instance: any): any;
+    $transcluded(parentInstance: any): any;
     registerKey(key: any, listener: any): void;
     registerForeignKey(key: any, listener: any): void;
     deregisterKey(key: any, id: any): boolean;
@@ -190,15 +209,11 @@ declare class Model {
     $postUpdate(fn: any): void;
     $destroy(): void;
     /**
-     * @param {number} count
-     */
-    incrementWatchersCount(count: number): void;
-    /**
      * Invokes the registered listener function with watched property changes.
      *
      * @param {Listener} listener - The property path that was changed.
      * @param {*} oldValue - The old value of the property.
      */
-    notifyListener(listener: Listener, oldValue: any): void;
+    notifyListener(listener: Listener, oldValue: any, target: any): void;
 }
 export {};

@@ -147,7 +147,7 @@ export function createHttpBackend($browser) {
     // xhr.abort()                        abort (The xhr object is normally inaccessible, but
     //                                    can be exposed with the xhrFactory)
     if (timeout > 0) {
-      var timeoutId = $browser.defer(() => {
+      var timeoutId = setTimeout(() => {
         timeoutRequest("timeout");
       }, timeout);
     } else if (isPromiseLike(timeout)) {
@@ -173,7 +173,7 @@ export function createHttpBackend($browser) {
     ) {
       // cancel timeout and subsequent timeout promise resolution
       if (isDefined(timeoutId)) {
-        $browser.cancel(timeoutId);
+        clearTimeout(timeoutId);
       }
 
       callback(status, response, headersString, statusText, xhrStatus);

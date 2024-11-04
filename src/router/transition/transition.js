@@ -49,14 +49,16 @@ export class Transition {
   constructor(fromPath, targetState, transitionService, globals) {
     this.globals = globals;
     this.transitionService = transitionService;
-    this._deferred = Promise.defer();
+    const { promise, resolve, reject } = Promise.withResolvers();
     /**
      * This promise is resolved or rejected based on the outcome of the Transition.
      *
      * When the transition is successful, the promise is resolved
      * When the transition is unsuccessful, the promise is rejected with the [[Rejection]] or javascript error
      */
-    this.promise = this._deferred.promise;
+    this.promise = promise;
+    this.resolve = resolve;
+    this.reject = reject;
     /** @internal Holds the hook registration functions such as those passed to Transition.onStart() */
     this._registeredHooks = {};
 
@@ -605,13 +607,13 @@ export class Transition {
     const transitionSuccess = () => {
       trace.traceSuccess(this.$to(), this);
       this.success = true;
-      this._deferred.resolve(this.to());
+      this.resolve(this.to());
       runAllHooks(getHooksFor(TransitionHookPhase.SUCCESS));
     };
     const transitionError = (reason) => {
       trace.traceError(reason, this);
       this.success = false;
-      this._deferred.reject(reason);
+      this.reject(reason);
       this._error = reason;
       runAllHooks(getHooksFor(TransitionHookPhase.ERROR));
     };

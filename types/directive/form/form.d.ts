@@ -131,7 +131,7 @@ export namespace nullFormCtrl {
     export function $$setSubmitted(): void;
 }
 export const PENDING_CLASS: "ng-pending";
-export const formDirective: (string | (($timeout: any, $parse: any) => {
+export const formDirective: (string | (($parse: any) => {
     name: string;
     restrict: string;
     require: string[];
@@ -140,7 +140,7 @@ export const formDirective: (string | (($timeout: any, $parse: any) => {
         pre: (scope: any, formElement: any, attr: any, ctrls: any) => void;
     };
 }))[];
-export const ngFormDirective: (string | (($timeout: any, $parse: any) => {
+export const ngFormDirective: (string | (($parse: any) => {
     name: string;
     restrict: string;
     require: string[];

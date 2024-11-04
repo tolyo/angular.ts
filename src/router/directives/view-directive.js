@@ -341,7 +341,6 @@ export function $ViewDirectiveFill($compile, $controller, $transitions, $view) {
             .children()
             .data("$ngControllerController", controllerInstance);
           registerControllerCallbacks(
-            $q,
             $transitions,
             controllerInstance,
             scope,
