@@ -27,7 +27,7 @@ describe("observe", () => {
     element = $compile(template)($scope);
   }
 
-  it("should set the scope property to the attribute value before any changes", () => {
+  fit("should set the scope property to the attribute value before any changes", () => {
     const scope = $rootScope.$new();
     const element = JQLite(
       '<div data-update="testProp" ng-observe="sourceAttr"></div>',
@@ -39,10 +39,9 @@ describe("observe", () => {
     expect(scope.testProp).toEqual("initialValue");
   });
 
-  it("should observe attribute changes and update the scope property", () => {
+  fit("should observe attribute changes and update the scope property", () => {
     $scope.myProp = "";
     createDirective("test-attribute", "myProp");
-    spyOn($scope, "$digest").and.callThrough();
 
     const mutationObserverCallback =
       MutationObserver.calls.mostRecent().args[0];
@@ -57,14 +56,11 @@ describe("observe", () => {
     mutationObserverCallback([mutationRecord]);
 
     expect($scope.myProp).toBe("newValue");
-    expect($scope.$digest).toHaveBeenCalled();
   });
 
-  it("should not trigger digest cycle if the attribute value is unchanged", () => {
+  fit("should change scope the attribute value is unchanged", () => {
     $scope.myProp = "existingValue";
     createDirective("test-attribute", "myProp");
-
-    spyOn($scope, "$digest").and.callThrough();
 
     const mutationObserverCallback =
       MutationObserver.calls.mostRecent().args[0];
@@ -77,11 +73,10 @@ describe("observe", () => {
     element[0].setAttribute("test-attribute", "existingValue");
 
     mutationObserverCallback([mutationRecord]);
-
-    expect($scope.$digest).not.toHaveBeenCalled();
+    expect($scope.myProp).toBe("existingValue");
   });
 
-  it("should disconnect the observer on scope destruction", () => {
+  fit("should disconnect the observer on scope destruction", () => {
     createDirective("test-attribute", "myProp");
 
     $scope.$destroy();

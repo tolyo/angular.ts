@@ -63,6 +63,9 @@ export class RootModelProvider {
  *                                     or the original value if the target is not an object.
  */
 export function createModel(target = {}, context) {
+  if (target === null) {
+    return null;
+  }
   if (typeof target === "object") {
     const proxy = new Proxy(target, context || new Model());
     for (const key in target) {
@@ -163,6 +166,9 @@ class Model {
     this.filters = [];
 
     this.$wrapperProxy = undefined;
+
+    /** @type {boolean} */
+    this.$$destroyed = false;
   }
 
   /**
@@ -925,6 +931,11 @@ class Model {
         val.filter((x) => x.scopeId !== this.id),
       );
     });
+
+    if (this.$$destroyed) return;
+
+    this.$broadcast("$destroy");
+    this.$$destroyed = true;
   }
 
   /**

@@ -21,7 +21,6 @@ describe("channel", () => {
 
   it("should subscribe to the specified EventBus channel", () => {
     element = $compile('<div ng-channel="testChannel"></div>')($scope);
-    $scope.$digest();
 
     expect(EventBus.subscribe).toHaveBeenCalledWith(
       "testChannel",
@@ -31,7 +30,6 @@ describe("channel", () => {
 
   it("should update innerHtml when EventBus emits a value", async () => {
     element = $compile('<div ng-channel="testChannel"></div>')($scope);
-    $scope.$digest();
 
     expect(element[0].innerHTML).toBe("");
 
@@ -43,7 +41,6 @@ describe("channel", () => {
 
   it("should unsubscribe from the EventBus when the scope is destroyed", () => {
     element = $compile('<div ng-channel="testChannel"></div>')($scope);
-    $scope.$digest();
 
     $scope.$destroy();
 

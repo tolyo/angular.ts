@@ -130,6 +130,8 @@ declare class Model {
     $$asyncQueue: AsyncQueueTask[];
     filters: any[];
     $wrapperProxy: any;
+    /** @type {boolean} */
+    $$destroyed: boolean;
     /**
      * Intercepts and handles property assignments on the target object. If a new value is
      * an object, it will be recursively proxied.
