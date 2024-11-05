@@ -1437,7 +1437,9 @@ describe("Model", () => {
         model.$watch("aValue", function (newValue, oldValue, m) {
           m.counter++;
         });
+        await wait();
         expect(model.counter).toBe(0);
+
         model.aValue.push(4);
         await wait();
         expect(model.counter).toBe(1);
@@ -1458,7 +1460,7 @@ describe("Model", () => {
 
         model.aValue.push(4);
         await wait();
-        expect(newValueGiven).toEqual([4]);
+        expect(newValueGiven).toEqual(model.aValue);
         expect(oldValueGiven).toBe(undefined);
 
         model.aValue.push(5);
@@ -1634,6 +1636,13 @@ describe("Model", () => {
     });
 
     describe("watching other proxies", () => {
+      it("should register a foreign proxies ", async () => {
+        let model1 = createModel();
+        let model2 = createModel({ b: 2 });
+        model1.service = model2;
+        expect(model1.$handler.foreignProxies.size).toEqual(1);
+      });
+
       it("should detect changes on another proxy", async () => {
         let model1 = createModel();
         let model2 = createModel({ b: 2 });
@@ -1690,12 +1699,12 @@ describe("Model", () => {
             expect(logs).toEqual([{ newVal: {}, oldVal: "test" }]);
           });
 
-          it("should not trigger change when object in collection changes", () => {
+          it("should not trigger change when object in collection changes", async () => {
             model.obj = { name: {} };
 
-            expect(logs).toEqual([
-              { newVal: { name: {} }, oldVal: { name: {} } },
-            ]);
+            await wait();
+
+            expect(logs).toEqual([{ newVal: { name: {} }, oldVal: undefined }]);
             logs = [];
 
             model.obj.name.bar = "foo";

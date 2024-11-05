@@ -1,3 +1,4 @@
+import { val } from "../../shared/hof.js";
 import {
   isUndefined,
   nextUid,
@@ -131,6 +132,9 @@ class Model {
     /** @type {Map<string, Array<Listener>>} Watch listeners from other proxies */
     this.foreignListeners = context ? context.foreignListeners : new Map();
 
+    /** @type {Set<ProxyConstructor>} */
+    this.foreignProxies = context ? context.foreignProxies : new Set();
+
     /** @type {WeakMap<Object, Array<string>>} */
     this.objectListeners = context ? context.objectListeners : new WeakMap();
 
@@ -193,7 +197,6 @@ class Model {
     ) {
       return true;
     }
-
     if (oldValue && oldValue[isProxySymbol]) {
       if (Array.isArray(value)) {
         if (oldValue !== value) {
@@ -268,6 +271,12 @@ class Model {
       }
       return true;
     } else {
+      if (isUndefined(target[property]) && isProxy(value)) {
+        this.foreignProxies.add(value);
+        target[property] = value;
+        return true;
+      }
+
       target[property] = createModel(value, this);
 
       if (oldValue !== value) {
@@ -298,57 +307,30 @@ class Model {
 
         let foreignListeners = this.foreignListeners.get(property);
 
-        console.log(this.$parent?.foreignListeners);
-
         if (!foreignListeners && this.$parent?.foreignListeners) {
           foreignListeners = this.$parent.foreignListeners.get(property);
-          console.log("foreign Listeners");
-          console.log(foreignListeners);
         }
         if (foreignListeners) {
           assert(foreignListeners.length !== 0);
-          // primitive only
-
-          // let isValue =
-          //   Number.isNaN(value) ||
-          //   foreignListeners[0].watchFn(this.context?.$target) == value ||
-          //   (() => {
-          //     const res = foreignListeners[0].watchFn(this.$target);
-          //     if (res && res[isProxySymbol]) {
-          //       return res.$target == value;
-          //     } else {
-          //       return res == value;
-          //     }
-          //   })();
-
-          // if (isValue) {
           this.scheduleListener(foreignListeners, oldValue);
-          //}
         }
       }
 
-      if (this.objectListeners.has(proxy)) {
+      if (this.objectListeners.has(proxy) && property !== "length") {
         let keys = this.objectListeners.get(proxy);
         keys.forEach((key) => {
           const listeners = this.watchers.get(key);
           if (listeners) {
-            let oldObject = structuredClone(target);
-            oldObject[property] = oldValue;
-            this.scheduleListener(listeners, oldObject);
+            if (Array.isArray(target)) {
+              this.scheduleListener(listeners, oldValue);
+            } else {
+              let oldObject = structuredClone(target);
+              oldObject[property] = oldValue;
+              this.scheduleListener(listeners, oldObject);
+            }
           }
         });
       }
-
-      // Right now this is only for Arrays
-      // if (this.objectListeners.has(target) && property !== "length") {
-      //   let keys = this.objectListeners.get(target);
-      //   keys.forEach((key) => {
-      //     const listeners = this.watchers.get(key);
-      //     if (listeners) {
-      //       this.scheduleListener(listeners, oldValue);
-      //     }
-      //   });
-      // }
 
       return true;
     }
@@ -369,7 +351,9 @@ class Model {
     this.$proxy = proxy;
     this.$target = target;
 
+    if (property === "$$watchersCount") return calculateWatcherCount(this);
     if (property === isProxySymbol) return true;
+
     const propertyMap = {
       $watch: this.$watch.bind(this),
       $watchGroup: this.$watchGroup.bind(this),
@@ -392,7 +376,6 @@ class Model {
       $handler: this,
       $parent: this.$parent,
       $root: this.$root,
-      $$watchersCount: calculateWatcherCount(this),
       $wrapperProxy: this.$wrapperProxy,
       $children: this.$children,
       id: this.id,
@@ -458,8 +441,8 @@ class Model {
 
     var oldValue = structuredClone(target);
     delete target[property];
-    if (this.objectListeners.has(target)) {
-      let keys = this.objectListeners.get(target);
+    if (this.objectListeners.has(this.$proxy)) {
+      let keys = this.objectListeners.get(this.$proxy);
       keys.forEach((key) => {
         const listeners = this.watchers.get(key);
         if (listeners) {
@@ -565,6 +548,16 @@ class Model {
         if (watchProp !== key) {
           // Handle nested expression call
           listener.watchProp = watchProp;
+
+          let potentialProxy = $parse(
+            watchProp.split(".").slice(0, -1).join("."),
+          )(listener.originalTarget);
+          if (potentialProxy && this.foreignProxies.has(potentialProxy)) {
+            potentialProxy.$handler.registerForeignKey(key, listener);
+            return () => {
+              return potentialProxy.$handler.deregisterKey(key, listener.id);
+            };
+          }
         }
         break;
       }
@@ -617,35 +610,6 @@ class Model {
     }
 
     this.registerKey(key, listener);
-
-    // if (
-    //   listener.context &&
-    //   listener.context() &&
-    //   listener.context()[isProxySymbol]
-    // ) {
-    //   listener.foreignListener = this.proxy;
-    //   listener.context().$handler.registerForeignKey(key, listener);
-    // } else {
-
-    // }
-
-    // let watchedValue = get(this.$target);
-    // const value =
-    //   watchedValue && watchedValue[isProxySymbol]
-    //     ? watchedValue.$target
-    //     : watchedValue;
-
-    // const isArray = Array.isArray(value);
-    // const isObject =
-    //   Object.prototype.toString.call(value) === "[object Object]";
-    // if (isArray || isObject) {
-    //   if (this.objectListeners.has(value)) {
-    //     this.objectListeners.get(value).push(key);
-    //   } else {
-    //     this.objectListeners.set(value, [key]);
-    //   }
-    // }
-
     return () => {
       return this.deregisterKey(key, listener.id);
     };
@@ -1011,4 +975,16 @@ function collectChildIds(child) {
     collectChildIds(c).forEach((id) => ids.add(id));
   });
   return ids;
+}
+
+/**
+ *
+ * @param {*} value
+ * @returns {boolean}
+ */
+function isProxy(value) {
+  if (value && value[isProxySymbol]) {
+    return true;
+  }
+  return false;
 }

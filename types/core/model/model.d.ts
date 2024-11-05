@@ -102,6 +102,8 @@ declare class Model {
     $$listeners: Map<string, Function[]>;
     /** @type {Map<string, Array<Listener>>} Watch listeners from other proxies */
     foreignListeners: Map<string, Array<Listener>>;
+    /** @type {Set<ProxyConstructor>} */
+    foreignProxies: Set<ProxyConstructor>;
     /** @type {WeakMap<Object, Array<string>>} */
     objectListeners: WeakMap<any, Array<string>>;
     /** @type {Map<Function, {oldValue: any, fn: Function}>} */
