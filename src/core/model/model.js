@@ -324,8 +324,12 @@ class Model {
             if (Array.isArray(target)) {
               this.scheduleListener(listeners, oldValue);
             } else {
-              let oldObject = structuredClone(target);
-              oldObject[property] = oldValue;
+              let oldObject = structuredClone(deProxy(target));
+              if (isUndefined(oldValue)) {
+                delete oldObject[property];
+              } else {
+                oldObject[property] = oldValue;
+              }
               this.scheduleListener(listeners, oldObject);
             }
           }
@@ -912,12 +916,7 @@ class Model {
     const { originalTarget, listenerFn, watchFn } = listener;
     try {
       const newVal = watchFn(target) || watchFn(listener.originalTarget);
-      //const res  = watchFn(listener.originalTarget.$target).$target
       listenerFn(newVal, oldValue, originalTarget);
-      // if (oneTime) {
-      //   this.deregisterKey(property, id)
-      // }
-
       this.$$asyncQueue.forEach((x) => {
         if (x.handler.id == this.id) {
           Promise.resolve().then(x.fn(x.handler, x.locals));
@@ -987,4 +986,17 @@ function isProxy(value) {
     return true;
   }
   return false;
+}
+
+function deProxy(obj) {
+  if (isObject(obj)) {
+    let newObj = obj;
+    for (const key in newObj) {
+      if (newObj[key] && newObj[key][isProxySymbol]) {
+        newObj[key] = deProxy(newObj[key].$target);
+      }
+    }
+    return newObj;
+  }
+  return obj;
 }

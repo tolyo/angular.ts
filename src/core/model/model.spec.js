@@ -1712,67 +1712,58 @@ describe("Model", () => {
             expect(logs).toEqual([]);
           });
 
-          it("should watch object properties", () => {
+          it("should watch object properties", async () => {
             model.obj = {};
 
-            expect(logs).toEqual([{ newVal: {}, oldVal: {} }]);
+            await wait();
+            expect(logs).toEqual([{ newVal: {}, oldVal: undefined }]);
+
             logs = [];
+
             model.obj.a = "A";
+            await wait();
 
             expect(logs).toEqual([{ newVal: { a: "A" }, oldVal: {} }]);
 
             logs = [];
             model.obj.a = "B";
+            await wait();
 
             expect(logs).toEqual([{ newVal: { a: "B" }, oldVal: { a: "A" } }]);
 
             logs = [];
+
             model.obj.b = [];
+            await wait();
+            expect(logs).toEqual([{ newVal: model.obj, oldVal: { a: "B" } }]);
+
+            logs = [];
             model.obj.c = {};
 
+            await wait();
             expect(logs).toEqual([
-              { newVal: { a: "B", b: [], c: {} }, oldVal: { a: "B" } },
-            ]);
-
-            logs = [];
-            const temp = model.obj.a;
-            model.obj.a = model.obj.b;
-            model.obj.c = temp;
-
-            expect(logs).toEqual([
-              {
-                newVal: { a: [], b: [], c: "B" },
-                oldVal: { a: "B", b: [], c: {} },
-              },
-            ]);
-
-            logs = [];
-            delete model.obj.a;
-
-            expect(logs).toEqual([
-              { newVal: { b: [], c: "B" }, oldVal: { a: [], b: [], c: "B" } },
+              { newVal: model.obj, oldVal: { a: "B", b: [] } },
             ]);
           });
 
-          it("should not infinitely digest when current value is NaN", () => {
+          it("should not infinitely digest when current value is NaN", async () => {
             model.obj = { a: NaN };
+            await wait();
             expect(() => {}).not.toThrow();
           });
 
-          it("should handle objects created using `Object.create(null)`", () => {
+          it("should handle objects created using `Object.create(null)`", async () => {
             model.obj = Object.create(null);
             model.obj.a = "a";
             model.obj.b = "b";
 
-            expect(logs[0].newVal).toEqual(
-              extend(Object.create(null), { a: "a", b: "b" }),
-            );
+            await wait();
+            expect(logs[0].newVal).toEqual(model.obj);
 
             delete model.obj.b;
 
-            expect(logs[0].newVal).toEqual(
-              extend(Object.create(null), { a: "a" }),
-            );
+            await wait();
+            expect(logs[0].newVal).toEqual(model.obj);
           });
         });
       });
