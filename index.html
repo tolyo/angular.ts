@@ -70,6 +70,8 @@
         {{ name }}
         
       </div>
-     
+
+      <input type="checkbox" ng-model="hide"/>
+      <div ng-if="hide">SHOW? {{ hide }} </div>
     </body>
 </html>

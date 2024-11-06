@@ -37,44 +37,48 @@ describe("ngIf", () => {
 
     function makeIf() {
       Array.from(arguments).forEach((expr) => {
-        element.append(
-          $compile(`<div class="my-class" ng-if="${expr}"><div>Hi</div></div>`)(
-            $scope,
-          ),
-        );
+        let newElement = $compile(
+          `<div class="my-class" ng-if="${expr}"><div>Hi</div></div>`,
+        )($scope);
+        element.append(newElement);
       });
-      $scope.$apply();
     }
 
-    it("should immediately remove the element if condition is falsy", () => {
+    it("should immediately remove the element if condition is falsy", async () => {
       makeIf("false", "undefined", "null", "NaN", "''", "0");
+      await wait();
       expect(element.children().length).toBe(0);
     });
 
-    it("should leave the element if condition is true", () => {
+    it("should leave the element if condition is true", async () => {
       makeIf("true");
+      await wait();
       expect(element.children().length).toBe(1);
     });
 
-    it("should leave the element if the condition is a non-empty string", () => {
+    it("should leave the element if the condition is a non-empty string", async () => {
       makeIf("'f'", "'0'", "'false'", "'no'", "'n'", "'[]'");
+      await wait();
       expect(element.children().length).toBe(6);
     });
 
-    it("should leave the element if the condition is an object", () => {
+    it("should leave the element if the condition is an object", async () => {
       makeIf("[]", "{}");
+      await wait();
       expect(element.children().length).toBe(2);
     });
 
-    it("should not add the element twice if the condition goes from true to true", () => {
+    it("should not add the element twice if the condition goes from true to true", async () => {
       $scope.hello = "true1";
       makeIf("hello");
+      await wait();
       expect(element.children().length).toBe(1);
       $scope.$apply('hello = "true2"');
+      await wait();
       expect(element.children().length).toBe(1);
     });
 
-    it("should not recreate the element if the condition goes from true to true", () => {
+    it("should not recreate the element if the condition goes from true to true", async () => {
       $scope.hello = "true1";
       makeIf("hello");
       element.children().data("flag", true);
@@ -82,15 +86,17 @@ describe("ngIf", () => {
       expect(element.children().data("flag")).toBe(true);
     });
 
-    it("should create then remove the element if condition changes", () => {
+    it("should create then remove the element if condition changes", async () => {
       $scope.hello = true;
       makeIf("hello");
+      await wait();
       expect(element.children().length).toBe(1);
       $scope.$apply("hello = false");
+      await wait();
       expect(element.children().length).toBe(0);
     });
 
-    it("should create a new scope every time the expression evaluates to true", () => {
+    it("should create a new scope every time the expression evaluates to true", async () => {
       $scope.$apply("value = true");
       element.append(
         $compile(
@@ -101,7 +107,7 @@ describe("ngIf", () => {
       expect(element.children("div").length).toBe(1);
     });
 
-    it("should destroy the child scope every time the expression evaluates to false", () => {
+    it("should destroy the child scope every time the expression evaluates to false", async () => {
       $scope.value = true;
       element.append($compile('<div ng-if="value"></div>')($scope));
       $scope.$apply();
@@ -109,7 +115,7 @@ describe("ngIf", () => {
       const childScope = $scope.$$childHead;
       let destroyed = false;
 
-      childScope.$on("$destroy", () => {
+      childScope.$on("$destroy", async () => {
         destroyed = true;
       });
 
@@ -119,7 +125,7 @@ describe("ngIf", () => {
       expect(destroyed).toBe(true);
     });
 
-    it("should play nice with other elements beside it", () => {
+    it("should play nice with other elements beside it", async () => {
       $scope.values = [1, 2, 3, 4];
       element.append(
         $compile(
@@ -152,7 +158,7 @@ describe("ngIf", () => {
       }, 300);
     });
 
-    it("should work with multiple elements", () => {
+    it("should work with multiple elements", async () => {
       $scope.show = true;
       $scope.things = [1, 2, 3];
       element.append(
@@ -176,7 +182,7 @@ describe("ngIf", () => {
       // expect(element.text()).toBe("before;after;");
     });
 
-    it("should restore the element to its compiled state", () => {
+    it("should restore the element to its compiled state", async () => {
       $scope.value = true;
       makeIf("value");
       expect(element.children().length).toBe(1);
@@ -208,7 +214,7 @@ describe("ngIf", () => {
       expect(element.text()).toBe("");
     });
 
-    it("should not trigger a digest when the element is removed", () => {
+    it("should not trigger a digest when the element is removed", async () => {
       const spy = spyOn($rootScope, "$digest").and.callThrough();
       $scope.hello = true;
       makeIf("hello");
@@ -220,7 +226,7 @@ describe("ngIf", () => {
     });
 
     describe("and transcludes", () => {
-      it("should allow access to directive controller from children when used in a replace template", () => {
+      it("should allow access to directive controller from children when used in a replace template", async () => {
         let controller;
         const { directive } = $compileProvider;
         directive(
@@ -247,7 +253,7 @@ describe("ngIf", () => {
         expect(controller.flag).toBe(true);
       });
 
-      it("should use the correct transcluded scope", () => {
+      it("should use the correct transcluded scope", async () => {
         $compileProvider.directive(
           "iso",
           valueFn({
