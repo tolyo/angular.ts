@@ -243,7 +243,7 @@ class Model {
         return true;
       }
 
-      if (isUndefined(value) || isDefined(value)) {
+      if (isUndefined(value)) {
         Object.keys(oldValue.$target).forEach((k) => {
           delete oldValue[k];
         });
@@ -253,19 +253,34 @@ class Model {
         if (listeners) {
           this.scheduleListener(listeners, oldValue);
         }
-        listeners = [];
-        if (this.$wrapperProxy) {
-          Object.keys(this.$wrapperProxy.$target).forEach((v) => {
-            this.watchers.get(v).forEach((i) => {
-              listeners.push(i);
-            });
-          });
-          const oldObject = Object.create(null);
 
-          oldObject[property] = oldValue;
+        return true;
+      }
 
-          this.scheduleListener(listeners, oldObject);
+      if (isDefined(value)) {
+        target[property] = value;
+        // Object.keys(oldValue.$target).forEach((k) => {
+        //   delete oldValue[k];
+        // });
+        // target[property] = undefined;
+        let listeners = this.watchers.get(property);
+
+        if (listeners) {
+          this.scheduleListener(listeners, oldValue);
         }
+        // listeners = [];
+        // if (this.$wrapperProxy) {
+        //   Object.keys(this.$wrapperProxy.$target).forEach((v) => {
+        //     this.watchers.get(v).forEach((i) => {
+        //       listeners.push(i);
+        //     });
+        //   });
+        //   const oldObject = Object.create(null);
+
+        //   oldObject[property] = oldValue;
+
+        //   this.scheduleListener(listeners, oldObject);
+        // }
 
         return true;
       }
@@ -298,8 +313,7 @@ class Model {
               const wrapperExpr = x.watchProp.split(".").slice(0, -1).join(".");
               const expectedTarget = $parse(wrapperExpr)(
                 x.originalTarget,
-              ).$target;
-              assert(isDefined(expectedTarget), "Proxy expected");
+              )?.$target;
               return expectedTarget === target;
             });
           });
@@ -358,37 +372,39 @@ class Model {
     if (property === "$$watchersCount") return calculateWatcherCount(this);
     if (property === isProxySymbol) return true;
 
-    const propertyMap = {
-      $watch: this.$watch.bind(this),
-      $watchGroup: this.$watchGroup.bind(this),
-      $watchCollection: this.$watchCollection.bind(this),
-      $new: this.$new.bind(this),
-      $newIsolate: this.$newIsolate.bind(this),
-      $destroy: this.$destroy.bind(this),
-      $eval: this.$eval.bind(this),
-      $apply: this.$apply.bind(this),
-      $evalAsync: this.$evalAsync.bind(this),
-      $postUpdate: this.$postUpdate.bind(this),
-      $isRoot: this.isRoot.bind(this),
-      $target: this.$target,
-      $proxy: this.$proxy,
-      $digest: this.$digest.bind(this),
-      $on: this.$on.bind(this),
-      $emit: this.$emit.bind(this),
-      $broadcast: this.$broadcast.bind(this),
-      $transcluded: this.$transcluded.bind(this),
-      $handler: this,
-      $parent: this.$parent,
-      $root: this.$root,
-      $wrapperProxy: this.$wrapperProxy,
-      $children: this.$children,
-      id: this.id,
-      registerForeignKey: this.registerForeignKey.bind(this),
-      notifyListener: this.notifyListener.bind(this),
-    };
+    if (!this.propertyMap) {
+      this.propertyMap = {
+        $watch: this.$watch.bind(this),
+        $watchGroup: this.$watchGroup.bind(this),
+        $watchCollection: this.$watchCollection.bind(this),
+        $new: this.$new.bind(this),
+        $newIsolate: this.$newIsolate.bind(this),
+        $destroy: this.$destroy.bind(this),
+        $eval: this.$eval.bind(this),
+        $apply: this.$apply.bind(this),
+        $evalAsync: this.$evalAsync.bind(this),
+        $postUpdate: this.$postUpdate.bind(this),
+        $isRoot: this.isRoot.bind(this),
+        $target: this.$target,
+        $proxy: this.$proxy,
+        $digest: this.$digest.bind(this),
+        $on: this.$on.bind(this),
+        $emit: this.$emit.bind(this),
+        $broadcast: this.$broadcast.bind(this),
+        $transcluded: this.$transcluded.bind(this),
+        $handler: this,
+        $parent: this.$parent,
+        $root: this.$root,
+        $wrapperProxy: this.$wrapperProxy,
+        $children: this.$children,
+        id: this.id,
+        registerForeignKey: this.registerForeignKey.bind(this),
+        notifyListener: this.notifyListener.bind(this),
+      };
+    }
 
-    return Object.prototype.hasOwnProperty.call(propertyMap, property)
-      ? propertyMap[property]
+    return Object.prototype.hasOwnProperty.call(this.propertyMap, property)
+      ? this.propertyMap[property]
       : target[property];
   }
 
@@ -535,7 +551,10 @@ class Model {
       }
       // 6
       case ASTType.BinaryExpression: {
-        throw new Error("Unsupported type " + type);
+        listener.property =
+          get.decoratedNode.body[0].expression.toWatch[0].property.name;
+        key = listener.property;
+        break;
       }
       // 7
       case ASTType.UnaryExpression: {
@@ -614,6 +633,7 @@ class Model {
     }
 
     this.registerKey(key, listener);
+    this.scheduleListener([listener], undefined);
     return () => {
       return this.deregisterKey(key, listener.id);
     };

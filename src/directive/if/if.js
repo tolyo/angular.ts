@@ -32,6 +32,7 @@ export function ngIfDirective($animate) {
       let childScope;
       /** @type {import("../../shared/jqlite/jqlite").JQLite} */
       let previousElements;
+
       $scope.$watch($attr["ngIf"], (value) => {
         if (value) {
           if (!childScope) {

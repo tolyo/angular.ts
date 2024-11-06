@@ -752,9 +752,9 @@ export class NgModelController {
           // external validators (e.g. calculated on the server),
           // that just call $setValidity and need the model value
           // to calculate their validity.
-          if (that.$modelValue[isProxySymbol]) {
-            delete that.$modelValue;
-          }
+          // if (that.$modelValue ?? that.$modelValue[isProxySymbol]) {
+          //   delete that.$modelValue;
+          // }
           that.$modelValue = allValid ? modelValue : undefined;
           writeToModelIfNeeded();
         }

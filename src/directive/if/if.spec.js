@@ -81,8 +81,10 @@ describe("ngIf", () => {
     it("should not recreate the element if the condition goes from true to true", async () => {
       $scope.hello = "true1";
       makeIf("hello");
+      await wait();
       element.children().data("flag", true);
       $scope.$apply('hello = "true2"');
+      await wait();
       expect(element.children().data("flag")).toBe(true);
     });
 
@@ -98,21 +100,22 @@ describe("ngIf", () => {
 
     it("should create a new scope every time the expression evaluates to true", async () => {
       $scope.$apply("value = true");
+      await wait();
       element.append(
         $compile(
           '<div ng-if="value"><span ng-init="value=false"></span></div>',
         )($scope),
       );
       $scope.$apply();
+      await wait();
       expect(element.children("div").length).toBe(1);
     });
 
     it("should destroy the child scope every time the expression evaluates to false", async () => {
       $scope.value = true;
       element.append($compile('<div ng-if="value"></div>')($scope));
-      $scope.$apply();
-
-      const childScope = $scope.$$childHead;
+      await wait();
+      const childScope = $scope.$handler.$children[0];
       let destroyed = false;
 
       childScope.$on("$destroy", async () => {
@@ -120,7 +123,8 @@ describe("ngIf", () => {
       });
 
       $scope.value = false;
-      $scope.$apply();
+
+      await wait();
 
       expect(destroyed).toBe(true);
     });
@@ -134,11 +138,15 @@ describe("ngIf", () => {
             '<div ng-repeat="i in values"></div>',
         )($scope),
       );
-      $scope.$apply();
+      await wait();
       expect(element.children().length).toBe(9);
+
       $scope.$apply("values.splice(0,1)");
+      await wait();
       expect(element.children().length).toBe(6);
+
       $scope.$apply("values.push(1)");
+      await wait();
       expect(element.children().length).toBe(9);
     });
 
