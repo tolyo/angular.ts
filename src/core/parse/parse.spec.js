@@ -1051,7 +1051,7 @@ describe("parser", () => {
           logs = [];
         });
 
-        fit("should only become stable when all the properties of an object have defined values", async () => {
+        it("should only become stable when all the properties of an object have defined values", async () => {
           $rootScope.$watch("::{foo: foo, bar: bar}", (value) => {
             logs.push(value);
           });
@@ -2199,7 +2199,7 @@ describe("parser", () => {
       logs = [];
     });
 
-    it("should support watching", () => {
+    it("should support watching", async () => {
       let lastVal = NaN;
       let callCount = 0;
       const listener = function (val) {
@@ -2208,21 +2208,27 @@ describe("parser", () => {
       };
 
       scope.$watch("{val: val}", listener);
+      await wait();
+      expect(callCount).toBe(1);
 
       scope.$apply("val = 1");
-      expect(callCount).toBe(1);
+      await wait();
+      expect(callCount).toBe(2);
       expect(lastVal).toEqual({ val: 1 });
 
       scope.$apply("val = []");
-      expect(callCount).toBe(2);
-      expect(lastVal).toEqual({ val: [] });
-
-      scope.$apply("val = []");
+      await wait();
       expect(callCount).toBe(3);
       expect(lastVal).toEqual({ val: [] });
 
-      scope.$apply("val = {}");
+      scope.$apply("val = []");
+      await wait();
       expect(callCount).toBe(4);
+      expect(lastVal).toEqual({ val: [] });
+
+      scope.$apply("val = {}");
+      await wait();
+      expect(callCount).toBe(5);
       expect(lastVal).toEqual({ val: {} });
     });
 

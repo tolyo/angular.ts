@@ -608,7 +608,10 @@ class Model {
 
       // 14
       case ASTType.ObjectExpression: {
-        throw new Error("Unsupported type " + type);
+        listener.property =
+          get.decoratedNode.body[0].expression.toWatch[0].name;
+        key = listener.property;
+        break;
       }
 
       // 15
@@ -935,7 +938,7 @@ class Model {
   notifyListener(listener, oldValue, target) {
     const { originalTarget, listenerFn, watchFn } = listener;
     try {
-      const newVal = watchFn(target) || watchFn(listener.originalTarget);
+      const newVal = watchFn(listener.originalTarget) || watchFn(target);
       listenerFn(newVal, oldValue, originalTarget);
       this.$$asyncQueue.forEach((x) => {
         if (x.handler.id == this.id) {

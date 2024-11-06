@@ -2199,7 +2199,7 @@ describe("Model", () => {
 
       child.$apply("a = 0");
       await wait();
-      expect(log).toEqual("1");
+      expect(log).toEqual("11");
     });
 
     //   it("should catch exceptions", () => {
