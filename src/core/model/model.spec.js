@@ -1161,7 +1161,7 @@ describe("Model", () => {
         model.counter = 0;
         model.someValue = { b: { c: undefined } };
 
-        model.$watch("someValue.b.c.d", function (newValue, oldValue, model) {
+        model.$watch("someValue.b.c.d", function (newValue, model) {
           model.counter++;
         });
         await wait();
