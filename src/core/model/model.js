@@ -248,7 +248,7 @@ class Model {
       if (isUndefined(value)) {
         let called = false;
         Object.keys(oldValue.$target).forEach((k) => {
-          if (oldValue[k][isProxySymbol]) {
+          if (oldValue[k]?.[isProxySymbol]) {
             called = true;
           }
           delete oldValue[k];
