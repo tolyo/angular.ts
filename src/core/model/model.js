@@ -99,7 +99,6 @@ export function createModel(target = {}, context) {
  * Listener function type.
  * @callback ListenerFunction
  * @param {*} newValue - The new value of the changed property.
- * @param {*} oldValue - The old value of the changed property.
  * @param {Object} originalTarget - The original target object.
  */
 
@@ -144,8 +143,11 @@ class Model {
     /** Current proxy being operated on */
     this.$proxy = null;
 
-    /** @type {*} Current target wrapped by current proxy */
+    /** @type {*} Current target begin called on */
     this.$target = null;
+
+    /** @type {*} Value wrapped by the proxy */
+    this.$value = null;
 
     /**
      * @type {Model[]}
@@ -203,13 +205,13 @@ class Model {
           const listeners = this.watchers.get(property);
 
           if (listeners) {
-            this.scheduleListener(listeners, oldValue);
+            this.scheduleListener(listeners);
           }
 
           const foreignListeners = this.foreignListeners.get(property);
 
           if (foreignListeners) {
-            this.scheduleListener(foreignListeners, oldValue);
+            this.scheduleListener(foreignListeners);
           }
         }
         target[property] = value;
@@ -229,13 +231,13 @@ class Model {
           const listeners = this.watchers.get(property);
 
           if (listeners) {
-            this.scheduleListener(listeners, oldValue);
+            this.scheduleListener(listeners);
           }
 
           const foreignListeners = this.foreignListeners.get(property);
 
           if (foreignListeners) {
-            this.scheduleListener(foreignListeners, oldValue);
+            this.scheduleListener(foreignListeners);
           }
         }
         target[property] = createModel({}, this);
@@ -244,14 +246,21 @@ class Model {
       }
 
       if (isUndefined(value)) {
+        let called = false;
         Object.keys(oldValue.$target).forEach((k) => {
+          if (oldValue[k][isProxySymbol]) {
+            called = true;
+          }
           delete oldValue[k];
         });
-        target[property] = undefined;
-        let listeners = this.watchers.get(property);
 
-        if (listeners) {
-          this.scheduleListener(listeners, oldValue);
+        target[property] = undefined;
+        if (!called) {
+          let listeners = this.watchers.get(property);
+
+          if (listeners) {
+            this.scheduleListener(listeners);
+          }
         }
 
         return true;
@@ -266,7 +275,7 @@ class Model {
         let listeners = this.watchers.get(property);
 
         if (listeners) {
-          this.scheduleListener(listeners, oldValue);
+          this.scheduleListener(listeners);
         }
         // listeners = [];
         // if (this.$wrapperProxy) {
@@ -306,14 +315,13 @@ class Model {
         if (listeners) {
           assert(listeners.length !== 0);
           // check if the listener actually appllies to this target
-          this.scheduleListener(listeners, oldValue, (x) => {
+          this.scheduleListener(listeners, (x) => {
             return x.filter((x) => {
               if (!x.watchProp) return true;
               // Compute the expected target based on `watchProp`
               const wrapperExpr = x.watchProp.split(".").slice(0, -1).join(".");
-              const expectedTarget = $parse(wrapperExpr)(
-                x.originalTarget,
-              )?.$target;
+              const expectedTarget = $parse(wrapperExpr)(x.originalTarget)
+                ?.$handler.$target;
               return expectedTarget === target;
             });
           });
@@ -326,7 +334,7 @@ class Model {
         }
         if (foreignListeners) {
           assert(foreignListeners.length !== 0);
-          this.scheduleListener(foreignListeners, oldValue);
+          this.scheduleListener(foreignListeners);
         }
       }
 
@@ -335,17 +343,7 @@ class Model {
         keys.forEach((key) => {
           const listeners = this.watchers.get(key);
           if (listeners) {
-            if (Array.isArray(target)) {
-              this.scheduleListener(listeners, oldValue);
-            } else {
-              let oldObject = structuredClone(deProxy(target));
-              if (isUndefined(oldValue)) {
-                delete oldObject[property];
-              } else {
-                oldObject[property] = oldValue;
-              }
-              this.scheduleListener(listeners, oldObject);
-            }
+            this.scheduleListener(listeners);
           }
         });
       }
@@ -411,23 +409,17 @@ class Model {
   /**
    * @private
    * @param {Listener[]} listeners
-   * @param {*} oldValue
    */
-  scheduleListener(listeners, oldValue, filter = (val) => val) {
-    console.log("scheduleListener");
+  scheduleListener(listeners, filter = (val) => val) {
     Promise.resolve().then(() => {
       let index = 0;
 
       while (index < filter(listeners).length) {
         const listener = filter(listeners)[index];
         if (listener.foreignListener) {
-          listener.foreignListener.notifyListener(
-            listener,
-            oldValue,
-            this.$target,
-          );
+          listener.foreignListener.notifyListener(listener, this.$target);
         } else {
-          this.notifyListener(listener, oldValue, this.$target);
+          this.notifyListener(listener, this.$target);
         }
 
         if (listener.oneTime) {
@@ -459,14 +451,13 @@ class Model {
       return true;
     }
 
-    var oldValue = structuredClone(target);
     delete target[property];
     if (this.objectListeners.has(this.$proxy)) {
       let keys = this.objectListeners.get(this.$proxy);
       keys.forEach((key) => {
         const listeners = this.watchers.get(key);
         if (listeners) {
-          this.scheduleListener(listeners, oldValue);
+          this.scheduleListener(listeners);
         }
       });
     } else {
@@ -636,7 +627,7 @@ class Model {
     }
 
     this.registerKey(key, listener);
-    this.scheduleListener([listener], undefined);
+    this.scheduleListener([listener]);
     return () => {
       return this.deregisterKey(key, listener.id);
     };
@@ -933,13 +924,12 @@ class Model {
    * Invokes the registered listener function with watched property changes.
    *
    * @param {Listener} listener - The property path that was changed.
-   * @param {*} oldValue - The old value of the property.
    */
-  notifyListener(listener, oldValue, target) {
+  notifyListener(listener, target) {
     const { originalTarget, listenerFn, watchFn } = listener;
     try {
-      const newVal = watchFn(listener.originalTarget) || watchFn(target);
-      listenerFn(newVal, oldValue, originalTarget);
+      const newVal = watchFn(target) || watchFn(originalTarget);
+      listenerFn(newVal, originalTarget);
       this.$$asyncQueue.forEach((x) => {
         if (x.handler.id == this.id) {
           Promise.resolve().then(x.fn(x.handler, x.locals));
@@ -1009,17 +999,4 @@ function isProxy(value) {
     return true;
   }
   return false;
-}
-
-function deProxy(obj) {
-  if (isObject(obj)) {
-    let newObj = obj;
-    for (const key in newObj) {
-      if (newObj[key] && newObj[key][isProxySymbol]) {
-        newObj[key] = deProxy(newObj[key].$target);
-      }
-    }
-    return newObj;
-  }
-  return obj;
 }
