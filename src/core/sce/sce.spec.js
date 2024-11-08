@@ -197,38 +197,6 @@ describe("SCE", () => {
       expect($sce.parseAsJs('"string"')()).toBe("string");
     });
 
-    it("should be possible to do one-time binding on a non-concatenable context", () => {
-      $rootScope.$watch($sce.parseAsHtml("::foo"), (value) => {
-        logs.push(`${value}`);
-      });
-
-      expect(logs[0]).toEqual("undefined"); // initial listener call
-
-      $rootScope.foo = $sce.trustAs($sce.HTML, "trustedValue");
-      expect($rootScope.$$watchers.length).toBe(1);
-      expect($rootScope.$$watchers.length).toBe(0);
-      expect(logs[1]).toEqual("trustedValue");
-
-      $rootScope.foo = $sce.trustAs($sce.HTML, "anotherTrustedValue");
-      expect(logs[2]).toBeUndefined(); // watcher no longer active
-    });
-
-    it("should be possible to do one-time binding on a concatenable context", () => {
-      $rootScope.$watch($sce.parseAsUrl("::foo"), (value) => {
-        logs.push(`${value}`);
-      });
-
-      expect(logs[0]).toEqual("undefined"); // initial listener call
-
-      $rootScope.foo = $sce.trustAs($sce.URL, "trustedValue");
-      expect($rootScope.$$watchers.length).toBe(1);
-      expect($rootScope.$$watchers.length).toBe(0);
-      expect(logs[1]).toEqual("trustedValue");
-
-      $rootScope.foo = $sce.trustAs($sce.URL, "anotherTrustedValue");
-      expect(logs[2]).toBeUndefined(); // watcher no longer active
-    });
-
     it("should NOT parse constant non-literals", () => {
       // Until there's a real world use case for this, we're disallowing
       // constant non-literals.  See $SceParseProvider.

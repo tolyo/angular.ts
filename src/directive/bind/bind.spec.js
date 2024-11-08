@@ -96,44 +96,6 @@ describe("ng-bind", () => {
       expect(element.text()).toBe(JSON.stringify($rootScope.value));
       expect(element.text()).not.toEqual($rootScope.value.toString());
     });
-
-    it("should one-time bind if the expression starts with two colons", () => {
-      element = $compile('<div ng-bind="::a"></div>')($rootScope);
-      $rootScope.a = "lucas";
-      expect($rootScope.$$watchers.length).toEqual(1);
-      expect(element.text()).toEqual("lucas");
-      expect($rootScope.$$watchers.length).toEqual(0);
-      $rootScope.a = undefined;
-      expect(element.text()).toEqual("lucas");
-    });
-
-    it("should be possible to bind to a new value within the same $digest", () => {
-      element = $compile('<div ng-bind="::a"></div>')($rootScope);
-      $rootScope.$watch("a", (newVal) => {
-        if (newVal === "foo") {
-          $rootScope.a = "bar";
-        }
-      });
-      $rootScope.a = "foo";
-      expect(element.text()).toEqual("bar");
-      $rootScope.a = undefined;
-      expect(element.text()).toEqual("bar");
-    });
-
-    it("should remove the binding if the value is defined at the end of a $digest loop", () => {
-      element = $compile('<div ng-bind="::a"></div>')($rootScope);
-      $rootScope.$watch("a", (newVal) => {
-        if (newVal === "foo") {
-          $rootScope.a = undefined;
-        }
-      });
-      $rootScope.a = "foo";
-      expect(element.text()).toEqual("");
-      $rootScope.a = "bar";
-      expect(element.text()).toEqual("bar");
-      $rootScope.a = "man";
-      expect(element.text()).toEqual("bar");
-    });
   });
 
   describe("ngBindTemplate", () => {
@@ -143,20 +105,6 @@ describe("ng-bind", () => {
       );
       $rootScope.name = "Misko";
       expect(element.text()).toEqual("Hello Misko!");
-    });
-
-    it("should one-time bind the expressions that start with ::", () => {
-      element = $compile(
-        '<div ng-bind-template="{{::hello}} {{::name}}!"></div>',
-      )($rootScope);
-      $rootScope.name = "Misko";
-      expect($rootScope.$$watchers.length).toEqual(2);
-      expect(element.text()).toEqual(" Misko!");
-      expect($rootScope.$$watchers.length).toEqual(1);
-      $rootScope.hello = "Hello";
-      $rootScope.name = "Lucas";
-      expect(element.text()).toEqual("Hello Misko!");
-      expect($rootScope.$$watchers.length).toEqual(0);
     });
 
     it("should render object as JSON ignore $$", () => {
@@ -212,16 +160,6 @@ describe("ng-bind", () => {
         expect(element.html()).toEqual("hello");
         $rootScope.html = "goodbye";
         expect(element.html()).toEqual("goodbye");
-      });
-
-      it("should one-time bind if the expression starts with two colons", () => {
-        element = $compile('<div ng-bind-html="::html"></div>')($rootScope);
-        $rootScope.html = '<div onclick="">hello</div>';
-        expect($rootScope.$$watchers.length).toEqual(1);
-        expect(element.text()).toEqual("hello");
-        expect($rootScope.$$watchers.length).toEqual(0);
-        $rootScope.html = '<div onclick="">hello</div>';
-        expect(element.text()).toEqual("hello");
       });
     });
 

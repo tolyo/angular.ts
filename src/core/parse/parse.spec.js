@@ -912,244 +912,6 @@ describe("parser", () => {
     });
   });
 
-  describe("one-time binding", () => {
-    beforeEach(() => {
-      createInjector([
-        "ng",
-        function ($filterProvider) {
-          filterProvider = $filterProvider;
-        },
-      ]).invoke((_$rootScope_) => {
-        $rootScope = _$rootScope_;
-      });
-      logs = [];
-    });
-
-    it("should always use the cache", () => {
-      expect($parse("foo")).toBe($parse("foo"));
-      expect($parse("::foo")).toBe($parse("::foo"));
-    });
-
-    it("should not affect calling the parseFn directly", async () => {
-      $rootScope.$watch("::foo");
-
-      $rootScope.foo = "bar";
-      expect($rootScope.$$watchersCount).toBe(1);
-      expect($rootScope.foo).toEqual("bar");
-
-      await wait();
-      expect($rootScope.$$watchersCount).toBe(0);
-      expect($rootScope.foo).toEqual("bar");
-
-      $rootScope.foo = "man";
-      await wait();
-      expect($rootScope.$$watchersCount).toBe(0);
-      expect($rootScope.foo).toEqual("man");
-
-      $rootScope.foo = "shell";
-      await wait();
-      expect($rootScope.$$watchersCount).toBe(0);
-      expect($rootScope.foo).toEqual("shell");
-    });
-
-    it("should stay stable once the value defined", async () => {
-      $rootScope.$watch("::foo", (value, old) => {
-        if (value !== old) logs.push(value);
-      });
-      expect(logs.length).toEqual(0);
-
-      expect($rootScope.$$watchersCount).toBe(1);
-
-      $rootScope.foo = "bar";
-      await wait();
-
-      expect($rootScope.$$watchersCount).toBe(0);
-      expect(logs[0]).toEqual("bar");
-
-      $rootScope.foo = "man";
-      await wait();
-
-      expect($rootScope.$$watchersCount).toBe(0);
-      expect(logs.length).toEqual(1);
-    });
-
-    it("should have a stable value if at the end of a $digest it has a defined value", async () => {
-      $rootScope.$watch("::foo", (value, old) => {
-        if (value !== old) logs.push(value);
-      });
-      $rootScope.$watch("foo", () => {
-        if ($rootScope.foo === "bar") {
-          $rootScope.foo = undefined;
-        }
-      });
-
-      $rootScope.foo = "bar";
-      await wait();
-
-      expect($rootScope.$$watchersCount).toBe(1);
-      expect(logs[0]).toEqual("bar");
-
-      $rootScope.foo = "man";
-      await wait();
-      expect($rootScope.$$watchersCount).toBe(1);
-      expect(logs[0]).toEqual("bar");
-
-      $rootScope.foo = "shell";
-
-      await wait();
-      expect($rootScope.$$watchersCount).toBe(1);
-      expect(logs.length).toEqual(1);
-    });
-
-    it("should not throw if the stable value is `null`", async () => {
-      $rootScope.$watch("::foo");
-      $rootScope.foo = null;
-      await wait();
-
-      $rootScope.foo = "foo";
-
-      await wait();
-      expect($rootScope.foo).toEqual("foo");
-    });
-
-    xit("should invoke a stateless filter", async () => {
-      const countFilter = jasmine.createSpy();
-      countFilter.and.callThrough();
-      createInjector([
-        "ng",
-        function ($filterProvider) {
-          $filterProvider.register("count", valueFn(countFilter));
-        },
-      ]).invoke((_$rootScope_, _$parse_) => {
-        scope = _$rootScope_;
-        $parse = _$parse_;
-      });
-      scope.count = 0;
-      scope.foo = function () {
-        scope.count++;
-        return scope.count;
-      };
-      // todo investiage our function stategy
-      scope.$watch("::foo() | count");
-
-      await wait();
-      expect(countFilter.calls.count()).toBe(1);
-    });
-  });
-
-  describe("literal expressions", () => {
-    it("should mark an empty expressions as literal", () => {
-      expect($parse("").literal).toBe(true);
-      expect($parse("   ").literal).toBe(true);
-      expect($parse("::").literal).toBe(true);
-      expect($parse("::    ").literal).toBe(true);
-    });
-
-    [true, false].forEach((isDeep) => {
-      describe(isDeep ? "deepWatch" : "watch", () => {
-        beforeEach(() => {
-          logs = [];
-        });
-
-        it("should only become stable when all the properties of an object have defined values", async () => {
-          $rootScope.$watch("::{foo: foo, bar: bar}", (value) => {
-            logs.push(value);
-          });
-
-          expect(logs).toEqual([]);
-          expect($rootScope.$$watchersCount).toBe(1);
-
-          // $rootScope.$digest();
-          // expect($rootScope.$$watchersCount).toBe(1);
-          // expect(logs[0]).toEqual({ foo: undefined, bar: undefined });
-
-          // $rootScope.foo = "foo";
-          // await wait();
-          // $rootScope.$digest();
-          // expect($rootScope.$$watchersCount).toBe(1);
-          //expect(logs[0]).toEqual({ foo: undefined, bar: undefined });
-
-          // $rootScope.foo = "foobar";
-          // $rootScope.bar = "bar";
-          // $rootScope.$digest();
-          // expect($rootScope.$$watchersCount).toBe(0);
-          // expect(logs[2]).toEqual({ foo: "foobar", bar: "bar" });
-
-          // $rootScope.foo = "baz";
-          // $rootScope.$digest();
-          // expect($rootScope.$$watchersCount).toBe(0);
-          // expect(logs[3]).toBeUndefined();
-        });
-
-        it("should only become stable when all the elements of an array have defined values", () => {
-          const fn = $parse("::[foo,bar]");
-          $rootScope.$watch(
-            fn,
-            (value) => {
-              logs.push(value);
-            },
-            isDeep,
-          );
-
-          expect(logs.length).toEqual(0);
-          expect($rootScope.$$watchersCount).toBe(1);
-
-          $rootScope.$digest();
-          expect($rootScope.$$watchersCount).toBe(1);
-          expect(logs[0]).toEqual([undefined, undefined]);
-
-          $rootScope.foo = "foo";
-          $rootScope.$digest();
-          expect($rootScope.$$watchersCount).toBe(1);
-          expect(logs[1]).toEqual(["foo", undefined]);
-
-          $rootScope.foo = "foobar";
-          $rootScope.bar = "bar";
-          $rootScope.$digest();
-          expect($rootScope.$$watchersCount).toBe(0);
-          expect(logs[2]).toEqual(["foobar", "bar"]);
-
-          $rootScope.foo = "baz";
-          $rootScope.$digest();
-          expect($rootScope.$$watchersCount).toBe(0);
-          expect(logs[3]).toBeUndefined();
-        });
-
-        it("should only become stable when all the elements of an array have defined values at the end of a $digest", () => {
-          const fn = $parse("::[foo]");
-          $rootScope.$watch(
-            fn,
-            (value) => {
-              logs.push(value);
-            },
-            isDeep,
-          );
-          $rootScope.$watch("foo", () => {
-            if ($rootScope.foo === "bar") {
-              $rootScope.foo = undefined;
-            }
-          });
-
-          $rootScope.foo = "bar";
-          $rootScope.$digest();
-          expect($rootScope.$$watchersCount).toBe(2);
-          expect(logs[0]).toEqual(["bar"]);
-          expect(logs[1]).toEqual([undefined]);
-
-          $rootScope.foo = "baz";
-          $rootScope.$digest();
-          expect($rootScope.$$watchersCount).toBe(1);
-          expect(logs[2]).toEqual(["baz"]);
-
-          $rootScope.bar = "qux";
-          $rootScope.$digest();
-          expect($rootScope.$$watchersCount).toBe(1);
-          expect(logs[3]).toBeUndefined();
-        });
-      });
-    });
-  });
-
   describe("watched $parse expressions", () => {
     beforeEach(() => {
       createInjector(["ng"]).invoke((_$rootScope_) => {
@@ -1268,29 +1030,6 @@ describe("parser", () => {
       expect(filterCalls).toEqual([0, 1]);
     });
 
-    it("should not be invoked unless the input/arguments change within literals (one-time)", () => {
-      const filterCalls = [];
-      filterProvider.register(
-        "foo",
-        valueFn((input) => {
-          filterCalls.push(input);
-          return input;
-        }),
-      );
-
-      scope.$watch("::[(a | foo:b:1), undefined]");
-      scope.a = 0;
-      scope.$digest();
-      expect(filterCalls).toEqual([0]);
-
-      scope.$digest();
-      expect(filterCalls).toEqual([0]);
-
-      scope.a++;
-      scope.$digest();
-      expect(filterCalls).toEqual([0, 1]);
-    });
-
     it("should always be invoked if they are marked as having $stateful", () => {
       let filterCalled = false;
       filterProvider.register(
@@ -1348,31 +1087,6 @@ describe("parser", () => {
     it("should ignore changes within nested objects", () => {
       const watchCalls = [];
       scope.$watch("[a]", (a) => {
-        watchCalls.push(a[0]);
-      });
-      scope.a = 0;
-      scope.$digest();
-      expect(watchCalls).toEqual([0]);
-
-      scope.$digest();
-      expect(watchCalls).toEqual([0]);
-
-      scope.a++;
-      scope.$digest();
-      expect(watchCalls).toEqual([0, 1]);
-
-      scope.a = {};
-      scope.$digest();
-      expect(watchCalls).toEqual([0, 1, {}]);
-
-      scope.a.foo = 42;
-      scope.$digest();
-      expect(watchCalls).toEqual([0, 1, { foo: 42 }]);
-    });
-
-    it("should ignore changes within nested objects (one-time)", () => {
-      const watchCalls = [];
-      scope.$watch("::[a, undefined]", (a) => {
         watchCalls.push(a[0]);
       });
       scope.a = 0;
@@ -1461,7 +1175,7 @@ describe("parser", () => {
         // Would be great if filter-output was checked for changes and this didn't throw...
         expect(() => {
           scope.$apply("a = {}");
-        }).toThrowError(/infdig/);
+        }).not.toThrowError(/infdig/);
       });
     });
 
@@ -1836,20 +1550,6 @@ describe("parser", () => {
       expect(args).toEqual([1]);
     });
 
-    it("should only be passed the intercepted value when wrapping one-time", () => {
-      let args;
-      function interceptor(v) {
-        args = sliceArgs(arguments);
-        return v;
-      }
-
-      scope.$watch($parse("::a", interceptor));
-
-      scope.a = 1;
-      scope.$digest();
-      expect(args).toEqual([1]);
-    });
-
     it("should only be passed the intercepted value when double-intercepted", () => {
       let args1;
       function int1(v) {
@@ -1924,68 +1624,6 @@ describe("parser", () => {
       called = false;
       scope.$digest();
       expect(called).toBe(true);
-    });
-
-    it("should always be invoked if flagged as $stateful when wrapping one-time", () => {
-      let interceptorCalls = 0;
-      function interceptor() {
-        interceptorCalls++;
-        return 123;
-      }
-      interceptor.$stateful = true;
-
-      scope.$watch($parse("::a", interceptor));
-
-      interceptorCalls = 0;
-      scope.$digest();
-      expect(interceptorCalls).not.toBe(0);
-
-      interceptorCalls = 0;
-      scope.$digest();
-      expect(interceptorCalls).not.toBe(0);
-    });
-
-    it("should always be invoked if flagged as $stateful when wrapping one-time with inputs", () => {
-      filterProvider.register(
-        "identity",
-        valueFn((x) => x),
-      );
-
-      let interceptorCalls = 0;
-      function interceptor() {
-        interceptorCalls++;
-        return 123;
-      }
-      interceptor.$stateful = true;
-
-      scope.$watch($parse("::a | identity", interceptor));
-
-      interceptorCalls = 0;
-      scope.$digest();
-      expect(interceptorCalls).not.toBe(0);
-
-      interceptorCalls = 0;
-      scope.$digest();
-      expect(interceptorCalls).not.toBe(0);
-    });
-
-    it("should always be invoked if flagged as $stateful when wrapping one-time literal", () => {
-      let interceptorCalls = 0;
-      function interceptor() {
-        interceptorCalls++;
-        return 123;
-      }
-      interceptor.$stateful = true;
-
-      scope.$watch($parse("::[a]", interceptor));
-
-      interceptorCalls = 0;
-      scope.$digest();
-      expect(interceptorCalls).not.toBe(0);
-
-      interceptorCalls = 0;
-      scope.$digest();
-      expect(interceptorCalls).not.toBe(0);
     });
 
     it("should not be invoked unless the input changes", () => {
@@ -2073,71 +1711,6 @@ describe("parser", () => {
       expect(called).toBe(true);
     });
 
-    it("should not affect when a one-time binding becomes stable", () => {
-      scope.$watch($parse("::x"));
-      scope.$watch($parse("::x", (x) => x));
-      scope.$watch($parse("::x", () => 1)); // interceptor that returns non-undefined
-
-      scope.$digest();
-      expect(scope.$$watchersCount).toBe(3);
-
-      scope.x = 1;
-      scope.$digest();
-      expect(scope.$$watchersCount).toBe(0);
-    });
-
-    it("should not affect when a one-time literal binding becomes stable", () => {
-      scope.$watch($parse("::[x]"));
-      scope.$watch($parse("::[x]", (x) => x));
-      scope.$watch($parse("::[x]", () => 1)); // interceptor that returns non-literal
-
-      scope.$digest();
-      expect(scope.$$watchersCount).toBe(3);
-
-      scope.x = 1;
-      scope.$digest();
-      expect(scope.$$watchersCount).toBe(0);
-    });
-
-    it("should watch the intercepted value of one-time bindings", () => {
-      scope.$watch(
-        $parse("::{x:x, y:y}", (lit) => lit.x),
-        (val) => logs.push(val),
-      );
-
-      scope.$apply();
-      expect(logs[0]).toBeUndefined();
-
-      scope.$apply("x = 1");
-      expect(logs[1]).toEqual(1);
-
-      scope.$apply("x = 2; y=1");
-      expect(logs[2]).toEqual(2);
-
-      scope.$apply("x = 1; y=2");
-      expect(logs[3]).toBeUndefined();
-    });
-
-    it("should watch the intercepted value of one-time bindings in nested interceptors", () => {
-      scope.$watch(
-        $parse(
-          $parse("::{x:x, y:y}", (lit) => lit.x),
-          (x) => x,
-        ),
-        (val) => logs.push(val),
-      );
-
-      scope.$apply();
-      expect(logs[0]).toBeUndefined();
-
-      scope.$apply("x = 1");
-      expect(logs[1]).toEqual(1);
-
-      scope.$apply("x = 2; y=1");
-      expect(logs[2]).toEqual(2);
-      expect(logs[3]).toBeUndefined();
-    });
-
     it("should nest interceptors around eachother, not around the intercepted", () => {
       function origin() {
         return 0;
@@ -2197,6 +1770,11 @@ describe("parser", () => {
         $parse = _$parse_;
       });
       logs = [];
+    });
+
+    it("should mark an empty expressions as literal", () => {
+      expect($parse("").literal).toBe(true);
+      expect($parse("   ").literal).toBe(true);
     });
 
     it("should support watching", async () => {
@@ -2677,8 +2255,6 @@ describe("parser", () => {
       it("should mark an empty expressions as constant", () => {
         expect($parse("").constant).toBe(true);
         expect($parse("   ").constant).toBe(true);
-        expect($parse("::").constant).toBe(true);
-        expect($parse("::    ").constant).toBe(true);
       });
 
       it("should mark scalar value expressions as constant", () => {

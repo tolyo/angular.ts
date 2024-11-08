@@ -31,7 +31,6 @@ export class RootModelProvider {
  * @property {import("../parse/parse.js").CompiledExpression} watchFn
  * @property {number} id - Deregistration id
  * @property {number} scopeId - The scope that created the Listener
- * @property {boolean} oneTime
  * @property {string} property
  * @property {string} [watchProp] - The original property to watch if different from observed key
  * @property {Proxy} [foreignListener]
@@ -41,7 +40,6 @@ export class RootModelProvider {
  * Listener function type.
  * @callback ListenerFunction
  * @param {*} newValue - The new value of the changed property.
- * @param {*} oldValue - The old value of the changed property.
  * @param {Object} originalTarget - The original target object.
  */
 export const isProxySymbol: unique symbol;
@@ -71,7 +69,6 @@ export type Listener = {
      * - The scope that created the Listener
      */
     scopeId: number;
-    oneTime: boolean;
     property: string;
     /**
      * - The original property to watch if different from observed key
@@ -82,7 +79,7 @@ export type Listener = {
 /**
  * Listener function type.
  */
-export type ListenerFunction = (newValue: any, oldValue: any, originalTarget: any) => any;
+export type ListenerFunction = (newValue: any, originalTarget: any) => any;
 /**
  * Model class for the Proxy. It intercepts operations like property access (get)
  * and property setting (set), and adds support for deep change tracking and
@@ -113,8 +110,10 @@ declare class Model {
     }>;
     /** Current proxy being operated on */
     $proxy: any;
-    /** @type {*} Current target wrapped by current proxy */
+    /** @type {*} Current target begin called on */
     $target: any;
+    /** @type {*} Value wrapped by the proxy */
+    $value: any;
     /**
      * @type {Model[]}
      */
@@ -155,10 +154,37 @@ declare class Model {
      * @returns {*} - The value of the property or a method if accessing `watch` or `sync`.
      */
     get(target: any, property: string | number | symbol, proxy: ProxyConstructor): any;
+    propertyMap: {
+        $watch: any;
+        $watchGroup: any;
+        $watchCollection: any;
+        $new: any;
+        $newIsolate: any;
+        $destroy: any;
+        $eval: any;
+        $apply: any;
+        $evalAsync: any;
+        $postUpdate: any;
+        $isRoot: any;
+        $target: any;
+        $proxy: any;
+        $digest: any;
+        $on: any;
+        $emit: any;
+        $broadcast: any;
+        $transcluded: any;
+        $handler: this;
+        $parent: Model;
+        $root: Model;
+        $wrapperProxy: any;
+        $children: Model[];
+        id: number;
+        registerForeignKey: any;
+        notifyListener: any;
+    };
     /**
      * @private
      * @param {Listener[]} listeners
-     * @param {*} oldValue
      */
     private scheduleListener;
     deleteProperty(target: any, property: any): boolean;
@@ -216,8 +242,7 @@ declare class Model {
      * Invokes the registered listener function with watched property changes.
      *
      * @param {Listener} listener - The property path that was changed.
-     * @param {*} oldValue - The old value of the property.
      */
-    notifyListener(listener: Listener, oldValue: any, target: any): void;
+    notifyListener(listener: Listener, target: any): void;
 }
 export {};

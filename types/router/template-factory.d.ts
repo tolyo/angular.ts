@@ -84,7 +84,7 @@ export class TemplateFactoryProvider {
      * @param {import("./resolve/resolve-context").ResolveContext} context The ResolveContext (for binding outputs to callbacks returned from resolves)
      * @param {string} component {string} Component's name in camel case.
      * @param {any} [bindings] An object defining the component's bindings: {foo: '<'}
-     * @return {string} The template as a string: "<component-name input1='::$resolve.foo'></component-name>".
+     * @return {string} The template as a string: "<component-name input1='$resolve.foo'></component-name>".
      */
     makeComponentTemplate(ngView: any, context: import("./resolve/resolve-context").ResolveContext, component: string, bindings?: any): string;
 }

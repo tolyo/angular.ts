@@ -88,7 +88,6 @@ export function createModel(target = {}, context) {
  * @property {import("../parse/parse.js").CompiledExpression} watchFn
  * @property {number} id - Deregistration id
  * @property {number} scopeId - The scope that created the Listener
- * @property {boolean} oneTime
  * @property {string} property
  * @property {string} [watchProp] - The original property to watch if different from observed key
  * @property {Proxy} [foreignListener]
@@ -248,7 +247,7 @@ class Model {
       if (isUndefined(value)) {
         let called = false;
         Object.keys(oldValue.$target).forEach((k) => {
-          if (oldValue[k]?.[isProxySymbol]) {
+          if (oldValue.$target[k]?.[isProxySymbol]) {
             called = true;
           }
           delete oldValue[k];
@@ -421,10 +420,6 @@ class Model {
         } else {
           this.notifyListener(listener, this.$target);
         }
-
-        if (listener.oneTime) {
-          this.deregisterKey(listener.property, listener.id);
-        }
         index++;
       }
     });
@@ -489,7 +484,7 @@ class Model {
           while (isFunction(res)) {
             res = res();
           }
-          listenerFn(res, undefined, this.$target);
+          listenerFn(res, this.$target);
         });
       }
       return () => {};
@@ -502,7 +497,6 @@ class Model {
       watchFn: get,
       scopeId: this.id,
       id: nextUid(),
-      oneTime: get.oneTime,
       property: undefined,
     };
 
@@ -553,7 +547,7 @@ class Model {
       }
       // function
       case ASTType.CallExpression: {
-        listener.property = get.decoratedNode.body[0].callee.name;
+        listener.property = get.decoratedNode.body[0].expression.toWatch.name;
         break;
       }
       case ASTType.MemberExpression: {

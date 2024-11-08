@@ -176,12 +176,11 @@ export class TemplateFactoryProvider {
    * @param {import("./resolve/resolve-context").ResolveContext} context The ResolveContext (for binding outputs to callbacks returned from resolves)
    * @param {string} component {string} Component's name in camel case.
    * @param {any} [bindings] An object defining the component's bindings: {foo: '<'}
-   * @return {string} The template as a string: "<component-name input1='::$resolve.foo'></component-name>".
+   * @return {string} The template as a string: "<component-name input1='$resolve.foo'></component-name>".
    */
   makeComponentTemplate(ngView, context, component, bindings) {
     bindings = bindings || {};
     // Bind once prefix
-    const prefix = "::"; //angular.version.minor >= 3 ? "::" : "";
     // Convert to kebob name. Add x- prefix if the string starts with `x-` or `data-`
     const kebob = (camelCase) => {
       const kebobed = kebobString(camelCase);
@@ -198,9 +197,8 @@ export class TemplateFactoryProvider {
         return `${attrName}='${ngView.attr(attrName)}'`;
       const resolveName = bindings[name] || name;
       // Pre-evaluate the expression for "@" bindings by enclosing in {{ }}
-      // some-attr="{{ ::$resolve.someResolveName }}"
-      if (type === "@")
-        return `${attrName}='{{${prefix}$resolve.${resolveName}}}'`;
+      // some-attr="{{$resolve.someResolveName }}"
+      if (type === "@") return `${attrName}='{{s$resolve.${resolveName}}}'`;
       // Wire "&" callbacks to resolves that return a callback function
       // Get the result of the resolve (should be a function) and annotate it to get its arguments.
       // some-attr="$resolve.someResolveResultName(foo, bar)"
@@ -213,7 +211,7 @@ export class TemplateFactoryProvider {
         return `${attrName}='$resolve.${resolveName}${arrayIdxStr}(${args.join(",")})'`;
       }
       // some-attr="::$resolve.someResolveName"
-      return `${attrName}='${prefix}$resolve.${resolveName}'`;
+      return `${attrName}='$resolve.${resolveName}'`;
     };
     const attrs = getComponentBindings(component).map(attributeTpl).join(" ");
     const kebobName = kebob(component);

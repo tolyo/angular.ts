@@ -405,20 +405,6 @@ describe("ngStateRef", () => {
       expect(JQLite(template[0]).attr("href")).toBe("#/other/10");
     });
 
-    it("allows one-time-binding on ng1.3+", () => {
-      el = JQLite('<a ng-state="::state" ng-state-params="::params">state</a>');
-
-      scope.state = "contacts.item";
-      scope.params = { id: 10 };
-      template = $compile(el)(scope);
-      expect(JQLite(template[0]).attr("href")).toBe("#/contacts/10");
-
-      scope.state = "other";
-      scope.params = { id: 22 };
-
-      expect(JQLite(template[0]).attr("href")).toBe("#/contacts/10");
-    });
-
     it("accepts option overrides", async () => {
       let transitionOptions;
 

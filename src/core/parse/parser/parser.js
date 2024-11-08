@@ -5,7 +5,6 @@ import { ASTInterpreter } from "../interpreter.js";
 /**
  * @typedef {Object} ParsedAST
  * @property {import("../ast/ast.js").ASTNode} ast - AST representation of expression
- * @property {boolean} oneTime - True if expression should be evaluated only once
  */
 
 /**
@@ -31,11 +30,10 @@ export class Parser {
    * @returns {import("../parse.js").CompiledExpression}
    */
   parse(exp) {
-    const { ast, oneTime } = this.getAst(exp);
+    const { ast } = this.getAst(exp);
     const fn = this.astCompiler.compile(ast);
     fn.literal = isLiteral(ast);
     fn.constant = isConstant(ast);
-    fn.oneTime = oneTime;
     return fn;
   }
 
@@ -44,16 +42,9 @@ export class Parser {
    * @returns {ParsedAST}
    */
   getAst(exp) {
-    let oneTime = false;
     exp = exp.trim();
-
-    if (exp.startsWith("::")) {
-      oneTime = true;
-      exp = exp.substring(2);
-    }
     return {
       ast: this.ast.ast(exp),
-      oneTime,
     };
   }
 }

@@ -7430,34 +7430,6 @@ describe("$compile", () => {
         expect(element.attr("name")).toEqual("attr: angular");
       });
 
-      it("should one-time bind if the expression starts with two colons", () => {
-        $rootScope.name = "angular";
-        element = $compile(
-          '<div name="attr: {{::name}}">text: {{::name}}</div>',
-        )($rootScope);
-        expect($rootScope.$$watchers.length).toBe(2);
-        expect(element.text()).toEqual("text: angular");
-        expect(element.attr("name")).toEqual("attr: angular");
-        expect($rootScope.$$watchers.length).toBe(0);
-        $rootScope.name = "not-angular";
-        expect(element.text()).toEqual("text: angular");
-        expect(element.attr("name")).toEqual("attr: angular");
-      });
-
-      it("should one-time bind if the expression starts with a space and two colons", () => {
-        $rootScope.name = "angular";
-        element = $compile(
-          '<div name="attr: {{::name}}">text: {{ ::name }}</div>',
-        )($rootScope);
-        expect($rootScope.$$watchers.length).toBe(2);
-        expect(element.text()).toEqual("text: angular");
-        expect(element.attr("name")).toEqual("attr: angular");
-        expect($rootScope.$$watchers.length).toBe(0);
-        $rootScope.name = "not-angular";
-        expect(element.text()).toEqual("text: angular");
-        expect(element.attr("name")).toEqual("attr: angular");
-      });
-
       it("should interpolate a multi-part expression for regular attributes", () => {
         element = $compile('<div foo="some/{{id}}"></div>')($rootScope);
         expect(element.attr("foo")).toBe("some/");
@@ -9606,150 +9578,6 @@ describe("$compile", () => {
           }
           return result;
         }
-
-        it("should be possible to one-time bind a parameter on a component with a template", () => {
-          module.directive("otherTplDir", () => ({
-            scope: { param1: "=", param2: "=" },
-            template: "1:{{param1}};2:{{param2}};3:{{::param1}};4:{{::param2}}",
-          }));
-
-          dealoc(document.getElementById("dummy"));
-          window.angular
-            .bootstrap(document.getElementById("dummy"), ["test1"])
-            .invoke((_$compile_, _$rootScope_) => {
-              $compile = _$compile_;
-              $rootScope = _$rootScope_;
-            });
-
-          element = $compile(
-            '<div other-tpl-dir param1="::foo" param2="bar"></div>',
-          )($rootScope);
-          expect(countWatches($rootScope)).toEqual(6); // 4 -> template watch group, 2 -> '='
-          expect(element.html()).toBe("1:;2:;3:;4:");
-          expect(countWatches($rootScope)).toEqual(6);
-
-          $rootScope.foo = "foo";
-          expect(element.html()).toBe("1:foo;2:;3:foo;4:");
-          expect(countWatches($rootScope)).toEqual(4);
-
-          $rootScope.foo = "baz";
-          $rootScope.bar = "bar";
-          expect(element.html()).toBe("1:foo;2:bar;3:foo;4:bar");
-          expect(countWatches($rootScope)).toEqual(3);
-
-          $rootScope.bar = "baz";
-          expect(element.html()).toBe("1:foo;2:baz;3:foo;4:bar");
-        });
-
-        it("should be possible to one-time bind a parameter on a component with a template", () => {
-          module.directive("otherTplDir", () => ({
-            scope: { param1: "@", param2: "@" },
-            template: "1:{{param1}};2:{{param2}};3:{{::param1}};4:{{::param2}}",
-          }));
-
-          dealoc(document.getElementById("dummy"));
-          window.angular
-            .bootstrap(document.getElementById("dummy"), ["test1"])
-            .invoke((_$compile_, _$rootScope_) => {
-              $compile = _$compile_;
-              $rootScope = _$rootScope_;
-            });
-
-          element = $compile(
-            '<div other-tpl-dir param1="{{::foo}}" param2="{{bar}}"></div>',
-          )($rootScope);
-          expect(countWatches($rootScope)).toEqual(6); // 4 -> template watch group, 2 -> {{ }}
-          expect(element.html()).toBe("1:;2:;3:;4:");
-          expect(countWatches($rootScope)).toEqual(4); // (- 2) -> bind-once in template
-
-          $rootScope.foo = "foo";
-          expect(element.html()).toBe("1:foo;2:;3:;4:");
-          expect(countWatches($rootScope)).toEqual(3);
-
-          $rootScope.foo = "baz";
-          $rootScope.bar = "bar";
-          expect(element.html()).toBe("1:foo;2:bar;3:;4:");
-          expect(countWatches($rootScope)).toEqual(3);
-
-          $rootScope.bar = "baz";
-          expect(element.html()).toBe("1:foo;2:baz;3:;4:");
-        });
-
-        it("should be possible to one-time bind a parameter on a component with a template", () => {
-          module.directive("otherTplDir", () => ({
-            scope: { param1: "=", param2: "=" },
-            templateUrl: "other.html",
-          }));
-
-          dealoc(document.getElementById("dummy"));
-          window.angular
-            .bootstrap(document.getElementById("dummy"), ["test1"])
-            .invoke((_$compile_, _$rootScope_, _$templateCache_) => {
-              $compile = _$compile_;
-              $rootScope = _$rootScope_;
-              $templateCache = _$templateCache_;
-            });
-
-          $templateCache.set(
-            "other.html",
-            "1:{{param1}};2:{{param2}};3:{{::param1}};4:{{::param2}}",
-          );
-          element = $compile(
-            '<div other-tpl-dir param1="::foo" param2="bar"></div>',
-          )($rootScope);
-          expect(element.html()).toBe("1:;2:;3:;4:");
-          expect(countWatches($rootScope)).toEqual(6); // 4 -> template watch group, 2 -> '='
-
-          $rootScope.foo = "foo";
-          expect(element.html()).toBe("1:foo;2:;3:foo;4:");
-          expect(countWatches($rootScope)).toEqual(4);
-
-          $rootScope.foo = "baz";
-          $rootScope.bar = "bar";
-          expect(element.html()).toBe("1:foo;2:bar;3:foo;4:bar");
-          expect(countWatches($rootScope)).toEqual(3);
-
-          $rootScope.bar = "baz";
-          expect(element.html()).toBe("1:foo;2:baz;3:foo;4:bar");
-        });
-
-        it("should be possible to one-time bind a parameter on a component with a template", () => {
-          module.directive("otherTplDir", () => ({
-            scope: { param1: "@", param2: "@" },
-            templateUrl: "other.html",
-          }));
-
-          dealoc(document.getElementById("dummy"));
-          window.angular
-            .bootstrap(document.getElementById("dummy"), ["test1"])
-            .invoke((_$compile_, _$rootScope_, _$templateCache_) => {
-              $compile = _$compile_;
-              $rootScope = _$rootScope_;
-              $templateCache = _$templateCache_;
-            });
-
-          $templateCache.set(
-            "other.html",
-            "1:{{param1}};2:{{param2}};3:{{::param1}};4:{{::param2}}",
-          );
-          element = $compile(
-            '<div other-tpl-dir param1="{{::foo}}" param2="{{bar}}"></div>',
-          )($rootScope);
-          expect(element.html()).toBe("1:;2:;3:;4:");
-          expect(countWatches($rootScope)).toEqual(4); // (4 - 2) -> template watch group, 2 -> {{ }}
-
-          $rootScope.foo = "foo";
-          expect(element.html()).toBe("1:foo;2:;3:;4:");
-          expect(countWatches($rootScope)).toEqual(3);
-
-          $rootScope.foo = "baz";
-          $rootScope.bar = "bar";
-          expect(element.html()).toBe("1:foo;2:bar;3:;4:");
-          expect(countWatches($rootScope)).toEqual(3);
-
-          $rootScope.bar = "baz";
-          expect(element.html()).toBe("1:foo;2:baz;3:;4:");
-        });
 
         it("should continue with a digets cycle when there is a two-way binding from the child to the parent", () => {
           module.directive("hello", () => ({
@@ -15864,18 +15692,6 @@ describe("$compile", () => {
       expect(() => {
         $rootScope.$apply();
       }).toThrowError(/interr/);
-    });
-
-    it("should not have endless digests when given arrays in concatenable context", () => {
-      element = $compile(
-        '<foo href="{{testUrl}}"></foo><foo href="{{::testUrl}}"></foo>' +
-          '<foo href="http://example.com/{{testUrl}}"></foo><foo href="http://example.com/{{::testUrl}}"></foo>',
-      )($rootScope);
-      $rootScope.testUrl = [1];
-      $rootScope.testUrl = [];
-      $rootScope.testUrl = { a: "b" };
-      $rootScope.testUrl = {};
-      expect(true).toBeTrue();
     });
   });
 

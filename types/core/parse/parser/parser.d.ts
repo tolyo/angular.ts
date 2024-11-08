@@ -1,7 +1,6 @@
 /**
  * @typedef {Object} ParsedAST
  * @property {import("../ast/ast.js").ASTNode} ast - AST representation of expression
- * @property {boolean} oneTime - True if expression should be evaluated only once
  */
 /**
  * @constructor
@@ -34,10 +33,6 @@ export type ParsedAST = {
      * - AST representation of expression
      */
     ast: import("../ast/ast.js").ASTNode;
-    /**
-     * - True if expression should be evaluated only once
-     */
-    oneTime: boolean;
 };
 import { AST } from "../ast/ast.js";
 import { ASTInterpreter } from "../interpreter.js";

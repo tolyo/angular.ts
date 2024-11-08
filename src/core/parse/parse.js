@@ -217,8 +217,6 @@ export function constantWatchDelegate(
 function addWatchDelegate(parsedExpression) {
   if (parsedExpression.constant) {
     parsedExpression.$$watchDelegate = constantWatchDelegate;
-  } else if (parsedExpression.oneTime) {
-    parsedExpression.$$watchDelegate = oneTimeWatchDelegate;
   } else if (parsedExpression.inputs) {
     parsedExpression.$$watchDelegate = inputsWatchDelegate;
   }
@@ -311,52 +309,6 @@ function inputsWatchDelegate(
       objectEquality,
     );
   }
-}
-
-function oneTimeWatchDelegate(
-  scope,
-  listener,
-  objectEquality,
-  parsedExpression,
-) {
-  const isDone = parsedExpression.literal ? isAllDefined : isDefined;
-
-  let unwatch;
-  let lastValue;
-
-  const exp = parsedExpression.$$intercepted || parsedExpression;
-  const post = parsedExpression.$$interceptor || ((x) => x);
-
-  const useInputs = parsedExpression.inputs && !exp.inputs;
-
-  // Propagate the literal/inputs/constant attributes
-  // ... but not oneTime since we are handling it
-  oneTimeWatch.literal = parsedExpression.literal;
-  oneTimeWatch.constant = parsedExpression.constant;
-  oneTimeWatch.inputs = parsedExpression.inputs;
-  oneTimeWatch.oneTime = undefined;
-
-  // Allow other delegates to run on this wrapped expression
-  addWatchDelegate(oneTimeWatch);
-
-  function unwatchIfDone() {
-    if (isDone(lastValue)) {
-      unwatch();
-    }
-  }
-
-  function oneTimeWatch(scope, locals, assign, inputs) {
-    lastValue =
-      useInputs && inputs ? inputs[0] : exp(scope, locals, assign, inputs);
-    if (isDone(lastValue)) {
-      scope.$postUpdate(unwatchIfDone);
-    }
-    return post(lastValue);
-  }
-
-  unwatch = scope.$watch(oneTimeWatch, listener, objectEquality);
-
-  return unwatch;
 }
 
 function chainInterceptors(first, second) {

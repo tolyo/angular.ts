@@ -507,51 +507,6 @@ describe("ngClass", () => {
     expect(element[0]).not.toHaveClass("orange");
   });
 
-  it("should support a one-time mixed literal-array/object variable", () => {
-    element = $compile('<div ng-class="::[classVar1, classVar2]"></div>')(
-      $rootScope,
-    );
-
-    $rootScope.classVar1 = { orange: true };
-    expect(element[0]).toHaveClass("orange");
-
-    $rootScope.classVar1.orange = false;
-    expect(element[0]).not.toHaveClass("orange");
-  });
-
-  it("should do value stabilization as expected when one-time binding", () => {
-    element = $compile('<div ng-class="::className"></div>')($rootScope);
-
-    $rootScope.$apply('className = "foo"');
-    expect(element[0]).toHaveClass("foo");
-
-    $rootScope.$apply('className = "bar"');
-    expect(element[0]).toHaveClass("foo");
-  });
-
-  it("should remove the watcher when static array one-time binding", () => {
-    element = $compile('<div ng-class="::[className]"></div>')($rootScope);
-
-    $rootScope.$apply('className = "foo"');
-    expect(element[0]).toHaveClass("foo");
-
-    $rootScope.$apply('className = "bar"');
-    expect(element[0]).toHaveClass("foo");
-    expect(element[0]).not.toHaveClass("bar");
-  });
-
-  it("should remove the watcher when static map one-time binding", () => {
-    element = $compile('<div ng-class="::{foo: fooPresent}"></div>')(
-      $rootScope,
-    );
-
-    $rootScope.$apply("fooPresent = true");
-    expect(element[0]).toHaveClass("foo");
-
-    $rootScope.$apply("fooPresent = false");
-    expect(element[0]).toHaveClass("foo");
-  });
-
   it("should track changes of mutating object inside an array", () => {
     $rootScope.classVar = [{ orange: true }];
     element = $compile('<div ng-class="classVar"></div>')($rootScope);

@@ -57,13 +57,6 @@ describe("ng-style", () => {
     expect(element[0].style.height).toBe("100px");
   });
 
-  it("should support lazy one-time binding for object literals", () => {
-    element = $compile('<div ng-style="::{height: heightStr}"></div>')($scope);
-    expect(parseInt(element[0].style.height + 0, 10)).toEqual(0); // height could be '' or '0px'
-    $scope.$apply('heightStr = "40px"');
-    expect(element[0].style.height).toBe("40px");
-  });
-
   describe("preserving styles set before and after compilation", () => {
     let scope;
     let preCompStyle;

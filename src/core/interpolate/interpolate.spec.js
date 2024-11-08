@@ -194,47 +194,6 @@ describe("$interpolate", () => {
       expect(lastVal).toBe('12true[false]{"a":2}');
     });
 
-    it("should respect one-time bindings for each individual expression", () => {
-      const calls = [];
-      $rootScope.$watch($interpolate("{{::a}} {{::s}}"), (val) => {
-        calls.push(val);
-      });
-
-      $rootScope.$apply();
-      expect(calls.length).toBe(1);
-      expect(calls).toEqual([" "]);
-
-      $rootScope.a = "a";
-      $rootScope.$apply();
-      expect(calls.length).toBe(2);
-      expect(calls[1]).toBe("a ");
-
-      $rootScope.a = "b";
-      $rootScope.$apply();
-      expect(calls.length).toBe(2);
-
-      $rootScope.s = "str!";
-      $rootScope.$apply();
-      expect(calls.length).toBe(3);
-      expect(calls[2]).toBe("a str!");
-    });
-
-    it("should respect one-time bindings for literals", () => {
-      const calls = [];
-      $rootScope.$watch($interpolate("{{ ::{x: x} }}"), (val) => {
-        calls.push(val);
-      });
-
-      $rootScope.$apply();
-      expect(calls.pop()).toBe("{}");
-
-      $rootScope.$apply("x = 1");
-      expect(calls.pop()).toBe('{"x":1}');
-
-      $rootScope.$apply("x = 2");
-      expect(calls.pop()).toBeUndefined();
-    });
-
     // TODO these tests shoudl be revereds
     // Calling interpolation with scope should CREATE watches on scope
     it("should stop watching strings with no expressions after first execution", async () => {

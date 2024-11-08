@@ -984,29 +984,10 @@ describe("Scope", function () {
       expect(oldValues).toEqual([3, 5, 4]);
     });
 
-    it("should remove all watchers once one-time/constant bindings are stable", () => {
-      // empty
-      scope.$watchGroup([], () => {});
-      // single one-time
-      scope.$watchGroup(["::a"], () => {});
-      // multi one-time
-      scope.$watchGroup(["::a", "::b"], () => {});
-      // single constant
-      scope.$watchGroup(["1"], () => {});
-      // multi constant
-      scope.$watchGroup(["1", "2"], () => {});
-      // multi one-time/constant
-      scope.$watchGroup(["::a", "1"], () => {});
-
-      expect(scope.$$watchersCount).not.toBe(0);
-      scope.$apply("a = b = 1");
-      expect(scope.$$watchersCount).toBe(0);
-    });
-
     it("should maintain correct new/old values with one time bindings", () => {
       let newValues;
       let oldValues;
-      scope.$watchGroup(["a", "::b", "b", "4"], (n, o) => {
+      scope.$watchGroup(["a", "b", "b", "4"], (n, o) => {
         newValues = n.slice();
         oldValues = o.slice();
       });
@@ -1037,7 +1018,7 @@ describe("Scope", function () {
     it("should maintain correct new/old values even when listener throws", () => {
       let newValues;
       let oldValues;
-      $rootScope.$watchGroup(["a", "::b", "b", "4"], (n, o) => {
+      $rootScope.$watchGroup(["a", "b", "b", "4"], (n, o) => {
         newValues = n.slice();
         oldValues = o.slice();
         throw "test";

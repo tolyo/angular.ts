@@ -615,18 +615,6 @@ fdescribe("ngProp*", () => {
         $rootScope.html = "goodbye";
         expect(element.html()).toEqual("goodbye");
       });
-
-      it("should one-time bind if the expression starts with two colons", () => {
-        const element = $compile('<div ng-prop-inner_h_t_m_l="::html"></div>')(
-          $rootScope,
-        );
-        $rootScope.html = '<div onclick="">hello</div>';
-        expect($rootScope.$$watchers.length).toEqual(1);
-        expect(element.text()).toEqual("hello");
-        expect($rootScope.$$watchers.length).toEqual(0);
-        $rootScope.html = '<div onclick="">hello</div>';
-        expect(element.text()).toEqual("hello");
-      });
     });
 
     describe("SCE enabled", () => {

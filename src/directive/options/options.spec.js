@@ -746,39 +746,6 @@ describe("ngOptions", () => {
     expect(options.eq(0)).toEqualOption("", "A");
   });
 
-  it("should be possible to use one-time binding on the expression", () => {
-    createSelect({
-      "ng-model": "someModel",
-      "ng-options": "o as o for o in ::arr",
-    });
-
-    let options;
-
-    // Initially the options list is just the unknown option
-    options = element.find("option");
-    expect(options.length).toEqual(1);
-
-    // Now initialize the scope and the options should be updated
-    scope.$apply(() => {
-      scope.arr = ["a", "b", "c"];
-    });
-    options = element.find("option");
-    expect(options.length).toEqual(4);
-    expect(options.eq(0)).toEqualUnknownOption();
-    expect(options.eq(1)).toEqualOption("a");
-    expect(options.eq(2)).toEqualOption("b");
-    expect(options.eq(3)).toEqualOption("c");
-
-    // Change the scope but the options should not change
-    scope.arr = ["w", "x", "y", "z"];
-    options = element.find("option");
-    expect(options.length).toEqual(4);
-    expect(options.eq(0)).toEqualUnknownOption();
-    expect(options.eq(1)).toEqualOption("a");
-    expect(options.eq(2)).toEqualOption("b");
-    expect(options.eq(3)).toEqualOption("c");
-  });
-
   it('should remove the "selected" attribute from the previous option when the model changes', () => {
     scope.values = [
       { id: 10, label: "ten" },
@@ -2330,19 +2297,6 @@ describe("ngOptions", () => {
 
       scope.selected = undefined;
       expect(element[0].value).toBe("");
-    });
-
-    it("should use exact same values as values in scope with one-time bindings", () => {
-      scope.values = [{ name: "A" }, { name: "B" }];
-      scope.selected = scope.values[0];
-      createSelect({
-        "ng-model": "selected",
-        "ng-options": "value.name for value in ::values",
-      });
-
-      setSelectValue(element, 1);
-
-      expect(scope.selected).toBe(scope.values[1]);
     });
 
     it('should ensure that at least one option element has the "selected" attribute', () => {
