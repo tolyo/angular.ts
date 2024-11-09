@@ -2,7 +2,6 @@ import { JQLite } from "../../shared/jqlite/jqlite";
 import { urlResolve } from "../url-utils/url-utils";
 import {
   encodeUriSegment,
-  isBoolean,
   isDefined,
   isNumber,
   isObject,
@@ -329,7 +328,6 @@ export class Location {
     // so the modification window is narrow.
     this.$$state = isUndefined(state) ? null : state;
     this.$$urlUpdatedByLocation = true;
-
     return this;
   }
 
@@ -543,26 +541,28 @@ export class LocationHashbangUrl extends Location {
   }
 }
 
-export function LocationProvider() {
-  let hashPrefix = "!";
-  const html5Mode = {
-    enabled: false,
-    requireBase: true,
-    rewriteLinks: true,
-  };
+export class LocationProvider {
+  constructor() {
+    this.hashPrefixValue = "!";
+    this.html5ModeConfig = {
+      enabled: false,
+      requireBase: true,
+      rewriteLinks: true,
+    };
+  }
 
   /**
    * The default value for the prefix is `'!'`.
-   * @param {string=} prefix Prefix for hash part (containing path and search)
-   * @returns {*} current value if used as getter or itself (chaining) if used as setter
+   * @param {string=} prefix - Prefix for hash part (containing path and search)
+   * @returns {string|LocationProvider} current value if used as getter or itself (chaining) if used as setter
    */
-  this.hashPrefix = function (prefix) {
-    if (isDefined(prefix)) {
-      hashPrefix = prefix;
+  hashPrefix(prefix) {
+    if (typeof prefix !== "undefined") {
+      this.hashPrefixValue = prefix;
       return this;
     }
-    return hashPrefix;
-  };
+    return this.hashPrefixValue;
+  }
 
   /**
    * @param {(boolean|Object)=} mode If boolean, sets `html5Mode.enabled` to value.
@@ -584,30 +584,29 @@ export function LocationProvider() {
    *
    * @returns {Object} html5Mode object if used as getter or itself (chaining) if used as setter
    */
-  this.html5Mode = function (mode) {
-    if (isBoolean(mode)) {
-      html5Mode.enabled = mode;
+  html5Mode(mode) {
+    if (typeof mode === "boolean") {
+      this.html5ModeConfig.enabled = mode;
       return this;
     }
-    if (isObject(mode)) {
-      if (isBoolean(mode.enabled)) {
-        html5Mode.enabled = mode.enabled;
-      }
 
-      if (isBoolean(mode.requireBase)) {
-        html5Mode.requireBase = mode.requireBase;
+    if (typeof mode === "object") {
+      if (typeof mode.enabled === "boolean")
+        this.html5ModeConfig.enabled = mode.enabled;
+      if (typeof mode.requireBase === "boolean")
+        this.html5ModeConfig.requireBase = mode.requireBase;
+      if (
+        typeof mode.rewriteLinks === "boolean" ||
+        typeof mode.rewriteLinks === "string"
+      ) {
+        this.html5ModeConfig.rewriteLinks = mode.rewriteLinks;
       }
-
-      if (isBoolean(mode.rewriteLinks) || isString(mode.rewriteLinks)) {
-        html5Mode.rewriteLinks = mode.rewriteLinks;
-      }
-
       return this;
     }
-    return html5Mode;
-  };
+    return this.html5ModeConfig;
+  }
 
-  this.$get = [
+  $get = [
     "$rootScope",
     "$browser",
     "$rootElement",
@@ -626,8 +625,8 @@ export function LocationProvider() {
       const initialUrl = /** @type {string} */ ($browser.url());
       let appBase;
 
-      if (html5Mode.enabled) {
-        if (!baseHref && html5Mode.requireBase) {
+      if (this.html5Mode.enabled) {
+        if (!baseHref && this.html5Mode.requireBase) {
           throw $locationMinErr(
             "nobase",
             "$location in HTML5 mode requires a <base> tag to be present!",
@@ -641,7 +640,11 @@ export function LocationProvider() {
       }
       const appBaseNoFile = stripFile(appBase);
 
-      $location = new LocationMode(appBase, appBaseNoFile, `#${hashPrefix}`);
+      $location = new LocationMode(
+        appBase,
+        appBaseNoFile,
+        `#${this.hashPrefix}`,
+      );
       $location.$$parseLinkUrl(initialUrl, initialUrl);
 
       $location.$$state = $browser.state();
@@ -668,7 +671,10 @@ export function LocationProvider() {
       }
 
       $rootElement.on("click", (event) => {
-        const { rewriteLinks } = html5Mode;
+        const { rewriteLinks } = this.html5Mode;
+        // TODO(vojta): rewrite link when opening in new tab/window (in legacy browser)
+        // currently we open nice url link and redirect then
+
         if (
           !rewriteLinks ||
           event.ctrlKey ||
@@ -767,55 +773,57 @@ export function LocationProvider() {
       });
 
       // update browser
-      // $rootScope.$watch(() => {
-      //   if (initializing || $location.$$urlUpdatedByLocation) {
-      //     $location.$$urlUpdatedByLocation = false;
+      function browserUpdate() {
+        if (initializing || $location.$$urlUpdatedByLocation) {
+          $location.$$urlUpdatedByLocation = false;
 
-      //     const oldUrl = /** @type {string} */ ($browser.url());
-      //     const newUrl = $location.absUrl();
-      //     const oldState = $browser.state();
-      //     const urlOrStateChanged =
-      //       !urlsEqual(oldUrl, newUrl) ||
-      //       ($location.$$html5 && oldState !== $location.$$state);
+          const oldUrl = /** @type {string} */ ($browser.url());
+          const newUrl = $location.absUrl();
+          const oldState = $browser.state();
+          const urlOrStateChanged =
+            !urlsEqual(oldUrl, newUrl) ||
+            ($location.$$html5 && oldState !== $location.$$state);
 
-      //     if (initializing || urlOrStateChanged) {
-      //       initializing = false;
+          if (initializing || urlOrStateChanged) {
+            initializing = false;
 
-      //       $rootScope.$evalAsync(() => {
-      //         const newUrl = $location.absUrl();
-      //         const { defaultPrevented } = $rootScope.$broadcast(
-      //           "$locationChangeStart",
-      //           newUrl,
-      //           oldUrl,
-      //           $location.$$state,
-      //           oldState,
-      //         );
+            $rootScope.$evalAsync(() => {
+              const newUrl = $location.absUrl();
+              const { defaultPrevented } = $rootScope.$broadcast(
+                "$locationChangeStart",
+                newUrl,
+                oldUrl,
+                $location.$$state,
+                oldState,
+              );
 
-      //         // if the location was changed by a `$locationChangeStart` handler then stop
-      //         // processing this location change
-      //         if ($location.absUrl() !== newUrl) return;
+              // if the location was changed by a `$locationChangeStart` handler then stop
+              // processing this location change
+              if ($location.absUrl() !== newUrl) return;
 
-      //         if (defaultPrevented) {
-      //           $location.$$parse(oldUrl);
-      //           $location.$$state = oldState;
-      //         } else {
-      //           if (urlOrStateChanged) {
-      //             setBrowserUrlWithFallback(
-      //               newUrl,
-      //               oldState === $location.$$state ? null : $location.$$state,
-      //             );
-      //           }
-      //           afterLocationChange(oldUrl, oldState);
-      //         }
-      //       });
-      //     }
-      //   }
+              if (defaultPrevented) {
+                $location.$$parse(oldUrl);
+                $location.$$state = oldState;
+              } else {
+                if (urlOrStateChanged) {
+                  setBrowserUrlWithFallback(
+                    newUrl,
+                    oldState === $location.$$state ? null : $location.$$state,
+                  );
+                }
+                afterLocationChange(oldUrl, oldState);
+              }
+            });
+          }
+        }
 
-      //   $location.$$replace = false;
+        $location.$$replace = false;
 
-      //   // we don't need to return anything because $evalAsync will make the digest loop dirty when
-      //   // there is a change
-      // });
+        // we don't need to return anything because $evalAsync will make the digest loop dirty when
+        // there is a change
+      }
+
+      setTimeout(() => browserUpdate());
 
       return $location;
 
@@ -827,6 +835,7 @@ export function LocationProvider() {
           $location.$$state,
           oldState,
         );
+        browserUpdate();
       }
     },
   ];

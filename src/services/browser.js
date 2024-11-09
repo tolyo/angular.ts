@@ -110,15 +110,12 @@ export class Browser {
    * @private
    */
   cacheState() {
-    this.cachedState = history.state;
-    this.cachedState = this.cachedState === undefined ? null : this.cachedState;
-
-    if (equals(this.cachedState, this.lastCachedState)) {
-      this.cachedState = this.lastCachedState;
+    const currentState = history.state ?? null;
+    if (!equals(currentState, this.lastCachedState)) {
+      this.cachedState = currentState;
+      this.lastCachedState = currentState;
+      this.lastHistoryState = currentState;
     }
-
-    this.lastCachedState = this.cachedState;
-    this.lastHistoryState = this.cachedState;
   }
 
   /**
