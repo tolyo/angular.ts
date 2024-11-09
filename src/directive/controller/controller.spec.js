@@ -78,7 +78,7 @@ describe("ngController", () => {
     element = $compile('<div ng-controller="BoundFoo">{{mark}}</div>')(
       $rootScope,
     );
-    await wait()
+    await wait();
     expect(element.text()).toBe("foo");
   });
 
@@ -86,7 +86,7 @@ describe("ngController", () => {
     element = $compile('<div ng-controller="Public as p">{{p.mark}}</div>')(
       $rootScope,
     );
-    await wait()
+    await wait();
     expect(element.text()).toBe("works");
   });
 
@@ -94,7 +94,7 @@ describe("ngController", () => {
     element = $compile(
       '<div ng-controller="PublicModule as p">{{p.mark}}</div>',
     )($rootScope);
-    await wait()
+    await wait();
     expect(element.text()).toBe("works");
   });
 
@@ -109,7 +109,7 @@ describe("ngController", () => {
     element = $compile(
       '<div ng-controller="Greeter"><div ng-controller="Child">{{protoGreet(name)}}</div></div>',
     )($rootScope);
-    await wait()
+    await wait();
     expect(element.text()).toBe("Hello Adam!");
   });
 
@@ -151,7 +151,7 @@ describe("ngController", () => {
 
     $rootScope.expr = "first";
     $rootScope.expr = "second";
-    await wait()
+    await wait();
     expect(count).toBe(1);
   });
 

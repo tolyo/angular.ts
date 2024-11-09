@@ -65,9 +65,9 @@
       </script>
     </head>
     <body ng-app="todo" ng-init="hide = false">
-      <div id="2" ng-controller="TodoCtrl" >
-       <input type="text" ng-model="name" />
-        {{ name }}
+      <div id="2" ng-controller="TodoCtrl as $ctrl" >
+       <input type="text" ng-model="$ctrl.greeting" />
+        Greeting {{ $ctrl.greeting }}
         
       </div>
 
@@ -75,6 +75,7 @@
       <input type="checkbox" ng-model="hide"/>
       <div ng-if="hide">SHOW? {{ hide }} </div>
       {{ hide }}
-      
+      <input type="text" ng-model="greeting" />
+      {{ greeting }}
     </body>
 </html>

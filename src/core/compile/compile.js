@@ -2462,9 +2462,12 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
             priority: 0,
             compile: () => (scope, node) => {
               let current = JQLite(node).controller();
-
-              node[0].nodeValue = interpolateFn(current || scope, (val) => {
-                node[0].nodeValue = val;
+              interpolateFn.expressions.forEach((x) => {
+                scope.$watch(x, () => {
+                  node[0].nodeValue = interpolateFn(current || scope, (val) => {
+                    node[0].nodeValue = val;
+                  });
+                });
               });
             },
           });

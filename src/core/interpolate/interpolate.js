@@ -340,7 +340,6 @@ export class InterpolateProvider {
                 for (; i < ii; i++) {
                   if (cb) {
                     const watchProp = expressions[i].trim();
-                    console.log(watchProp);
                     context.$watch(watchProp, () => {
                       let vals = new Array(ii);
                       let j = 0;
