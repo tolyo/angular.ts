@@ -2,6 +2,7 @@ import { Angular } from "../../loader";
 import { createInjector } from "../../core/di/injector";
 import { dealoc, JQLite } from "../../shared/jqlite/jqlite";
 import { bind } from "../../shared/utils";
+import { wait } from "../../shared/test-utils";
 
 describe("ngController", () => {
   let angular;
@@ -65,44 +66,50 @@ describe("ngController", () => {
     dealoc(element);
   });
 
-  it("should instantiate controller and bind methods", () => {
+  it("should instantiate controller and bind methods", async () => {
     element = $compile('<div ng-controller="Greeter">{{greet(name)}}</div>')(
       $rootScope,
     );
+    await wait();
     expect(element.text()).toBe("Hello Misko!");
   });
 
-  it("should instantiate bound constructor functions", () => {
+  it("should instantiate bound constructor functions", async () => {
     element = $compile('<div ng-controller="BoundFoo">{{mark}}</div>')(
       $rootScope,
     );
+    await wait()
     expect(element.text()).toBe("foo");
   });
 
-  it("should publish controller into scope", () => {
+  it("should publish controller into scope", async () => {
     element = $compile('<div ng-controller="Public as p">{{p.mark}}</div>')(
       $rootScope,
     );
+    await wait()
     expect(element.text()).toBe("works");
   });
 
-  it("should publish controller into scope from module", () => {
+  it("should publish controller into scope from module", async () => {
     element = $compile(
       '<div ng-controller="PublicModule as p">{{p.mark}}</div>',
     )($rootScope);
+    await wait()
     expect(element.text()).toBe("works");
   });
 
-  it("should allow nested controllers", () => {
+  it("should allow nested controllers", async () => {
     element = $compile(
       '<div ng-controller="Greeter"><div ng-controller="Child">{{greet(name)}}</div></div>',
     )($rootScope);
+    await wait();
     expect(element.text()).toBe("Hello Adam!");
     dealoc(element);
 
     element = $compile(
       '<div ng-controller="Greeter"><div ng-controller="Child">{{protoGreet(name)}}</div></div>',
     )($rootScope);
+    await wait()
     expect(element.text()).toBe("Hello Adam!");
   });
 
@@ -126,7 +133,7 @@ describe("ngController", () => {
     }, 200);
   });
 
-  it("should only instantiate the controller once with ngInclude on the same element", () => {
+  it("should only instantiate the controller once with ngInclude on the same element", async () => {
     let count = 0;
 
     element = JQLite(
@@ -144,10 +151,11 @@ describe("ngController", () => {
 
     $rootScope.expr = "first";
     $rootScope.expr = "second";
+    await wait()
     expect(count).toBe(1);
   });
 
-  it("when ngInclude is on the same element, the content included content should get a child scope of the controller", () => {
+  it("when ngInclude is on the same element, the content included content should get a child scope of the controller", async () => {
     let controllerScope;
 
     element = JQLite(
@@ -163,6 +171,7 @@ describe("ngController", () => {
     injector = angular.bootstrap(element, ["myModule"]);
 
     $rootScope = injector.get("$rootScope");
+    await wait();
     expect(controllerScope.name).toBeUndefined();
   });
 });
