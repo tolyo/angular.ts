@@ -669,9 +669,6 @@ export function LocationProvider() {
 
       $rootElement.on("click", (event) => {
         const { rewriteLinks } = html5Mode;
-        // TODO(vojta): rewrite link when opening in new tab/window (in legacy browser)
-        // currently we open nice url link and redirect then
-
         if (
           !rewriteLinks ||
           event.ctrlKey ||
@@ -770,55 +767,55 @@ export function LocationProvider() {
       });
 
       // update browser
-      $rootScope.$watch(() => {
-        if (initializing || $location.$$urlUpdatedByLocation) {
-          $location.$$urlUpdatedByLocation = false;
+      // $rootScope.$watch(() => {
+      //   if (initializing || $location.$$urlUpdatedByLocation) {
+      //     $location.$$urlUpdatedByLocation = false;
 
-          const oldUrl = /** @type {string} */ ($browser.url());
-          const newUrl = $location.absUrl();
-          const oldState = $browser.state();
-          const urlOrStateChanged =
-            !urlsEqual(oldUrl, newUrl) ||
-            ($location.$$html5 && oldState !== $location.$$state);
+      //     const oldUrl = /** @type {string} */ ($browser.url());
+      //     const newUrl = $location.absUrl();
+      //     const oldState = $browser.state();
+      //     const urlOrStateChanged =
+      //       !urlsEqual(oldUrl, newUrl) ||
+      //       ($location.$$html5 && oldState !== $location.$$state);
 
-          if (initializing || urlOrStateChanged) {
-            initializing = false;
+      //     if (initializing || urlOrStateChanged) {
+      //       initializing = false;
 
-            $rootScope.$evalAsync(() => {
-              const newUrl = $location.absUrl();
-              const { defaultPrevented } = $rootScope.$broadcast(
-                "$locationChangeStart",
-                newUrl,
-                oldUrl,
-                $location.$$state,
-                oldState,
-              );
+      //       $rootScope.$evalAsync(() => {
+      //         const newUrl = $location.absUrl();
+      //         const { defaultPrevented } = $rootScope.$broadcast(
+      //           "$locationChangeStart",
+      //           newUrl,
+      //           oldUrl,
+      //           $location.$$state,
+      //           oldState,
+      //         );
 
-              // if the location was changed by a `$locationChangeStart` handler then stop
-              // processing this location change
-              if ($location.absUrl() !== newUrl) return;
+      //         // if the location was changed by a `$locationChangeStart` handler then stop
+      //         // processing this location change
+      //         if ($location.absUrl() !== newUrl) return;
 
-              if (defaultPrevented) {
-                $location.$$parse(oldUrl);
-                $location.$$state = oldState;
-              } else {
-                if (urlOrStateChanged) {
-                  setBrowserUrlWithFallback(
-                    newUrl,
-                    oldState === $location.$$state ? null : $location.$$state,
-                  );
-                }
-                afterLocationChange(oldUrl, oldState);
-              }
-            });
-          }
-        }
+      //         if (defaultPrevented) {
+      //           $location.$$parse(oldUrl);
+      //           $location.$$state = oldState;
+      //         } else {
+      //           if (urlOrStateChanged) {
+      //             setBrowserUrlWithFallback(
+      //               newUrl,
+      //               oldState === $location.$$state ? null : $location.$$state,
+      //             );
+      //           }
+      //           afterLocationChange(oldUrl, oldState);
+      //         }
+      //       });
+      //     }
+      //   }
 
-        $location.$$replace = false;
+      //   $location.$$replace = false;
 
-        // we don't need to return anything because $evalAsync will make the digest loop dirty when
-        // there is a change
-      });
+      //   // we don't need to return anything because $evalAsync will make the digest loop dirty when
+      //   // there is a change
+      // });
 
       return $location;
 

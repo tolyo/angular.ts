@@ -447,6 +447,8 @@ export function selectDirective() {
       // we need to work of an array, so we need to see if anything was inserted/removed
       let lastView;
       let lastViewRef = NaN;
+      debugger;
+      // this will throw
       scope.$watch(() => {
         if (
           lastViewRef === ngModelCtrl.$viewValue &&

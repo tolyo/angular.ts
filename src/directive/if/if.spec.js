@@ -68,6 +68,38 @@ describe("ngIf", () => {
       expect(element.children().length).toBe(2);
     });
 
+    it("should react to changes on a property of an object", async () => {
+      $scope.a = {
+        b: true,
+      };
+      makeIf("a.b");
+      await wait();
+      expect(element.children().length).toBe(1);
+
+      $scope.a.b = false;
+      await wait();
+      expect(element.children().length).toBe(0);
+    });
+
+    it("should react to changes on a property of a nested object", async () => {
+      $scope.a = {
+        b: {
+          c: true,
+        },
+      };
+      makeIf("a.b.c");
+      await wait();
+      expect(element.children().length).toBe(1);
+
+      $scope.a.b.c = false;
+      await wait();
+      expect(element.children().length).toBe(0);
+
+      $scope.a.b.c = true;
+      await wait();
+      expect(element.children().length).toBe(1);
+    });
+
     it("should not add the element twice if the condition goes from true to true", async () => {
       $scope.hello = "true1";
       makeIf("hello");
@@ -179,26 +211,34 @@ describe("ngIf", () => {
         )($scope),
       );
       $scope.$apply();
+      await wait();
       expect(element.text()).toBe("before;start;1;2;3;end;after;");
 
       $scope.things.push(4);
       $scope.$apply();
+      await wait();
       expect(element.text()).toBe("before;start;1;2;3;4;end;after;");
 
       $scope.show = false;
       $scope.$apply();
-      // expect(element.text()).toBe("before;after;");
+      await wait();
+      expect(element.text()).toBe("before;after;");
     });
 
     it("should restore the element to its compiled state", async () => {
       $scope.value = true;
       makeIf("value");
+      await wait();
       expect(element.children().length).toBe(1);
       element.children()[0].classList.remove("my-class");
       expect(element.children()[0].className).not.toContain("my-class");
+
       $scope.$apply("value = false");
+      await wait();
       expect(element.children().length).toBe(0);
+
       $scope.$apply("value = true");
+      await wait();
       expect(element.children().length).toBe(1);
       expect(element.children()[0].className).toContain("my-class");
     });
@@ -210,14 +250,19 @@ describe("ngIf", () => {
       element.append('<div ng-if="show" test></div>');
       $compile(element)($rootScope);
       $rootScope.show = true;
+      await wait();
       expect(element.text()).toBe("");
-      $rootScope.$apply();
 
+      $rootScope.$apply();
+      await wait();
       expect(element.text()).toBe("");
+
       await wait(100);
       expect(element.text()).toBe("hello");
+
       $rootScope.show = false;
       $rootScope.$apply();
+      await wait();
       expect(element.children().length).toBe(0);
       expect(element.text()).toBe("");
     });
@@ -226,8 +271,10 @@ describe("ngIf", () => {
       const spy = spyOn($rootScope, "$digest").and.callThrough();
       $scope.hello = true;
       makeIf("hello");
+      await wait();
       expect(element.children().length).toBe(1);
       $scope.$apply("hello = false");
+      await wait();
       spy.calls.reset();
       expect(element.children().length).toBe(0);
       expect(spy).not.toHaveBeenCalled();
@@ -258,6 +305,7 @@ describe("ngIf", () => {
         );
         $compile("<div><div template></div></div>")($rootScope);
         $rootScope.$apply();
+        await wait();
         expect(controller.flag).toBe(true);
       });
 
@@ -279,6 +327,7 @@ describe("ngIf", () => {
         const element = $compile('<iso><span ng-bind="val"></span></iso>')(
           $rootScope,
         );
+        await wait();
         expect(element.text().trim()).toEqual(
           "val=value in iso scope-transcluded content",
         );

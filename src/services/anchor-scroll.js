@@ -127,23 +127,21 @@ export class AnchorScrollProvider {
       // does not scroll when user clicks on anchor link that is currently on
       // (no url change, no $location.hash() change), browser native does scroll
       if (this.autoScrollingEnabled) {
-        $rootScope.$watch(
-          () => $location.hash(),
-          (newVal, oldVal) => {
-            // skip the initial scroll if $location.hash is empty
-            if (newVal === oldVal && newVal === "") return;
+        $rootScope["$location"] = $location;
+        $rootScope.$watch("$location.$$hash", (newVal, oldVal) => {
+          // skip the initial scroll if $location.hash is empty
+          if (newVal === oldVal && newVal === "") return;
 
-            const action = () => $rootScope.$evalAsync(scroll);
-            if (document.readyState === "complete") {
-              // Force the action to be run async for consistent behavior
-              // from the action's point of view
-              // i.e. it will definitely not be in a $apply
-              window.setTimeout(() => action());
-            } else {
-              window.addEventListener("load", () => action());
-            }
-          },
-        );
+          const action = () => $rootScope.$evalAsync(scroll);
+          if (document.readyState === "complete") {
+            // Force the action to be run async for consistent behavior
+            // from the action's point of view
+            // i.e. it will definitely not be in a $apply
+            window.setTimeout(() => action());
+          } else {
+            window.addEventListener("load", () => action());
+          }
+        });
       }
 
       return scroll;

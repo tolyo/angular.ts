@@ -1995,125 +1995,21 @@ describe("Model", () => {
       expect(log).toEqual("11");
     });
 
-    //   it("should catch exceptions", () => {
-    //     let log = "";
-    //     const child = model.$new();
-    //     model.$watch("a", (a) => {
-    //       log += "1";
-    //     });
-    //     model.a = 0;
-    //     child.$apply(() => {
-    //       throw new Error("MyError");
-    //     });
-    //     expect(log).toEqual("1");
-    //     expect(logs[0].message).toEqual("MyError");
-    //   });
-
-    //   it("should log exceptions from $digest", () => {
-    //     model.$watch("a", () => {
-    //       model.b++;
-    //     });
-    //     model.$watch("b", () => {
-    //       model.a++;
-    //     });
-    //     model.a = model.b = 0;
-
-    //     expect(() => {
-    //       model.$apply();
-    //     }).toThrow();
-
-    //     expect(logs[0]).toBeDefined();
-
-    //     expect(model.$$phase).toBe(0);
-    //   });
-
-    //   describe("exceptions", () => {
-    //     let log;
-
-    //     beforeEach(() => {
-    //       logs = [];
-    //       log = "";
-    //       model.$watch(() => {
-    //         log += "$digest;";
-    //       });
-    //
-    //       log = "";
-    //     });
-
-    //     it("should execute and return value and update", () => {
-    //       model.name = "abc";
-    //       expect(model.$apply((model) => model.name)).toEqual("abc");
-    //       expect(log).toEqual("$digest;");
-    //       expect(logs).toEqual([]);
-    //     });
-
-    //     it("should catch exception and update", () => {
-    //       const error = new Error("MyError");
-    //       model.$apply(() => {
-    //         throw error;
-    //       });
-    //       expect(log).toEqual("$digest;");
-    //       expect(logs).toEqual([error]);
-    //     });
-    //   });
-
-    //   describe("recursive $apply protection", () => {
-    //     beforeEach(() => (logs = []));
-
-    //     it("should throw an exception if $apply is called while an $apply is in progress", () => {
-    //       model.$apply(() => {
-    //         model.$apply();
-    //       });
-    //       expect(logs[0].message.match(/progress/g).length).toBeTruthy();
-    //     });
-
-    //     it("should not clear the state when calling $apply during an $apply", () => {
-    //       model.$apply(() => {
-    //         model.$apply();
-    //         expect(logs[0].message.match(/progress/g).length).toBeTruthy();
-    //         logs = [];
-    //         model.$apply();
-    //         expect(logs[0].message.match(/progress/g).length).toBeTruthy();
-    //       });
-    //       logs = [];
-    //       model.$apply();
-    //       expect(logs).toEqual([]);
-    //     });
-
-    //     it("should throw an exception if $apply is called while flushing evalAsync queue", () => {
-    //       model.$apply(() => {
-    //         model.$evalAsync(() => {
-    //           model.$apply();
-    //         });
-    //       });
-    //       expect(logs[0].message.match(/progress/g).length).toBeTruthy();
-    //     });
-
-    //     it("should throw an exception if $apply is called while a watch is being initialized", () => {
-    //       const childmodel1 = model.$new();
-    //       childmodel1.$watch("x", () => {
-    //         childmodel1.$apply();
-    //       });
-    //       childmodel1.$apply();
-    //       expect(logs[0].message.match(/progress/g).length).toBeTruthy();
-    //     });
-
-    //     it("should thrown an exception if $apply in called from a watch fn (after init)", () => {
-    //       const childmodel2 = model.$new();
-    //       childmodel2.$apply(() => {
-    //         childmodel2.$watch("x", (newVal, oldVal) => {
-    //           if (newVal !== oldVal) {
-    //             childmodel2.$apply();
-    //           }
-    //         });
-    //       });
-    //       childmodel2.$apply(() => {
-    //         childmodel2.x = "something";
-    //       });
-
-    //       expect(logs[0].message.match(/progress/g).length).toBeTruthy();
-    //     });
-    //   });
+    it("should catch exceptions", async () => {
+      let log = "";
+      const child = model.$new();
+      model.$watch("a", (a) => {
+        log += "1";
+      });
+      model.a = 0;
+      await wait();
+      child.$apply(() => {
+        throw new Error("MyError");
+      });
+      await wait();
+      expect(log).toEqual("11");
+      expect(logs[0].message).toEqual("MyError");
+    });
   });
 
   // describe("$applyAsync", () => {

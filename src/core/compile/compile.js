@@ -1391,6 +1391,8 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                 }
               }
               if (isFunction(controllerInstance.$doCheck)) {
+                debugger;
+                // this will throw
                 controllerScope.$watch(() => {
                   controllerInstance.$doCheck();
                 });

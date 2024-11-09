@@ -322,6 +322,10 @@ class Model {
           }
         }
 
+        if (Array.isArray(target)) {
+          this.watchers.get("length")?.forEach((l) => listeners.push(l));
+        }
+
         this.watchers.get(property)?.forEach((l) => listeners.push(l));
         if (listeners.length > 0) {
           // check if the listener actually appllies to this target
@@ -547,7 +551,11 @@ class Model {
       }
       // 6
       case ASTType.BinaryExpression: {
-        key = get.decoratedNode.body[0].expression.toWatch[0].property.name;
+        let expr = get.decoratedNode.body[0].expression.toWatch[0];
+        key = expr.property ? expr.property.name : expr.name;
+        if (!key) {
+          throw new Error("Unable to determine key");
+        }
         listener.property.push(key);
         break;
       }
@@ -670,7 +678,7 @@ class Model {
         Object.setPrototypeOf(childInstance, this.$target);
       } else {
         Object.setPrototypeOf(
-          Object.getPrototypeOf(childInstance),
+          Object.getPrototypeOf(childInstance) || childInstance,
           this.$target,
         );
       }
