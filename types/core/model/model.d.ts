@@ -31,7 +31,7 @@ export class RootModelProvider {
  * @property {import("../parse/parse.js").CompiledExpression} watchFn
  * @property {number} id - Deregistration id
  * @property {number} scopeId - The scope that created the Listener
- * @property {string} property
+ * @property {string[]} property
  * @property {string} [watchProp] - The original property to watch if different from observed key
  * @property {Proxy} [foreignListener]
  *
@@ -69,7 +69,7 @@ export type Listener = {
      * - The scope that created the Listener
      */
     scopeId: number;
-    property: string;
+    property: string[];
     /**
      * - The original property to watch if different from observed key
      */

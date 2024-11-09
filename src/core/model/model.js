@@ -620,8 +620,10 @@ class Model {
         // get.decoratedNode.body[0].expression.expression.forEach(x => {
         //   x.toWatch[0].name
         // });
-        key = get.decoratedNode.body[0].expression.toWatch[0].name;
+        key = get.decoratedNode.body[0].expression.properties[0].key.name;
         listener.property.push(key);
+        // key = get.decoratedNode.body[0].expression.toWatch[0].name;
+        // listener.property.push(key);
         break;
       }
 

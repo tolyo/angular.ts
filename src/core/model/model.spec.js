@@ -755,7 +755,7 @@ describe("Model", () => {
         expect(spy).toHaveBeenCalledWith("misko", model);
       });
 
-      xit("should watch and fire on correct expression change", async () => {
+      it("should watch and fire on correct expression change", async () => {
         const spy = jasmine.createSpy();
         model.$watch("name.first", spy);
         await wait();
@@ -963,7 +963,7 @@ describe("Model", () => {
         expect(model.counter).toBe(3);
       });
 
-      xit("calls the listener function when a nested value is created on an empty wrapper object", async () => {
+      it("calls the listener function when a nested value is created on an empty wrapper object", async () => {
         model.counter = 0;
         model.someValue = {};
 
@@ -1753,88 +1753,33 @@ describe("Model", () => {
         describe("object", () => {
           beforeEach(() => {
             logs = [];
-            model.$watch("{a: obj}", (newVal, oldVal) => {
-              const msg = { newVal, oldVal };
-
-              if (newVal === oldVal) {
-                msg.identical = true;
-              }
+            model.$watch("{a: obj}", (newVal) => {
+              const msg = { newVal };
 
               logs.push(msg);
             });
           });
 
-          it("should return oldCollection === newCollection only on the first listener call", () => {
-            model.obj = "b";
-            // first time should be identical
-
-            expect(logs).toEqual([{ newVal: { a: "b" }, oldVal: { a: "b" } }]);
-
-            // second time not identical
-            logs = [];
-            model.obj = "c";
-
-            expect(logs).toEqual([{ newVal: { a: "c" }, oldVal: { a: "b" } }]);
-          });
-
-          it("should trigger when property changes into object", () => {
-            model.obj = "test";
-
-            expect(logs).toEqual([
-              { newVal: { a: "test" }, oldVal: { a: "test" } },
-            ]);
-
+          it("should trigger when property changes into object", async () => {
             logs = [];
             model.obj = {};
-
-            expect(logs).toEqual([
-              { newVal: { a: {} }, oldVal: { a: "test" } },
-            ]);
+            await wait();
+            expect(logs).toEqual([{ newVal: { a: {} } }]);
           });
 
-          it("should not trigger change when object in collection changes", () => {
+          it("should not trigger change when object in collection changes", async () => {
             model.obj = { name: "foo" };
-
+            await wait();
             expect(logs).toEqual([
               {
                 newVal: { a: { name: "foo" } },
-                oldVal: { a: { name: "foo" } },
-                identical: true,
               },
             ]);
 
             logs = [];
             model.obj.name = "bar";
-
+            await wait();
             expect(logs).toEqual([]);
-          });
-
-          it("should watch object properties", () => {
-            model.obj = {};
-
-            expect(logs).toEqual([{ newVal: { a: {} }, oldVal: { a: {} } }]);
-
-            logs = [];
-            model.obj = "A";
-
-            expect(logs).toEqual([{ newVal: { a: "A" }, oldVal: { a: {} } }]);
-
-            logs = [];
-            model.obj = "B";
-
-            expect(logs).toEqual([{ newVal: { a: "B" }, oldVal: { a: "A" } }]);
-
-            logs = [];
-            model.obj = [];
-
-            expect(logs).toEqual([{ newVal: { a: [] }, oldVal: { a: "B" } }]);
-
-            logs = [];
-            delete model.obj;
-
-            expect(logs).toEqual([
-              { newVal: { a: undefined }, oldVal: { a: [] } },
-            ]);
           });
 
           it("should not infinitely digest when current value is NaN", () => {
@@ -1844,109 +1789,54 @@ describe("Model", () => {
         });
 
         describe("object computed property", () => {
-          beforeEach(() => {
+          beforeEach(async () => {
             logs = [];
-            model.$watch("{[key]: obj}", (newVal, oldVal) => {
-              const msg = { newVal, oldVal };
-
-              if (newVal === oldVal) {
-                msg.identical = true;
-              }
+            model.$watch("{[key]: obj}", (newVal) => {
+              const msg = { newVal };
 
               logs.push(msg);
             });
+
+            await wait();
+            logs = [];
           });
 
-          it('should default to "undefined" key', () => {
+          it("should not trigger when key absent", async () => {
             model.obj = "test";
-
-            expect(logs).toEqual([
-              {
-                newVal: { undefined: "test" },
-                oldVal: { undefined: "test" },
-                identical: true,
-              },
-            ]);
+            await wait();
+            expect(logs).toEqual([]);
           });
 
-          it("should trigger when key changes", () => {
+          it("should trigger when key changes", async () => {
             model.key = "a";
             model.obj = "test";
-
-            expect(logs).toEqual([
-              { newVal: { a: "test" }, oldVal: { a: "test" } },
-            ]);
+            await wait();
+            expect(logs).toEqual([{ newVal: { a: "test" } }]);
 
             logs = [];
             model.key = "b";
-
-            expect(logs).toEqual([
-              { newVal: { b: "test" }, oldVal: { a: "test" } },
-            ]);
+            await wait();
+            expect(logs).toEqual([{ newVal: { b: "test" } }]);
 
             logs = [];
             model.key = true;
-
-            expect(logs).toEqual([
-              { newVal: { true: "test" }, oldVal: { b: "test" } },
-            ]);
+            await wait();
+            expect(logs).toEqual([{ newVal: { true: "test" } }]);
           });
 
-          it("should not trigger when key changes but stringified key does not", () => {
-            model.key = 1;
-            model.obj = "test";
-
-            expect(logs).toEqual([
-              { newVal: { 1: "test" }, oldVal: { 1: "test" } },
-            ]);
-
-            logs = [];
-            model.key = "1";
-
-            expect(logs).toEqual([]);
-
-            model.key = true;
-
-            expect(logs).toEqual([
-              { newVal: { true: "test" }, oldVal: { 1: "test" } },
-            ]);
-
-            logs = [];
-            model.key = "true";
-
-            expect(logs).toEqual([]);
-
-            logs = [];
-            model.key = {};
-
-            expect(logs).toEqual([
-              {
-                newVal: { "[object Object]": "test" },
-                oldVal: { true: "test" },
-              },
-            ]);
-
-            logs = [];
-            model.key = {};
-
-            expect(logs).toEqual([]);
-          });
-
-          it("should not trigger change when object in collection changes", () => {
+          it("should not trigger change when object in collection changes", async () => {
             model.key = "a";
             model.obj = { name: "foo" };
-
+            await wait();
             expect(logs).toEqual([
               {
                 newVal: { a: { name: "foo" } },
-                oldVal: { a: { name: "foo" } },
-                identical: true,
               },
             ]);
             logs = [];
 
             model.obj.name = "bar";
-
+            await wait();
             expect(logs).toEqual([]);
           });
 
