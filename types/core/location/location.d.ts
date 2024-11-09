@@ -230,15 +230,13 @@ export class LocationHtml5Url extends Location {
  */
 export class LocationHashbangUrl extends Location {
     constructor(appBase: any, appBaseNoFile: any, hashPrefix: any);
-    appBase: any;
-    appBaseNoFile: any;
     hashPrefix: any;
     /**
      * Parse given hashbang URL into properties
      * @param {string} url Hashbang URL
      */
     $$parse(url: string): void;
-    $$normalizeUrl(url: any): any;
+    $$normalizeUrl(url: any): string;
     /**
      * @param {string} url
      * @returns {boolean}
