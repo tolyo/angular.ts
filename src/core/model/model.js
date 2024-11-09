@@ -1,4 +1,5 @@
 import { val } from "../../shared/hof.js";
+import { isNull } from "../../shared/predicates.js";
 import {
   isUndefined,
   nextUid,
@@ -64,9 +65,10 @@ export class RootModelProvider {
  *                                     or the original value if the target is not an object.
  */
 export function createModel(target = {}, context) {
-  if (target === null) {
-    return null;
+  if (isNull(target)) {
+    return target;
   }
+
   if (typeof target === "object") {
     const proxy = new Proxy(target, context || new Model());
     for (const key in target) {
@@ -88,7 +90,7 @@ export function createModel(target = {}, context) {
  * @property {import("../parse/parse.js").CompiledExpression} watchFn
  * @property {number} id - Deregistration id
  * @property {number} scopeId - The scope that created the Listener
- * @property {string} property
+ * @property {string[]} property
  * @property {string} [watchProp] - The original property to watch if different from observed key
  * @property {Proxy} [foreignListener]
  *
@@ -300,7 +302,11 @@ class Model {
         return true;
       }
 
-      target[property] = createModel(value, this);
+      if (isUndefined(value)) {
+        target[property] = value;
+      } else {
+        target[property] = createModel(value, this);
+      }
 
       if (oldValue !== value) {
         // Handle the case where we need to start observing object after a watcher has been set
@@ -497,7 +503,7 @@ class Model {
       watchFn: get,
       scopeId: this.id,
       id: nextUid(),
-      property: undefined,
+      property: [],
     };
 
     // simplest case
@@ -536,9 +542,8 @@ class Model {
       }
       // 6
       case ASTType.BinaryExpression: {
-        listener.property =
-          get.decoratedNode.body[0].expression.toWatch[0].property.name;
-        key = listener.property;
+        key = get.decoratedNode.body[0].expression.toWatch[0].property.name;
+        listener.property.push(key);
         break;
       }
       // 7
@@ -547,11 +552,15 @@ class Model {
       }
       // function
       case ASTType.CallExpression: {
-        listener.property = get.decoratedNode.body[0].expression.toWatch.name;
+        listener.property.push(
+          get.decoratedNode.body[0].expression.toWatch.name,
+        );
         break;
       }
       case ASTType.MemberExpression: {
-        listener.property = get.decoratedNode.body[0].expression.property.name;
+        listener.property.push(
+          get.decoratedNode.body[0].expression.property.name,
+        );
         key = get.decoratedNode.body[0].expression.property.name;
         if (watchProp !== key) {
           // Handle nested expression call
@@ -572,7 +581,7 @@ class Model {
 
       // 10
       case ASTType.Identifier: {
-        listener.property = get.decoratedNode.body[0].expression.name;
+        listener.property.push(get.decoratedNode.body[0].expression.name);
         break;
       }
 
@@ -583,7 +592,17 @@ class Model {
 
       // 12
       case ASTType.ArrayExpression: {
-        throw new Error("Unsupported type " + type);
+        let keys = get.decoratedNode.body[0].expression.elements.map(
+          (x) => x.toWatch[0].name,
+        );
+        keys.forEach((key) => {
+          this.registerKey(key, listener);
+        });
+        return () => {
+          keys.forEach((key) => {
+            this.deregisterKey(key, listener.id);
+          });
+        };
       }
 
       // 13
@@ -593,9 +612,11 @@ class Model {
 
       // 14
       case ASTType.ObjectExpression: {
-        listener.property =
-          get.decoratedNode.body[0].expression.toWatch[0].name;
-        key = listener.property;
+        // get.decoratedNode.body[0].expression.expression.forEach(x => {
+        //   x.toWatch[0].name
+        // });
+        key = get.decoratedNode.body[0].expression.toWatch[0].name;
+        listener.property.push(key);
         break;
       }
 
@@ -922,7 +943,7 @@ class Model {
   notifyListener(listener, target) {
     const { originalTarget, listenerFn, watchFn } = listener;
     try {
-      const newVal = watchFn(target) || watchFn(originalTarget);
+      const newVal = watchFn(originalTarget) || watchFn(target);
       listenerFn(newVal, originalTarget);
       this.$$asyncQueue.forEach((x) => {
         if (x.handler.id == this.id) {

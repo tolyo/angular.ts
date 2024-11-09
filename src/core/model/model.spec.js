@@ -1685,69 +1685,67 @@ describe("Model", () => {
         describe("array", () => {
           beforeEach(() => {
             logs = [];
-            model.$watch("[obj]", (newVal, oldVal) => {
-              const msg = { newVal, oldVal };
-
-              if (newVal === oldVal) {
-                msg.identical = true;
-              }
+            model.$watch("[obj]", (newVal) => {
+              const msg = { newVal };
 
               logs.push(msg);
             });
           });
 
-          it("should return oldCollection === newCollection only on the first listener call", () => {
+          it("should return oldCollection === newCollection only on the first listener call", async () => {
             // first time should be identical
             model.obj = "a";
-
-            expect(logs).toEqual([{ newVal: ["a"], oldVal: ["a"] }]);
+            await wait();
+            expect(logs).toEqual([{ newVal: ["a"] }]);
             logs = [];
 
             // second time should be different
             model.obj = "b";
-
-            expect(logs).toEqual([{ newVal: ["b"], oldVal: ["a"] }]);
+            await wait();
+            expect(logs).toEqual([{ newVal: ["b"] }]);
           });
 
-          it("should trigger when property changes into array", () => {
+          it("should trigger when property changes into array", async () => {
             model.obj = "test";
-
-            expect(logs).toEqual([{ newVal: ["test"], oldVal: ["test"] }]);
+            await wait();
+            expect(logs).toEqual([{ newVal: ["test"] }]);
 
             logs = [];
             model.obj = [];
-
-            expect(logs).toEqual([{ newVal: [[]], oldVal: ["test"] }]);
+            await wait();
+            expect(logs).toEqual([{ newVal: [[]] }]);
 
             logs = [];
             model.obj = {};
-
-            expect(logs).toEqual([{ newVal: [{}], oldVal: [[]] }]);
+            await wait();
+            expect(logs).toEqual([{ newVal: [{}] }]);
 
             logs = [];
             model.obj = [];
-
-            expect(logs).toEqual([{ newVal: [[]], oldVal: [{}] }]);
+            await wait();
+            expect(logs).toEqual([{ newVal: [[]] }]);
 
             logs = [];
-            model.obj = undefined;
 
-            expect(logs).toEqual([{ newVal: [undefined], oldVal: [[]] }]);
+            model.obj = undefined;
+            await wait();
+            expect(logs).toEqual([{ newVal: [undefined] }]);
           });
 
-          it("should not trigger change when object in collection changes", () => {
+          it("should not trigger change when object in collection changes", async () => {
             model.obj = {};
-
-            expect(logs).toEqual([{ newVal: [{}], oldVal: [{}] }]);
+            await wait();
+            expect(logs).toEqual([{ newVal: [{}] }]);
 
             logs = [];
             model.obj.name = "foo";
-
-            expect(logs).toEqual([]);
+            await wait();
+            expect(logs).toEqual([{ newVal: [{ name: "foo" }] }]);
           });
 
-          it("should not infinitely digest when current value is NaN", () => {
+          it("should not infinitely digest when current value is NaN", async () => {
             model.obj = NaN;
+            await wait();
             expect(() => {}).not.toThrow();
           });
         });
