@@ -309,16 +309,21 @@ class Model {
       }
 
       if (oldValue !== value) {
+        let listeners = [];
         // Handle the case where we need to start observing object after a watcher has been set
         if (isUndefined(oldValue) && isObject(target[property])) {
           if (!this.objectListeners.has(target[property])) {
             this.objectListeners.set(target[property], [property]);
           }
+          for (const k of Object.keys(value)) {
+            this.watchers.get(k)?.forEach((l) => listeners.push(l));
+            // overwhrite the context so we pass the owneship test in filter
+            target = value;
+          }
         }
 
-        let listeners = this.watchers.get(property);
-        if (listeners) {
-          assert(listeners.length !== 0);
+        this.watchers.get(property)?.forEach((l) => listeners.push(l));
+        if (listeners.length > 0) {
           // check if the listener actually appllies to this target
           this.scheduleListener(listeners, (x) => {
             return x.filter((x) => {

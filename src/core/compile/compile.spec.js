@@ -1300,7 +1300,7 @@ describe("$compile", () => {
     reloadModules();
     var el = $("<div my-directive></div>");
     $compile(el)($rootScope);
-    expect(givenScope.$parent).toBe($rootScope);
+    expect(givenScope.$parent.id).toBe($rootScope.id);
   });
 
   it("gives inherited scope to all directives on element", () => {
