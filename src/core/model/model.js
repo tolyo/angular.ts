@@ -427,7 +427,6 @@ class Model {
   scheduleListener(listeners, filter = (val) => val) {
     Promise.resolve().then(() => {
       let index = 0;
-
       while (index < filter(listeners).length) {
         const listener = filter(listeners)[index];
         if (listener.foreignListener) {
@@ -444,6 +443,10 @@ class Model {
     // Currently deletes $model
     if (target[property] && target[property][isProxySymbol]) {
       delete target[property];
+      const listeners = this.watchers.get(property);
+      if (listeners) {
+        this.scheduleListener(listeners);
+      }
       return true;
     }
 

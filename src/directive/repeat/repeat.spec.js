@@ -75,7 +75,7 @@ describe("ngRepeat", () => {
     expect(element.text()).toEqual("shyam;");
   });
 
-  fit("should iterate over an array-like object", async () => {
+  it("should iterate over an array-like object", async () => {
     element = $compile(
       "<ul>" + '<li ng-repeat="item in items">{{item.name}};</li>' + "</ul>",
     )(scope);
@@ -95,7 +95,7 @@ describe("ngRepeat", () => {
     document.getElementById("dummy").innerHTML = "";
   });
 
-  fit("should iterate over an array-like class", async () => {
+  it("should iterate over an array-like class", async () => {
     function Collection() {}
     Collection.prototype = new Array();
     Collection.prototype.length = 0;
@@ -115,27 +115,29 @@ describe("ngRepeat", () => {
     expect(element.text()).toEqual("x;y;z;");
   });
 
-  it("should iterate over on object/map", () => {
+  it("should iterate over on object/map", async () => {
     element = $compile(
       "<ul>" +
         '<li ng-repeat="(key, value) in items">{{key}}:{{value}}|</li>' +
         "</ul>",
     )(scope);
     scope.items = { misko: "swe", shyam: "set" };
+    await wait();
     expect(element.text()).toEqual("misko:swe|shyam:set|");
   });
 
-  it("should iterate over on object/map where (key,value) contains whitespaces", () => {
+  it("should iterate over on object/map where (key,value) contains whitespaces", async () => {
     element = $compile(
       "<ul>" +
         '<li ng-repeat="(  key ,  value  ) in items">{{key}}:{{value}}|</li>' +
         "</ul>",
     )(scope);
     scope.items = { me: "swe", you: "set" };
+    await wait();
     expect(element.text()).toEqual("me:swe|you:set|");
   });
 
-  fit("should iterate over an object/map with identical values", async () => {
+  it("should iterate over an object/map with identical values", async () => {
     element = $compile(
       "<ul>" +
         '<li ng-repeat="(key, value) in items">{{key}}:{{value}}|</li>' +
@@ -155,7 +157,7 @@ describe("ngRepeat", () => {
     );
   });
 
-  fit("should iterate over on object created using `Object.create(null)`", async () => {
+  it("should iterate over on object created using `Object.create(null)`", async () => {
     element = $compile(
       "<ul>" +
         '<li ng-repeat="(key, value) in items">{{key}}:{{value}}|</li>' +

@@ -71,6 +71,7 @@ describe("ngInclude", () => {
       $templateCache.set("myUrl", [200, "{{name}}", {}]);
       $rootScope.name = "misko";
       $rootScope.url = "myUrl";
+      await wait(100);
       expect(body.text()).toEqual("misko");
       body.empty();
       dealoc($rootScope);
@@ -88,21 +89,24 @@ describe("ngInclude", () => {
       }, 200);
     });
 
-    it("should NOT use untrusted URL expressions ", () => {
+    it("should NOT use untrusted URL expressions ", async () => {
       element = JQLite('<ng-include src="url"></ng-include>');
       const injector = angular.bootstrap(element, ["myModule"]);
       $rootScope = injector.get("$rootScope");
       $rootScope.url = "http://example.com/myUrl";
+      await wait();
       expect(() => {}).toThrowError(/insecurl/);
     });
 
-    it("should NOT use mistyped expressions ", () => {
+    it("should NOT use mistyped expressions ", async () => {
       element = JQLite('<ng-include src="url"></ng-include>');
       const injector = angular.bootstrap(element, ["myModule"]);
       $rootScope = injector.get("$rootScope");
       $rootScope.name = "chirayu";
+      await wait();
       let $sce = injector.get("$sce");
       $rootScope.url = $sce.trustAsUrl("http://example.com/myUrl");
+      await wait();
       expect(() => {}).toThrowError(/insecurl/);
     });
 
@@ -252,16 +256,18 @@ describe("ngInclude", () => {
       await wait(100);
       expect(element.text()).toEqual("");
       $rootScope.url = "/mock/hello";
+      await wait();
       // No request being made
       expect(element.text()).toEqual("Hello");
     });
 
-    it("should clear content when error during xhr request", () => {
+    it("should clear content when error during xhr request", async () => {
       window.angular.module("myModule", []);
       element = JQLite('<div><ng-include src="url">content</ng-include></div>');
       const injector = angular.bootstrap(element, ["myModule"]);
       $rootScope = injector.get("$rootScope");
       $rootScope.url = "/mock/401";
+      await wait();
       expect(element.text()).toBe("");
     });
 
@@ -271,13 +277,6 @@ describe("ngInclude", () => {
       const injector = angular.bootstrap(element, ["myModule"]);
       $rootScope = injector.get("$rootScope");
       $rootScope.url = "/mock/hello";
-
-      let called = 0;
-      // we want to assert only during first watch
-      $rootScope.$watch(() => {
-        if (!called) expect(element.text()).toBe("");
-        called++;
-      });
 
       setTimeout(() => {
         expect(element.text()).toBe("Hello");

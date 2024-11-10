@@ -27,7 +27,7 @@ describe("observe", () => {
     element = $compile(template)($scope);
   }
 
-  fit("should set the scope property to the attribute value before any changes", () => {
+  it("should set the scope property to the attribute value before any changes", () => {
     const scope = $rootScope.$new();
     const element = JQLite(
       '<div data-update="testProp" ng-observe="sourceAttr"></div>',
@@ -39,7 +39,7 @@ describe("observe", () => {
     expect(scope.testProp).toEqual("initialValue");
   });
 
-  fit("should observe attribute changes and update the scope property", () => {
+  it("should observe attribute changes and update the scope property", () => {
     $scope.myProp = "";
     createDirective("test-attribute", "myProp");
 
@@ -58,7 +58,7 @@ describe("observe", () => {
     expect($scope.myProp).toBe("newValue");
   });
 
-  fit("should change scope the attribute value is unchanged", () => {
+  it("should change scope the attribute value is unchanged", () => {
     $scope.myProp = "existingValue";
     createDirective("test-attribute", "myProp");
 
@@ -76,7 +76,7 @@ describe("observe", () => {
     expect($scope.myProp).toBe("existingValue");
   });
 
-  fit("should disconnect the observer on scope destruction", () => {
+  it("should disconnect the observer on scope destruction", () => {
     createDirective("test-attribute", "myProp");
 
     $scope.$destroy();

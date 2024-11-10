@@ -1451,7 +1451,6 @@ describe("Model", () => {
         await wait();
         expect(model.counter).toBe(5);
 
-        //   debugger
         model.aValue = undefined;
         await wait();
         expect(model.counter).toBe(6);

@@ -1,6 +1,7 @@
 import { dealoc } from "../../shared/jqlite/jqlite";
 import { Angular } from "../../loader";
 import { createInjector } from "../../core/di/injector";
+import { wait } from "../../shared/test-utils";
 
 describe("ngNonBindable", () => {
   let element;
@@ -26,7 +27,7 @@ describe("ngNonBindable", () => {
     dealoc(element);
   });
 
-  it("should prevent compilation of the owning element and its children", () => {
+  it("should prevent compilation of the owning element and its children", async () => {
     element = $compile(
       '<div ng-non-bindable text="{{name}}"><span ng-bind="name"></span></div>',
     )($rootScope);
@@ -43,6 +44,7 @@ describe("ngNonBindable", () => {
     )($rootScope);
     $rootScope.a = "one";
     $rootScope.b = "two";
+    await wait();
     // Bindings not contained by ng-non-bindable should resolve.
     const spans = element.find("span");
     expect(spans.eq(0).text()).toEqual("one");

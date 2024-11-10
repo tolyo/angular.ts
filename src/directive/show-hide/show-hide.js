@@ -50,7 +50,6 @@ export function ngHideDirective($animate) {
     multiElement: true,
     link(scope, element, attr) {
       scope.$watch(attr["ngHide"], (value) => {
-        debugger;
         const truthyValue = !convertValue(value);
         // The comment inside of the ngShowDirective explains why we add and
         // remove a temporary class for the show/hide animation
@@ -60,7 +59,6 @@ export function ngHideDirective($animate) {
           });
         } else {
           scope.$postUpdate(() => {
-            debugger;
             if (truthyValue) {
               element
                 .elements()

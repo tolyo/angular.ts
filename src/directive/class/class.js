@@ -31,16 +31,20 @@ function classDirective(name, selector) {
         }
 
         if (name !== "ngClass") {
-          if (!indexWatchExpression) {
-            indexWatchExpression = $parse("$index", function moduloTwo($index) {
-              return $index & 1;
-            });
-          }
+          // if (!indexWatchExpression) {
+          //   indexWatchExpression = $parse("$index", function moduloTwo($index) {
+          //     return $index & 1;
+          //   });
+          // }
+          ngClassIndexWatchAction(scope.$index & 1);
+          // scope.$watch("$index", (val) => {
+          //   console.log(val)
 
-          scope.$watch(indexWatchExpression, ngClassIndexWatchAction);
+          // });
         }
-
-        scope.$watch($parse(attr[name], toClassString), ngClassWatchAction);
+        scope.$watch(attr[name], (val) => {
+          ngClassWatchAction(toClassString(val));
+        });
 
         function addClasses(classString) {
           classString = digestClassCounts(split(classString), 1);
@@ -77,21 +81,16 @@ function classDirective(name, selector) {
 
           const toRemoveString = digestClassCounts(toRemoveArray, -1);
           const toAddString = digestClassCounts(toAddArray, 1);
-
           if (hasAnimate(element[0])) {
             attr.$addClass(toAddString);
             attr.$removeClass(toRemoveString);
           } else {
-            scope.$postUpdate(() => {
-              if (toAddString !== "") {
-                element[0].classList.add(...toAddString.trim().split(" "));
-              }
-              if (toRemoveString !== "") {
-                element[0].classList.remove(
-                  ...toRemoveString.trim().split(" "),
-                );
-              }
-            });
+            if (toAddString !== "") {
+              element[0].classList.add(...toAddString.trim().split(" "));
+            }
+            if (toRemoveString !== "") {
+              element[0].classList.remove(...toRemoveString.trim().split(" "));
+            }
           }
         }
 
