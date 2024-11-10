@@ -160,6 +160,7 @@ declare class Model {
         $watchCollection: any;
         $new: any;
         $newIsolate: any;
+        $deproxy: any;
         $destroy: any;
         $eval: any;
         $apply: any;
@@ -201,6 +202,7 @@ declare class Model {
     $new(childInstance: any): any;
     $newIsolate(instance: any): any;
     $transcluded(parentInstance: any): any;
+    $deproxy(): any;
     registerKey(key: any, listener: any): void;
     registerForeignKey(key: any, listener: any): void;
     deregisterKey(key: any, id: any): boolean;

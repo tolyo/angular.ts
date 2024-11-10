@@ -1,4 +1,3 @@
-import { val } from "../../shared/hof.js";
 import { isNull } from "../../shared/predicates.js";
 import {
   isUndefined,
@@ -391,6 +390,7 @@ class Model {
         $watchCollection: this.$watchCollection.bind(this),
         $new: this.$new.bind(this),
         $newIsolate: this.$newIsolate.bind(this),
+        $deproxy: this.$deproxy.bind(this),
         $destroy: this.$destroy.bind(this),
         $eval: this.$eval.bind(this),
         $apply: this.$apply.bind(this),
@@ -708,6 +708,22 @@ class Model {
     const proxy = new Proxy(child, new Model(this));
     this.$children.push(proxy);
     return proxy;
+  }
+
+  $deproxy() {
+    if (isObject(this.$target) && !Array.isArray(this.$target)) {
+      let clone = {};
+      for (let k in this.$target) {
+        let v = this.$target[k];
+        if (v[isProxySymbol]) {
+          clone[k] = v.$deproxy();
+        } else {
+          clone[k] = v;
+        }
+      }
+    } else {
+      return this.$target;
+    }
   }
 
   registerKey(key, listener) {

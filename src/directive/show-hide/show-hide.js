@@ -1,4 +1,4 @@
-import { hasAnimate } from "../../shared/utils";
+import { hasAnimate, isBoolean, isString } from "../../shared/utils";
 
 const NG_HIDE_CLASS = "ng-hide";
 const NG_HIDE_IN_PROGRESS_CLASS = "ng-hide-animate";
@@ -13,6 +13,7 @@ export function ngShowDirective($animate) {
     multiElement: true,
     link(scope, element, $attr) {
       scope.$watch($attr["ngShow"], (value) => {
+        const truthyValue = convertValue(value);
         // we're adding a temporary, animation-specific class for ng-hide since this way
         // we can control when the element is actually displayed on screen without having
         // to have a global/greedy CSS selector that breaks when other animations are run.
@@ -23,7 +24,7 @@ export function ngShowDirective($animate) {
           });
         } else {
           scope.$postUpdate(() => {
-            if (value) {
+            if (truthyValue) {
               element
                 .elements()
                 .forEach((element) => element.classList.remove(NG_HIDE_CLASS));
@@ -48,7 +49,9 @@ export function ngHideDirective($animate) {
     restrict: "A",
     multiElement: true,
     link(scope, element, attr) {
-      scope.$watch(attr.ngHide, (value) => {
+      scope.$watch(attr["ngHide"], (value) => {
+        debugger;
+        const truthyValue = !convertValue(value);
         // The comment inside of the ngShowDirective explains why we add and
         // remove a temporary class for the show/hide animation
         if (hasAnimate(element[0])) {
@@ -57,7 +60,8 @@ export function ngHideDirective($animate) {
           });
         } else {
           scope.$postUpdate(() => {
-            if (value) {
+            debugger;
+            if (truthyValue) {
               element
                 .elements()
                 .forEach((element) => element.classList.add(NG_HIDE_CLASS));
@@ -71,4 +75,18 @@ export function ngHideDirective($animate) {
       });
     },
   };
+}
+
+function convertValue(val) {
+  if (isBoolean(val)) return val;
+  if (isString(val)) {
+    switch (val) {
+      case "false":
+      case "":
+        return false;
+      default:
+        return true;
+    }
+  }
+  return !!val;
 }

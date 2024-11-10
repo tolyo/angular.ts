@@ -8,7 +8,7 @@ export function ngInitDirective() {
       return {
         pre(scope, element, attrs) {
           if (element.controller()) {
-            element.controller().$eval(attrs.ngInit);
+            element.controller().$eval(attrs["ngInit"]);
           } else {
             scope.$eval(attrs.ngInit);
           }

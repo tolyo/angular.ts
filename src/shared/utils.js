@@ -1,3 +1,4 @@
+import { isProxySymbol } from "../core/model/model";
 import { PREFIX_REGEXP, SPECIAL_CHARS_REGEXP } from "./constants";
 
 const ngMinErr = minErr("ng");
@@ -649,6 +650,9 @@ export function assertNotHasOwnProperty(name, context) {
 }
 
 export function stringify(value) {
+  if (value && value[isProxySymbol]) {
+    return value.$deproxy();
+  }
   if (value == null) {
     // null || undefined
     return "";

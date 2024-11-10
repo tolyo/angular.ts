@@ -1,6 +1,7 @@
 import { Angular } from "../../loader";
 import { dealoc, JQLite } from "../../shared/jqlite/jqlite";
 import { valueFn } from "../../shared/utils";
+import { wait } from "../../shared/test-utils";
 
 describe("ngRepeat", () => {
   let element;
@@ -47,35 +48,38 @@ describe("ngRepeat", () => {
     dealoc(element);
   });
 
-  it("should iterate over an array of objects", () => {
+  it("should iterate over an array of objects", async () => {
     element = $compile(
       '<ul><li ng-repeat="item in items">{{item.name}};</li></ul>',
     )(scope);
-
+    await wait();
     Array.prototype.extraProperty = "should be ignored";
     // INIT
     scope.items = [{ name: "misko" }, { name: "shyam" }];
+    await wait();
     expect(element.find("li").length).toEqual(2);
     expect(element.text()).toEqual("misko;shyam;");
     delete Array.prototype.extraProperty;
 
     // GROW
     scope.items.push({ name: "adam" });
+    await wait();
     expect(element.find("li").length).toEqual(3);
     expect(element.text()).toEqual("misko;shyam;adam;");
 
     // // SHRINK
     scope.items.pop();
     scope.items.shift();
+    await wait();
     expect(element.find("li").length).toEqual(1);
     expect(element.text()).toEqual("shyam;");
   });
 
-  it("should iterate over an array-like object", () => {
+  fit("should iterate over an array-like object", async () => {
     element = $compile(
       "<ul>" + '<li ng-repeat="item in items">{{item.name}};</li>' + "</ul>",
     )(scope);
-
+    await wait();
     document.getElementById("dummy").innerHTML =
       "<a class='test' name='x'>a</a>" +
       "<a class='test' name='y'>b</a>" +
@@ -83,6 +87,7 @@ describe("ngRepeat", () => {
 
     const htmlCollection = document.getElementsByClassName("test");
     scope.items = htmlCollection;
+    await wait();
     expect(element.find("li").length).toEqual(3);
     expect(element.text()).toEqual("x;y;x;");
 
@@ -90,7 +95,7 @@ describe("ngRepeat", () => {
     document.getElementById("dummy").innerHTML = "";
   });
 
-  it("should iterate over an array-like class", () => {
+  fit("should iterate over an array-like class", async () => {
     function Collection() {}
     Collection.prototype = new Array();
     Collection.prototype.length = 0;
@@ -103,8 +108,9 @@ describe("ngRepeat", () => {
     element = $compile(
       "<ul>" + '<li ng-repeat="item in items">{{item.name}};</li>' + "</ul>",
     )(scope);
-
+    await wait();
     scope.items = collection;
+    await wait();
     expect(element.find("li").length).toEqual(3);
     expect(element.text()).toEqual("x;y;z;");
   });
@@ -129,12 +135,13 @@ describe("ngRepeat", () => {
     expect(element.text()).toEqual("me:swe|you:set|");
   });
 
-  it("should iterate over an object/map with identical values", () => {
+  fit("should iterate over an object/map with identical values", async () => {
     element = $compile(
       "<ul>" +
         '<li ng-repeat="(key, value) in items">{{key}}:{{value}}|</li>' +
         "</ul>",
     )(scope);
+    await wait();
     scope.items = {
       age: 20,
       wealth: 20,
@@ -142,26 +149,29 @@ describe("ngRepeat", () => {
       dogname: "Bingo",
       codename: "20",
     };
+    await wait();
     expect(element.text()).toEqual(
       "age:20|wealth:20|prodname:Bingo|dogname:Bingo|codename:20|",
     );
   });
 
-  it("should iterate over on object created using `Object.create(null)`", () => {
+  fit("should iterate over on object created using `Object.create(null)`", async () => {
     element = $compile(
       "<ul>" +
         '<li ng-repeat="(key, value) in items">{{key}}:{{value}}|</li>' +
         "</ul>",
     )(scope);
-
+    await wait();
     const items = Object.create(null);
     items.misko = "swe";
     items.shyam = "set";
 
     scope.items = items;
+    await wait();
     expect(element.text()).toEqual("misko:swe|shyam:set|");
 
     delete items.shyam;
+    await wait();
     expect(element.text()).toEqual("misko:swe|");
   });
 
