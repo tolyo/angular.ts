@@ -60,7 +60,13 @@
             }
           }
           window.angular.module("todo", [])
-            .controller("TodoCtrl", TodoController).controller("DemoCtrl", Demo);
+            .controller("TodoCtrl", TodoController).controller("DemoCtrl", Demo)
+            .run(($rootScope) => {
+              $rootScope.model = [
+                { name: "a", item: ["a1", "a2"] },
+                { name: "b", item: ["b1", "b2"] },
+              ];
+            });
         });
       </script>
     </head>
@@ -77,5 +83,11 @@
       {{ hide }}
       <input type="text" ng-model="greeting" />
       {{ greeting }}
+
+      <div>
+        <div ng-repeat="m in model" name="{{m.name}}">
+         <ul name="{{i}}" ng-repeat="i in m.item">{{i}}</ul>
+        </div>
+      </div>
     </body>
 </html>

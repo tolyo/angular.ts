@@ -2627,7 +2627,7 @@ describe("$compile", () => {
       reloadModules();
       var el = $("<div my-directive></div>");
       $compile(el);
-      $rootScope.$apply();
+      await wait();
       setTimeout(() => {
         expect(el.find("div").length).toBe(1);
         done();
@@ -2648,7 +2648,7 @@ describe("$compile", () => {
       var el = $("<div my-directive></div>");
 
       $compile(el);
-      $rootScope.$apply();
+      await wait();
       setTimeout(() => {
         expect(compileSpy).toHaveBeenCalled();
         done();
@@ -2669,7 +2669,7 @@ describe("$compile", () => {
       var el = $("<div my-directive my-other-directive></div>");
 
       $compile(el);
-      $rootScope.$apply();
+      await wait();
 
       setTimeout(() => {
         expect(otherCompileSpy).toHaveBeenCalled();
@@ -2691,7 +2691,7 @@ describe("$compile", () => {
       var el = $("<div my-directive></div>");
 
       $compile(el);
-      $rootScope.$apply();
+      await wait();
 
       setTimeout(() => {
         expect(otherCompileSpy).toHaveBeenCalled();
@@ -2714,7 +2714,7 @@ describe("$compile", () => {
       var el = $("<div my-directive></div>");
 
       $compile(el);
-      $rootScope.$apply();
+      await wait();
       expect(templateUrlSpy.calls.first().args[0][0]).toBe(el[0]);
       expect(templateUrlSpy.calls.first().args[1].myDirective).toBeDefined();
     });
@@ -2748,7 +2748,7 @@ describe("$compile", () => {
       var el = $("<div my-directive my-other-directive></div>");
 
       $compile(el);
-      $rootScope.$apply();
+      await wait();
       setTimeout(() => {
         expect(el.find("div").length).toBe(1);
         done();
@@ -2769,7 +2769,7 @@ describe("$compile", () => {
       var el = $("<div my-directive></div>");
 
       var linkFunction = $compile(el);
-      $rootScope.$apply();
+      await wait();
 
       linkFunction($rootScope);
 
@@ -2796,7 +2796,7 @@ describe("$compile", () => {
       var el = $("<div my-directive></div>");
 
       var linkFunction = $compile(el);
-      $rootScope.$apply();
+      await wait();
 
       linkFunction($rootScope);
       setTimeout(() => {
@@ -2823,7 +2823,7 @@ describe("$compile", () => {
 
       var linkFunction = $compile(el)($rootScope); // link first
 
-      $rootScope.$apply();
+      await wait();
 
       setTimeout(() => {
         expect(linkSpy).toHaveBeenCalled();
@@ -2848,7 +2848,7 @@ describe("$compile", () => {
       var el = $("<div my-directive my-other-directive></div>");
 
       let linkFunction = $compile(el);
-      $rootScope.$apply();
+      await wait();
       linkFunction($rootScope);
 
       setTimeout(() => {
@@ -2877,7 +2877,7 @@ describe("$compile", () => {
       var el = $('<div my-directive="42" my-other-directive></div>');
 
       var linkFunction = $compile(el);
-      $rootScope.$apply();
+      await wait();
 
       linkFunction($rootScope);
 
@@ -2905,7 +2905,7 @@ describe("$compile", () => {
       var el = $('<div my-directive="42"></div>');
 
       $compile(el)($rootScope);
-      $rootScope.$apply();
+      await wait();
 
       setTimeout(() => {
         expect(linkSpy).toHaveBeenCalled();
@@ -2933,7 +2933,7 @@ describe("$compile", () => {
       reloadModules();
       var el = $('<div my-directive="42"></div>');
       $compile(el)($rootScope);
-      $rootScope.$apply();
+      await wait();
       setTimeout(() => {
         expect(linkSpy).toHaveBeenCalled();
         expect(linkSpy.calls.first().args[0]).not.toBe($rootScope);
@@ -2966,7 +2966,7 @@ describe("$compile", () => {
       var el = $("<div my-directive my-other-directive></div>");
 
       $compile(el)($rootScope);
-      $rootScope.$apply();
+      await wait();
 
       //requests[0].respond(200, {}, "<div></div>");
       setTimeout(() => {
@@ -2994,7 +2994,7 @@ describe("$compile", () => {
       var el = $("<div my-transcluder><div in-transclude></div></div>");
 
       var linkFunction = $compile(el);
-      $rootScope.$apply();
+      await wait();
       linkFunction($rootScope); // then link
       setTimeout(() => {
         expect(el[0].outerHTML.match(/from-template/)).toBeTruthy();
@@ -3024,7 +3024,7 @@ describe("$compile", () => {
       var el = $("<div my-transcluder my-second-transcluder></div>");
 
       $compile(el);
-      $rootScope.$apply();
+      await wait();
 
       expect(otherCompileSpy).not.toHaveBeenCalled();
     });
@@ -3185,14 +3185,14 @@ describe("$compile", () => {
       var el = $("<div my-transcluder><div my-inner-directive>TEST</div>");
       $compile(el)($rootScope);
 
-      $rootScope.$apply();
+      await wait();
       expect(watchSpy.calls.count()).toBe(2);
 
-      $rootScope.$apply();
+      await wait();
       expect(watchSpy.calls.count()).toBe(3);
 
       $rootScope.$broadcast("destroyNow");
-      $rootScope.$apply();
+      await wait();
       expect(watchSpy.calls.count()).toBe(3);
     });
 
@@ -3341,14 +3341,14 @@ describe("$compile", () => {
 
       $compile(el)($rootScope);
 
-      $rootScope.$apply();
+      await wait();
       expect(watchSpy.calls.count()).toBe(2);
 
-      $rootScope.$apply();
+      await wait();
       expect(watchSpy.calls.count()).toBe(3);
 
       $rootScope.$broadcast("destroyNow");
-      $rootScope.$apply();
+      await wait();
       expect(watchSpy.calls.count()).toBe(3);
     });
 
@@ -3753,11 +3753,11 @@ describe("$compile", () => {
       var el = $("<div>My expression: {{myExpr}}</div>");
       $compile(el)($rootScope);
 
-      $rootScope.$apply();
+      await wait();
       expect(el.html()).toEqual("My expression: ");
 
       $rootScope.myExpr = "Hello";
-      $rootScope.$apply();
+      await wait();
       expect(el.html()).toEqual("My expression: Hello");
     });
 
@@ -3767,11 +3767,11 @@ describe("$compile", () => {
       var el = $('<img alt="{{myAltText}}">');
       $compile(el)($rootScope);
 
-      $rootScope.$apply();
+      await wait();
       expect(el.attr("alt")).toEqual("");
 
       $rootScope.myAltText = "My favourite photo";
-      $rootScope.$apply();
+      await wait();
       expect(el.attr("alt")).toEqual("My favourite photo");
     });
 
@@ -3791,7 +3791,7 @@ describe("$compile", () => {
       $compile(el)($rootScope);
 
       $rootScope.myAltText = "My favourite photo";
-      $rootScope.$apply();
+      await wait();
       expect(observerSpy.calls.mostRecent().args[0]).toEqual(
         "My favourite photo",
       );
@@ -3811,7 +3811,7 @@ describe("$compile", () => {
       reloadModules();
       var el = $('<img alt="{{myAltText}}" my-directive>');
       $compile(el)($rootScope);
-      $rootScope.$apply();
+      await wait();
 
       expect(observerSpy.calls.count()).toBe(1);
     });
@@ -3870,7 +3870,7 @@ describe("$compile", () => {
       $rootScope.myExpr = "Hello";
       $rootScope.myDifferentExpr = "Other Hello";
       $compile(el)($rootScope);
-      $rootScope.$apply();
+      await wait();
 
       expect(el.attr("my-attr")).toEqual("Other Hello");
     });
@@ -3889,7 +3889,7 @@ describe("$compile", () => {
       var el = $('<div my-directive my-attr="{{myExpr}}"></div>');
       $rootScope.myExpr = "Hello";
       $compile(el)($rootScope);
-      $rootScope.$apply();
+      await wait();
 
       expect(el.attr("my-attr")).toBeFalsy();
     });
@@ -3919,7 +3919,7 @@ describe("$compile", () => {
         var el = $("<div my-directive></div>");
         $rootScope.myExpr = 42;
         $compile(el)($rootScope);
-        $rootScope.$apply();
+        await wait();
 
         expect(el.html()).toEqual("Value is 42");
       });
@@ -4064,7 +4064,7 @@ describe("$compile", () => {
       reloadModules();
       var el = $("<my-component></my-component>");
       $compile(el)($rootScope);
-      $rootScope.$apply();
+      await wait();
       expect(el.text()).toEqual("Hello from component");
     });
 
@@ -4079,7 +4079,7 @@ describe("$compile", () => {
       $templateCache.set("/my_component.html", "{{ $ctrl.message }}");
       var el = $("<my-component></my-component>");
       $compile(el)($rootScope);
-      $rootScope.$apply();
+      await wait();
       setTimeout(() => {
         expect(el.text()).toEqual("Hello from component");
         done();
@@ -4135,7 +4135,7 @@ describe("$compile", () => {
       reloadModules();
       var el = $("<my-component></my-component>");
       $compile(el)($rootScope);
-      $rootScope.$apply();
+      await wait();
       expect(el.text()).toEqual("2");
     });
 
@@ -4313,12 +4313,12 @@ describe("$compile", () => {
       $rootScope.aValue = 42;
       var el = $('<my-component my-binding="aValue"></my-component>');
       $compile(el)($rootScope);
-      $rootScope.$apply();
+      await wait();
 
       expect(changesSpy.calls.count()).toBe(1);
 
       $rootScope.aValue = 43;
-      $rootScope.$apply();
+      await wait();
       expect(changesSpy.calls.count()).toBe(2);
 
       var lastChanges = changesSpy.calls.mostRecent().args[0];
@@ -4342,12 +4342,12 @@ describe("$compile", () => {
       reloadModules();
       var el = $('<my-component my-attr="42"></my-component>');
       $compile(el)($rootScope);
-      $rootScope.$apply();
+      await wait();
 
       expect(changesSpy.calls.count()).toBe(1);
 
       attrs.$set("myAttr", "43");
-      $rootScope.$apply();
+      await wait();
       expect(changesSpy.calls.count()).toBe(2);
 
       var lastChanges = changesSpy.calls.mostRecent().args[0];
@@ -4375,13 +4375,13 @@ describe("$compile", () => {
         '<my-component my-binding="aValue" my-attr="fourtyTwo"></my-component>',
       );
       $compile(el)($rootScope);
-      $rootScope.$apply();
+      await wait();
 
       expect(changesSpy.calls.count()).toBe(1);
 
       $rootScope.aValue = 43;
       attrs.$set("myAttr", "fourtyThree");
-      $rootScope.$apply();
+      await wait();
       expect(changesSpy.calls.count()).toBe(2);
 
       var lastChanges = changesSpy.calls.mostRecent().args[0];
@@ -4408,10 +4408,10 @@ describe("$compile", () => {
       $rootScope.aValue = 42;
       var el = $('<my-component my-binding="aValue"></my-component>');
       $compile(el)($rootScope);
-      $rootScope.$apply();
+      await wait();
 
       $rootScope.aValue = 43;
-      $rootScope.$apply();
+      await wait();
 
       expect(el.text()).toEqual("myBinding is 43");
     });
@@ -4430,7 +4430,7 @@ describe("$compile", () => {
       $rootScope.aValue = 42;
       var el = $('<my-component my-binding="aValue"></my-component>');
       $compile(el)($rootScope);
-      $rootScope.$apply();
+      await wait();
 
       $rootScope.aValue = 43;
       $rootScope.$watch("aValue", () => {
@@ -4438,7 +4438,7 @@ describe("$compile", () => {
           $rootScope.aValue = 44;
         }
       });
-      $rootScope.$apply();
+      await wait();
       expect(changesSpy.calls.count()).toBe(2);
 
       var lastChanges = changesSpy.calls.mostRecent().args[0];
@@ -4472,12 +4472,12 @@ describe("$compile", () => {
           "</div>",
       );
       $compile(el)($rootScope);
-      $rootScope.$apply();
+      await wait();
       // Dirty watches always cause a second digest
       expect(watchSpy.calls.count()).toBe(2);
 
       $rootScope.aValue = 43;
-      $rootScope.$apply();
+      await wait();
       // Two more because of dirty watches $apply here,
       // plus one more for onchanges
       expect(watchSpy.calls.count()).toBe(5);
@@ -4508,11 +4508,11 @@ describe("$compile", () => {
           "</div>",
       );
       $compile(el)($rootScope);
-      $rootScope.$apply();
+      await wait();
 
       $rootScope.valueOne = 42;
       $rootScope.valueTwo = 42;
-      $rootScope.$apply();
+      await wait();
       expect($rootScope.valueOne).toBe(51);
       expect($rootScope.valueTwo).toBe(51);
     });
@@ -5008,7 +5008,7 @@ describe("$compile", () => {
       }
 
       $compile(element)($rootScope);
-      $rootScope.$apply();
+      await wait();
 
       // object's children can't be compiled in this case, so we expect them to be raw
       expect(element.html()).toBe("3");
@@ -6447,7 +6447,7 @@ describe("$compile", () => {
             '<div><div ng-repeat="i in [1,2]"><div delayed title="{{coolTitle + i}}"></div>|</div></div>',
           )($rootScope);
 
-          $rootScope.$apply();
+          await wait();
           expect(controllerSpy).toHaveBeenCalledTimes(2);
           expect(element.text()).toBe("boom!1|boom!2|");
         });
@@ -6851,7 +6851,7 @@ describe("$compile", () => {
         element = $compile("<div><span tscope></span></div>")($rootScope);
         expect(log.length).toEqual(2);
         $rootScope.name = "Jozo";
-        $rootScope.$apply();
+        await wait();
         expect(element.text().match(/Jozo/)).toBeTruthy();
       });
 
@@ -6863,7 +6863,7 @@ describe("$compile", () => {
         element = $compile("<div><span trscope></span></div>")($rootScope);
         expect(log.length).toEqual(2);
         $rootScope.name = "Jozo";
-        $rootScope.$apply();
+        await wait();
         expect(element.text().match(/Jozo/)).toBeTruthy();
       });
 
@@ -6874,7 +6874,7 @@ describe("$compile", () => {
         )($rootScope);
         expect(log.length).toEqual(6);
         $rootScope.name = "Jozo";
-        $rootScope.$apply();
+        await wait();
         expect(element.text()).toBe("Jozo|Jozo|Jozo|");
       });
 
@@ -7275,7 +7275,7 @@ describe("$compile", () => {
       //           element = $compile('<div><a ng-if="true" iscope></a></div>')(
       //             $rootScope,
       //           );
-      //           $rootScope.$apply();
+      //           await wait();
       //           directiveElement = element.find("a");
       //           expect(directiveElement.scope().$parent).toBe($rootScope);
       //           expect(directiveElement.scope()).not.toBe(
@@ -7290,7 +7290,7 @@ describe("$compile", () => {
       //           element = $compile('<div><a ng-if="true" tiscope></a></div>')(
       //             $rootScope,
       //           );
-      //           $rootScope.$apply();
+      //           await wait();
       //           ;
       //           directiveElement = element.find("a");
       //           child = directiveElement.find("span");
@@ -7303,7 +7303,7 @@ describe("$compile", () => {
       //           element = $compile('<div><a ng-if="true" stiscope></a></div>')(
       //             $rootScope,
       //           );
-      //           $rootScope.$apply();
+      //           await wait();
       //           directiveElement = element.find("a");
       //           child = directiveElement.find("span");
       //           expect(child.scope()).toBe(directiveElement.isolateScope());
@@ -7478,7 +7478,7 @@ describe("$compile", () => {
           '<div attr-log-high-priority attr-log my-name="{{name}}"></div>',
         )($rootScope);
         $rootScope.name = "angular";
-        $rootScope.$apply();
+        await wait();
         log.push(`digest=${element.attr("my-name")}`);
         expect(log.join("; ")).toEqual(
           "compile={{name}}; preLinkP101={{name}}; preLinkP0=; postLink=; digest=angular",
@@ -7870,7 +7870,7 @@ describe("$compile", () => {
 
         $templateCache.set("test-link.html", "{{testAttr}}");
         element = $compile('<div test-link="{{1+2}}"></div>')($rootScope);
-        $rootScope.$apply();
+        await wait();
         expect(element.text()).toBe("3");
       });
 
@@ -8475,7 +8475,7 @@ describe("$compile", () => {
           // Clear log
           log = [];
 
-          $rootScope.$apply();
+          await wait();
           expect(log).toEqual(["$doCheck", "$doCheck"]);
 
           //Clear log
@@ -8514,7 +8514,7 @@ describe("$compile", () => {
           // Clear log
           log = [];
 
-          $rootScope.$apply();
+          await wait();
           expect(log).toEqual(["$doCheck", "$doCheck"]);
 
           // Clear log
@@ -9475,7 +9475,7 @@ describe("$compile", () => {
         });
 
         $compile('<div attr-exposer to-string="{{1 + 1}}">')($rootScope);
-        $rootScope.$apply();
+        await wait();
         expect(attrs.toString).toBe("2");
       });
 
@@ -9649,7 +9649,7 @@ describe("$compile", () => {
           )($rootScope);
 
           $rootScope.name = "igor";
-          $rootScope.$apply();
+          await wait();
 
           expect(componentScope.attr).toEqual("hello igor");
           expect(componentScope.attrAlias).toEqual("hello igor");
@@ -9667,7 +9667,7 @@ describe("$compile", () => {
           expect(componentScope.$refAlias).toBe(componentScope.ref);
 
           $rootScope.name = "misko";
-          $rootScope.$apply();
+          await wait();
 
           expect($rootScope.name).toBe("misko");
           expect(componentScope.ref).toBe("misko");
@@ -9675,7 +9675,7 @@ describe("$compile", () => {
           expect(componentScope.$refAlias).toBe("misko");
 
           $rootScope.name = {};
-          $rootScope.$apply();
+          await wait();
           expect(componentScope.ref).toBe($rootScope.name);
           expect(componentScope.refAlias).toBe($rootScope.name);
           expect(componentScope.$refAlias).toBe($rootScope.name);
@@ -9688,7 +9688,7 @@ describe("$compile", () => {
           $rootScope.name = { mark: 123 };
           componentScope.ref = "misko";
 
-          $rootScope.$apply();
+          await wait();
           expect($rootScope.name).toEqual({ mark: 123 });
           expect(componentScope.ref).toBe($rootScope.name);
           expect(componentScope.refAlias).toBe($rootScope.name);
@@ -9696,7 +9696,7 @@ describe("$compile", () => {
 
           $rootScope.name = "igor";
           componentScope.ref = {};
-          $rootScope.$apply();
+          await wait();
           expect($rootScope.name).toEqual("igor");
           expect(componentScope.ref).toBe($rootScope.name);
           expect(componentScope.refAlias).toBe($rootScope.name);
@@ -9711,11 +9711,11 @@ describe("$compile", () => {
           // change both sides to the same item within the same digest cycle
           componentScope.ref = "same";
           $rootScope.name = "same";
-          $rootScope.$apply();
+          await wait();
 
           // change origin back to its previous value
           $rootScope.name = "aaa";
-          $rootScope.$apply();
+          await wait();
 
           expect($rootScope.name).toBe("aaa");
           expect(componentScope.ref).toBe("aaa");
@@ -9726,35 +9726,35 @@ describe("$compile", () => {
             $rootScope,
           );
           $rootScope.name = "world";
-          $rootScope.$apply();
+          await wait();
           expect(componentScope.ref).toBe("hello world");
 
           componentScope.ref = "ignore me";
           expect(() => {
-            $rootScope.$apply();
+            await wait();
           }).toThrowError(/nonassign/);
           expect(componentScope.ref).toBe("hello world");
           // reset since the exception was rethrown which prevented phase clearing
           $rootScope.$$phase = 0;
 
           $rootScope.name = "misko";
-          $rootScope.$apply();
+          await wait();
           expect(componentScope.ref).toBe("hello misko");
         });
 
         it("should complain if assigning to undefined", () => {
           $compile("<div><span my-component>")($rootScope);
-          $rootScope.$apply();
+          await wait();
           expect(componentScope.ref).toBeUndefined();
 
           componentScope.ref = "ignore me";
           expect(() => {
-            $rootScope.$apply();
+            await wait();
           }).toThrowError(/nonassign/);
           expect(componentScope.ref).toBeUndefined();
 
           $rootScope.$$phase = 0; // reset since the exception was rethrown which prevented phase clearing
-          $rootScope.$apply();
+          await wait();
           expect(componentScope.ref).toBeUndefined();
         });
 
@@ -9768,10 +9768,10 @@ describe("$compile", () => {
           });
 
           $rootScope.name = "aaa";
-          $rootScope.$apply();
+          await wait();
 
           componentScope.reference = "new";
-          $rootScope.$apply();
+          await wait();
 
           expect(lastRefValueInParent).toBe("new");
         });
@@ -9783,11 +9783,11 @@ describe("$compile", () => {
             );
 
             $rootScope.name = "a";
-            $rootScope.$apply();
+            await wait();
             expect(componentScope.reference).toEqual({ name: "a" });
 
             $rootScope.name = "b";
-            $rootScope.$apply();
+            await wait();
             expect(componentScope.reference).toEqual({ name: "b" });
           });
 
@@ -9797,9 +9797,9 @@ describe("$compile", () => {
             );
 
             $rootScope.name = "a";
-            $rootScope.$apply();
+            await wait();
             const lastComponentValue = componentScope.reference;
-            $rootScope.$apply();
+            await wait();
             expect(componentScope.reference).toBe(lastComponentValue);
           });
 
@@ -9809,10 +9809,10 @@ describe("$compile", () => {
             );
 
             $rootScope.name = "a";
-            $rootScope.$apply();
+            await wait();
             componentScope.reference = { name: "b" };
             expect(() => {
-              $rootScope.$apply();
+              await wait();
             }).toThrowError(/nonassign/);
           });
 
@@ -9828,7 +9828,7 @@ describe("$compile", () => {
                 $rootScope,
               );
 
-              $rootScope.$apply();
+              await wait();
               expect(componentScope.reference).toBe(literalValue);
               dealoc(element);
             }
@@ -9846,13 +9846,13 @@ describe("$compile", () => {
           expect(componentScope.$optRefAlias).toBe(componentScope.optRef);
 
           $rootScope.name = "misko";
-          $rootScope.$apply();
+          await wait();
           expect(componentScope.optref).toBe($rootScope.name);
           expect(componentScope.optrefAlias).toBe($rootScope.name);
           expect(componentScope.$optrefAlias).toBe($rootScope.name);
 
           $rootScope.name = {};
-          $rootScope.$apply();
+          await wait();
           expect(componentScope.optref).toBe($rootScope.name);
           expect(componentScope.optrefAlias).toBe($rootScope.name);
           expect(componentScope.$optrefAlias).toBe($rootScope.name);
@@ -9881,7 +9881,7 @@ describe("$compile", () => {
             },
           ];
           $rootScope.query = "";
-          $rootScope.$apply();
+          await wait();
 
           $compile(
             '<div><span my-component colref="collection | filter:query" $colref$="collection | filter:query">',
@@ -9892,7 +9892,7 @@ describe("$compile", () => {
           expect(componentScope.$colrefAlias).toEqual(componentScope.colref);
 
           $rootScope.query = "Gab";
-          $rootScope.$apply();
+          await wait();
 
           expect(componentScope.colref).toEqual([$rootScope.collection[0]]);
           expect(componentScope.colrefAlias).toEqual([
@@ -9939,7 +9939,7 @@ describe("$compile", () => {
           expect(componentScope.$owRefAlias).toBe(componentScope.owRef);
 
           $rootScope.obj = { value: "initial" };
-          $rootScope.$apply();
+          await wait();
 
           expect($rootScope.obj).toEqual({ value: "initial" });
           expect(componentScope.owRef).toEqual({ value: "initial" });
@@ -9948,7 +9948,7 @@ describe("$compile", () => {
 
           // This changes in both scopes because of reference
           $rootScope.obj.value = "origin1";
-          $rootScope.$apply();
+          await wait();
           expect(componentScope.owRef.value).toBe("origin1");
           expect(componentScope.owRefAlias.value).toBe("origin1");
           expect(componentScope.$owRefAlias.value).toBe("origin1");
@@ -9959,14 +9959,14 @@ describe("$compile", () => {
 
           // Change does not propagate because object identity hasn't changed
           $rootScope.obj.value = "origin2";
-          $rootScope.$apply();
+          await wait();
           expect(componentScope.owRef.value).toBe("isolate1");
           expect(componentScope.owRefAlias.value).toBe("origin2");
           expect(componentScope.$owRefAlias.value).toBe("origin2");
 
           // Change does propagate because object identity changes
           $rootScope.obj = { value: "origin3" };
-          $rootScope.$apply();
+          await wait();
           expect(componentScope.owRef.value).toBe("origin3");
           expect(componentScope.owRef).toBe($rootScope.obj);
           expect(componentScope.owRefAlias).toBe($rootScope.obj);
@@ -9981,7 +9981,7 @@ describe("$compile", () => {
           $rootScope.name = { mark: 123 };
           componentScope.owRef = "misko";
 
-          $rootScope.$apply();
+          await wait();
           expect($rootScope.name).toEqual({ mark: 123 });
           expect(componentScope.owRef).toBe($rootScope.name);
           expect(componentScope.owRefAlias).toBe($rootScope.name);
@@ -9989,7 +9989,7 @@ describe("$compile", () => {
 
           $rootScope.name = "igor";
           componentScope.owRef = {};
-          $rootScope.$apply();
+          await wait();
           expect($rootScope.name).toEqual("igor");
           expect(componentScope.owRef).toBe($rootScope.name);
           expect(componentScope.owRefAlias).toBe($rootScope.name);
@@ -10196,11 +10196,11 @@ describe("$compile", () => {
             // change both sides to the same item within the same digest cycle
             componentScope.owRef = "same";
             $rootScope.name = "same";
-            $rootScope.$apply();
+            await wait();
 
             // change origin back to its previous value
             $rootScope.name = "aaa";
-            $rootScope.$apply();
+            await wait();
 
             expect($rootScope.name).toBe("aaa");
             expect(componentScope.owRef).toBe("aaa");
@@ -10218,7 +10218,7 @@ describe("$compile", () => {
             expect(componentScope.$owRefAlias).toBe($rootScope.name);
 
             componentScope.owRef = "martin";
-            $rootScope.$apply();
+            await wait();
             expect($rootScope.name).toEqual({ mark: 123 });
             expect(componentScope.owRef).toBe("martin");
             expect(componentScope.owRefAlias).toEqual({ mark: 123 });
@@ -10233,7 +10233,7 @@ describe("$compile", () => {
             expect(componentScope.owRef).toBe($rootScope.obj);
 
             componentScope.owRef.mark = 789;
-            $rootScope.$apply();
+            await wait();
             expect($rootScope.obj).toEqual({ mark: 789 });
             expect(componentScope.owRef).toBe($rootScope.obj);
           });
@@ -10244,7 +10244,7 @@ describe("$compile", () => {
             );
 
             $rootScope.name = "world";
-            $rootScope.$apply();
+            await wait();
             expect(componentScope.owRef).toBe("hello world");
 
             componentScope.owRef = "ignore me";
@@ -10252,7 +10252,7 @@ describe("$compile", () => {
             expect($rootScope.name).toBe("world");
 
             $rootScope.name = "misko";
-            $rootScope.$apply();
+            await wait();
             expect(componentScope.owRef).toBe("hello misko");
           });
 
@@ -10264,7 +10264,7 @@ describe("$compile", () => {
             componentScope.owRef = "ignore me";
             expect(componentScope.owRef).toBe("ignore me");
 
-            $rootScope.$apply();
+            await wait();
             expect(componentScope.owRef).toBe("ignore me");
           });
 
@@ -10278,7 +10278,7 @@ describe("$compile", () => {
             expect(isolateScope.owRef).toBeNaN();
 
             $rootScope.num = 64;
-            $rootScope.$apply();
+            await wait();
             expect(isolateScope.owRef).toBe(64);
           });
         });
@@ -10290,11 +10290,11 @@ describe("$compile", () => {
             );
 
             $rootScope.name = "a";
-            $rootScope.$apply();
+            await wait();
             expect(componentScope.owRef).toEqual({ name: "a" });
 
             $rootScope.name = "b";
-            $rootScope.$apply();
+            await wait();
             expect(componentScope.owRef).toEqual({ name: "b" });
           });
 
@@ -10302,9 +10302,9 @@ describe("$compile", () => {
             $compile('<div><span my-component ref="{name: name}">')($rootScope);
 
             $rootScope.name = "a";
-            $rootScope.$apply();
+            await wait();
             const lastComponentValue = componentScope.owRef;
-            $rootScope.$apply();
+            await wait();
             expect(componentScope.owRef).toBe(lastComponentValue);
           });
 
@@ -10322,7 +10322,7 @@ describe("$compile", () => {
 
             $rootScope.name = "lucas";
             $rootScope.obj = { name: "martin" };
-            $rootScope.$apply();
+            await wait();
             expect(componentScope.owRef).toEqual([
               { name: "lucas" },
               { name: "martin" },
@@ -10343,7 +10343,7 @@ describe("$compile", () => {
 
             $rootScope.name = "lucas";
             $rootScope.obj = { name: "martin" };
-            $rootScope.$apply();
+            await wait();
             expect(componentScope.owRef).toEqual({
               name: "lucas",
               item: { name: "martin" },
@@ -10372,7 +10372,7 @@ describe("$compile", () => {
             element = $compile(
               '<form name="f" undi="[f.i]"><input name="i" ng-model="a"/></form>',
             )($rootScope);
-            $rootScope.$apply();
+            await wait();
             expect(componentScope.undi).toBeDefined();
           });
 
@@ -10382,7 +10382,7 @@ describe("$compile", () => {
             );
 
             $rootScope.name = "a";
-            $rootScope.$apply();
+            await wait();
             componentScope.owRef = { name: "b" };
             componentScope.$apply();
 
@@ -10390,7 +10390,7 @@ describe("$compile", () => {
             expect($rootScope.name).toBe("a");
 
             $rootScope.name = "c";
-            $rootScope.$apply();
+            await wait();
             expect(componentScope.owRef).toEqual({ name: "c" });
           });
 
@@ -10426,13 +10426,13 @@ describe("$compile", () => {
               );
 
               $rootScope.name = "misko";
-              $rootScope.$apply();
+              await wait();
               expect(componentScope.owOptref).toBe($rootScope.name);
               expect(componentScope.owOptrefAlias).toBe($rootScope.name);
               expect(componentScope.$owOptrefAlias).toBe($rootScope.name);
 
               $rootScope.name = {};
-              $rootScope.$apply();
+              await wait();
               expect(componentScope.owOptref).toBe($rootScope.name);
               expect(componentScope.owOptrefAlias).toBe($rootScope.name);
               expect(componentScope.$owOptrefAlias).toBe($rootScope.name);
@@ -10462,7 +10462,7 @@ describe("$compile", () => {
             },
           ];
           $rootScope.query = "";
-          $rootScope.$apply();
+          await wait();
 
           $compile(
             '<div><span my-component ow-colref="collection | filter:query" $ow-colref$="collection | filter:query">',
@@ -10475,7 +10475,7 @@ describe("$compile", () => {
           );
 
           $rootScope.query = "Gab";
-          $rootScope.$apply();
+          await wait();
 
           expect(componentScope.owColref).toEqual([$rootScope.collection[0]]);
           expect(componentScope.owColrefAlias).toEqual([
@@ -10497,7 +10497,7 @@ describe("$compile", () => {
               value: 91,
             },
           ];
-          $rootScope.$apply();
+          await wait();
 
           $compile(
             '<div><span my-component ow-colref="collection" $ow-colref$="collection">',
@@ -10514,7 +10514,7 @@ describe("$compile", () => {
             componentScope.$owColrefAlias =
               undefined;
           $rootScope.collection[0].name = "Joe";
-          $rootScope.$apply();
+          await wait();
 
           expect(componentScope.owColref).toBeUndefined();
           expect(componentScope.owColrefAlias).toBeUndefined();
@@ -10531,7 +10531,7 @@ describe("$compile", () => {
             value: 91,
           };
           $rootScope.query = "";
-          $rootScope.$apply();
+          await wait();
 
           $compile(
             '<div><span my-component ow-colref="[gab, tony] | filter:query" $ow-colref$="[gab, tony] | filter:query">',
@@ -10551,7 +10551,7 @@ describe("$compile", () => {
           ]);
 
           $rootScope.query = "Gab";
-          $rootScope.$apply();
+          await wait();
 
           expect(componentScope.owColref).toEqual([$rootScope.gab]);
           expect(componentScope.owColrefAlias).toEqual([$rootScope.gab]);
@@ -10567,7 +10567,7 @@ describe("$compile", () => {
             name: "Tony",
             value: 91,
           };
-          $rootScope.$apply();
+          await wait();
 
           $compile(
             '<div><span my-component ow-colref="[gab, tony]" $ow-colref$="[gab, tony]">',
@@ -10590,7 +10590,7 @@ describe("$compile", () => {
             name: "Bob",
             value: 42,
           };
-          $rootScope.$apply();
+          await wait();
 
           expect(componentScope.owColref).toEqual([
             $rootScope.gab,
@@ -11720,7 +11720,7 @@ describe("$compile", () => {
           "<span>template:{{mainCtrl.name}}</span>",
         );
         element = $compile("<main/>")($rootScope);
-        $rootScope.$apply();
+        await wait();
         expect(element.text()).toBe("template:george");
       });
 
@@ -11754,7 +11754,7 @@ describe("$compile", () => {
           }));
         initInjector("test1");
         element = $compile("<div nester><div nested></div></div>")($rootScope);
-        $rootScope.$apply();
+        await wait();
         expect(log.toString()).toBe("done");
         expect(element.data("$nesterController")).toBe(expectedController);
       });
@@ -12257,7 +12257,7 @@ describe("$compile", () => {
           "<span ng-init=\"name='WORKS'\">{{name}}</span>",
         );
         element = $compile("<div isolate non-isolate></div>")($rootScope);
-        $rootScope.$apply();
+        await wait();
 
         expect(normalScope).toBe($rootScope);
         expect(normalScope.name).toEqual(undefined);
@@ -12344,7 +12344,7 @@ describe("$compile", () => {
         element = $compile("<div main>transclude:{{mainCtrl.name}}</div>")(
           $rootScope,
         );
-        $rootScope.$apply();
+        await wait();
         expect(element.text()).toBe("template:lucas transclude:");
       });
 
@@ -12361,7 +12361,7 @@ describe("$compile", () => {
         initInjector("test1");
         $templateCache.set("main.html", "<span>{{mainCtrl.name}}</span>");
         element = $compile("<div main></div>")($rootScope);
-        $rootScope.$apply();
+        await wait();
         expect(element.text()).toBe("lucas");
       });
 
@@ -12557,7 +12557,7 @@ describe("$compile", () => {
         expect(syncCtrlSpy).not.toHaveBeenCalled();
         expect(asyncCtrlSpy).not.toHaveBeenCalled();
 
-        $rootScope.$apply();
+        await wait();
 
         // expect(syncCtrlSpy).toHaveBeenCalled();
         expect(asyncCtrlSpy).toHaveBeenCalled();
@@ -12600,7 +12600,7 @@ describe("$compile", () => {
         element = $compile(
           "<div parent-directive><div child-directive></div>childContentText;</div>",
         )($rootScope);
-        $rootScope.$apply();
+        await wait();
         expect(log.join("; ")).toEqual("parentController; childController");
         expect(element.text()).toBe("childTemplateText;childContentText;");
       });
@@ -12621,7 +12621,7 @@ describe("$compile", () => {
         $rootScope.foo = "bar";
 
         element = $compile('<div my-directive my-foo="foo"></div>')($rootScope);
-        $rootScope.$apply();
+        await wait();
         expect(log[0]).toEqual("myFoo=bar");
       });
 
@@ -12642,7 +12642,7 @@ describe("$compile", () => {
         $rootScope.foo = "bar";
 
         element = $compile('<div my-directive my-foo="foo"></div>')($rootScope);
-        $rootScope.$apply();
+        await wait();
         expect(log[0]).toEqual("myFoo=bar");
       });
 
@@ -12696,7 +12696,7 @@ describe("$compile", () => {
             "</div>" +
             "</div>",
         )($rootScope);
-        $rootScope.$apply();
+        await wait();
         expect(log.join("; ")).toEqual(
           "parentController; childController; babyController",
         );
@@ -12723,7 +12723,7 @@ describe("$compile", () => {
         $templateCache.set("/mock/hello", "<p>Hello</p>");
 
         element = $compile("<div my-directive></div>")($rootScope);
-        $rootScope.$apply();
+        await wait();
 
         expect(log[0]).toEqual("instance");
         expect(element.text()).toBe("Hello");
@@ -12747,7 +12747,7 @@ describe("$compile", () => {
         }));
         initInjector("test1");
         element = $compile("<div my-directive></div>")($rootScope);
-        $rootScope.$apply();
+        await wait();
 
         expect(log[0]).toEqual("instance");
         expect(element.text()).toBe("Hello");
@@ -12811,7 +12811,7 @@ describe("$compile", () => {
             "<div><div trans>T:{{x}}<span>;</span></div></div>",
           )($rootScope);
           $rootScope.x = "root";
-          $rootScope.$apply();
+          await wait();
           expect(element.text()).toEqual("W:isoT:root;");
           expect(
             JQLite(JQLite(element.find("li")[1])[0].childNodes[0]).text(),
@@ -12854,7 +12854,7 @@ describe("$compile", () => {
             $rootScope,
           );
           expect(element.text()).toEqual("book-");
-          $rootScope.$apply();
+          await wait();
           expect(element.text()).toEqual(
             "book-chapter-section-![(paragraph)]!",
           );
@@ -12892,7 +12892,7 @@ describe("$compile", () => {
 
           expect(lowerPriority).toBeLessThan(ngTranscludePriority);
 
-          $rootScope.$apply();
+          await wait();
 
           expect(element.text()).toEqual("transcluded content");
           expect(log.join("; ")).toEqual("pre; post");
@@ -12919,7 +12919,7 @@ describe("$compile", () => {
           )($rootScope);
           $rootScope.before = "BEFORE";
           $rootScope.after = "AFTER";
-          $rootScope.$apply();
+          await wait();
           expect(element.text()).toEqual(
             "This is before BEFORE. This is after AFTER",
           );
@@ -12928,7 +12928,7 @@ describe("$compile", () => {
           $rootScope.after = "AfTeR";
           $rootScope.$$childHead.before = "BeFoRe";
           $rootScope.$$childHead.after = "Not-After";
-          $rootScope.$apply();
+          await wait();
           expect(element.text()).toEqual(
             "This is before BeFoRe. This is after AfTeR",
           );
@@ -13026,7 +13026,7 @@ describe("$compile", () => {
           initInjector("test1");
           element = $compile("<isolate></isolate>")($rootScope);
           $rootScope.x = "root";
-          $rootScope.$apply();
+          await wait();
           expect(element.text()).toEqual("iso");
         });
 
@@ -13058,7 +13058,7 @@ describe("$compile", () => {
           initInjector("test1");
           element = $compile("<child></child>")($rootScope);
           $rootScope.x = "root";
-          $rootScope.$apply();
+          await wait();
           expect(element.text()).toEqual("child");
         });
 
@@ -13235,7 +13235,7 @@ describe("$compile", () => {
           element = $compile("<div><div trans>T:{{$$transcluded}}</div></div>")(
             $rootScope,
           );
-          $rootScope.$apply();
+          await wait();
           expect(JQLite(element.find("span")[0]).text()).toEqual("I:");
           expect(JQLite(element.find("span")[1]).text()).toEqual("T:true");
         });
@@ -13247,7 +13247,7 @@ describe("$compile", () => {
           }));
           initInjector("test1");
           element = $compile("<div trans>unicorn!</div>")($rootScope);
-          $rootScope.$apply();
+          await wait();
           expect(element.html()).toEqual(
             '<div ng-transclude="">unicorn!</div>',
           );
@@ -13260,7 +13260,7 @@ describe("$compile", () => {
           }));
           initInjector("test1");
           element = $compile("<div trans></div>")($rootScope);
-          $rootScope.$apply();
+          await wait();
           expect(element.html()).toEqual(
             '<div ng-transclude="">old stuff!</div>',
           );
@@ -13276,7 +13276,7 @@ describe("$compile", () => {
           const linkfn = $compile(element);
           expect(element.html()).toEqual('<div ng-transclude=""></div>');
           linkfn($rootScope);
-          $rootScope.$apply();
+          await wait();
           expect(element.html()).toEqual(
             '<div ng-transclude="">fallback content</div>',
           );
@@ -13290,7 +13290,7 @@ describe("$compile", () => {
           }));
           initInjector("test1");
           element = $compile("<div trans></div>")($rootScope);
-          $rootScope.$apply();
+          await wait();
           expect(element.text()).toEqual("012");
         });
 
@@ -13309,7 +13309,7 @@ describe("$compile", () => {
             }));
           initInjector("test1");
           element = $compile("<div trans>unicorn!</div>")($rootScope);
-          $rootScope.$apply();
+          await wait();
           expect(element.html()).toEqual(
             '<div ng-transclude="">unicorn!</div>',
           );
@@ -13331,7 +13331,7 @@ describe("$compile", () => {
             }));
           initInjector("test1");
           element = $compile("<div trans></div>")($rootScope);
-          $rootScope.$apply();
+          await wait();
           expect(element.html()).toEqual(
             '<div ng-transclude=""><inner>old stuff! </inner></div>',
           );
@@ -13353,7 +13353,7 @@ describe("$compile", () => {
             }));
           initInjector("test1");
           element = $compile("<div trans>\n  \n</div>")($rootScope);
-          $rootScope.$apply();
+          await wait();
           expect(element.html()).toEqual(
             '<div ng-transclude=""><inner>old stuff! </inner></div>',
           );
@@ -13377,7 +13377,7 @@ describe("$compile", () => {
           element = $compile("<div trans>\n<!-- some comment -->  \n</div>")(
             $rootScope,
           );
-          $rootScope.$apply();
+          await wait();
           expect(element.html()).toEqual(
             '<div ng-transclude="">\n<!-- some comment -->  \n</div>',
           );
@@ -13401,7 +13401,7 @@ describe("$compile", () => {
             }));
           initInjector("test1");
           element = $compile("<div trans></div>")($rootScope);
-          $rootScope.$apply();
+          await wait();
           expect(element.html()).toEqual(
             '<div ng-transclude="optionalSlot"><inner>old stuff! </inner></div>',
           );
@@ -13415,7 +13415,7 @@ describe("$compile", () => {
           }));
           initInjector("test1");
           element = $compile("<div trans></div>")($rootScope);
-          $rootScope.$apply();
+          await wait();
           expect(element.html()).toEqual('<div ng-transclude=""></div>');
         });
 
@@ -13535,7 +13535,7 @@ describe("$compile", () => {
           element = $compile("<div trans-in-compile>transcluded content</div>")(
             $rootScope,
           );
-          $rootScope.$apply();
+          await wait();
 
           expect(element.text()).toBe("transcluded content");
         });
@@ -13557,7 +13557,7 @@ describe("$compile", () => {
           element = $compile("<div trans><span>unicorn!</span></div>")(
             $rootScope,
           );
-          $rootScope.$apply();
+          await wait();
           expect(log.join("; ")).toEqual("pre(); post(unicorn!)");
         });
 
@@ -13583,7 +13583,7 @@ describe("$compile", () => {
           element = $compile("<div trans><span>unicorn!</span></div>")(
             $rootScope,
           );
-          $rootScope.$apply();
+          await wait();
           expect(log.join("; ")).toEqual("pre(); post(unicorn!)");
         });
 
@@ -13605,7 +13605,7 @@ describe("$compile", () => {
           element = $compile("<div replaced-trans><span>unicorn!</span></div>")(
             $rootScope,
           );
-          $rootScope.$apply();
+          await wait();
           expect(log.join("; ")).toEqual("pre(); post(unicorn!)");
         });
 
@@ -13632,7 +13632,7 @@ describe("$compile", () => {
             element = $compile(
               "<div replaced-trans><span>unicorn!</span></div>",
             )($rootScope);
-            $rootScope.$apply();
+            await wait();
             expect(log.join("; ")).toEqual("pre(); post(unicorn!)");
           },
         );
@@ -13718,7 +13718,7 @@ describe("$compile", () => {
           );
           initInjector("test1");
           element = $compile("<div transclude>{{$id}}</div>")($rootScope);
-          $rootScope.$apply();
+          await wait();
           expect(element.text()).toBe(`${$rootScope.$id}`);
         });
 
@@ -14106,11 +14106,11 @@ describe("$compile", () => {
             $compile(element)($rootScope.$new());
 
             $rootScope.nums = [0, 1, 2];
-            $rootScope.$apply();
+            await wait();
             size = CACHE.size;
 
             $rootScope.nums = [3, 4, 5];
-            $rootScope.$apply();
+            await wait();
             expect(CACHE.size).toEqual(size);
 
             element.remove();
@@ -14258,7 +14258,7 @@ describe("$compile", () => {
         element = $compile('<div><div trans="text">{{$id}}</div></div>')(
           $rootScope,
         );
-        $rootScope.$apply();
+        await wait();
 
         expect(log.join("; ")).toEqual("compile; link");
         expect(element.text()).not.toEqual("");
@@ -14953,7 +14953,7 @@ describe("$compile", () => {
           "<span>kevin</span>" +
           "</minion-component>",
       )($rootScope);
-      $rootScope.$apply();
+      await wait();
       expect(element.text()).toEqual("stuartbobkevin");
     });
 
@@ -14975,7 +14975,7 @@ describe("$compile", () => {
           "<span>kevin</span>" +
           "</minion-component>",
       )($rootScope);
-      $rootScope.$apply();
+      await wait();
       const a = element.children().eq(0);
       const b = element.children().eq(1);
       const c = element.children().eq(2);
@@ -15007,7 +15007,7 @@ describe("$compile", () => {
           "<span>kevin</span>" +
           "</minion-component>",
       )($rootScope);
-      $rootScope.$apply();
+      await wait();
       expect(element.text()).toEqual("text1stuartbobtext2kevin");
     });
 
@@ -15033,7 +15033,7 @@ describe("$compile", () => {
           "<minion>kevin</minion>" +
           "</minion-component>",
       )($rootScope);
-      $rootScope.$apply();
+      await wait();
       expect(element.children().eq(0).text()).toEqual("gru");
       expect(element.children().eq(1).text()).toEqual("stuartkevin");
       expect(element.children().eq(2).text()).toEqual("dorothy");
@@ -15061,7 +15061,7 @@ describe("$compile", () => {
           "<minion>kevin</minion>" +
           "</minion-component>",
       )($rootScope);
-      $rootScope.$apply();
+      await wait();
       expect(element.children().eq(0).text()).toEqual("gru");
       expect(element.children().eq(1).text()).toEqual("stuartkevin");
       expect(element.children().eq(2).text()).toEqual("dorothy");
@@ -15111,7 +15111,7 @@ describe("$compile", () => {
           "<span>dorothy</span>" +
           "</minion-component>",
       )($rootScope);
-      $rootScope.$apply();
+      await wait();
       expect(element.children().eq(1).text()).toEqual("stuart");
       expect(element.children().eq(2).text()).toEqual("dorothy");
     });
@@ -15156,7 +15156,7 @@ describe("$compile", () => {
       }));
       initInjector("test1");
       element = $compile("<foo><bar>baz</bar></foo>")($rootScope);
-      $rootScope.$apply();
+      await wait();
       expect(element.text()).toEqual("baz");
     });
 
@@ -15181,7 +15181,7 @@ describe("$compile", () => {
           "<data-moo-kar>baz2</data-moo-kar>" +
           "</foo>",
       )($rootScope);
-      $rootScope.$apply();
+      await wait();
       expect(element.children().eq(0).text()).toEqual("bar1bar2");
       expect(element.children().eq(1).text()).toEqual("baz1baz2");
     });
@@ -15211,7 +15211,7 @@ describe("$compile", () => {
           "  <span>dorothy</span>" +
           "</minion-component>",
       )($rootScope);
-      $rootScope.$apply();
+      await wait();
 
       const hasMinions = capturedTranscludeFn.isSlotFilled("minionSlot");
       const hasBosses = capturedTranscludeFn.isSlotFilled("bossSlot");
@@ -15241,7 +15241,7 @@ describe("$compile", () => {
           "<minion>kevin</minion>" +
           "</minion-component>",
       )($rootScope);
-      $rootScope.$apply();
+      await wait();
       expect(element.children().eq(0).text()).toEqual("default boss content");
       expect(element.children().eq(1).text()).toEqual("stuartkevin");
       expect(element.children().eq(2).text()).toEqual("dorothy");
@@ -15369,7 +15369,7 @@ describe("$compile", () => {
     it("should not sanitize attributes other than src", () => {
       element = $compile('<img title="{{testUrl}}"></img>')($rootScope);
       $rootScope.testUrl = "javascript:doEvilStuff()";
-      $rootScope.$apply();
+      await wait();
       expect(element.attr("title")).toBe("javascript:doEvilStuff()");
     });
 
@@ -15381,7 +15381,7 @@ describe("$compile", () => {
       initInjector("test1");
       $rootScope.testUrl = "someUrl";
       element = $compile('<img src="{{testUrl}}"></img>')($rootScope);
-      $rootScope.$apply();
+      await wait();
       expect(element.attr("src")).toBe("someSanitizedUrl");
       expect($$sanitizeUri).toHaveBeenCalledWith($rootScope.testUrl, true);
     });
@@ -15414,7 +15414,7 @@ describe("$compile", () => {
       // Assigning javascript:foo to src makes at least IE9-11 complain, so use another
       // protocol name.
       $rootScope.testUrl = $sce.trustAsMediaUrl("untrusted:foo();");
-      $rootScope.$apply();
+      await wait();
       expect(element.attr("src")).toEqual("untrusted:foo();");
     });
   });
@@ -15478,7 +15478,7 @@ describe("$compile", () => {
       initInjector("test1");
       element = $compile('<img srcset="{{testUrl}}"></img>')($rootScope);
       $rootScope.testUrl = "someUrl";
-      $rootScope.$apply();
+      await wait();
       expect(element.attr("srcset")).toBe("someSanitizedUrl");
       expect($$sanitizeUri).toHaveBeenCalledWith($rootScope.testUrl, true);
 
@@ -15486,14 +15486,14 @@ describe("$compile", () => {
         $rootScope,
       );
       $rootScope.testUrl = "javascript:yay";
-      $rootScope.$apply();
+      await wait();
       expect(element.attr("srcset")).toEqual(
         "someSanitizedUrl ,someSanitizedUrl",
       );
 
       element = $compile('<img srcset="java{{testUrl}}"></img>')($rootScope);
       $rootScope.testUrl = "script:yay, javascript:nay";
-      $rootScope.$apply();
+      await wait();
       expect(element.attr("srcset")).toEqual(
         "someSanitizedUrl ,someSanitizedUrl",
       );
@@ -15583,7 +15583,7 @@ describe("$compile", () => {
     it("should not sanitize href on elements other than anchor", () => {
       element = $compile('<div href="{{testUrl}}"></div>')($rootScope);
       $rootScope.testUrl = "javascript:doEvilStuff()";
-      $rootScope.$apply();
+      await wait();
 
       expect(element.attr("href")).toBe("javascript:doEvilStuff()");
     });
@@ -15591,7 +15591,7 @@ describe("$compile", () => {
     it("should not sanitize attributes other than href/ng-href", () => {
       element = $compile('<a title="{{testUrl}}"></a>')($rootScope);
       $rootScope.testUrl = "javascript:doEvilStuff()";
-      $rootScope.$apply();
+      await wait();
 
       expect(element.attr("title")).toBe("javascript:doEvilStuff()");
     });
@@ -15606,14 +15606,14 @@ describe("$compile", () => {
       initInjector("test1");
       element = $compile('<a href="{{testUrl}}"></a>')($rootScope);
       $rootScope.testUrl = "someUrl";
-      $rootScope.$apply();
+      await wait();
       expect(element.attr("href")).toBe("someSanitizedUrl");
       expect($$sanitizeUri).toHaveBeenCalledWith($rootScope.testUrl, false);
 
       $$sanitizeUri.calls.reset();
 
       element = $compile('<a ng-href="{{testUrl}}"></a>')($rootScope);
-      $rootScope.$apply();
+      await wait();
       expect(element.attr("href")).toBe("someSanitizedUrl");
       expect($$sanitizeUri).toHaveBeenCalledWith($rootScope.testUrl, false);
     });
@@ -15633,7 +15633,7 @@ describe("$compile", () => {
       const elementA = $compile(
         "<svg><a xlink-href=\"{{ testUrl + 'aTag' }}\"></a></svg>",
       )($rootScope);
-      $rootScope.$apply();
+      await wait();
       expect(elementA.find("a").attr("xlink-href")).toBe(
         "https://clean.example.org",
       );
@@ -15645,7 +15645,7 @@ describe("$compile", () => {
       const elementImage = $compile(
         "<svg><image xlink-href=\"{{ testUrl + 'imageTag' }}\"></image></svg>",
       )($rootScope);
-      $rootScope.$apply();
+      await wait();
       expect(elementImage.find("image").attr("xlink-href")).toBe(
         "https://clean.example.org",
       );
@@ -15670,7 +15670,7 @@ describe("$compile", () => {
       element = $compile(
         '<svg><a xlink:href="" ng-href="{{ testUrl }}"></a></svg>',
       )($rootScope);
-      $rootScope.$apply();
+      await wait();
       expect(element.find("a")[0].href.baseVal).toBe(
         "https://clean.example.org",
       );
@@ -15690,7 +15690,7 @@ describe("$compile", () => {
       $rootScope.testUrl = "https://bad.example.org";
 
       expect(() => {
-        $rootScope.$apply();
+        await wait();
       }).toThrowError(/interr/);
     });
   });
@@ -15724,7 +15724,7 @@ describe("$compile", () => {
         $rootScope,
       );
       $rootScope.onClickJs = "javascript:doSomething()";
-      $rootScope.$apply();
+      await wait();
       expect(element.attr("on-click")).toEqual("javascript:doSomething()");
     });
 
@@ -15733,12 +15733,12 @@ describe("$compile", () => {
         $rootScope,
       );
       $rootScope.dataOnVar = "data-on text";
-      $rootScope.$apply();
+      await wait();
       expect(element.attr("data-on")).toEqual("data-on text");
 
       element = $compile('<button on="{{onVar}}"></button>')($rootScope);
       $rootScope.onVar = "on text";
-      $rootScope.$apply();
+      await wait();
       expect(element.attr("on")).toEqual("on text");
     });
   });
@@ -15756,7 +15756,7 @@ describe("$compile", () => {
     it("should pass through src attributes for the same domain", () => {
       element = $compile('<iframe src="{{testUrl}}"></iframe>')($rootScope);
       $rootScope.testUrl = "different_page";
-      $rootScope.$apply();
+      await wait();
       expect(element.attr("src")).toEqual("different_page");
     });
 
@@ -15764,7 +15764,7 @@ describe("$compile", () => {
       element = $compile('<iframe src="{{testUrl}}"></iframe>')($rootScope);
       $rootScope.testUrl = "http://a.different.domain.example.com";
       expect(() => {
-        $rootScope.$apply();
+        await wait();
       }).toThrowError(/interr/);
     });
 
@@ -15772,7 +15772,7 @@ describe("$compile", () => {
       element = $compile('<iframe src="{{testUrl}}"></iframe>')($rootScope);
       $rootScope.testUrl = "javascript:alert(1);";
       expect(() => {
-        $rootScope.$apply();
+        await wait();
       }).toThrowError(/interr/);
     });
 
@@ -15780,7 +15780,7 @@ describe("$compile", () => {
       element = $compile('<iframe src="{{testUrl}}"></iframe>')($rootScope);
       $rootScope.testUrl = $sce.trustAsUrl("javascript:doTrustedStuff()");
       expect(() => {
-        $rootScope.$apply();
+        await wait();
       }).toThrowError(/interr/);
     });
 
@@ -15789,7 +15789,7 @@ describe("$compile", () => {
       $rootScope.testUrl = $sce.trustAsResourceUrl(
         "javascript:doTrustedStuff()",
       );
-      $rootScope.$apply();
+      await wait();
 
       expect(element.attr("src")).toEqual("javascript:doTrustedStuff()");
     });
@@ -15806,12 +15806,12 @@ describe("$compile", () => {
       element = $compile('<base href="{{testUrl}}"/>')($rootScope);
 
       $rootScope.testUrl = $sce.trustAsResourceUrl("https://example.com/");
-      $rootScope.$apply();
+      await wait();
       expect(element.attr("href")).toContain("https://example.com/");
 
       $rootScope.testUrl = "https://not.example.com/";
       expect(() => {
-        $rootScope.$apply();
+        await wait();
       }).toThrowError(/interr/);
     });
   });
@@ -15829,7 +15829,7 @@ describe("$compile", () => {
     it("should pass through action attribute for the same domain", () => {
       element = $compile('<form action="{{testUrl}}"></form>')($rootScope);
       $rootScope.testUrl = "different_page";
-      $rootScope.$apply();
+      await wait();
       expect(element.attr("action")).toEqual("different_page");
     });
 
@@ -15837,7 +15837,7 @@ describe("$compile", () => {
       element = $compile('<form action="{{testUrl}}"></form>')($rootScope);
       $rootScope.testUrl = "http://a.different.domain.example.com";
       expect(() => {
-        $rootScope.$apply();
+        await wait();
       }).toThrowError(/interr/);
     });
 
@@ -15845,7 +15845,7 @@ describe("$compile", () => {
       element = $compile('<form action="{{testUrl}}"></form>')($rootScope);
       $rootScope.testUrl = "javascript:alert(1);";
       expect(() => {
-        $rootScope.$apply();
+        await wait();
       }).toThrowError(/interr/);
     });
 
@@ -15853,7 +15853,7 @@ describe("$compile", () => {
       element = $compile('<form action="{{testUrl}}"></form>')($rootScope);
       $rootScope.testUrl = $sce.trustAsUrl("javascript:doTrustedStuff()");
       expect(() => {
-        $rootScope.$apply();
+        await wait();
       }).toThrowError(/interr/);
     });
 
@@ -15862,7 +15862,7 @@ describe("$compile", () => {
       $rootScope.testUrl = $sce.trustAsResourceUrl(
         "javascript:doTrustedStuff()",
       );
-      $rootScope.$apply();
+      await wait();
 
       expect(element.attr("action")).toEqual("javascript:doTrustedStuff()");
     });
@@ -15884,7 +15884,7 @@ describe("$compile", () => {
       );
       $rootScope.testUrl = "https://evil.example.org/css.css";
       expect(() => {
-        $rootScope.$apply();
+        await wait();
       }).toThrowError(/interr/);
     });
 
@@ -15894,13 +15894,13 @@ describe("$compile", () => {
       );
 
       $rootScope.testUrl = "./css1.css";
-      $rootScope.$apply();
+      await wait();
       expect(element.attr("href")).toContain("css1.css");
 
       $rootScope.testUrl = $sce.trustAsResourceUrl(
         "https://elsewhere.example.org/css2.css",
       );
-      $rootScope.$apply();
+      await wait();
       expect(element.attr("href")).toContain(
         "https://elsewhere.example.org/css2.css",
       );
@@ -15911,7 +15911,7 @@ describe("$compile", () => {
         '<link href="https://elsewhere.example.org/css2.css" rel="stylesheet" />',
       )($rootScope);
 
-      $rootScope.$apply();
+      await wait();
       expect(element.attr("href")).toContain(
         "https://elsewhere.example.org/css2.css",
       );
@@ -16055,7 +16055,7 @@ describe("$compile", () => {
       $compile(
         '<div attr-exposer ng-attr-title="12" ng-attr-super-title="34" ng-attr-my-camel_title="56">',
       )($rootScope);
-      $rootScope.$apply();
+      await wait();
 
       expect(attrs.title).toBe("12");
       expect(attrs.$attr.title).toBe("title");
@@ -16291,15 +16291,15 @@ describe("$compile", () => {
       const element = $compile('<div ng-prop-foo="bar"></div>')($rootScope);
 
       $rootScope.bar = "untrusted:test1";
-      $rootScope.$apply();
+      await wait();
       expect(element[0].foo).toBe("unsafe:untrusted:test1");
 
       $rootScope.bar = $sce.trustAsCss("untrusted:test2");
-      $rootScope.$apply();
+      await wait();
       expect(element[0].foo).toBe("unsafe:untrusted:test2");
 
       $rootScope.bar = $sce.trustAsMediaUrl("untrusted:test3");
-      $rootScope.$apply();
+      await wait();
       expect(element[0].foo).toBe("untrusted:test3");
     });
 
@@ -16316,15 +16316,15 @@ describe("$compile", () => {
       const element = $compile('<div ng-prop-foo="bar"></div>')($rootScope);
 
       $rootScope.bar = "untrusted:test1";
-      $rootScope.$apply();
+      await wait();
       expect(element[0].foo).toBe("unsafe:untrusted:test1");
 
       $rootScope.bar = $sce.trustAsCss("untrusted:test2");
-      $rootScope.$apply();
+      await wait();
       expect(element[0].foo).toBe("unsafe:untrusted:test2");
 
       $rootScope.bar = $sce.trustAsMediaUrl("untrusted:test3");
-      $rootScope.$apply();
+      await wait();
       expect(element[0].foo).toBe("untrusted:test3");
     });
 
@@ -16342,15 +16342,15 @@ describe("$compile", () => {
       const element = $compile('<div ng-prop-foo="bar"></div>')($rootScope);
 
       $rootScope.bar = "untrusted:test1";
-      $rootScope.$apply();
+      await wait();
       expect(element[0].foo).toBe("unsafe:untrusted:test1");
 
       $rootScope.bar = $sce.trustAsCss("untrusted:test2");
-      $rootScope.$apply();
+      await wait();
       expect(element[0].foo).toBe("unsafe:untrusted:test2");
 
       $rootScope.bar = $sce.trustAsMediaUrl("untrusted:test3");
-      $rootScope.$apply();
+      await wait();
       expect(element[0].foo).toBe("untrusted:test3");
     });
   });
@@ -16796,7 +16796,7 @@ describe("$compile", () => {
 
       expect(linkCalls).toEqual(["2", "3"]);
       expect(destroyCalls).toEqual([]);
-      $rootScope.$apply();
+      await wait();
       expect(linkCalls).toEqual(["2", "3", "1"]);
       expect(destroyCalls).toEqual(["2", "3"]);
     });
@@ -16823,7 +16823,7 @@ describe("$compile", () => {
       });
 
       const linkedElements = $compile(toCompile)($rootScope);
-      $rootScope.$apply();
+      await wait();
       linkedElements.remove();
 
       Object.entries(preCompiledChildren).forEach(([i, element]) => {

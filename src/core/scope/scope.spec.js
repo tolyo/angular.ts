@@ -1024,7 +1024,7 @@ describe("Scope", function () {
         throw "test";
       });
 
-      $rootScope.$apply();
+      await wait();
       expect(newValues).toEqual(oldValues);
       expect(oldValues).toEqual([undefined, undefined, undefined, 4]);
       expect(logs.length).toBe(1);
@@ -1251,7 +1251,7 @@ describe("Scope", function () {
       $rootScope.a = $rootScope.b = 0;
 
       expect(() => {
-        $rootScope.$apply();
+        await wait();
       }).toThrow();
 
       expect(logs[0]).toBeDefined();
@@ -1293,28 +1293,28 @@ describe("Scope", function () {
 
       it("should throw an exception if $apply is called while an $apply is in progress", () => {
         $rootScope.$apply(() => {
-          $rootScope.$apply();
+          await wait();
         });
         expect(logs[0].message.match(/progress/g).length).toBeTruthy();
       });
 
       it("should not clear the state when calling $apply during an $apply", () => {
         $rootScope.$apply(() => {
-          $rootScope.$apply();
+          await wait();
           expect(logs[0].message.match(/progress/g).length).toBeTruthy();
           logs = [];
-          $rootScope.$apply();
+          await wait();
           expect(logs[0].message.match(/progress/g).length).toBeTruthy();
         });
         logs = [];
-        $rootScope.$apply();
+        await wait();
         expect(logs).toEqual([]);
       });
 
       it("should throw an exception if $apply is called while flushing evalAsync queue", () => {
         $rootScope.$apply(() => {
           $rootScope.$evalAsync(() => {
-            $rootScope.$apply();
+            await wait();
           });
         });
         expect(logs[0].message.match(/progress/g).length).toBeTruthy();
@@ -1461,7 +1461,7 @@ describe("Scope", function () {
 
       $rootScope.$postUpdate(() => {
         signature += "B";
-        $rootScope.$apply();
+        await wait();
         signature += "D";
       });
 

@@ -95,14 +95,14 @@ describe("ngSrc", () => {
     it("should pass through src attributes for the same domain", () => {
       element = $compile('<iframe ng-src="{{testUrl}}"></iframe>')($scope);
       $scope.testUrl = "different_page";
-      $scope.$apply();
+      await wait();
       expect(element.attr("src")).toEqual("different_page");
     });
 
     it("should error on src attributes for a different domain", () => {
       element = $compile('<iframe ng-src="{{testUrl}}"></iframe>')($scope);
       $scope.testUrl = "http://a.different.domain.example.com";
-      $scope.$apply();
+      await wait();
       expect($scope.$apply).toThrowError();
     });
 
@@ -121,7 +121,7 @@ describe("ngSrc", () => {
     it("should pass through $sce.trustAs() values in src attributes", () => {
       element = $compile('<iframe ng-src="{{testUrl}}"></iframe>')($scope);
       $scope.testUrl = $sce.trustAsResourceUrl("javascript:doTrustedStuff()");
-      $scope.$apply();
+      await wait();
 
       expect(element.attr("src")).toEqual("javascript:doTrustedStuff()");
     });

@@ -34,19 +34,19 @@ describe("ngSwitch", () => {
     )($scope);
     expect(element[0].innerHTML).toEqual("<!----><!----><!---->");
     $scope.select = 1;
-    $scope.$apply();
+    await wait();
     expect(element.text()).toEqual("first:");
     $scope.name = "shyam";
-    $scope.$apply();
+    await wait();
     expect(element.text()).toEqual("first:shyam");
     $scope.select = 2;
-    $scope.$apply();
+    await wait();
     expect(element.text()).toEqual("second:shyam");
     $scope.name = "misko";
-    $scope.$apply();
+    await wait();
     expect(element.text()).toEqual("second:misko");
     $scope.select = true;
-    $scope.$apply();
+    await wait();
     expect(element.text()).toEqual("true:misko");
   });
 
@@ -61,21 +61,21 @@ describe("ngSwitch", () => {
     )($scope);
     expect(element[0].innerHTML).toEqual("<!----><!----><!----><!---->");
     $scope.select = 1;
-    $scope.$apply();
+    await wait();
     expect(element.text()).toEqual("first:, first too:");
     $scope.name = "shyam";
-    $scope.$apply();
+    await wait();
     expect(element.text()).toEqual("first:shyam, first too:shyam");
 
     $scope.select = 2;
-    $scope.$apply();
+    await wait();
     expect(element.text()).toEqual("second:shyam");
     $scope.name = "misko";
-    $scope.$apply();
+    await wait();
     expect(element.text()).toEqual("second:misko");
 
     $scope.select = true;
-    $scope.$apply();
+    await wait();
     expect(element.text()).toEqual("true:misko");
   });
 
@@ -111,10 +111,10 @@ describe("ngSwitch", () => {
         "<div ng-switch-default>other</div>" +
         "</ng-switch>",
     )($scope);
-    $scope.$apply();
+    await wait();
     expect(element.text()).toEqual("other");
     $scope.select = 1;
-    $scope.$apply();
+    await wait();
     expect(element.text()).toEqual("one");
   });
 
@@ -151,10 +151,10 @@ describe("ngSwitch", () => {
         "<li ng-switch-default>, other too</li>" +
         "</ul>",
     )($scope);
-    $scope.$apply();
+    await wait();
     expect(element.text()).toEqual("other, other too");
     $scope.select = 1;
-    $scope.$apply();
+    await wait();
     expect(element.text()).toEqual("one");
   });
 
@@ -168,10 +168,10 @@ describe("ngSwitch", () => {
         "<li ng-switch-default>other too </li>" +
         "</ul>",
     )($scope);
-    $scope.$apply();
+    await wait();
     expect(element.text()).toEqual("always other, other too ");
     $scope.select = 1;
-    $scope.$apply();
+    await wait();
     expect(element.text()).toEqual("always one ");
   });
 
@@ -193,10 +193,10 @@ describe("ngSwitch", () => {
           "<li>8</li>" +
           "</ul>",
       )($scope);
-      $scope.$apply();
+      await wait();
       expect(element.text()).toEqual("135678");
       $scope.select = 1;
-      $scope.$apply();
+      await wait();
       expect(element.text()).toEqual("12368");
     },
   );
@@ -216,10 +216,10 @@ describe("ngSwitch", () => {
           "<li ng-switch-default>7</li>" +
           "</ul>",
       )($scope);
-      $scope.$apply();
+      await wait();
       expect(element.text()).toEqual("3567");
       $scope.select = 1;
-      $scope.$apply();
+      await wait();
       expect(element.text()).toEqual("236");
     },
   );
@@ -228,25 +228,25 @@ describe("ngSwitch", () => {
     element = $compile(
       '<ng-switch on="url"><div ng-switch-when="a">{{name}}</div></ng-switch>',
     )($scope);
-    $scope.$apply();
+    await wait();
 
     expect($scope.$$childHead).toBeNull();
 
     $scope.url = "a";
-    $scope.$apply();
+    await wait();
     const child1 = $scope.$$childHead;
     expect(child1).toBeDefined();
     spyOn(child1, "$destroy");
 
     $scope.url = "x";
-    $scope.$apply();
+    await wait();
 
     // NOTE THAT THE CHILD SCOPE IS NOT ACTUALLY DESTROYED.
     expect(child1).toBeDefined();
     expect(child1.$destroy).toHaveBeenCalled();
 
     $scope.url = "a";
-    $scope.$apply();
+    await wait();
     // ... BUT A NEW CHILD SCOPE WILL BE CREATED IN A TAIL.
     const child2 = $scope.$$childTail;
     expect(child2).toBeDefined();
@@ -286,7 +286,7 @@ describe("ngSwitch", () => {
         "</ng-switch>" +
         "</div>",
     )($scope);
-    $scope.$apply();
+    await wait();
 
     // element now contains only empty repeater. this element is deallocated by local afterEach.
     // afterwards a global afterEach will check for leaks in jq data cache object
@@ -324,12 +324,12 @@ describe("ngSwitch", () => {
         '<div ng-switch-when="2">second</div>' +
         "</div>",
     )($scope);
-    $scope.$apply();
+    await wait();
 
     expect(element.text()).toEqual("first");
 
     $scope.select = 2;
-    $scope.$apply();
+    await wait();
     spy.calls.reset();
     expect(element.text()).toEqual("second");
     // If ngSwitch re-introduces code that triggers a digest after an element is removed (in an
@@ -630,7 +630,7 @@ describe("ngSwitch", () => {
 //             "</svg-container>",
 //         )($rootScope);
 //         $rootScope.inc = "one";
-//         $rootScope.$apply();
+//         await wait();
 
 //         const circle = element.find("circle");
 //         expect(circle[0].toString()).toMatch(/SVG/);

@@ -719,9 +719,9 @@ export class LocationProvider {
             // getting double entries in the location history.
             event.preventDefault();
             // update location manually
-            if ($location.absUrl() !== $browser.url()) {
-              $rootScope.$apply();
-            }
+            // if ($location.absUrl() !== $browser.url()) {
+            //   $rootScope.$apply();
+            // }
           }
         }
       });

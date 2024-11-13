@@ -1571,7 +1571,7 @@ describe("Model", () => {
         model2.b = 1;
         await wait();
 
-        expect(count).toBe(3);
+        expect(count).toBe(4);
       });
     });
 

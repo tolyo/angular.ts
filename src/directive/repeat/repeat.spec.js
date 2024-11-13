@@ -1232,7 +1232,7 @@ describe("ngRepeat", () => {
 
       injector.invoke(($compile, $rootScope) => {
         const element = $compile("<div><div template></div></div>")($rootScope);
-        $rootScope.$apply();
+        await wait();
         expect(controller.flag).toBe(true);
         dealoc(element);
       });
@@ -1286,7 +1286,7 @@ describe("ngRepeat", () => {
           '<svg-container><circle ng-repeat="r in rows"></circle></svg-container>',
         )($rootScope);
         $rootScope.rows = [1];
-        $rootScope.$apply();
+        await wait();
 
         const circle = element.find("circle");
         expect(circle[0].toString()).toMatch(/SVG/);

@@ -366,7 +366,7 @@ describe("$http", function () {
     }).then(function (r) {
       response = r;
     });
-    $rootScope.$apply();
+    await wait();
 
     expect(response.data).toEqual("*Hello*");
   });
@@ -380,7 +380,7 @@ describe("$http", function () {
     }).then(function (r) {
       response = r;
     });
-    $rootScope.$apply();
+    await wait();
 
     expect(response.data).toEqual("*Hello*");
   });
@@ -396,7 +396,7 @@ describe("$http", function () {
     }).then(function (r) {
       response = r;
     });
-    $rootScope.$apply();
+    await wait();
 
     expect(response.data).toEqual("*Hello*");
   });
@@ -410,7 +410,7 @@ describe("$http", function () {
     }).catch(function (r) {
       response = r;
     });
-    $rootScope.$apply();
+    await wait();
 
     expect(response.data).toEqual("*Unauthorized*");
   });
@@ -429,7 +429,7 @@ describe("$http", function () {
     }).catch(function (r) {
       response = r;
     });
-    $rootScope.$apply();
+    await wait();
 
     expect(response.data).toEqual("unauthorized");
   });
@@ -442,7 +442,7 @@ describe("$http", function () {
     }).then(function (r) {
       response = r;
     });
-    $rootScope.$apply();
+    await wait();
     expect(response.data).toEqual({ aKey: 42 });
     expect(response.config.data).toEqual({ aKey: 42 });
   });
@@ -455,7 +455,7 @@ describe("$http", function () {
     }).then(function (r) {
       response = r;
     });
-    $rootScope.$apply();
+    await wait();
     expect(response.data).toEqual([1, "two", 3]);
   });
 
@@ -481,7 +481,7 @@ describe("$http", function () {
       response = r;
     });
 
-    $rootScope.$apply();
+    await wait();
 
     expect(response.config.data.size).toEqual(5);
     expect(response.data).toEqual("");
@@ -498,7 +498,7 @@ describe("$http", function () {
       response = r;
     });
 
-    $rootScope.$apply();
+    await wait();
 
     expect(response.config.data).toEqual(formData);
     expect(response.data).toEqual("");
@@ -512,7 +512,7 @@ describe("$http", function () {
     }).then(function (r) {
       response = r;
     });
-    $rootScope.$apply();
+    await wait();
 
     expect(isObject(response.data)).toBe(true);
     expect(response.data.aKey).toBe(42);
@@ -526,7 +526,7 @@ describe("$http", function () {
     }).then(function (r) {
       response = r;
     });
-    $rootScope.$apply();
+    await wait();
 
     expect(isObject(response.data)).toBe(true);
     expect(response.data.aKey).toBe(42);
@@ -540,7 +540,7 @@ describe("$http", function () {
     }).then(function (r) {
       response = r;
     });
-    $rootScope.$apply();
+    await wait();
 
     expect(Array.isArray(response.data)).toBe(true);
     expect(response.data).toEqual([1, 2, 3]);
@@ -554,7 +554,7 @@ describe("$http", function () {
     }).then(function (r) {
       response = r;
     });
-    $rootScope.$apply();
+    await wait();
 
     expect(response.data).toEqual("{1, 2, 3]");
   });
@@ -567,7 +567,7 @@ describe("$http", function () {
     }).then(function (r) {
       response = r;
     });
-    $rootScope.$apply();
+    await wait();
     expect(response.data).toEqual("{{expr}}");
   });
 
@@ -581,7 +581,7 @@ describe("$http", function () {
     }).then(function (r) {
       response = r;
     });
-    $rootScope.$apply();
+    await wait();
     expect(
       response.config.paramSerializer(response.config.params).endsWith("a=42"),
     ).toBeTrue();
@@ -596,7 +596,7 @@ describe("$http", function () {
     }).then(function (r) {
       response = r;
     });
-    $rootScope.$apply();
+    await wait();
     expect(
       response.config.paramSerializer(response.config.params).endsWith("b=42"),
     ).toBeTrue();
@@ -611,7 +611,7 @@ describe("$http", function () {
     }).then(function (r) {
       response = r;
     });
-    $rootScope.$apply();
+    await wait();
 
     expect(
       response.config
@@ -630,7 +630,7 @@ describe("$http", function () {
     }).then(function (r) {
       response = r;
     });
-    $rootScope.$apply();
+    await wait();
     expect(
       response.config.paramSerializer(response.config.params).endsWith(""),
     ).toBeTrue();
@@ -645,7 +645,7 @@ describe("$http", function () {
     }).then(function (r) {
       response = r;
     });
-    $rootScope.$apply();
+    await wait();
     expect(
       response.config
         .paramSerializer(response.config.params)
@@ -663,7 +663,7 @@ describe("$http", function () {
     }).then(function (r) {
       response = r;
     });
-    $rootScope.$apply();
+    await wait();
     expect(
       response.config
         .paramSerializer(response.config.params)
@@ -680,7 +680,7 @@ describe("$http", function () {
     }).then(function (r) {
       response = r;
     });
-    $rootScope.$apply();
+    await wait();
     expect(
       response.config
         .paramSerializer(response.config.params)
@@ -705,7 +705,7 @@ describe("$http", function () {
     }).then(function (r) {
       response = r;
     });
-    $rootScope.$apply();
+    await wait();
 
     expect(
       response.config
@@ -741,7 +741,7 @@ describe("$http", function () {
       }).then(function (r) {
         response = r;
       });
-      $rootScope.$apply();
+      await wait();
     });
     expect(
       response.config
@@ -766,7 +766,7 @@ describe("$http", function () {
       .then(function (r) {
         response = r;
       });
-    $rootScope.$apply();
+    await wait();
 
     expect(
       response.config.paramSerializer(response.config.params).endsWith("q=42"),
@@ -782,7 +782,7 @@ describe("$http", function () {
       .then(function (r) {
         response = r;
       });
-    $rootScope.$apply();
+    await wait();
 
     expect(
       response.config.paramSerializer(response.config.params).endsWith("q=42"),
@@ -799,7 +799,7 @@ describe("$http", function () {
         response = r;
       });
 
-    $rootScope.$apply();
+    await wait();
 
     expect(
       response.config.paramSerializer(response.config.params).endsWith("q=42"),
@@ -815,7 +815,7 @@ describe("$http", function () {
       .then(function (r) {
         response = r;
       });
-    $rootScope.$apply();
+    await wait();
 
     expect(
       response.config.paramSerializer(response.config.params).endsWith("q=42"),
@@ -832,7 +832,7 @@ describe("$http", function () {
       .then(function (r) {
         response = r;
       });
-    $rootScope.$apply();
+    await wait();
     expect(
       response.config.paramSerializer(response.config.params).endsWith("q=42"),
     ).toBeTrue();
@@ -848,7 +848,7 @@ describe("$http", function () {
       .then(function (r) {
         response = r;
       });
-    $rootScope.$apply();
+    await wait();
 
     expect(
       response.config.paramSerializer(response.config.params).endsWith("q=42"),
@@ -919,7 +919,7 @@ describe("$http", function () {
       response = r;
     });
 
-    $rootScope.$apply();
+    await wait();
 
     expect(
       response.config
@@ -948,7 +948,7 @@ describe("$http", function () {
     await $http.get("/mock/hello", { params: {} }).then(function (r) {
       response = r;
     });
-    $rootScope.$apply();
+    await wait();
 
     expect(
       response.config
@@ -976,7 +976,7 @@ describe("$http", function () {
     await $http.get("/mock/hello").then(function (r) {
       response = r;
     });
-    $rootScope.$apply();
+    await wait();
 
     expect(response.intercepted).toBe(true);
   });
@@ -1029,8 +1029,8 @@ describe("$http", function () {
     $rootScope = injector.get("$rootScope");
 
     await $http.get("/mock/hello");
-    $rootScope.$apply();
-    $rootScope.$apply();
+    await wait();
+    await wait();
 
     expect(responseErrorSpy).toHaveBeenCalledWith("fail");
   });
@@ -1042,7 +1042,7 @@ describe("$http", function () {
       status = res.status;
       config = res.config;
     });
-    $rootScope.$apply();
+    await wait();
 
     expect(data).toBe("Hello");
     expect(status).toBe(200);
@@ -1057,7 +1057,7 @@ describe("$http", function () {
         res = r;
       },
     );
-    $rootScope.$apply();
+    await wait();
 
     expect(res.data).toBe("Unauthorized");
     expect(res.status).toBe(401);
@@ -1077,7 +1077,7 @@ describe("$http", function () {
         },
       );
     timeout.resolve();
-    $rootScope.$apply();
+    await wait();
     expect(response.xhrStatus).toBe("abort");
   });
 
@@ -1092,19 +1092,16 @@ describe("$http", function () {
           response = err;
         },
       );
-    $rootScope.$apply();
+    await wait();
 
     expect(response.xhrStatus).toBe("timeout");
   });
 
   describe("pending requests", function () {
-    it("are in the collection while pending", function (done) {
-      $http.get("/mock/hello").then(() => {
-        expect($http.pendingRequests.length).toBe(0);
-        done();
-      });
-      $rootScope.$apply();
-
+    it("are in the collection while pending", async function (done) {
+      $http.get("/mock/hello");
+      expect($http.pendingRequests.length).toBe(0);
+      await wait();
       expect($http.pendingRequests).toBeDefined();
       expect($http.pendingRequests.length).toBe(1);
       expect($http.pendingRequests[0].url).toBe("/mock/hello");
@@ -1116,7 +1113,7 @@ describe("$http", function () {
         (err) => {},
       );
 
-      $rootScope.$apply();
+      await wait();
 
       expect($http.pendingRequests.length).toBe(0);
     });
@@ -1137,7 +1134,7 @@ describe("$http", function () {
     it("does not resolve promise immediately when enabled", async function () {
       const resolvedSpy = jasmine.createSpy();
       $http.get("/mock/hello").then(resolvedSpy);
-      $rootScope.$apply();
+      await wait();
 
       expect(resolvedSpy).not.toHaveBeenCalled();
     });
@@ -1145,7 +1142,7 @@ describe("$http", function () {
     it("resolves promise later when enabled", async function () {
       const resolvedSpy = jasmine.createSpy();
       await $http.get("/mock/hello").then(resolvedSpy);
-      $rootScope.$apply();
+      await wait();
 
       expect(resolvedSpy).toHaveBeenCalled();
     });
@@ -1226,7 +1223,7 @@ describe("$http", function () {
 //           await $http({ method: "GET", url: "/url" }).then((r) => {
 //             response = r;
 //           });
-//           $rootScope.$apply();
+//           await wait();
 //           $httpBackend.flush();
 //           expect(response.data).toEqual("response:1:2");
 //         });
@@ -1289,7 +1286,7 @@ describe("$http", function () {
 //             data: { one: "two" },
 //             headers: { foo: "bar" },
 //           });
-//           $rootScope.$apply();
+//           await wait();
 //           expect(run).toEqual(true);
 //         });
 //       });
@@ -1314,7 +1311,7 @@ describe("$http", function () {
 //             )
 //             .respond("");
 //           $http.get("/url");
-//           $rootScope.$apply();
+//           await wait();
 //         });
 //       });
 
@@ -1334,7 +1331,7 @@ describe("$http", function () {
 //             )
 //             .respond("");
 //           $http.get("/url");
-//           $rootScope.$apply();
+//           await wait();
 //         });
 //       });
 
@@ -1351,7 +1348,7 @@ describe("$http", function () {
 //           const success = jasmine.createSpy();
 //           const error = jasmine.createSpy();
 //           $http.get("/url").then(success, error);
-//           $rootScope.$apply();
+//           await wait();
 //           expect(success).not.toHaveBeenCalled();
 //           expect(error).toHaveBeenCalledWith(reason);
 //         });
@@ -1372,11 +1369,11 @@ describe("$http", function () {
 //           const configCopy = angular.copy(config);
 //           $httpBackend.expect("GET", "/intercepted").respond("");
 //           $http.get("/url", config);
-//           $rootScope.$apply();
+//           await wait();
 //           expect(config).toEqual(configCopy);
 //           $httpBackend.expect("POST", "/intercepted").respond("");
 //           $http.post("/url", { bar: "baz" }, config);
-//           $rootScope.$apply();
+//           await wait();
 //           expect(config).toEqual(configCopy);
 //         });
 //       });
@@ -1394,7 +1391,7 @@ describe("$http", function () {
 //         inject(($http, $httpBackend, $rootScope) => {
 //           $httpBackend.expect("POST", "/intercepted").respond("");
 //           $http.post("/url");
-//           $rootScope.$apply();
+//           await wait();
 //         });
 //       });
 
@@ -1413,7 +1410,7 @@ describe("$http", function () {
 //         inject(($http, $httpBackend, $rootScope) => {
 //           $httpBackend.expect("POST", "/intercepted").respond("");
 //           $http.post("/two");
-//           $rootScope.$apply();
+//           await wait();
 //         });
 //       });
 //     });
@@ -2233,7 +2230,7 @@ describe("$http", function () {
 //           eventHandlers: { progress: progressFn },
 //           uploadEventHandlers: { progress: uploadProgressFn },
 //         });
-//         $rootScope.$apply();
+//         await wait();
 //         const mockXHR = MockXhr.$$lastInstance;
 //         expect(mockXHR.$$events.progress).toEqual(jasmine.any(Function));
 //         expect(mockXHR.upload.$$events.progress).toEqual(jasmine.any(Function));
@@ -3237,7 +3234,7 @@ describe("$http", function () {
 //         ;
 //         expect($http.pendingRequests.push).toHaveBeenCalled();
 
-//         $rootScope.$apply();
+//         await wait();
 //         expect($http.pendingRequests.length).toBe(0);
 //       }));
 

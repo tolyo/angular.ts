@@ -819,7 +819,7 @@ describe("ngModelOptions", () => {
           const spy = ($rootScope.name = jasmine
             .createSpy("setterSpy")
             .and.callFake(() => "b"));
-          $rootScope.$apply();
+          await wait();
           expect(inputElm.val()).toBe("b");
 
           changeGivenInputTo(inputElm, "a");
@@ -871,7 +871,7 @@ describe("ngModelOptions", () => {
             },
           };
           spyOn($rootScope.someService, "getterSetter").and.callThrough();
-          $rootScope.$apply();
+          await wait();
 
           expect(inputElm.val()).toBe("a");
           expect($rootScope.someService.getterSetter).toHaveBeenCalledWith();
@@ -882,7 +882,7 @@ describe("ngModelOptions", () => {
           expect($rootScope.someService.value).toBe("b");
 
           $rootScope.someService.value = "c";
-          $rootScope.$apply();
+          await wait();
           expect(inputElm.val()).toBe("c");
           expect($rootScope.someService.getterSetter).toHaveBeenCalledWith();
         });

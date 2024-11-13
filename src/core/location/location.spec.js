@@ -1215,7 +1215,7 @@ describe("$location", () => {
   //       ).and.callThrough();
   //       $location.path("/new/path");
   //       expect($browserUrl).not.toHaveBeenCalled();
-  //       $rootScope.$apply();
+  //       await wait();
 
   //       expect($browserUrl).toHaveBeenCalled();
   //       expect($browser.url()).toBe("http://new.com/a/b#!/new/path");
@@ -1236,7 +1236,7 @@ describe("$location", () => {
   //         $location.search("a=b");
   //       });
 
-  //       $rootScope.$apply();
+  //       await wait();
   //       expect($browserUrl).toHaveBeenCalled();
   //       expect($browser.url()).toBe("http://new.com/a/b#!/new/path?a=b");
   //     });
@@ -1251,7 +1251,7 @@ describe("$location", () => {
   //         "url",
   //       ).and.callThrough();
   //       $location.path("/n/url").replace();
-  //       $rootScope.$apply();
+  //       await wait();
 
   //       expect($browserUrl).toHaveBeenCalled();
   //       expect($browserUrl.calls.mostRecent().args).toEqual([
@@ -1269,21 +1269,21 @@ describe("$location", () => {
   //     inject(($rootScope, $browser, $location) => {
   //       // init watches
   //       $location.url("/initUrl");
-  //       $rootScope.$apply();
+  //       await wait();
 
   //       // changes url but resets it before digest
   //       $location.url("/newUrl").replace().url("/initUrl");
-  //       $rootScope.$apply();
+  //       await wait();
   //       expect($location.$$replace).toBe(false);
 
   //       // set the url to the old value
   //       $location.url("/newUrl").replace();
-  //       $rootScope.$apply();
+  //       await wait();
   //       expect($location.$$replace).toBe(false);
 
   //       // doesn't even change url only calls replace()
   //       $location.replace();
-  //       $rootScope.$apply();
+  //       await wait();
   //       expect($location.$$replace).toBe(false);
   //     });
   //   });
@@ -1395,7 +1395,7 @@ describe("$location", () => {
   //         "url",
   //       ).and.callThrough();
   //       $location.path("/n/url").state({ a: 2 }).replace();
-  //       $rootScope.$apply();
+  //       await wait();
 
   //       expect($browserUrl).toHaveBeenCalled();
   //       expect($browserUrl.calls.mostRecent().args).toEqual([
@@ -1423,7 +1423,7 @@ describe("$location", () => {
   //         .replace()
   //         .state({ b: 3 })
   //         .path("/o/url");
-  //       $rootScope.$apply();
+  //       await wait();
 
   //       expect($browserUrl).toHaveBeenCalled();
   //       expect($browserUrl.calls.mostRecent().args).toEqual([
@@ -1446,7 +1446,7 @@ describe("$location", () => {
   //         "url",
   //       ).and.callThrough();
   //       $location.state({ a: 2 }).replace().state({ b: 3 });
-  //       $rootScope.$apply();
+  //       await wait();
 
   //       expect($browserUrl).toHaveBeenCalled();
   //       expect($browserUrl.calls.mostRecent().args).toEqual([
@@ -1466,7 +1466,7 @@ describe("$location", () => {
   //     inject(($rootScope, $location) => {
   //       // init watches
   //       $location.url("/initUrl").state({ a: 2 });
-  //       $rootScope.$apply();
+  //       await wait();
 
   //       // changes url & state but resets them before digest
   //       $location
@@ -1475,17 +1475,17 @@ describe("$location", () => {
   //         .replace()
   //         .state({ b: 3 })
   //         .url("/initUrl");
-  //       $rootScope.$apply();
+  //       await wait();
   //       expect($location.$$replace).toBe(false);
 
   //       // set the url to the old value
   //       $location.url("/newUrl").state({ a: 2 }).replace();
-  //       $rootScope.$apply();
+  //       await wait();
   //       expect($location.$$replace).toBe(false);
 
   //       // doesn't even change url only calls replace()
   //       $location.replace();
-  //       $rootScope.$apply();
+  //       await wait();
   //       expect($location.$$replace).toBe(false);
   //     });
   //   });
@@ -1498,11 +1498,11 @@ describe("$location", () => {
   //       const o = { a: 2 };
   //       $location.state(o);
   //       o.a = 3;
-  //       $rootScope.$apply();
+  //       await wait();
   //       expect($browser.state()).toEqual({ a: 3 });
 
   //       o.a = 4;
-  //       $rootScope.$apply();
+  //       await wait();
   //       expect($browser.state()).toEqual({ a: 3 });
   //     });
   //   });
@@ -1513,7 +1513,7 @@ describe("$location", () => {
 
   //     inject(($rootScope, $location, $browser) => {
   //       $location.state({ a: 2 });
-  //       $rootScope.$apply();
+  //       await wait();
   //       expect($location.state()).toBe($browser.state());
   //     });
   //   });
@@ -1524,7 +1524,7 @@ describe("$location", () => {
 
   //     inject(($rootScope, $location) => {
   //       $location.url("/foo").state({ a: 2 });
-  //       $rootScope.$apply();
+  //       await wait();
   //       expect($location.state()).toEqual({ a: 2 });
   //     });
   //   });
@@ -1535,14 +1535,14 @@ describe("$location", () => {
 
   //     inject(($rootScope, $location, $browser) => {
   //       $location.url("/foo").state({ a: 2 });
-  //       $rootScope.$apply();
+  //       await wait();
 
   //       const $browserUrl = spyOnlyCallsWithArgs(
   //         $browser,
   //         "url",
   //       ).and.callThrough();
   //       $location.url("/bar");
-  //       $rootScope.$apply();
+  //       await wait();
 
   //       expect($browserUrl).toHaveBeenCalled();
   //       expect($browserUrl.calls.mostRecent().args).toEqual([
@@ -1582,7 +1582,7 @@ describe("$location", () => {
   //       expect($browser.url()).toBe("http://domain.com/base/index.html#!/a/b");
   //       $location.path("/new");
   //       $location.search({ a: true });
-  //       $rootScope.$apply();
+  //       await wait();
   //       expect($browser.url()).toBe(
   //         "http://domain.com/base/index.html#!/new?a",
   //       );
@@ -1599,7 +1599,7 @@ describe("$location", () => {
   //       expect($browser.url()).toBe("http://domain.com/base/index.html#/a/b");
   //       $location.path("/new");
   //       $location.search({ a: true });
-  //       $rootScope.$apply();
+  //       await wait();
   //       expect($browser.url()).toBe("http://domain.com/base/index.html#/new?a");
   //     });
   //   });
@@ -1621,7 +1621,7 @@ describe("$location", () => {
   //         );
   //         $location.path("/new");
   //         $location.search({ a: true });
-  //         $rootScope.$apply();
+  //         await wait();
   //         expect($browser.url()).toBe(
   //           "http://domain.com/base/index.html#!!/new?a",
   //         );
@@ -1673,7 +1673,7 @@ describe("$location", () => {
   //       expect($browser.url()).toBe("http://domain.com/base/old/index.html#a");
   //       $location.path("/new");
   //       $location.search({ a: true });
-  //       $rootScope.$apply();
+  //       await wait();
   //       expect($browser.url()).toBe("http://domain.com/base/new?a#a");
   //     });
   //   });
@@ -1688,7 +1688,7 @@ describe("$location", () => {
   //       expect($browser.url()).toBe("http://domain.com/base/a/b");
   //       $location.path("/new");
   //       $location.hash("abc");
-  //       $rootScope.$apply();
+  //       await wait();
   //       expect($browser.url()).toBe("http://domain.com/base/new#abc");
   //       expect($location.path()).toBe("/new");
   //     });
@@ -2573,7 +2573,7 @@ describe("$location", () => {
   //     expect($browser.url()).toEqual("http://server/");
   //     expect($log.info.logs).toEqual([]);
 
-  //     $rootScope.$apply();
+  //     await wait();
 
   //     expect($log.info.logs.shift()).toEqual([
   //       "before",
@@ -2614,7 +2614,7 @@ describe("$location", () => {
   //     expect($browser.url()).toEqual("http://server/");
   //     expect($log.info.logs).toEqual([]);
 
-  //     $rootScope.$apply();
+  //     await wait();
 
   //     expect($log.info.logs.shift()).toEqual([
   //       "before",
@@ -2644,7 +2644,7 @@ describe("$location", () => {
   //     });
 
   //     $location.url("/somePath");
-  //     $rootScope.$apply();
+  //     await wait();
 
   //     expect($log.info.logs.shift()).toEqual([
   //       "before",
@@ -2687,7 +2687,7 @@ describe("$location", () => {
   //     });
 
   //     $location.url("/somePath");
-  //     $rootScope.$apply();
+  //     await wait();
 
   //     expect($log.info.logs.shift()).toEqual([
   //       "before",
@@ -2731,7 +2731,7 @@ describe("$location", () => {
   //     });
 
   //     $location.url("/somePath");
-  //     $rootScope.$apply();
+  //     await wait();
 
   //     expect($log.info.logs.shift()).toEqual([
   //       "before",
@@ -2768,7 +2768,7 @@ describe("$location", () => {
   //     $browser,
   //     $rootScope,
   //   ) => {
-  //     $rootScope.$apply(); // clear initial $locationChangeStart
+  //     await wait(); // clear initial $locationChangeStart
 
   //     expect($browser.url()).toEqual("http://server/");
   //     expect($location.url()).toEqual("");
@@ -2802,7 +2802,7 @@ describe("$location", () => {
   //     $log,
   //   ) => {
   //     $location.url("/somepath");
-  //     $rootScope.$apply();
+  //     await wait();
 
   //     expect($browser.url()).toEqual("http://server/#!/somepath");
   //     expect($location.url()).toEqual("/somepath");

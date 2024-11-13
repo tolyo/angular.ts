@@ -153,36 +153,36 @@ describe("$interpolate", () => {
   });
 
   describe("watching", () => {
-    it("should be watchable with any input types", () => {
+    it("should be watchable with any input types", async () => {
       let lastVal;
       $rootScope.$watch($interpolate("{{i}}"), (val) => {
         lastVal = val;
       });
-      $rootScope.$apply();
+      await wait();
       expect(lastVal).toBe("");
 
       $rootScope.i = null;
-      $rootScope.$apply();
+      await wait();
       expect(lastVal).toBe("");
 
       $rootScope.i = "";
-      $rootScope.$apply();
+      await wait();
       expect(lastVal).toBe("");
 
       $rootScope.i = 0;
-      $rootScope.$apply();
+      await wait();
       expect(lastVal).toBe("0");
 
       $rootScope.i = [0];
-      $rootScope.$apply();
+      await wait();
       expect(lastVal).toBe("[0]");
 
       $rootScope.i = { a: 1, b: 2 };
-      $rootScope.$apply();
+      await wait();
       expect(lastVal).toBe('{"a":1,"b":2}');
     });
 
-    it("should be watchable with literal values", () => {
+    it("should be watchable with literal values", async () => {
       let lastVal;
       $rootScope.$watch(
         $interpolate('{{1}}{{"2"}}{{true}}{{[false]}}{{ {a: 2} }}'),
@@ -190,7 +190,7 @@ describe("$interpolate", () => {
           lastVal = val;
         },
       );
-      $rootScope.$apply();
+      await wait();
       expect(lastVal).toBe('12true[false]{"a":2}');
     });
 

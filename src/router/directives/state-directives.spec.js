@@ -111,7 +111,7 @@ describe("ngStateRef", () => {
         '<a ng-sref="contacts.item.detail({\n\tid: $index\n})">Details</a>',
       );
       $rootScope.$index = 3;
-      $rootScope.$apply();
+      await wait();
 
       $compile(el)($rootScope);
       expect(el.attr("href")).toBe("#/contacts/3");
@@ -217,7 +217,7 @@ describe("ngStateRef", () => {
       $state.go("contacts.item.detail", { id: "123" });
       el = JQLite('<a ng-sref="{\n\tid: $index\n}">Details</a>');
       $rootScope.$index = 3;
-      $rootScope.$apply();
+      await wait();
 
       $compile(el)($rootScope);
       expect(el.attr("href")).toBe("#/contacts/3");

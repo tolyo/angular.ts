@@ -587,6 +587,7 @@ class Model {
           )(listener.originalTarget);
           if (potentialProxy && this.foreignProxies.has(potentialProxy)) {
             potentialProxy.$handler.registerForeignKey(key, listener);
+            potentialProxy.$handler.scheduleListener([listener]);
             return () => {
               return potentialProxy.$handler.deregisterKey(key, listener.id);
             };
@@ -655,8 +656,9 @@ class Model {
     }
 
     // if the target is an object, then start observing it
-    if (isObject(listener.watchFn(this.$target))) {
-      this.objectListeners.set(listener.watchFn(this.$target), [key]);
+    let listenerObject = listener.watchFn(this.$target);
+    if (isObject(listenerObject)) {
+      this.objectListeners.set(listenerObject, [key]);
     }
 
     this.registerKey(key, listener);

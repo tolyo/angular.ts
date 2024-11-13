@@ -1631,21 +1631,21 @@ describe("ngModel", () => {
         isFormValid = value;
       });
 
-      $rootScope.$apply();
+      await wait();
 
       expect($rootScope.myForm.$valid).toBe(true);
       expect(isFormValid).toBe(true);
       expect($rootScope.myForm.myControl).toBeUndefined();
 
       $rootScope.inputPresent = true;
-      $rootScope.$apply();
+      await wait();
 
       expect($rootScope.myForm.$valid).toBe(false);
       expect(isFormValid).toBe(false);
       expect($rootScope.myForm.myControl).toBeDefined();
 
       $rootScope.inputPresent = false;
-      $rootScope.$apply();
+      await wait();
 
       expect($rootScope.myForm.$valid).toBe(true);
       expect(isFormValid).toBe(true);
@@ -1673,21 +1673,21 @@ describe("ngModel", () => {
         isFormValid = value;
       });
 
-      $rootScope.$apply();
+      await wait();
 
       expect($rootScope.myForm.$valid).toBe(true);
       expect(isFormValid).toBe(true);
       expect($rootScope.myForm.myControl).toBeUndefined();
 
       $rootScope.inputPresent = true;
-      $rootScope.$apply();
+      await wait();
 
       expect($rootScope.myForm.$valid).toBe(false);
       expect(isFormValid).toBe(false);
       expect($rootScope.myForm.myControl).toBeDefined();
 
       $rootScope.inputPresent = false;
-      $rootScope.$apply();
+      await wait();
 
       expect($rootScope.myForm.$valid).toBe(true);
       expect(isFormValid).toBe(true);
@@ -1708,12 +1708,12 @@ describe("ngModel", () => {
           "</form>",
       )($rootScope);
 
-      $rootScope.$apply();
+      await wait();
       expect(isFormValid).toBe(false);
       expect($rootScope.myForm.$valid).toBe(false);
 
       $rootScope.value = "value";
-      $rootScope.$apply();
+      await wait();
       expect(isFormValid).toBe(true);
       expect($rootScope.myForm.$valid).toBe(true);
 

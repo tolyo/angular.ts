@@ -63,7 +63,7 @@ describe("validators", () => {
       )($rootScope);
 
       $rootScope.pat = patternVal;
-      $rootScope.$apply();
+      await wait();
       expect(inputElm[0].getAttribute("ng-pattern")).toEqual("/^\\w+$/");
     });
 
@@ -159,7 +159,7 @@ describe("validators", () => {
 
       inputElm[0].value = "abcd";
       inputElm[0].dispatchEvent(new Event("change"));
-      $rootScope.$apply();
+      await wait();
       expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
       expect($rootScope.form.input.$error.pattern).toBe(true);
 
@@ -664,7 +664,7 @@ describe("validators", () => {
           '<input type="radio" ng-value="false" ng-model="answer" required />',
       )($rootScope);
 
-      $rootScope.$apply();
+      await wait();
       expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
 
       $rootScope.$apply("answer = true");

@@ -872,7 +872,6 @@ export function HttpProvider() {
             $rootScope.$applyAsync(resolveHttpPromise);
           } else {
             resolveHttpPromise();
-            if (!$rootScope.$$phase) $rootScope.$apply();
           }
         }
 

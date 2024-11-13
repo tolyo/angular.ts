@@ -355,7 +355,8 @@ export class InterpolateProvider {
                   values[i] = parseFns[i](context);
                 }
 
-                return compute(values);
+                let res = compute(values);
+                return res;
               } catch (err) {
                 interr(text, err);
               }

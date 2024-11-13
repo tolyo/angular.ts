@@ -26,6 +26,7 @@ import {
 import { dealoc, JQLite, startingTag } from "./shared/jqlite/jqlite";
 import { Angular } from "./loader";
 import { createInjector } from "./core/di/injector";
+import { wait } from "./shared/test-utils";
 
 describe("angular", () => {
   let element, document, module, injector, $rootScope, $compile;
@@ -1514,24 +1515,26 @@ describe("angular", () => {
   });
 
   describe("compile", () => {
-    it("should link to existing node and create scope", () => {
+    it("should link to existing node and create scope", async () => {
       const template = angular.element(
         '<div>{{greeting = "hello world"}}</div>',
       );
       element = $compile(template)($rootScope);
+      await wait();
       expect(template.text()).toEqual("hello world");
       expect($rootScope.greeting).toEqual("hello world");
     });
 
-    it("should link to existing node and given scope", () => {
+    it("should link to existing node and given scope", async () => {
       const template = angular.element(
         '<div>{{greeting = "hello world"}}</div>',
       );
       element = $compile(template)($rootScope);
+      await wait();
       expect(template.text()).toEqual("hello world");
     });
 
-    it("should link to new node and given scope", () => {
+    it("should link to new node and given scope", async () => {
       const template = JQLite('<div>{{greeting = "hello world"}}</div>');
 
       const compile = $compile(template);
@@ -1540,15 +1543,17 @@ describe("angular", () => {
       element = compile($rootScope, (clone) => {
         templateClone = clone;
       });
+      await wait();
       expect(template.text()).toEqual('{{greeting = "hello world"}}');
       expect(element.text()).toEqual("hello world");
       expect(element).toEqual(templateClone);
       expect($rootScope.greeting).toEqual("hello world");
     });
 
-    it("should link to cloned node and create scope", () => {
+    it("should link to cloned node and create scope", async () => {
       const template = JQLite('<div>{{greeting = "hello world"}}</div>');
       element = $compile(template)($rootScope, () => {});
+      await wait();
       expect(template.text()).toEqual('{{greeting = "hello world"}}');
       expect(element.text()).toEqual("hello world");
       expect($rootScope.greeting).toEqual("hello world");

@@ -380,7 +380,7 @@ describe("ngRef", () => {
     //       const template =
     //         '<my-component ng-ref="myComponent">{{myComponent.text}}</my-component>';
     //       const element = $compile(template)($rootScope);
-    //       $rootScope.$apply();
+    //       await wait();
     //       expect(element.text()).toBe("SUCCESS");
     //       dealoc(element);
     //     });
@@ -409,7 +409,7 @@ describe("ngRef", () => {
     //         "</my-component>" +
     //         "</div>";
     //       const element = $compile(template)($rootScope);
-    //       $rootScope.$apply();
+    //       await wait();
     //       expect(element.text()).toBe("SUCCESS");
     //       dealoc(element);
     //     });
@@ -481,15 +481,15 @@ describe("ngRef", () => {
     //         "</my-transcluding-component>" +
     //         "</div>";
     //       const element = $compile(template)($rootScope);
-    //       $rootScope.$apply();
+    //       await wait();
     //       expect(element.text()).toBe("");
 
     //       myComponentController.transclude("transcludedOk");
-    //       $rootScope.$apply();
+    //       await wait();
     //       expect(element.text()).toBe("transcludedOk");
 
     //       myComponentController.destroy();
-    //       $rootScope.$apply();
+    //       await wait();
     //       expect(element.text()).toBe("");
     //     });
     //   });
@@ -517,7 +517,7 @@ describe("ngRef", () => {
     //         "</my-directive>" +
     //         "</div>";
     //       const element = $compile(template)($rootScope);
-    //       $rootScope.$apply();
+    //       await wait();
     //       expect(element.text()).toBe("SUCCESS");
     //       dealoc(element);
     //     });
@@ -539,7 +539,7 @@ describe("ngRef", () => {
     //       '<div><http-component ng-ref="controller"></http-component></div>';
     //     const element = $compile(template)($rootScope);
     //     $httpBackend.expect("GET", "template.html").respond("ok");
-    //     $rootScope.$apply();
+    //     await wait();
     //     expect($rootScope.controller).toBeUndefined();
     //     $httpBackend.flush();
     //     expect($rootScope.controller.me).toBe(true);
@@ -566,7 +566,7 @@ describe("ngRef", () => {
     //     const template =
     //       '<div><my-component ng-repeat="(key, el) in elements" ng-ref="controllers[key]"></my-component></div>';
     //     const element = $compile(template)($rootScope);
-    //     $rootScope.$apply();
+    //     await wait();
 
     //     expect($rootScope.controllers).toEqual(controllers);
 

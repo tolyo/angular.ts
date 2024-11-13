@@ -559,7 +559,7 @@ describe("ngInclude", () => {
         const injector = angular.bootstrap(element, ["myModule"]);
         $rootScope = injector.get("$rootScope");
 
-        $rootScope.$apply();
+        await wait();
         setTimeout(() => {
           expect(controller.flag).toBe(true);
           done();
@@ -579,7 +579,7 @@ describe("ngInclude", () => {
         );
         const injector = angular.bootstrap(element, ["myModule"]);
         $rootScope = injector.get("$rootScope");
-        $rootScope.$apply();
+        await wait();
         setTimeout(() => {
           expect(testElement[0].nodeName).toBe("DIV");
           done();
@@ -596,7 +596,7 @@ describe("ngInclude", () => {
         element = JQLite("<div><div ng-include=\"'/mock/hello'\" test></div>");
         const injector = angular.bootstrap(element, ["myModule"]);
         $rootScope = injector.get("$rootScope");
-        $rootScope.$apply();
+        await wait();
 
         setTimeout(() => {
           expect(contentOnLink).toBe("Hello");
@@ -614,7 +614,7 @@ describe("ngInclude", () => {
         element = JQLite("<div><div ng-include=\"'/mock/directive'\"></div>");
         const injector = angular.bootstrap(element, ["myModule"]);
         $rootScope = injector.get("$rootScope");
-        $rootScope.$apply();
+        await wait();
         await wait(100);
         expect(root[0]).toBe(element[0]);
       });

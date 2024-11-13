@@ -138,7 +138,6 @@ describe("ngIf", () => {
           '<div ng-if="value"><span ng-init="value=false"></span></div>',
         )($scope),
       );
-      $scope.$apply();
       await wait();
       expect(element.children("div").length).toBe(1);
     });
@@ -210,17 +209,14 @@ describe("ngIf", () => {
             "<div>after;</div></div>",
         )($scope),
       );
-      $scope.$apply();
       await wait();
       expect(element.text()).toBe("before;start;1;2;3;end;after;");
 
       $scope.things.push(4);
-      $scope.$apply();
       await wait();
       expect(element.text()).toBe("before;start;1;2;3;4;end;after;");
 
       $scope.show = false;
-      $scope.$apply();
       await wait();
       expect(element.text()).toBe("before;after;");
     });
@@ -252,8 +248,6 @@ describe("ngIf", () => {
       $rootScope.show = true;
       await wait();
       expect(element.text()).toBe("");
-
-      $rootScope.$apply();
       await wait();
       expect(element.text()).toBe("");
 
@@ -261,7 +255,6 @@ describe("ngIf", () => {
       expect(element.text()).toBe("hello");
 
       $rootScope.show = false;
-      $rootScope.$apply();
       await wait();
       expect(element.children().length).toBe(0);
       expect(element.text()).toBe("");
@@ -304,7 +297,7 @@ describe("ngIf", () => {
           }),
         );
         $compile("<div><div template></div></div>")($rootScope);
-        $rootScope.$apply();
+        await wait();
         await wait();
         expect(controller.flag).toBe(true);
       });

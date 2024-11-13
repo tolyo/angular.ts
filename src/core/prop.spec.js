@@ -211,7 +211,7 @@ fdescribe("ngProp*", () => {
     }).toThrowError(/nodomevents/);
   });
 
-  it("should process property bindings in pre-linking phase at priority 100", () => {
+  it("should process property bindings in pre-linking phase at priority 100", async () => {
     compileProvider.directive("propLog", () => ({
       compile($element, $attrs) {
         logs.push(`compile=${$element[0].myName}`);
@@ -244,7 +244,7 @@ fdescribe("ngProp*", () => {
       '<div prop-log-high-priority prop-log ng-prop-my_name="name"></div>',
     )($rootScope);
     $rootScope.name = "loader";
-    $rootScope.$apply();
+    await wait();
     logs.push(`digest=${element[0].myName}`);
     expect(logs.join("; ")).toEqual(
       "compile=undefined; preLinkP101=undefined; preLinkP0=pre101; postLink=pre101; digest=loader",
@@ -260,7 +260,7 @@ fdescribe("ngProp*", () => {
       expect(element[0].src).toEqual("someuntrustedthing:foo();");
     });
 
-    it("should use $$sanitizeUri", () => {
+    it("should use $$sanitizeUri", async () => {
       const $$sanitizeUri = jasmine
         .createSpy("$$sanitizeUri")
         .and.returnValue("someSanitizedUrl");
@@ -276,12 +276,12 @@ fdescribe("ngProp*", () => {
       const element = $compile('<img ng-prop-src="testUrl"></img>')($rootScope);
       $rootScope.testUrl = "someUrl";
 
-      $rootScope.$apply();
+      await wait();
       expect(element[0].src).toMatch(/^http:\/\/.*\/someSanitizedUrl$/);
       expect($$sanitizeUri).toHaveBeenCalledWith($rootScope.testUrl, true);
     });
 
-    it("should not use $$sanitizeUri with trusted values", () => {
+    it("should not use $$sanitizeUri with trusted values", async () => {
       const $$sanitizeUri = jasmine
         .createSpy("$$sanitizeUri")
         .and.throwError("Should not have been called");
@@ -299,7 +299,7 @@ fdescribe("ngProp*", () => {
       // Assigning javascript:foo to src makes at least IE9-11 complain, so use another
       // protocol name.
       $rootScope.testUrl = $sce.trustAsMediaUrl("untrusted:foo();");
-      $rootScope.$apply();
+      await wait();
       expect(element[0].src).toBe("untrusted:foo();");
     });
   });
@@ -332,25 +332,25 @@ fdescribe("ngProp*", () => {
       expect(element[0].href).toEqual("unsafe:javascript:foo()");
     });
 
-    it("should not sanitize href on elements other than anchor", () => {
+    it("should not sanitize href on elements other than anchor", async () => {
       const element = $compile('<div ng-prop-href="testUrl"></div>')(
         $rootScope,
       );
       $rootScope.testUrl = "javascript:doEvilStuff()";
-      $rootScope.$apply();
+      await wait();
 
       expect(element[0].href).toBe("javascript:doEvilStuff()");
     });
 
-    it("should not sanitize properties other then those configured", () => {
+    it("should not sanitize properties other then those configured", async () => {
       const element = $compile('<a ng-prop-title="testUrl"></a>')($rootScope);
       $rootScope.testUrl = "javascript:doEvilStuff()";
-      $rootScope.$apply();
+      await wait();
 
       expect(element[0].title).toBe("javascript:doEvilStuff()");
     });
 
-    it("should use $$sanitizeUri", () => {
+    it("should use $$sanitizeUri", async () => {
       const $$sanitizeUri = jasmine
         .createSpy("$$sanitizeUri")
         .and.returnValue("someSanitizedUrl");
@@ -365,14 +365,14 @@ fdescribe("ngProp*", () => {
       });
       let element = $compile('<a ng-prop-href="testUrl"></a>')($rootScope);
       $rootScope.testUrl = "someUrl";
-      $rootScope.$apply();
+      await wait();
       expect(element[0].href).toMatch(/^http:\/\/.*\/someSanitizedUrl$/);
       expect($$sanitizeUri).toHaveBeenCalledWith($rootScope.testUrl, false);
 
       $$sanitizeUri.calls.reset();
 
       element = $compile('<a ng-prop-href="testUrl"></a>')($rootScope);
-      $rootScope.$apply();
+      await wait();
       expect(element[0].href).toMatch(/^http:\/\/.*\/someSanitizedUrl$/);
       expect($$sanitizeUri).toHaveBeenCalledWith($rootScope.testUrl, false);
     });
@@ -400,53 +400,53 @@ fdescribe("ngProp*", () => {
       );
     });
 
-    it("should pass through src properties for the same domain", () => {
+    it("should pass through src properties for the same domain", async () => {
       const element = $compile('<iframe ng-prop-src="testUrl"></iframe>')(
         $rootScope,
       );
       $rootScope.testUrl = "different_page";
-      $rootScope.$apply();
+      await wait();
       expect(element[0].src).toMatch(/\/different_page$/);
     });
 
-    it("should clear out src properties for a different domain", () => {
+    it("should clear out src properties for a different domain", async () => {
       const element = $compile('<iframe ng-prop-src="testUrl"></iframe>')(
         $rootScope,
       );
       $rootScope.testUrl = "http://a.different.domain.example.com";
-      expect(() => {
-        $rootScope.$apply();
+      expect(async () => {
+        await wait();
       }).toThrowError(/insecurl/);
     });
 
-    it("should clear out JS src properties", () => {
+    it("should clear out JS src properties", async () => {
       const element = $compile('<iframe ng-prop-src="testUrl"></iframe>')(
         $rootScope,
       );
       $rootScope.testUrl = "javascript:alert(1);";
-      expect(() => {
-        $rootScope.$apply();
+      expect(async () => {
+        await wait();
       }).toThrowError(/insecurl/);
     });
 
-    it("should clear out non-resource_url src properties", () => {
+    it("should clear out non-resource_url src properties", async () => {
       const element = $compile('<iframe ng-prop-src="testUrl"></iframe>')(
         $rootScope,
       );
       $rootScope.testUrl = $sce.trustAsUrl("javascript:doTrustedStuff()");
-      expect(() => {
-        $rootScope.$apply();
+      expect(async () => {
+        await wait();
       }).toThrowError(/insecurl/);
     });
 
-    it("should pass through $sce.trustAs() values in src properties", () => {
+    it("should pass through $sce.trustAs() values in src properties", async () => {
       const element = $compile('<iframe ng-prop-src="testUrl"></iframe>')(
         $rootScope,
       );
       $rootScope.testUrl = $sce.trustAsResourceUrl(
         "javascript:doTrustedStuff()",
       );
-      $rootScope.$apply();
+      await wait();
 
       expect(element[0].src).toEqual("javascript:doTrustedStuff()");
     });
@@ -463,16 +463,16 @@ fdescribe("ngProp*", () => {
       );
     });
 
-    it("should be a RESOURCE_URL context", () => {
+    it("should be a RESOURCE_URL context", async () => {
       const element = $compile('<base ng-prop-href="testUrl"/>')($rootScope);
 
       $rootScope.testUrl = $sce.trustAsResourceUrl("https://example.com/");
-      $rootScope.$apply();
+      await wait();
       expect(element[0].href).toContain("https://example.com/");
 
       $rootScope.testUrl = "https://not.example.com/";
-      expect(() => {
-        $rootScope.$apply();
+      expect(async () => {
+        await wait();
       }).toThrowError(/insecurl/);
     });
   });
@@ -488,22 +488,22 @@ fdescribe("ngProp*", () => {
       );
     });
 
-    it("should pass through action property for the same domain", () => {
+    it("should pass through action property for the same domain", async () => {
       const element = $compile('<form ng-prop-action="testUrl"></form>')(
         $rootScope,
       );
       $rootScope.testUrl = "different_page";
-      $rootScope.$apply();
+      await wait();
       expect(element[0].action).toMatch(/\/different_page$/);
     });
 
-    it("should clear out action property for a different domain", () => {
+    it("should clear out action property for a different domain", async () => {
       const element = $compile('<form ng-prop-action="testUrl"></form>')(
         $rootScope,
       );
       $rootScope.testUrl = "http://a.different.domain.example.com";
-      expect(() => {
-        $rootScope.$apply();
+      expect(async () => {
+        await wait();
       }).toThrowError(/insecurl/);
     });
 
@@ -512,8 +512,8 @@ fdescribe("ngProp*", () => {
         $rootScope,
       );
       $rootScope.testUrl = "javascript:alert(1);";
-      expect(() => {
-        $rootScope.$apply();
+      expect(async () => {
+        await wait();
       }).toThrowError(/insecurl/);
     });
 
@@ -522,19 +522,19 @@ fdescribe("ngProp*", () => {
         $rootScope,
       );
       $rootScope.testUrl = $sce.trustAsUrl("javascript:doTrustedStuff()");
-      expect(() => {
-        $rootScope.$apply();
+      expect(async () => {
+        await wait();
       }).toThrowError(/insecurl/);
     });
 
-    it("should pass through $sce.trustAsResourceUrl() values in action property", () => {
+    it("should pass through $sce.trustAsResourceUrl() values in action property", async () => {
       const element = $compile('<form ng-prop-action="testUrl"></form>')(
         $rootScope,
       );
       $rootScope.testUrl = $sce.trustAsResourceUrl(
         "javascript:doTrustedStuff()",
       );
-      $rootScope.$apply();
+      await wait();
 
       expect(element[0].action).toEqual("javascript:doTrustedStuff()");
     });
@@ -556,24 +556,24 @@ fdescribe("ngProp*", () => {
         '<link ng-prop-href="testUrl" rel="stylesheet" />',
       )($rootScope);
       $rootScope.testUrl = "https://evil.example.org/css.css";
-      expect(() => {
-        $rootScope.$apply();
+      expect(async () => {
+        await wait();
       }).toThrowError(/insecurl/);
     });
 
-    it("should accept valid RESOURCE_URLs", () => {
+    it("should accept valid RESOURCE_URLs", async () => {
       const element = $compile(
         '<link ng-prop-href="testUrl" rel="stylesheet" />',
       )($rootScope);
 
       $rootScope.testUrl = "./css1.css";
-      $rootScope.$apply();
+      await wait();
       expect(element[0].href).toContain("css1.css");
 
       $rootScope.testUrl = $sce.trustAsResourceUrl(
         "https://elsewhere.example.org/css2.css",
       );
-      $rootScope.$apply();
+      await wait();
       expect(element[0].href).toContain(
         "https://elsewhere.example.org/css2.css",
       );
