@@ -309,7 +309,7 @@ describe("binding", () => {
     expect(element[0].classList.contains("ng-hide")).toBeFalse();
   });
 
-  fit("ShowBinding", async () => {
+  it("ShowBinding", async () => {
     element = $compile('<div ng-show="show"/>')($rootScope);
 
     $rootScope.show = "true";

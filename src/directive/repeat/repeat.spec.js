@@ -48,7 +48,7 @@ describe("ngRepeat", () => {
     dealoc(element);
   });
 
-  it("should iterate over an array of objects", async () => {
+  fit("should iterate over an array of objects", async () => {
     element = $compile(
       '<ul><li ng-repeat="item in items">{{item.name}};</li></ul>',
     )(scope);
@@ -67,8 +67,11 @@ describe("ngRepeat", () => {
     expect(element.find("li").length).toEqual(3);
     expect(element.text()).toEqual("misko;shyam;adam;");
 
-    // // SHRINK
+    // SHRINK
     scope.items.pop();
+    await wait();
+    expect(element.find("li").length).toEqual(2);
+
     scope.items.shift();
     await wait();
     expect(element.find("li").length).toEqual(1);
@@ -172,7 +175,7 @@ describe("ngRepeat", () => {
     await wait();
     expect(element.text()).toEqual("misko:swe|shyam:set|");
 
-    delete items.shyam;
+    delete scope.items.shyam;
     await wait();
     expect(element.text()).toEqual("misko:swe|");
   });
@@ -1230,7 +1233,7 @@ describe("ngRepeat", () => {
           }),
         );
 
-      injector.invoke(($compile, $rootScope) => {
+      injector.invoke(async ($compile, $rootScope) => {
         const element = $compile("<div><div template></div></div>")($rootScope);
         await wait();
         expect(controller.flag).toBe(true);
@@ -1275,13 +1278,13 @@ describe("ngRepeat", () => {
       });
     });
 
-    it("should work with svg elements when the svg container is transcluded", () => {
+    it("should work with svg elements when the svg container is transcluded", async () => {
       $compileProvider.directive("svgContainer", () => ({
         template: "<svg ng-transclude></svg>",
         replace: true,
         transclude: true,
       }));
-      injector.invoke(($compile, $rootScope) => {
+      injector.invoke(async ($compile, $rootScope) => {
         const element = $compile(
           '<svg-container><circle ng-repeat="r in rows"></circle></svg-container>',
         )($rootScope);

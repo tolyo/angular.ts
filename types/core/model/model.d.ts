@@ -130,9 +130,9 @@ declare class Model {
     /** @type {AsyncQueueTask[]} */
     $$asyncQueue: AsyncQueueTask[];
     filters: any[];
-    $wrapperProxy: any;
     /** @type {boolean} */
     $$destroyed: boolean;
+    scheduled: any[];
     /**
      * Intercepts and handles property assignments on the target object. If a new value is
      * an object, it will be recursively proxied.
@@ -177,7 +177,6 @@ declare class Model {
         $handler: this;
         $parent: Model;
         $root: Model;
-        $wrapperProxy: any;
         $children: Model[];
         id: number;
         registerForeignKey: any;

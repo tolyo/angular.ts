@@ -72,7 +72,11 @@ export function createModel(target = {}, context) {
     const proxy = new Proxy(target, context || new Model());
     for (const key in target) {
       if (Object.prototype.hasOwnProperty.call(target, key)) {
-        target[key] = createModel(target[key], proxy.$handler);
+        try {
+          target[key] = createModel(target[key], proxy.$handler);
+        } catch (e) {
+          // convert only what we cant
+        }
       }
     }
     return proxy;
@@ -171,10 +175,10 @@ class Model {
 
     this.filters = [];
 
-    this.$wrapperProxy = undefined;
-
     /** @type {boolean} */
     this.$$destroyed = false;
+
+    this.scheduled = [];
   }
 
   /**
@@ -268,28 +272,24 @@ class Model {
 
       if (isDefined(value)) {
         target[property] = value;
-        // Object.keys(oldValue.$target).forEach((k) => {
-        //   delete oldValue[k];
-        // });
-        // target[property] = undefined;
         let listeners = this.watchers.get(property);
 
         if (listeners) {
           this.scheduleListener(listeners);
         }
-        // listeners = [];
-        // if (this.$wrapperProxy) {
-        //   Object.keys(this.$wrapperProxy.$target).forEach((v) => {
-        //     this.watchers.get(v).forEach((i) => {
-        //       listeners.push(i);
-        //     });
-        //   });
-        //   const oldObject = Object.create(null);
 
-        //   oldObject[property] = oldValue;
-
-        //   this.scheduleListener(listeners, oldObject);
-        // }
+        if (Array.isArray(target)) {
+          if (this.objectListeners.has(proxy) && property !== "length") {
+            let keys = this.objectListeners.get(proxy);
+            keys.forEach((key) => {
+              const listeners = this.watchers.get(key);
+              if (listeners) {
+                this.scheduleListener(listeners);
+              }
+            });
+            decodeURI;
+          }
+        }
 
         return true;
       }
@@ -356,7 +356,9 @@ class Model {
         keys.forEach((key) => {
           const listeners = this.watchers.get(key);
           if (listeners) {
-            this.scheduleListener(listeners);
+            if (this.scheduled !== listeners) {
+              this.scheduleListener(listeners);
+            }
           }
         });
       }
@@ -376,7 +378,6 @@ class Model {
    * @returns {*} - The value of the property or a method if accessing `watch` or `sync`.
    */
   get(target, property, proxy) {
-    // Sets current proxy and current targets
     this.$proxy = proxy;
     this.$target = target;
 
@@ -407,12 +408,26 @@ class Model {
         $handler: this,
         $parent: this.$parent,
         $root: this.$root,
-        $wrapperProxy: this.$wrapperProxy,
         $children: this.$children,
         id: this.id,
         registerForeignKey: this.registerForeignKey.bind(this),
         notifyListener: this.notifyListener.bind(this),
       };
+    }
+
+    if (
+      Array.isArray(target) &&
+      ["pop", "shift"].includes(/** @type { string } */ (property))
+    ) {
+      if (this.objectListeners.has(proxy)) {
+        let keys = this.objectListeners.get(this.$proxy);
+        keys.forEach((key) => {
+          const listeners = this.watchers.get(key);
+          if (listeners) {
+            this.scheduled = listeners;
+          }
+        });
+      }
     }
 
     return Object.prototype.hasOwnProperty.call(this.propertyMap, property)
@@ -443,28 +458,31 @@ class Model {
     // Currently deletes $model
     if (target[property] && target[property][isProxySymbol]) {
       delete target[property];
-      const listeners = this.watchers.get(property);
+
+      let listeners = this.watchers.get(property);
       if (listeners) {
         this.scheduleListener(listeners);
       }
-      return true;
-    }
-
-    if (this.$wrapperProxy) {
-      let listeners = [];
-      Object.keys(this.$wrapperProxy.$target).forEach((v) => {
-        this.watchers.get(v).forEach((i) => {
-          listeners.push(i);
+      if (this.objectListeners.has(this.$proxy)) {
+        let keys = this.objectListeners.get(this.$proxy);
+        keys.forEach((key) => {
+          listeners = this.watchers.get(key);
+          if (listeners) {
+            this.scheduleListener(listeners);
+          }
         });
-      });
-      const oldObject = Object.create(null);
-      oldObject[property] = undefined;
+      }
 
-      this.scheduleListener(listeners, oldObject);
+      if (this.scheduled) {
+        this.scheduleListener(this.scheduled);
+        this.scheduled = [];
+      }
+
       return true;
     }
 
     delete target[property];
+
     if (this.objectListeners.has(this.$proxy)) {
       let keys = this.objectListeners.get(this.$proxy);
       keys.forEach((key) => {

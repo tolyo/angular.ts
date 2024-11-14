@@ -49,7 +49,7 @@ export const ngRepeatDirective = [
       transclude: "element",
       priority: 1000,
       terminal: true,
-      compile: function ngRepeatCompile($element, $attr) {
+      compile: ($element, $attr) => {
         const expression = $attr.ngRepeat;
 
         let match = expression.match(

@@ -1455,95 +1455,91 @@ describe("Model", () => {
         await wait();
         expect(model.counter).toBe(6);
         expect(newValue).toEqual(undefined);
-        // });
-
-        // it("should allow deregistration", async () => {
-        //   model.obj = [];
-        //   count = 0;
-        //   let deregister = model.$watch("obj", (newVal) => {
-        //     logs.push(newVal);
-        //     count++;
-        //   });
-
-        //   model.obj.push("a");
-        //   await wait();
-        //   expect(logs.length).toBe(2);
-        //   expect(count).toEqual(2);
-
-        //   model.obj.push("a");
-        //   await wait();
-        //   expect(logs.length).toBe(3);
-        //   expect(count).toEqual(3);
-
-        //   deregister();
-        //   model.obj.push("a");
-        //   await wait();
-        //   expect(logs.length).toBe(3);
-        //   expect(count).toEqual(3);
       });
 
-      // it("should not trigger change when object in collection changes", () => {
-      //   model.obj = [{}];
+      it("should allow deregistration", async () => {
+        model.obj = [];
+        count = 0;
+        let deregister = model.$watch("obj", (newVal) => {
+          logs.push(newVal);
+          count++;
+        });
 
-      //   expect(logs).toEqual([
-      //     { newVal: [{}], oldVal: [{}] },
-      //   ]);
+        model.obj.push("a");
+        await wait();
+        expect(logs.length).toBe(2);
+        expect(count).toEqual(2);
 
-      //   logs = [];
-      //   model.obj[0].name = "foo";
+        model.obj.push("a");
+        await wait();
+        expect(logs.length).toBe(3);
+        expect(count).toEqual(3);
 
-      //   expect(logs).toEqual([]);
-      // });
+        deregister();
+        model.obj.push("a");
+        await wait();
+        expect(logs.length).toBe(3);
+        expect(count).toEqual(3);
+      });
 
-      // it("should watch array properties", () => {
-      //   model.obj = [];
+      it("should not trigger change when object in collection changes", async () => {
+        model.$watch("obj", function () {
+          count++;
+        });
+        model.obj = [{}];
+        await wait();
+        expect(count).toEqual(2);
 
-      //   expect(logs).toEqual([{ newVal: [], oldVal: [] }]);
+        model.obj[0].name = "foo";
+        await wait();
+        expect(count).toEqual(2);
+      });
 
-      //   logs = [];
-      //   model.obj.push("a");
+      it("should watch array properties", async () => {
+        let counter = 0;
+        model.obj = [];
+        model.$watch("obj", function () {
+          counter++;
+        });
+        await wait();
+        expect(counter).toEqual(1);
 
-      //   expect(logs).toEqual([{ newVal: ["a"], oldVal: [] }]);
+        model.obj.push("a");
 
-      //   logs = [];
-      //   model.obj[0] = "b";
+        await wait();
+        expect(counter).toEqual(2);
 
-      //   expect(logs).toEqual([{ newVal: ["b"], oldVal: ["a"] }]);
+        model.obj[0] = "b";
+        await wait();
+        expect(counter).toEqual(3);
 
-      //   logs = [];
-      //   model.obj.push([]);
-      //   model.obj.push({});
+        model.obj.push([]);
+        model.obj.push({});
+        expect(model.obj.length).toBe(3);
+        await wait();
+        expect(counter).toEqual(5);
 
-      //   expect(logs).toEqual([{ newVal: ["b", [], {}], oldVal: ["b"] }]);
+        model.obj.shift();
+        await wait();
+        expect(counter).toEqual(6);
 
-      //   logs = [];
-      //   const temp = model.obj[1];
-      //   model.obj[1] = model.obj[2];
-      //   model.obj[2] = temp;
+        model.obj[0] = "c";
+        await wait();
+        expect(counter).toEqual(7);
 
-      //   expect(logs).toEqual([
-      //     { newVal: ["b", {}, []], oldVal: ["b", [], {}] },
-      //   ]);
+        model.obj.pop();
+        await wait();
+        expect(counter).toEqual(8);
+      });
 
-      //   logs = [];
-      //   model.obj.shift();
-
-      //   expect(logs).toEqual([{ newVal: [{}, []], oldVal: ["b", {}, []] }]);
-      // });
-
-      // it("should not infinitely digest when current value is NaN", () => {
-      //   model.obj = [NaN];
-      //   expect(() => {
-
-      //   }).not.toThrow();
-      // });
-
-      // it("should watch array-like objects like arrays", () => {
-      //   logs = [];
-      //   model.obj = document.getElementsByTagName("src");
-
-      //   expect(logs.length).toBeTruthy();
-      // });
+      it("should watch array-like objects like arrays", async () => {
+        model.$watch("obj", function () {
+          counter++;
+        });
+        model.obj = document.getElementsByTagName("src");
+        await wait();
+        expect(logs.length).toBeTruthy();
+      });
     });
 
     describe("watching other proxies", () => {
