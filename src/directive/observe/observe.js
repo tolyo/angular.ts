@@ -6,8 +6,11 @@ export function ngObserveDirective() {
     restrict: "A",
     link: (scope, element, attrs) => {
       const targetElement = element[0];
-      const prop = targetElement.dataset["update"];
       const source = attrs["ngObserve"];
+      let prop = targetElement.dataset["update"];
+      if (!prop) {
+        prop = source;
+      }
 
       if (!scope[prop]) {
         scope[prop] = targetElement.getAttribute(source);

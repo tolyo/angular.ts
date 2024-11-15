@@ -86,11 +86,7 @@
     <br />
 
     {{ activeid }}
-    <fluent-tabs
-      ng-observe="activeid"
-      data-update="activeid"
-      activeid="entrees"
-    >
+    <fluent-tabs ng-observe="activeid" activeid="entrees">
       <fluent-tab id="apps">Appetizers</fluent-tab>
       <fluent-tab id="entrees">Entrees</fluent-tab>
       <fluent-tab id="desserts">Desserts</fluent-tab>
@@ -173,13 +169,9 @@
       </fluent-tab-panel>
     </fluent-tabs>
 
-    {{ radio }}
+    {{ value }}
 
-    <fluent-radio-group
-      ng-observe="value"
-      data-update="radio"
-      orientation="vertical"
-    >
+    <fluent-radio-group ng-observe="value" orientation="vertical">
       <fluent-radio value="1">18-24</fluent-radio>
       <fluent-radio value="2">25-33</fluent-radio>
       <fluent-radio value="3">34-44</fluent-radio>

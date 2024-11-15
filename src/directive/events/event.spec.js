@@ -1,6 +1,7 @@
-import { Angular } from "../../loader";
-import { createInjector } from "../../core/di/injector";
-import { dealoc } from "../../shared/jqlite/jqlite";
+import { Angular } from "../../loader.js";
+import { createInjector } from "../../core/di/injector.js";
+import { dealoc } from "../../shared/jqlite/jqlite.js";
+import { wait } from "../../shared/test-utils.js";
 
 describe("event directives", () => {
   let angular;
@@ -85,50 +86,51 @@ describe("event directives", () => {
 
   describe("focus", () => {
     describe("call the listener asynchronously during $apply", () => {
-      it("should call the listener with non isolate scopes", () => {
+      it("should call the listener with non isolate scopes", async () => {
         let scope = $rootScope.$new();
         element = $compile('<input type="text" ng-focus="focus()">')(scope);
+        await wait();
         scope.focus = jasmine.createSpy("focus");
 
-        scope.$apply(() => {
-          element.triggerHandler("focus");
-          expect(scope.focus).not.toHaveBeenCalled();
-        });
+        expect(scope.focus).not.toHaveBeenCalled();
+        element.triggerHandler("focus");
+        await wait();
 
         expect(scope.focus).toHaveBeenCalled();
       });
 
-      it("should call the listener with isolate scopes", () => {
-        let scope = $rootScope.$new(true);
+      it("should call the listener with isolate scopes", async () => {
+        let scope = $rootScope.$newIsolate();
         element = $compile('<input type="text" ng-focus="focus()">')(scope);
-        scope.focus = jasmine.createSpy("focus");
+        await wait();
 
-        scope.$apply(() => {
-          element.triggerHandler("focus");
-          expect(scope.focus).not.toHaveBeenCalled();
-        });
+        scope.focus = jasmine.createSpy("focus");
+        element.triggerHandler("focus");
+        expect(scope.focus).toHaveBeenCalled();
       });
     });
 
-    it("should call the listener synchronously inside of $apply if outside of $apply", () => {
+    it("should call the listener synchronously inside of $apply if outside of $apply", async () => {
       element = $compile(
         '<input type="text" ng-focus="focus()" ng-model="value">',
       )($rootScope);
+      await wait();
       $rootScope.focus = jasmine.createSpy("focus").and.callFake(() => {
         $rootScope.value = "newValue";
       });
 
       element.triggerHandler("focus");
-
       expect($rootScope.focus).toHaveBeenCalled();
+      await wait();
       expect(element.val()).toBe("newValue");
     });
   });
 
   describe("DOM event object", () => {
-    it("should allow access to the $event object", () => {
+    it("should allow access to the $event object", async () => {
       const scope = $rootScope.$new();
       element = $compile('<button ng-click="e = $event">BTN</button>')(scope);
+      await wait();
       element.triggerHandler("click");
       expect(scope.e.target).toBe(element[0]);
     });
@@ -136,37 +138,34 @@ describe("event directives", () => {
 
   describe("blur", () => {
     describe("call the listener asynchronously during $apply", () => {
-      it("should call the listener with non isolate scopes", () => {
+      it("should call the listener with non isolate scopes", async () => {
         const scope = $rootScope.$new();
         element = $compile('<input type="text" ng-blur="blur()">')(scope);
+        await wait();
         scope.blur = jasmine.createSpy("blur");
 
-        scope.$apply(() => {
-          element.triggerHandler("blur");
-          expect(scope.blur).not.toHaveBeenCalled();
-        });
-
+        expect(scope.blur).not.toHaveBeenCalled();
+        element.triggerHandler("blur");
         expect(scope.blur).toHaveBeenCalled();
       });
 
-      it("should call the listener with isolate scopes", () => {
+      it("should call the listener with isolate scopes", async () => {
         const scope = $rootScope.$new(true);
         element = $compile('<input type="text" ng-blur="blur()">')(scope);
+        await wait();
         scope.blur = jasmine.createSpy("blur");
-
-        scope.$apply(() => {
-          element.triggerHandler("blur");
-          expect(scope.blur).not.toHaveBeenCalled();
-        });
+        expect(scope.blur).not.toHaveBeenCalled();
+        element.triggerHandler("blur");
 
         expect(scope.blur).toHaveBeenCalled();
       });
     });
 
-    it("should call the listener synchronously inside of $apply if outside of $apply", () => {
+    it("should call the listener synchronously inside of $apply if outside of $apply", async () => {
       element = $compile(
         '<input type="text" ng-blur="blur()" ng-model="value">',
       )($rootScope);
+      await wait();
       $rootScope.blur = jasmine.createSpy("blur").and.callFake(() => {
         $rootScope.value = "newValue";
       });
@@ -199,12 +198,13 @@ describe("event directives", () => {
     expect(watchedVal).toEqual("newValue");
   });
 
-  it("should call the listener synchronously if the event is triggered outside of a digest", () => {
+  it("should call the listener synchronously if the event is triggered outside of a digest", async () => {
     let watchedVal;
 
     element = $compile(
       '<button type="button" ng-click="click()">Button</button>',
     )($rootScope);
+    await wait();
     $rootScope.$watch("value", (newValue) => {
       watchedVal = newValue;
     });
@@ -219,11 +219,11 @@ describe("event directives", () => {
   });
 
   describe("throwing errors in event handlers", () => {
-    it("should not stop execution if the event is triggered outside a digest", () => {
+    it("should not stop execution if the event is triggered outside a digest", async () => {
       element = $compile('<button ng-click="click()">Click</button>')(
         $rootScope,
       );
-
+      await wait();
       $rootScope.click = function () {
         throw new Error("listener error");
       };
@@ -237,11 +237,11 @@ describe("event directives", () => {
       expect(logs).toEqual(["listener error"]);
     });
 
-    it("should not stop execution if the event is triggered inside a digest", () => {
+    it("should not stop execution if the event is triggered inside a digest", async () => {
       element = $compile('<button ng-click="click()">Click</button>')(
         $rootScope,
       );
-
+      await wait();
       $rootScope.click = function () {
         throw new Error("listener error");
       };
@@ -259,10 +259,11 @@ describe("event directives", () => {
       expect(logs[1]).toEqual("done");
     });
 
-    it("should not stop execution if the event is triggered in a watch expression function", () => {
+    it("should not stop execution if the event is triggered in a watch expression function", async () => {
       element = $compile('<button ng-click="click()">Click</button>')(
         $rootScope,
       );
+      await wait();
       $rootScope.click = function () {
         throw new Error("listener error");
       };

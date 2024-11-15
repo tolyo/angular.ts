@@ -2397,7 +2397,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
           });
 
         return function delayedNodeLinkFn(
-          ignoreChildLinkFn,
+          _ignoreChildLinkFn,
           scope,
           node,
           rootElement,
@@ -2456,7 +2456,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
       }
 
       function addTextInterpolateDirective(directives, text) {
-        const interpolateFn = $interpolate(text, true);
+        const interpolateFn = $interpolate(text, true); // Create interpolation function
         if (interpolateFn) {
           directives.push({
             priority: 0,

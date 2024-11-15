@@ -11,6 +11,7 @@ build:
 		echo "Removing $(BUILD_DIR)..."; \
 		rm -r "$(BUILD_DIR)"; \
 	fi
+	@npm i
 	./node_modules/.bin/rollup -c
 
 pretty:

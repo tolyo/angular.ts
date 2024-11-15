@@ -25,6 +25,7 @@ describe("observe", () => {
   function createDirective(attributeValue, updateProp) {
     const template = `<div ng-observe="${attributeValue}" data-update="${updateProp}"></div>`;
     element = $compile(template)($scope);
+    $scope.$digest();
   }
 
   it("should set the scope property to the attribute value before any changes", () => {
@@ -42,6 +43,7 @@ describe("observe", () => {
   it("should observe attribute changes and update the scope property", () => {
     $scope.myProp = "";
     createDirective("test-attribute", "myProp");
+    spyOn($scope, "$digest").and.callThrough();
 
     const mutationObserverCallback =
       MutationObserver.calls.mostRecent().args[0];
@@ -56,11 +58,14 @@ describe("observe", () => {
     mutationObserverCallback([mutationRecord]);
 
     expect($scope.myProp).toBe("newValue");
+    expect($scope.$digest).toHaveBeenCalled();
   });
 
-  it("should change scope the attribute value is unchanged", () => {
+  it("should not trigger digest cycle if the attribute value is unchanged", () => {
     $scope.myProp = "existingValue";
     createDirective("test-attribute", "myProp");
+
+    spyOn($scope, "$digest").and.callThrough();
 
     const mutationObserverCallback =
       MutationObserver.calls.mostRecent().args[0];
@@ -73,7 +78,8 @@ describe("observe", () => {
     element[0].setAttribute("test-attribute", "existingValue");
 
     mutationObserverCallback([mutationRecord]);
-    expect($scope.myProp).toBe("existingValue");
+
+    expect($scope.$digest).not.toHaveBeenCalled();
   });
 
   it("should disconnect the observer on scope destruction", () => {
@@ -82,5 +88,28 @@ describe("observe", () => {
     $scope.$destroy();
 
     expect(observerSpy.disconnect).toHaveBeenCalled();
+  });
+
+  it("should observe attribute changes and update the same scope name if data-update attribute is absent", () => {
+    $scope.myProp = "";
+    const template = `<div ng-observe="test-attribute"></div>`;
+    element = $compile(template)($scope);
+    $scope.$digest();
+    spyOn($scope, "$digest").and.callThrough();
+
+    const mutationObserverCallback =
+      MutationObserver.calls.mostRecent().args[0];
+    const mutationRecord = {
+      target: element[0],
+      attributeName: "test-attribute",
+    };
+
+    element.attr("test-attribute", "newValue");
+    element[0].setAttribute("test-attribute", "newValue");
+
+    mutationObserverCallback([mutationRecord]);
+
+    expect($scope.myProp).toBe("newValue");
+    expect($scope.$digest).toHaveBeenCalled();
   });
 });
