@@ -1618,7 +1618,7 @@ describe("ngModel", () => {
   });
 
   describe("nested in a form", () => {
-    it("should register/deregister a nested ngModel with parent form when entering or leaving DOM", () => {
+    it("should register/deregister a nested ngModel with parent form when entering or leaving DOM", async () => {
       const element = $compile(
         '<form name="myForm">' +
           '<input ng-if="inputPresent" name="myControl" ng-model="value" required >' +
@@ -1654,7 +1654,7 @@ describe("ngModel", () => {
       dealoc(element);
     });
 
-    it("should register/deregister a nested ngModel with parent form when entering or leaving DOM with animations", () => {
+    it("should register/deregister a nested ngModel with parent form when entering or leaving DOM with animations", async () => {
       // ngAnimate performs the dom manipulation after digest, and since the form validity can be affected by a form
       // control going away we must ensure that the deregistration happens during the digest while we are still doing
       // dirty checking.
@@ -1696,7 +1696,7 @@ describe("ngModel", () => {
       dealoc(element);
     });
 
-    it("should keep previously defined watches consistent when changes in validity are made", () => {
+    it("should keep previously defined watches consistent when changes in validity are made", async () => {
       let isFormValid;
       $rootScope.$watch("myForm.$valid", (value) => {
         isFormValid = value;

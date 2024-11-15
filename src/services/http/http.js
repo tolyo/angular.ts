@@ -1,4 +1,3 @@
-import { ScopePhase } from "../../core/scope/scope";
 import { urlIsAllowedOriginFactory } from "../../core/url-utils/url-utils";
 import {
   minErr,
@@ -821,8 +820,6 @@ export function HttpProvider() {
               applyHandlers[key] = function (event) {
                 if (useApplyAsync) {
                   setTimeout(() => $rootScope.$apply(callEventHandler));
-                } else if ($rootScope.$$phase !== ScopePhase.NONE) {
-                  callEventHandler();
                 } else {
                   $rootScope.$apply(callEventHandler);
                 }

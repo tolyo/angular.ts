@@ -71,7 +71,7 @@ import { HttpBackendProvider } from "./services/http-backend/http-backend.js";
 import { LocationProvider } from "./core/location/location.js";
 import { LogProvider } from "./services/log.js";
 import { ParseProvider } from "./core/parse/parse.js";
-import { RootModelProvider } from "./core/model/model.js";
+import { RootScopeProvider } from "./core/scope/scope.js";
 import { SceProvider, SceDelegateProvider } from "./core/sce/sce.js";
 import { TaskTrackerFactoryProvider } from "./core/task-tracker-factory.js";
 import { TemplateRequestProvider } from "./services/template-request.js";
@@ -255,7 +255,7 @@ export function publishExternalAPI(angular) {
             $log: LogProvider,
             $parse: ParseProvider,
             $$rAFScheduler: RafSchedulerProvider,
-            $rootScope: RootModelProvider,
+            $rootScope: RootScopeProvider,
             $routerGlobals: UIRouterGlobals,
             $sce: SceProvider,
             $sceDelegate: SceDelegateProvider,

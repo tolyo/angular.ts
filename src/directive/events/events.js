@@ -1,5 +1,4 @@
 import { directiveNormalize } from "../../shared/utils";
-import { ScopePhase } from "../../core/scope/scope";
 
 /*
  * A collection of directives that allows creation of custom event handlers that are defined as
@@ -65,16 +64,10 @@ export function createEventDirective(
             fn(scope, { $event: event });
           };
 
-          if ($rootScope.$$phase === ScopePhase.NONE) {
-            scope.$apply(callback);
-          } else if (forceAsync) {
-            scope.$evalAsync(callback);
-          } else {
-            try {
-              callback();
-            } catch (error) {
-              $exceptionHandler(error);
-            }
+          try {
+            callback();
+          } catch (error) {
+            $exceptionHandler(error);
           }
         });
       };

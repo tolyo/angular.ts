@@ -48,7 +48,7 @@ describe("ngRepeat", () => {
     dealoc(element);
   });
 
-  fit("should iterate over an array of objects", async () => {
+  it("should iterate over an array of objects", async () => {
     element = $compile(
       '<ul><li ng-repeat="item in items">{{item.name}};</li></ul>',
     )(scope);

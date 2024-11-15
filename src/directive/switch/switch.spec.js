@@ -24,7 +24,7 @@ describe("ngSwitch", () => {
     dealoc(element);
   });
 
-  it("should switch on value change", () => {
+  it("should switch on value change", async () => {
     element = $compile(
       '<div ng-switch="select">' +
         '<div ng-switch-when="1">first:{{name}}</div>' +
@@ -50,7 +50,7 @@ describe("ngSwitch", () => {
     expect(element.text()).toEqual("true:misko");
   });
 
-  it("should show all switch-whens that match the current value", () => {
+  it("should show all switch-whens that match the current value", async () => {
     element = $compile(
       '<ul ng-switch="select">' +
         '<li ng-switch-when="1">first:{{name}}</li>' +
@@ -104,7 +104,7 @@ describe("ngSwitch", () => {
     expect(element.find("li").eq(2).text()).toBe("F");
   });
 
-  it("should switch on switch-when-default", () => {
+  it("should switch on switch-when-default", async () => {
     element = $compile(
       '<ng-switch on="select">' +
         '<div ng-switch-when="1">one</div>' +
@@ -143,7 +143,7 @@ describe("ngSwitch", () => {
     expect(element.find("li").eq(2).text()).toBe("F");
   });
 
-  it("should show all switch-when-default", () => {
+  it("should show all switch-when-default", async () => {
     element = $compile(
       '<ul ng-switch="select">' +
         '<li ng-switch-when="1">one</li>' +
@@ -158,7 +158,7 @@ describe("ngSwitch", () => {
     expect(element.text()).toEqual("one");
   });
 
-  it("should always display the elements that do not match a switch", () => {
+  it("should always display the elements that do not match a switch", async () => {
     element = $compile(
       '<ul ng-switch="select">' +
         "<li>always </li>" +
@@ -180,7 +180,7 @@ describe("ngSwitch", () => {
       "ngSwitchDefault at the position specified in the template, when the " +
       "first and last elements in the ngSwitch body do not have a ngSwitch* " +
       "directive",
-    () => {
+    async () => {
       element = $compile(
         '<ul ng-switch="select">' +
           "<li>1</li>" +
@@ -205,7 +205,7 @@ describe("ngSwitch", () => {
     "should display the elements that do not have ngSwitchWhen nor " +
       "ngSwitchDefault at the position specified in the template when the " +
       "first and last elements in the ngSwitch have a ngSwitch* directive",
-    () => {
+    async () => {
       element = $compile(
         '<ul ng-switch="select">' +
           '<li ng-switch-when="1">2</li>' +
@@ -224,7 +224,7 @@ describe("ngSwitch", () => {
     },
   );
 
-  it("should properly create and destroy child scopes", () => {
+  it("should properly create and destroy child scopes", async () => {
     element = $compile(
       '<ng-switch on="url"><div ng-switch-when="a">{{name}}</div></ng-switch>',
     )($scope);
@@ -253,7 +253,7 @@ describe("ngSwitch", () => {
     expect(child2).not.toBe(child1);
   });
 
-  it("should interoperate with other transclusion directives like ngRepeat", () => {
+  it("should interoperate with other transclusion directives like ngRepeat", async () => {
     element = $compile(
       '<div ng-switch="value">' +
         '<div ng-switch-when="foo" ng-repeat="foo in foos">{{value}}:{{foo}}|</div>' +
@@ -278,7 +278,7 @@ describe("ngSwitch", () => {
     );
   });
 
-  it("should not leak jq data when compiled but not attached to parent when parent is destroyed", () => {
+  it("should not leak jq data when compiled but not attached to parent when parent is destroyed", async () => {
     element = $compile(
       '<div ng-repeat="i in []">' +
         '<ng-switch on="url">' +
@@ -314,7 +314,7 @@ describe("ngSwitch", () => {
     expect(element.children().length).toBe(1);
   });
 
-  it("should not trigger a digest after an element is removed", () => {
+  it("should not trigger a digest after an element is removed", async () => {
     const spy = spyOn($scope, "$digest").and.callThrough();
 
     $scope.select = 1;

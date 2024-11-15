@@ -56,7 +56,7 @@ describe("validators", () => {
       expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
     });
 
-    it("should listen on ng-pattern when pattern is changed", () => {
+    it("should listen on ng-pattern when pattern is changed", async () => {
       const patternVal = /^\w+$/;
       inputElm = $compile(
         '<input type="text" ng-model="value" ng-pattern="pat" />',
@@ -151,7 +151,7 @@ describe("validators", () => {
       expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
     });
 
-    it('should register "pattern" with the model validations when the pattern attribute is used', () => {
+    it('should register "pattern" with the model validations when the pattern attribute is used', async () => {
       const formElm = $compile(
         '<form name="form"><input type="text" name="input" ng-model="value" pattern="^\\d+$" /></form>',
       )($rootScope);
@@ -658,7 +658,7 @@ describe("validators", () => {
       expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue(); // invalid because of the number validator
     });
 
-    it('should allow `false` as a valid value when the input type is not "checkbox"', () => {
+    it('should allow `false` as a valid value when the input type is not "checkbox"', async () => {
       inputElm = $compile(
         '<input type="radio" ng-value="true" ng-model="answer" required />' +
           '<input type="radio" ng-value="false" ng-model="answer" required />',

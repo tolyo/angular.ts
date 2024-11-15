@@ -27,8 +27,6 @@ import {
 } from "../form/form";
 import { defaultModelOptions } from "../model-options/model-options";
 import { startingTag } from "../../shared/jqlite/jqlite";
-import { ScopePhase } from "../../core/scope/scope";
-import { isProxySymbol } from "../../core/model/model";
 
 export const ngModelMinErr = minErr("ngModel");
 
@@ -857,12 +855,8 @@ export class NgModelController {
       this.$$pendingDebounce = setTimeout(() => {
         that.$commitViewValue();
       }, /** @type {number} */ (debounceDelay));
-    } else if (this.$$rootScope.$$phase !== ScopePhase.NONE) {
-      this.$commitViewValue();
     } else {
-      this.$$scope.$apply(() => {
-        that.$commitViewValue();
-      });
+      this.$commitViewValue();
     }
   }
 

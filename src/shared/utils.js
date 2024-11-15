@@ -1,5 +1,5 @@
-import { isProxySymbol } from "../core/model/model";
-import { PREFIX_REGEXP, SPECIAL_CHARS_REGEXP } from "./constants";
+import { isProxySymbol } from "../core/scope/scope.js";
+import { PREFIX_REGEXP, SPECIAL_CHARS_REGEXP } from "./constants.js";
 
 const ngMinErr = minErr("ng");
 

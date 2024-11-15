@@ -7,7 +7,6 @@ import {
   startingTag,
 } from "../../shared/jqlite/jqlite";
 import { identifierForController } from "../controller/controller";
-import { TTL } from "../scope/scope";
 import {
   minErr,
   assertArg,
@@ -37,8 +36,6 @@ import { PREFIX_REGEXP } from "../../shared/constants";
 import { createEventDirective } from "../../directive/events/events";
 import { CACHE, EXPANDO } from "../cache/cache";
 import { Attributes } from "./attributes";
-
-let ttl = TTL;
 
 /**
  * Function that aggregates all linking fns for a compilation root (nodeList)
