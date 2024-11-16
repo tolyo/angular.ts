@@ -462,7 +462,7 @@ export class ASTInterpreter {
    * @returns {function} The binary logical AND function.
    */
   "binary&&"(left, right, context) {
-    return function (scope, locals, assign) {
+    return (scope, locals, assign) => {
       const arg = left(scope, locals, assign) && right(scope, locals, assign);
       return context ? { value: arg } : arg;
     };

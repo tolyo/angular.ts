@@ -378,7 +378,11 @@ export class Scope {
    * @returns {*} - The value of the property or a method if accessing `watch` or `sync`.
    */
   get(target, property, proxy) {
-    this.$proxy = proxy;
+    if (target[property] && isProxy(target[property])) {
+      this.$proxy = target[property];
+    } else {
+      this.$proxy = proxy;
+    }
     this.$target = target;
 
     if (property === "$$watchersCount") return calculateWatcherCount(this);
@@ -455,6 +459,7 @@ export class Scope {
   }
 
   deleteProperty(target, property) {
+    debugger;
     // Currently deletes $model
     if (target[property] && target[property][isProxySymbol]) {
       delete target[property];
@@ -564,11 +569,23 @@ export class Scope {
         break;
       // 4
       case ASTType.ConditionalExpression: {
-        throw new Error("Unsupported type " + type);
+        key = get.decoratedNode.body[0].expression.toWatch[0]?.test.name;
+        listener.property.push(key);
+        break;
       }
       // 5
       case ASTType.LogicalExpression: {
-        throw new Error("Unsupported type " + type);
+        let keys = [];
+        keys.push(get.decoratedNode.body[0].expression.left.toWatch[0]?.name);
+        keys.push(get.decoratedNode.body[0].expression.right.toWatch[0]?.name);
+        keys.forEach((key) => {
+          this.registerKey(key, listener);
+        });
+        return () => {
+          keys.forEach((key) => {
+            this.deregisterKey(key, listener.id);
+          });
+        };
       }
       // 6
       case ASTType.BinaryExpression: {

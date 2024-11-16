@@ -2,6 +2,7 @@ import { Angular } from "../../loader";
 import { createInjector } from "../../core/di/injector";
 import { dealoc } from "../../shared/jqlite/jqlite";
 import { isDefined } from "../../shared/utils";
+import { wait } from "../../shared/test-utils";
 
 describe("ngHref", () => {
   let $rootScope;
@@ -27,13 +28,13 @@ describe("ngHref", () => {
     dealoc(element);
   });
 
-  it("should interpolate the expression and bind to href", () => {
+  it("should interpolate the expression and bind to href", async () => {
     element = $compile('<a ng-href="some/{{id}}"></div>')($rootScope);
+    await wait();
     expect(element.attr("href")).toEqual("some/");
 
-    $rootScope.$apply(() => {
-      $rootScope.id = 1;
-    });
+    $rootScope.id = 1;
+    await wait();
     expect(element.attr("href")).toEqual("some/1");
   });
 
