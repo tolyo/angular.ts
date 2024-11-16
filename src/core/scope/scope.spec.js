@@ -1260,7 +1260,7 @@ describe("Scope", () => {
 
     it("should watch functions", async () => {
       scope.$watch("fn", (fn) => {
-        logs.push(fn());
+        logs.push(fn);
       });
       await wait();
       logs = [];

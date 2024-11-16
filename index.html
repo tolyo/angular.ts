@@ -74,7 +74,9 @@
       <div id="2" ng-controller="TodoCtrl as $ctrl" >
        <input type="text" ng-model="$ctrl.greeting" />
         Greeting {{ $ctrl.greeting }}
-        
+        <div ng-repeat="m in $ctrl.tasks">
+          here {{ m.task }}
+        </div>
       </div>
 
      

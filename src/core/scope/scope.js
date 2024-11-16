@@ -459,7 +459,6 @@ export class Scope {
   }
 
   deleteProperty(target, property) {
-    debugger;
     // Currently deletes $model
     if (target[property] && target[property][isProxySymbol]) {
       delete target[property];
@@ -545,6 +544,7 @@ export class Scope {
     let key = get.decoratedNode.body[0].expression.name;
 
     let type = get.decoratedNode.body[0].expression.type;
+    debugger;
     switch (type) {
       // 1
       case ASTType.Program: {
@@ -603,10 +603,18 @@ export class Scope {
       }
       // function
       case ASTType.CallExpression: {
-        listener.property.push(
-          get.decoratedNode.body[0].expression.toWatch.name,
-        );
-        break;
+        let keys = [];
+        get.decoratedNode.body[0].expression.toWatch.forEach((x) => {
+          keys.push(x.name);
+        });
+        keys.forEach((key) => {
+          this.registerKey(key, listener);
+        });
+        return () => {
+          keys.forEach((key) => {
+            this.deregisterKey(key, listener.id);
+          });
+        };
       }
       case ASTType.MemberExpression: {
         listener.property.push(
@@ -644,9 +652,16 @@ export class Scope {
 
       // 12
       case ASTType.ArrayExpression: {
-        let keys = get.decoratedNode.body[0].expression.elements.map(
-          (x) => x.toWatch[0].name,
-        );
+        let keys = get.decoratedNode.body[0].expression.elements
+          .map((x) => {
+            switch (x.type) {
+              case 11:
+                return x.value;
+              default:
+                return x.toWatch[0].name;
+            }
+          })
+          .filter((x) => !!x);
         keys.forEach((key) => {
           this.registerKey(key, listener);
         });
@@ -1014,7 +1029,19 @@ export class Scope {
   notifyListener(listener, target) {
     const { originalTarget, listenerFn, watchFn } = listener;
     try {
-      const newVal = watchFn(originalTarget) || watchFn(target);
+      let newVal = watchFn(originalTarget) || watchFn(target);
+      if (isFunction(newVal)) {
+        newVal = newVal(originalTarget);
+      }
+      if (Array.isArray(newVal)) {
+        newVal = newVal.map((x) => {
+          if (isFunction(x)) {
+            return x(originalTarget);
+          }
+          return x;
+        });
+      }
+
       listenerFn(newVal, originalTarget);
       this.$$asyncQueue.forEach((x) => {
         if (x.handler.id == this.id) {
