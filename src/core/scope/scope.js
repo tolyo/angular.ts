@@ -232,6 +232,7 @@ export class Scope {
         }
 
         if (oldValue !== value) {
+          debugger;
           const listeners = this.watchers.get(property);
 
           if (listeners) {
@@ -544,7 +545,6 @@ export class Scope {
     let key = get.decoratedNode.body[0].expression.name;
 
     let type = get.decoratedNode.body[0].expression.type;
-    debugger;
     switch (type) {
       // 1
       case ASTType.Program: {
@@ -601,7 +601,7 @@ export class Scope {
       case ASTType.UnaryExpression: {
         throw new Error("Unsupported type " + type);
       }
-      // function
+      // 8 function
       case ASTType.CallExpression: {
         let keys = [];
         get.decoratedNode.body[0].expression.toWatch.forEach((x) => {
@@ -609,6 +609,7 @@ export class Scope {
         });
         keys.forEach((key) => {
           this.registerKey(key, listener);
+          this.scheduleListener([listener]);
         });
         return () => {
           keys.forEach((key) => {
@@ -664,6 +665,7 @@ export class Scope {
           .filter((x) => !!x);
         keys.forEach((key) => {
           this.registerKey(key, listener);
+          this.scheduleListener([listener]);
         });
         return () => {
           keys.forEach((key) => {

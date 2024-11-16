@@ -15564,12 +15564,14 @@ describe("$compile", () => {
       expect(element.attr("ng-href")).toEqual("javascript:foo()");
     });
 
-    it("should sanitize non-trusted values", () => {
+    it("should sanitize non-trusted values", async () => {
       $rootScope.testUrl = "javascript:foo()"; // `javascript` is not trusted
       element = $compile('<a href="{{testUrl}}"></a>')($rootScope);
+      await wait();
       expect(element.attr("href")).toEqual("unsafe:javascript:foo()");
 
       element = $compile('<a ng-href="{{testUrl}}"></a>')($rootScope);
+      await wait();
       expect(element.attr("href")).toEqual("unsafe:javascript:foo()");
     });
 

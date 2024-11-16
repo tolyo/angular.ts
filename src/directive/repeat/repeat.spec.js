@@ -1188,10 +1188,11 @@ describe("ngRepeat", () => {
       }, 500);
     });
 
-    it("should allow mixing ngRepeat with ngIf", () => {
+    it("should allow mixing ngRepeat with ngIf", async () => {
       element = $compile(
         '<div><div ng-repeat="i in [1,2,3,4]" ng-if="i % 2 === 0">{{i}};</div></div>',
       )(scope);
+      await wait();
       expect(element.text()).toBe("2;4;");
     });
   });

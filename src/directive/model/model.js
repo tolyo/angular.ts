@@ -152,7 +152,7 @@ export class NgModelController {
     this.$$currentValidationRunId = 0;
 
     /** @type {import('../../core/scope/scope.js').Scope} */
-    this.$$scope = $element.controller() ? $element.controller() : $scope; // attempt to bind to nearest controller if present
+    this.$$scope = $scope; // attempt to bind to nearest controller if present
 
     /** @type {import('../../core/scope/scope.js').Scope} */
     this.$$rootScope = $scope.$root;
@@ -768,6 +768,7 @@ export class NgModelController {
   }
 
   $$writeModelToScope() {
+    console.log(this.$$scope.id);
     this.$$ngModelSet(this.$$scope, this.$modelValue);
     Object.values(this.$viewChangeListeners).forEach((listener) => {
       try {

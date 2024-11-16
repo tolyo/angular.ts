@@ -46,7 +46,6 @@ export const ngRefDirective = [
         };
 
       return (scope, element, attrs) => {
-        debugger;
         let refValue;
 
         if (Object.prototype.hasOwnProperty.call(attrs, "ngRefRead")) {

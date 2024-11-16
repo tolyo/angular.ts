@@ -75,8 +75,9 @@
        <input type="text" ng-model="$ctrl.greeting" />
         Greeting {{ $ctrl.greeting }}
         <div ng-repeat="m in $ctrl.tasks">
-          here {{ m.task }}
+          {{ $index+1 }} {{ m.task }}
         </div>
+        
       </div>
 
      
