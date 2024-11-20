@@ -8,7 +8,7 @@ export const ngRepeatDirective = [
     const NG_REMOVED = "$$NG_REMOVED";
     const ngRepeatMinErr = minErr("ngRepeat");
 
-    const updateScope = function (
+    function updateScope(
       scope,
       index,
       valueIdentifier,
@@ -18,14 +18,17 @@ export const ngRepeatDirective = [
       arrayLength,
     ) {
       // TODO(perf): generate setters to shave off ~40ms or 1-1.5%
-      scope[valueIdentifier] = value;
+      if (scope[valueIdentifier] !== value) {
+        scope.$target[valueIdentifier] = value;
+      }
+
       if (keyIdentifier) scope[keyIdentifier] = key;
       scope.$index = index;
       scope.$first = index === 0;
       scope.$last = index === arrayLength - 1;
       scope.$middle = !(scope.$first || scope.$last);
       scope.$odd = !(scope.$even = (index & 1) === 0);
-    };
+    }
 
     const getBlockStart = function (block) {
       return block.clone[0];
@@ -130,8 +133,7 @@ export const ngRepeatDirective = [
           let lastBlockMap = Object.create(null);
 
           // watch props
-          //watch props
-          $scope.$watchCollection(rhs, (collection) => {
+          $scope.$watch(rhs, (collection) => {
             var index,
               length,
               previousNode = $element[0], // node that cloned nodes should be inserted after
@@ -268,35 +270,38 @@ export const ngRepeatDirective = [
                 );
               } else {
                 // new item which we don't know about
-                $transclude((clone, scope) => {
-                  block.scope = scope;
-                  // Removing this comment node breaks // "clobber ng-if" test
-                  // TODO investigate
-                  const endNode = document.createComment("");
-                  clone[clone.length++] = endNode;
-                  $animate.enter(clone, null, previousNode);
-                  previousNode = endNode;
-                  // Note: We only need the first/last node of the cloned nodes.
-                  // However, we need to keep the reference to the jqlite wrapper as it might be changed later
-                  // by a directive with templateUrl when its template arrives.
-                  block.clone = clone;
-                  $animate.enter(clone, null, previousNode);
-                  previousNode = clone;
-                  // Note: We only need the first/last node of the cloned nodes.
-                  // However, we need to keep the reference to the jqlite wrapper as it might be changed later
-                  // by a directive with templateUrl when its template arrives.
-                  block.clone = clone;
-                  nextBlockMap[block.id] = block;
-                  updateScope(
-                    block.scope,
-                    index,
-                    valueIdentifier,
-                    value,
-                    keyIdentifier,
-                    key,
-                    collectionLength,
-                  );
-                });
+                $transclude(
+                  // Clone attach function
+                  (clone, scope) => {
+                    block.scope = scope;
+                    // Removing this comment node breaks // "clobber ng-if" test
+                    // TODO investigate
+                    const endNode = document.createComment("");
+                    clone[clone.length++] = endNode;
+                    $animate.enter(clone, null, previousNode);
+                    previousNode = endNode;
+                    // Note: We only need the first/last node of the cloned nodes.
+                    // However, we need to keep the reference to the jqlite wrapper as it might be changed later
+                    // by a directive with templateUrl when its template arrives.
+                    block.clone = clone;
+                    $animate.enter(clone, null, previousNode);
+                    previousNode = clone;
+                    // Note: We only need the first/last node of the cloned nodes.
+                    // However, we need to keep the reference to the jqlite wrapper as it might be changed later
+                    // by a directive with templateUrl when its template arrives.
+                    block.clone = clone;
+                    nextBlockMap[block.id] = block;
+                    updateScope(
+                      block.scope,
+                      index,
+                      valueIdentifier,
+                      value,
+                      keyIdentifier,
+                      key,
+                      collectionLength,
+                    );
+                  },
+                );
               }
             }
             lastBlockMap = nextBlockMap;

@@ -79,6 +79,7 @@ export function createScope(target = {}, context) {
         }
       }
     }
+
     return proxy;
   } else {
     return target;
@@ -218,7 +219,12 @@ export class Scope {
             this.scheduleListener(foreignListeners);
           }
         }
-        target[property] = value;
+
+        if (this.objectListeners.get(target[property])) {
+          this.objectListeners.delete(target[property]);
+        }
+        target[property] = createScope(value, this);
+        this.objectListeners.set(target[property], [property]);
         return true;
       }
 
@@ -232,7 +238,6 @@ export class Scope {
         }
 
         if (oldValue !== value) {
-          debugger;
           const listeners = this.watchers.get(property);
 
           if (listeners) {
@@ -245,8 +250,8 @@ export class Scope {
             this.scheduleListener(foreignListeners);
           }
         }
-        target[property] = createScope({}, this);
-        setDeepValue(target[property], value);
+        target[property] = createScope(value, this);
+        //setDeepValue(target[property], value);
         return true;
       }
 
@@ -329,16 +334,7 @@ export class Scope {
         this.watchers.get(property)?.forEach((l) => listeners.push(l));
         if (listeners.length > 0) {
           // check if the listener actually appllies to this target
-          this.scheduleListener(listeners, (x) => {
-            return x.filter((x) => {
-              if (!x.watchProp) return true;
-              // Compute the expected target based on `watchProp`
-              const wrapperExpr = x.watchProp.split(".").slice(0, -1).join(".");
-              const expectedTarget = $parse(wrapperExpr)(x.originalTarget)
-                ?.$handler.$target;
-              return expectedTarget === target;
-            });
-          });
+          this.scheduleListener(listeners);
         }
 
         let foreignListeners = this.foreignListeners.get(property);
@@ -515,6 +511,7 @@ export class Scope {
    */
   $watch(watchProp, listenerFn) {
     assert(isString(watchProp), "Watched property required");
+    watchProp = watchProp.trim();
     const get = $parse(watchProp);
 
     // Constant are immediately passed to listener function
@@ -540,7 +537,6 @@ export class Scope {
       id: nextUid(),
       property: [],
     };
-
     // simplest case
     let key = get.decoratedNode.body[0].expression.name;
 
@@ -1031,7 +1027,10 @@ export class Scope {
   notifyListener(listener, target) {
     const { originalTarget, listenerFn, watchFn } = listener;
     try {
-      let newVal = watchFn(originalTarget) || watchFn(target);
+      let newVal = watchFn(originalTarget);
+      if (isUndefined(newVal)) {
+        newVal = watchFn(target);
+      }
       if (isFunction(newVal)) {
         newVal = newVal(originalTarget);
       }
@@ -1071,6 +1070,7 @@ function setDeepValue(model, obj) {
       model[key] = obj[key];
     }
   }
+  Object.setPrototypeOf(model, obj);
 }
 
 /**

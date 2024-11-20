@@ -1643,7 +1643,6 @@ describe("parser", () => {
     xit("should invoke all statements in multi-statement expressions", async () => {
       let lastVal = NaN;
       const listener = function (val) {
-        debugger;
         lastVal = val;
       };
 

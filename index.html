@@ -31,6 +31,10 @@
               }, 100);
             }
 
+            get() {
+              return this.counter;
+            }
+
             increase() {
               console.log(this)
               this.counter++
@@ -50,7 +54,9 @@
              * @return {void}
              */
             archive() {
-              this.tasks = this.tasks.filter((task) => !task.done);
+              debugger
+              let newTasks = this.tasks.filter((task) => !task.done)
+              this.tasks = newTasks;
             }
           }
 
@@ -71,26 +77,23 @@
       </script>
     </head>
     <body ng-app="todo" ng-init="hide = false">
-      <div id="2" ng-controller="TodoCtrl as $ctrl" >
-       <input type="text" ng-model="$ctrl.greeting" />
-        Greeting {{ $ctrl.greeting }}
-        <div ng-repeat="m in $ctrl.tasks">
-          {{ $index+1 }} {{ m.task }}
-        </div>
-        
+      <div ng-controller="TodoCtrl as $ctrl">
+        <h3>Todos</h3>
+        <button ng-click="$ctrl.archive()">Archive</button>
+        <ul>
+          <li ng-repeat="todo in $ctrl.tasks">
+            {{ todo.task }} {{ todo.done }}
+            <input type="checkbox" ng-click="todo.done = !todo.done" />
+          </li>
+        </ul>
+        <input type="text" ng-model="newTodo" ng-required="true" />
+        <button ng-click="$ctrl.add(newTodo)" type="submit">Add</button>
+        <!-- <form ng-submit="$ctrl.add(newTodo)">
+          <input type="text" ng-model="newTodo" ng-required="true" />
+          <button type="submit">Add</button>
+        </form> -->
       </div>
 
-     
-      <input type="checkbox" ng-model="hide"/>
-      <div ng-if="hide">SHOW? {{ hide }} </div>
-      {{ hide }}
-      <input type="text" ng-model="greeting" />
-      {{ greeting }}
-
-      <div>
-        <div ng-repeat="m in model" name="{{m.name}}">
-         <ul name="{{i}}" ng-repeat="i in m.item">{{i}}</ul>
-        </div>
-      </div>
+      
     </body>
 </html>

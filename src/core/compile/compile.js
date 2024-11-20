@@ -907,11 +907,13 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
             transcludedScope.$$transcluded = true;
           }
 
-          return transcludeFn(transcludedScope, cloneFn, {
+          const transcludeRes = transcludeFn(transcludedScope, cloneFn, {
             parentBoundTranscludeFn: previousBoundTranscludeFn,
             transcludeControllers: controllers,
             futureParentElement,
           });
+
+          return transcludeRes;
         }
 
         // We need  to attach the transclusion slots onto the `boundTranscludeFn`
@@ -1334,7 +1336,8 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
             const bindings = controllerDirective.$$bindings.bindToController;
 
             // Controller instance is bound to the scope
-            controller.instance = controllerScope.$new(controller());
+            const controllerInstance = controller();
+            controller.instance = controllerScope.$new(controllerInstance);
             $element.data(
               `$${controllerDirective.name}Controller`,
               controller.instance,
@@ -1503,13 +1506,14 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
               //  * `undefined` - a slot that was not declared (i.e. invalid)
               const slotTranscludeFn = boundTranscludeFn.$$slots[slotName];
               if (slotTranscludeFn) {
-                return slotTranscludeFn(
+                const slotTranscludeRes = slotTranscludeFn(
                   scope,
                   cloneAttachFn,
                   transcludeControllers,
                   futureParentElement,
                   scopeToChild,
                 );
+                return slotTranscludeRes;
               }
               if (isUndefined(slotTranscludeFn)) {
                 throw $compileMinErr(
@@ -1521,13 +1525,14 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                 );
               }
             } else {
-              return boundTranscludeFn(
+              const boundTranscludeRes = boundTranscludeFn(
                 scope,
                 cloneAttachFn,
                 transcludeControllers,
                 futureParentElement,
                 scopeToChild,
               );
+              return boundTranscludeRes;
             }
           }
         };
@@ -2459,6 +2464,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
             priority: 0,
             compile: () => (scope, node) => {
               interpolateFn.expressions.forEach((x) => {
+                console.log(x);
                 scope.$watch(x, () => {
                   node[0].nodeValue = interpolateFn(scope, (val) => {
                     node[0].nodeValue = val;

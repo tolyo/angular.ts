@@ -51,6 +51,26 @@ describe("Scope", () => {
     expect(scope.d).toEqual(3);
   });
 
+  class Demo {
+    a = "test";
+
+    check() {
+      return this.a + "!";
+    }
+  }
+
+  it("can be instantiated from a class instance", () => {
+    scope = createScope(new Demo());
+    expect(scope.a).toEqual("test");
+    expect(scope.check()).toEqual("test!");
+  });
+
+  it("can be instantiated from a class instance as a property", () => {
+    scope.test = createScope(new Demo());
+    expect(scope.test.a).toEqual("test");
+    expect(scope.test.check()).toEqual("test!");
+  });
+
   describe("$id", () => {
     it("should have a unique id", () => {
       expect(scope.id < scope.$new().id).toBeTruthy();
