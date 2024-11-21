@@ -2464,7 +2464,6 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
             priority: 0,
             compile: () => (scope, node) => {
               interpolateFn.expressions.forEach((x) => {
-                console.log(x);
                 scope.$watch(x, () => {
                   node[0].nodeValue = interpolateFn(scope, (val) => {
                     node[0].nodeValue = val;

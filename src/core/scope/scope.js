@@ -249,6 +249,8 @@ export class Scope {
           if (foreignListeners) {
             this.scheduleListener(foreignListeners);
           }
+
+          this.checkeListenersForAllKeys(value);
         }
         target[property] = createScope(value, this);
         //setDeepValue(target[property], value);
@@ -334,7 +336,16 @@ export class Scope {
         this.watchers.get(property)?.forEach((l) => listeners.push(l));
         if (listeners.length > 0) {
           // check if the listener actually appllies to this target
-          this.scheduleListener(listeners);
+          this.scheduleListener(listeners, (x) => {
+            return x.filter((x) => {
+              if (!x.watchProp) return true;
+              // Compute the expected target based on `watchProp`
+              const wrapperExpr = x.watchProp.split(".").slice(0, -1).join(".");
+              const expectedTarget = $parse(wrapperExpr)(x.originalTarget)
+                ?.$handler.$target;
+              return expectedTarget === target;
+            });
+          });
         }
 
         let foreignListeners = this.foreignListeners.get(property);
@@ -362,6 +373,22 @@ export class Scope {
 
       return true;
     }
+  }
+
+  checkeListenersForAllKeys(value) {
+    if (isUndefined(value)) {
+      return;
+    }
+    Object.keys(value).forEach((k) => {
+      const listeners = this.watchers.get(k);
+
+      if (listeners) {
+        this.scheduleListener(listeners);
+      }
+      if (isObject(value[k])) {
+        this.checkeListenersForAllKeys(value[k]);
+      }
+    });
   }
 
   /**
@@ -443,8 +470,9 @@ export class Scope {
   scheduleListener(listeners, filter = (val) => val) {
     Promise.resolve().then(() => {
       let index = 0;
-      while (index < filter(listeners).length) {
-        const listener = filter(listeners)[index];
+      let filteredListeners = filter(listeners);
+      while (index < filteredListeners.length) {
+        const listener = filteredListeners[index];
         if (listener.foreignListener) {
           listener.foreignListener.notifyListener(listener, this.$target);
         } else {
@@ -1059,19 +1087,19 @@ export class Scope {
   }
 }
 
-function setDeepValue(model, obj) {
-  for (const key in obj) {
-    if (isObject(obj[key]) && !Array.isArray(obj[key])) {
-      if (!isObject(model[key])) {
-        model[key] = {};
-      }
-      setDeepValue(model[key], obj[key]);
-    } else {
-      model[key] = obj[key];
-    }
-  }
-  Object.setPrototypeOf(model, obj);
-}
+// function setDeepValue(model, obj) {
+//   for (const key in obj) {
+//     if (isObject(obj[key]) && !Array.isArray(obj[key])) {
+//       if (!isObject(model[key])) {
+//         model[key] = {};
+//       }
+//       setDeepValue(model[key], obj[key]);
+//     } else {
+//       model[key] = obj[key];
+//     }
+//   }
+//   Object.setPrototypeOf(model, obj);
+// }
 
 /**
  * @param {Scope} model
