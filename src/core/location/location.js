@@ -388,7 +388,7 @@ export class LocationHtml5Url extends Location {
   }
 
   $$normalizeUrl(url) {
-    return this.appBaseNoFile + url.substr(1); // first char is always '/'
+    return this.appBaseNoFile + url.substring(1); // first char is always '/'
   }
 
   /**
@@ -924,17 +924,17 @@ function startsWith(str, search) {
  */
 export function stripBaseUrl(base, url) {
   if (startsWith(url, base)) {
-    return url.substr(base.length);
+    return url.substring(base.length);
   }
 }
 
 export function stripHash(url) {
   const index = url.indexOf("#");
-  return index === -1 ? url : url.substr(0, index);
+  return index === -1 ? url : url.substring(0, index);
 }
 
 export function stripFile(url) {
-  return url.substr(0, stripHash(url).lastIndexOf("/") + 1);
+  return url.substring(0, stripHash(url).lastIndexOf("/") + 1);
 }
 
 /* return the server only (scheme://host:port) */

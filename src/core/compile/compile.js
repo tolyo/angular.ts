@@ -1009,7 +1009,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                 name = name
                   .replace(PREFIX_REGEXP, "")
                   .toLowerCase()
-                  .substr(4 + ngPrefixMatch[1].length)
+                  .substring(4 + ngPrefixMatch[1].length)
                   .replace(/_(.)/g, (match, letter) => letter.toUpperCase());
 
                 // Support *-start / *-end multi element directives
@@ -1018,8 +1018,8 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                 directiveIsMultiElement(multiElementMatch[1])
               ) {
                 attrStartName = name;
-                attrEndName = `${name.substr(0, name.length - 5)}end`;
-                name = name.substr(0, name.length - 6);
+                attrEndName = `${name.substring(0, name.length - 5)}end`;
+                name = name.substring(0, name.length - 6);
               }
 
               if (isNgProp || isNgEvent) {
@@ -2105,7 +2105,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
        *
        * @param {string} name name of the directive to look up.
        * @param {string} location The directive must be found in specific format.
-       *   String containing any of theses characters:
+       *   String containing any of these characters:
        *
        *   * `E`: element name
        *   * `A': attribute
@@ -2120,8 +2120,8 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
         startAttrName,
         endAttrName,
       ) {
-        if (name === ignoreDirective) return null;
-        let match = null;
+        if (name === ignoreDirective) return false;
+        let match = false;
         if (Object.prototype.hasOwnProperty.call(hasDirectives, name)) {
           for (
             let directive,

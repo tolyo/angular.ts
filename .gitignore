@@ -10,3 +10,4 @@ tsconfig.tsbuildinfo
 .idea
 .vscode
 qodana.yaml
+angular.ts.iml

@@ -61,7 +61,7 @@ export function AnimateJsProvider($animateProvider) {
             beforeFn = "leave";
             afterFn = "afterLeave"; // TODO(matsko): get rid of this
           } else {
-            beforeFn = `before${event.charAt(0).toUpperCase()}${event.substr(1)}`;
+            beforeFn = `before${event.charAt(0).toUpperCase()}${event.substring(1)}`;
             afterFn = event;
           }
 

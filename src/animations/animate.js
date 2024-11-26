@@ -118,7 +118,7 @@ export function AnimateProvider($provide) {
     }
 
     const key = `${name}-animation`;
-    provider.$$registeredAnimations[name.substr(1)] = key;
+    provider.$$registeredAnimations[name.substring(1)] = key;
     $provide.factory(key, factory);
   };
 

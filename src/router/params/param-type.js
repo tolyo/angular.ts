@@ -51,7 +51,7 @@ export class ParamType {
   }
   $subPattern() {
     const sub = this.pattern.toString();
-    return sub.substr(1, sub.length - 2);
+    return sub.substring(1, sub.length - 2);
   }
   toString() {
     return `{ParamType:${this.name}}`;

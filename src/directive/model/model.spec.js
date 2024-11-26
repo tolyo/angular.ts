@@ -1223,7 +1223,7 @@ describe("ngModel", () => {
 
       it("should always use the most recent $viewValue for validation", () => {
         ctrl.$parsers.push((value) => {
-          if (value && value.substr(-1) === "b") {
+          if (value && value.slice(-1) === "b") {
             value = "a";
             ctrl.$setViewValue(value);
             ctrl.$render();
@@ -1246,14 +1246,14 @@ describe("ngModel", () => {
 
       it("should validate even if the modelValue did not change", () => {
         ctrl.$parsers.push((value) => {
-          if (value && value.substr(-1) === "b") {
+          if (value && value.slice(-1) === "b") {
             value = "a";
           }
 
           return value;
         });
 
-        ctrl.$validators.mock = function (modelValue) {
+        ctrl.$validators.mock = function () {
           return true;
         };
 

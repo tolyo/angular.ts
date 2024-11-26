@@ -174,7 +174,7 @@ export class Ng1ViewConfig {
       ngViewName = relativeViewNameSugar[2]; // set view-name to "foo.bar"
     }
     if (ngViewName.charAt(0) === "!") {
-      ngViewName = ngViewName.substr(1);
+      ngViewName = ngViewName.substring(1);
       ngViewContextAnchor = ""; // target absolutely from root
     }
     // handle parent relative targeting "^.^.^"

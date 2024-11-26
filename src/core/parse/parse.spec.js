@@ -689,7 +689,7 @@ describe("parser", () => {
         scope.zero = 0;
         scope.bool = false;
 
-        expect(scope.$eval("empty.substr(0)")).toBe("");
+        expect(scope.$eval("empty.substring(0)")).toBe("");
         expect(scope.$eval("zero.toString()")).toBe("0");
         expect(scope.$eval("bool.toString()")).toBe("false");
       });

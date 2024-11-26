@@ -20,7 +20,7 @@ import { pattern, val } from "./hof";
  */
 export function maxLength(max, str) {
   if (str.length <= max) return str;
-  return str.substr(0, max - 3) + "...";
+  return str.substring(0, max - 3) + "...";
 }
 /**
  * Returns a string, with spaces added to the end, up to a desired str length
@@ -46,7 +46,7 @@ export function functionToString(fn) {
   const toStr = namedFunctionMatch ? namedFunctionMatch[1] : fnStr;
   const fnName = fn["name"] || "";
   if (fnName && toStr.match(/function \(/)) {
-    return "function " + fnName + toStr.substr(9);
+    return "function " + fnName + toStr.substring(9);
   }
   return toStr;
 }
@@ -97,7 +97,7 @@ export const beforeAfterSubstr = (char) => (str) => {
   if (!str) return ["", ""];
   const idx = str.indexOf(char);
   if (idx === -1) return [str, ""];
-  return [str.substr(0, idx), str.substr(idx + 1)];
+  return [str.substring(0, idx), str.substring(idx + 1)];
 };
 export const hostRegex = new RegExp("^(?:[a-z]+:)?//[^/]+/");
 export const stripLastPathElement = (str) => str.replace(/\/[^/]*$/, "");
