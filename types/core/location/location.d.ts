@@ -244,39 +244,33 @@ export class LocationHashbangUrl extends Location {
     $$parseLinkUrl(url: string): boolean;
 }
 export class LocationProvider {
-    hashPrefixValue: string;
-    html5ModeConfig: {
-        enabled: boolean;
-        requireBase: boolean;
-        rewriteLinks: boolean;
-    };
+    /** @type {string} */
+    hashPrefixConf: string;
+    /** @type {Html5Mode} */
+    html5ModeConf: Html5Mode;
     /**
      * The default value for the prefix is `'!'`.
-     * @param {string=} prefix - Prefix for hash part (containing path and search)
-     * @returns {string|LocationProvider} current value if used as getter or itself (chaining) if used as setter
+     * @param {string=} prefix Prefix for hash part (containing path and search)
+     * @returns {void}
      */
-    hashPrefix(prefix?: string | undefined): string | LocationProvider;
+    setHashPrefix(prefix?: string | undefined): void;
     /**
-     * @param {(boolean|Object)=} mode If boolean, sets `html5Mode.enabled` to value.
-     *   If object, sets `enabled`, `requireBase` and `rewriteLinks` to respective values. Supported
-     *   properties:
-     *   - **enabled** – `{boolean}` – (default: false) If true, will rely on `history.pushState` to
-     *     change urls where supported. Will fall back to hash-prefixed paths in browsers that do not
-     *     support `pushState`.
-     *   - **requireBase** - `{boolean}` - (default: `true`) When html5Mode is enabled, specifies
-     *     whether or not a <base> tag is required to be present. If `enabled` and `requireBase` are
-     *     true, and a base tag is not present, an error will be thrown when `$location` is injected.
-     *     See the {@link guide/$location $location guide for more information}
-     *   - **rewriteLinks** - `{boolean|string}` - (default: `true`) When html5Mode is enabled,
-     *     enables/disables URL rewriting for relative links. If set to a string, URL rewriting will
-     *     only happen on links with an attribute that matches the given string. For example, if set
-     *     to `'internal-link'`, then the URL will only be rewritten for `<a internal-link>` links.
-     *     Note that [attribute name normalization](guide/directive#normalization) does not apply
-     *     here, so `'internalLink'` will **not** match `'internal-link'`.
-     *
-     * @returns {Object} html5Mode object if used as getter or itself (chaining) if used as setter
+     * Current hash prefix
+     * @returns {string}
      */
-    html5Mode(mode?: (boolean | any) | undefined): any;
+    getHashPrefix(): string;
+    /**
+     * Configures html5 mode
+     * @param {(boolean|Html5Mode)=} mode If boolean, sets `html5Mode.enabled` to value. Otherwise, accepts html5Mode object
+     *
+     * @returns {void}
+     */
+    setHtml5Mode(mode?: (boolean | Html5Mode) | undefined): void;
+    /**
+     * Returns html5 mode cofiguration
+     * @returns {Html5Mode}
+     */
+    getHtml5Mode(): Html5Mode;
     $get: (string | (($rootScope: import("../scope/scope").Scope, $browser: import("../../services/browser").Browser, $rootElement: JQLite) => Location))[];
 }
 export type DefaultPorts = {
@@ -284,9 +278,30 @@ export type DefaultPorts = {
     https: number;
     ftp: number;
 };
+/**
+ * Represents the configuration options for HTML5 mode.
+ */
 export type Html5Mode = {
+    /**
+     * - (default: false) If true, will rely on `history.pushState` to
+     * change URLs where supported. Falls back to hash-prefixed paths in browsers that do not
+     * support `pushState`.
+     */
     enabled: boolean;
+    /**
+     * - (default: `true`) When html5Mode is enabled, specifies
+     * whether or not a `<base>` tag is required to be present. If both `enabled` and `requireBase`
+     * are true, and a `<base>` tag is not present, an error will be thrown when `$location` is injected.
+     * See the {@link guide /$location $location guide} for more information.
+     */
     requireBase: boolean;
+    /**
+     * - (default: `true`) When html5Mode is enabled, enables or
+     * disables URL rewriting for relative links. If set to a string, URL rewriting will only apply to links
+     * with an attribute that matches the given string. For example, if set to `'internal-link'`, URL rewriting
+     * will only occur for `<a internal-link>` links. Note that [attribute name normalization](guide/directive#normalization)
+     * does not apply here, so `'internalLink'` will **not** match `'internal-link'`.
+     */
     rewriteLinks: boolean | string;
 };
 import { JQLite } from "../../shared/jqlite/jqlite";

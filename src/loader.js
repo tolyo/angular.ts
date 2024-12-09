@@ -146,12 +146,13 @@ export class Angular {
        * @param {import("./core/di/internal-injector").InjectorService} $injector
        */
       function (scope, el, compile, $injector) {
+        // ng-route deps
+        services.$injector = $injector;
         scope.$apply(() => {
           el.data("$injector", $injector);
           compile(el)(scope);
         });
-        // ng-route deps
-        services.$injector = $injector;
+
         // https://github.com/angular-ui/ui-router/issues/3678
         if (!Object.prototype.hasOwnProperty.call($injector, "strictDi")) {
           try {
