@@ -119,8 +119,9 @@ export class Scope {
    * Initializes the handler with the target object and a context.
    *
    * @param {Scope} [context] - The context containing listeners.
+   * @param {Scope} [parent] - Custom parent.
    */
-  constructor(context) {
+  constructor(context, parent) {
     this.context = context
       ? context.context
         ? context.context
@@ -169,7 +170,7 @@ export class Scope {
      */
     this.$root = context ? context.$root : this;
 
-    this.$parent = this.$root === this ? null : context;
+    this.$parent = parent ? parent : this.$root === this ? null : context;
 
     /** @type {AsyncQueueTask[]} */
     this.$$asyncQueue = [];
@@ -777,16 +778,15 @@ export class Scope {
 
   $newIsolate(instance) {
     let child = instance ? Object.create(instance) : Object.create(null);
-    child.$root = this.$root;
-    const proxy = new Proxy(child, new Scope(this));
+    // child.$root = this.$root;
+    const proxy = new Proxy(child, new Scope(this, this.$root));
     this.$children.push(proxy);
     return proxy;
   }
 
   $transcluded(parentInstance) {
     let child = Object.create(this.$target);
-    child.$parent = parentInstance;
-    const proxy = new Proxy(child, new Scope(this));
+    const proxy = new Proxy(child, new Scope(this, parentInstance));
     this.$children.push(proxy);
     return proxy;
   }
@@ -1137,7 +1137,7 @@ function collectChildIds(child) {
  * @param {*} value
  * @returns {boolean}
  */
-export function isProxy(value) {
+function isProxy(value) {
   if (value && value[isProxySymbol]) {
     return true;
   }

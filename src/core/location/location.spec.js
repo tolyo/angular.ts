@@ -3048,7 +3048,7 @@ describe("$location", () => {
           $locationProvider.setHtml5Mode({
             rewriteLinks: "yes-rewrite",
           });
-          
+
           expect($locationProvider.getHtml5Mode().rewriteLinks).toEqual(
             "yes-rewrite",
           );

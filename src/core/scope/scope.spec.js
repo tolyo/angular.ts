@@ -199,9 +199,9 @@ describe("Scope", () => {
       expect(scope.aValue).toEqual([1, 2, 3]);
       expect(child.aValue).toEqual([1, 2, 3, 4]);
       expect(scope.bValue).toEqual({ a: 1 });
-      // expect(child.bValue).toEqual({ b: 2 });
-      // expect(scope.cValue).toEqual(1);
-      // expect(child.cValue).toEqual(2);
+      expect(child.bValue).toEqual({ b: 2 });
+      expect(scope.cValue).toEqual(1);
+      expect(child.cValue).toEqual(2);
     });
 
     it("inherits the parents listeners", () => {
@@ -233,14 +233,14 @@ describe("Scope", () => {
       scope.a = 123;
       expect(isolated.a).toBeUndefined();
       expect(trans.a).toEqual(123);
-      expect(trans.$root.$id).toEqual(scope.$root.$id);
-      expect(trans.$parent.$id).toEqual(isolated.$id);
+      expect(trans.$root.id).toEqual(scope.$root.id);
+      expect(trans.$parent.id).toEqual(isolated.id);
     });
   });
 
   describe("$root", () => {
     it("should point to itself", () => {
-      expect(scope.$root.$id).toEqual(scope.$id);
+      expect(scope.$root.id).toEqual(scope.id);
       expect(scope.$root).toEqual(scope.$root.$root);
     });
 
@@ -259,7 +259,7 @@ describe("Scope", () => {
       const child = scope.$new();
 
       expect(scope.$parent).toEqual(null);
-      expect(child.$parent.$id).toEqual(scope.$id);
+      expect(child.$parent.id).toEqual(scope.id);
       expect(child.$parent).toEqual(scope.$handler);
       expect(child.$new().$parent).toEqual(child.$handler);
     });
