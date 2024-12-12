@@ -789,7 +789,7 @@ export class LocationProvider {
       });
 
       // update browser
-      $rootScope.$watch(() => {
+      (() => {
         if (initializing || $location.$$urlUpdatedByLocation) {
           $location.$$urlUpdatedByLocation = false;
 
@@ -837,7 +837,7 @@ export class LocationProvider {
 
         // we don't need to return anything because $evalAsync will make the digest loop dirty when
         // there is a change
-      });
+      })();
 
       return $location;
 

@@ -1137,7 +1137,7 @@ function collectChildIds(child) {
  * @param {*} value
  * @returns {boolean}
  */
-function isProxy(value) {
+export function isProxy(value) {
   if (value && value[isProxySymbol]) {
     return true;
   }
