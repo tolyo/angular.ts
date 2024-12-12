@@ -22,31 +22,37 @@ describe("ngStateRef", () => {
     window.location.hash = "";
     window.angular = new Angular();
     let module = window.angular.module("defaultModule", []);
-    module.config(($stateProvider, $locationProvider) => {
-      _locationProvider = $locationProvider;
-      $locationProvider.hashPrefix("");
-      $stateProvider
-        .state({ name: "top", url: "" })
-        .state({ name: "other", url: "/other/:id", template: "other" })
-        .state({ name: "other.detail", url: "/detail", template: "detail" })
-        .state({
-          name: "contacts",
-          url: "/contacts",
-          template:
-            '<a ng-sref=".item({ id: 5 })" class="item">Person</a> <ng-view></ng-view>',
-        })
-        .state({
-          name: "contacts.item",
-          url: "/{id:int}",
-          template:
-            '<a ng-sref=".detail" class="item-detail">Detail</a> | <a ng-sref="^" class="item-parent">Parent</a> | <ng-view></ng-view>',
-        })
-        .state({
-          name: "contacts.item.detail",
-          template:
-            '<div class="title">Detail</div> | <a ng-sref="^" class="item-parent2">Item</a>',
-        });
-    });
+    module.config(
+      /**
+       * @param $stateProvider
+       * @param {import('../../core/location/location.js').LocationProvider} $locationProvider
+       */
+      ($stateProvider, $locationProvider) => {
+        _locationProvider = $locationProvider;
+        $locationProvider.setHashPrefix("");
+        $stateProvider
+          .state({ name: "top", url: "" })
+          .state({ name: "other", url: "/other/:id", template: "other" })
+          .state({ name: "other.detail", url: "/detail", template: "detail" })
+          .state({
+            name: "contacts",
+            url: "/contacts",
+            template:
+              '<a ng-sref=".item({ id: 5 })" class="item">Person</a> <ng-view></ng-view>',
+          })
+          .state({
+            name: "contacts.item",
+            url: "/{id:int}",
+            template:
+              '<a ng-sref=".detail" class="item-detail">Detail</a> | <a ng-sref="^" class="item-parent">Parent</a> | <ng-view></ng-view>',
+          })
+          .state({
+            name: "contacts.item.detail",
+            template:
+              '<div class="title">Detail</div> | <a ng-sref="^" class="item-parent2">Item</a>',
+          });
+      },
+    );
     $injector = window.angular.bootstrap(document.getElementById("dummy"), [
       "defaultModule",
     ]);

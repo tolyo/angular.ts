@@ -21,6 +21,9 @@ export class UrlService {
 
   /**
    * @param {import("../../core/location/location").LocationProvider} $locationProvider
+   * @param {import("../../router/state/state-service.js").StateProvider} stateService
+   * @param globals
+   * @param {import("../../router/url/url-config.js").UrlConfigProvider} urlConfigProvider
    */
   constructor($locationProvider, stateService, globals, urlConfigProvider) {
     this.stateService = stateService;
@@ -29,9 +32,6 @@ export class UrlService {
 
     this.$location = undefined;
     this.$browser = undefined;
-
-    /** @type {boolean} */
-    this.interceptDeferred = false;
 
     /** Provides services related to the URL */
     this.urlRuleFactory = new UrlRuleFactory(this, this.stateService, globals);
@@ -91,7 +91,7 @@ export class UrlService {
      * @param {import('../../core/location/location').Location} $location
      * @param {import('../../services/browser').Browser} $browser
      * @param {import('../../core/scope/scope').Scope} $rootScope
-     * @returns
+     * @returns {UrlService}
      */
     ($location, $browser, $rootScope) => {
       this.$location = $location;
@@ -104,10 +104,14 @@ export class UrlService {
     },
   ];
 
+  /**
+   * @returns {boolean}
+   */
   html5Mode() {
-    let html5Mode = this.$locationProvider.html5Mode();
-    html5Mode = isObject(html5Mode) ? html5Mode.enabled : html5Mode;
-    return html5Mode && typeof history !== "undefined";
+    return (
+      this.$locationProvider.getHtml5Mode().enabled &&
+      typeof history !== "undefined"
+    );
   }
 
   baseHref() {
@@ -214,7 +218,6 @@ export class UrlService {
    *
    * #### Example:
    * ```js
-   * urlService.deferIntercept();
    *
    * fetch('/states.json').then(resp => resp.json()).then(data => {
    *   data.forEach(state => $stateRegistry.register(state));
@@ -261,7 +264,6 @@ export class UrlService {
    *
    * #### Example:
    * ```js
-   * urlService.deferIntercept();
    *
    * fetch('/states.json').then(resp => resp.json()).then(data => {
    *   data.forEach(state => $stateRegistry.register(state));
@@ -282,34 +284,7 @@ export class UrlService {
         this._stopListeningFn || this.onChange((evt) => this.sync(evt)));
     }
   }
-  /**
-   * Disables monitoring of the URL.
-   *
-   * Call this method before ng-router has bootstrapped.
-   * It will stop ng-router from performing the initial url sync.
-   *
-   * This can be useful to perform some asynchronous initialization before the router starts.
-   * Once the initialization is complete, call [[listen]] to tell ng-router to start watching and synchronizing the URL.
-   *
-   * #### Example:
-   * ```js
-   * // Prevent ng-router from automatically intercepting URL changes when it starts;
-   * urlService.deferIntercept();
-   *
-   * fetch('/states.json').then(resp => resp.json()).then(data => {
-   *   data.forEach(state => $stateRegistry.register(state));
-   *   urlService.listen();
-   *   urlService.sync();
-   * });
-   * ```
-   *
-   * @param defer Indicates whether to defer location change interception.
-   *        Passing no parameter is equivalent to `true`.
-   */
-  deferIntercept(defer) {
-    if (defer === undefined) defer = true;
-    this.interceptDeferred = defer;
-  }
+
   /**
    * Matches a URL
    *
@@ -394,7 +369,7 @@ export class UrlService {
     options = options || { absolute: false };
     const isHtml5 = this.html5Mode();
     if (!isHtml5 && url !== null) {
-      url = "#" + this.$locationProvider.hashPrefix() + url;
+      url = "#" + this.$locationProvider.getHashPrefix() + url;
     }
     url = appendBasePath(url, isHtml5, options.absolute, this.baseHref());
     if (!options.absolute || !url) {

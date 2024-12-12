@@ -5,14 +5,15 @@ export class UrlService {
     static $inject: string[];
     /**
      * @param {import("../../core/location/location").LocationProvider} $locationProvider
+     * @param {import("../../router/state/state-service.js").StateProvider} stateService
+     * @param globals
+     * @param {import("../../router/url/url-config.js").UrlConfigProvider} urlConfigProvider
      */
-    constructor($locationProvider: import("../../core/location/location").LocationProvider, stateService: any, globals: any, urlConfigProvider: any);
-    stateService: any;
+    constructor($locationProvider: import("../../core/location/location").LocationProvider, stateService: import("../../router/state/state-service.js").StateProvider, globals: any, urlConfigProvider: import("../../router/url/url-config.js").UrlConfigProvider);
+    stateService: import("../../router/state/state-service.js").StateProvider;
     $locationProvider: import("../../core/location/location").LocationProvider;
     $location: import("../../core/location/location").Location;
     $browser: import("../../services/browser").Browser;
-    /** @type {boolean} */
-    interceptDeferred: boolean;
     /** Provides services related to the URL */
     urlRuleFactory: UrlRuleFactory;
     /**
@@ -56,7 +57,10 @@ export class UrlService {
      */
     hash: () => string | import("../../core/location/location").Location;
     _urlListeners: any[];
-    $get: (string | (($location: import("../../core/location/location").Location, $browser: import("../../services/browser").Browser, $rootScope: import("../../core/scope/scope").Scope) => this))[];
+    $get: (string | (($location: import("../../core/location/location").Location, $browser: import("../../services/browser").Browser, $rootScope: import("../../core/scope/scope").Scope) => UrlService))[];
+    /**
+     * @returns {boolean}
+     */
     html5Mode(): boolean;
     baseHref(): string;
     _baseHref: string;
@@ -149,7 +153,6 @@ export class UrlService {
      *
      * #### Example:
      * ```js
-     * urlService.deferIntercept();
      *
      * fetch('/states.json').then(resp => resp.json()).then(data => {
      *   data.forEach(state => $stateRegistry.register(state));
@@ -170,7 +173,6 @@ export class UrlService {
      *
      * #### Example:
      * ```js
-     * urlService.deferIntercept();
      *
      * fetch('/states.json').then(resp => resp.json()).then(data => {
      *   data.forEach(state => $stateRegistry.register(state));
@@ -184,31 +186,6 @@ export class UrlService {
      */
     listen(enabled: any): any;
     _stopListeningFn: any;
-    /**
-     * Disables monitoring of the URL.
-     *
-     * Call this method before ng-router has bootstrapped.
-     * It will stop ng-router from performing the initial url sync.
-     *
-     * This can be useful to perform some asynchronous initialization before the router starts.
-     * Once the initialization is complete, call [[listen]] to tell ng-router to start watching and synchronizing the URL.
-     *
-     * #### Example:
-     * ```js
-     * // Prevent ng-router from automatically intercepting URL changes when it starts;
-     * urlService.deferIntercept();
-     *
-     * fetch('/states.json').then(resp => resp.json()).then(data => {
-     *   data.forEach(state => $stateRegistry.register(state));
-     *   urlService.listen();
-     *   urlService.sync();
-     * });
-     * ```
-     *
-     * @param defer Indicates whether to defer location change interception.
-     *        Passing no parameter is equivalent to `true`.
-     */
-    deferIntercept(defer: any): void;
     /**
      * Matches a URL
      *
