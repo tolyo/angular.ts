@@ -73,7 +73,7 @@ describe("Scope", () => {
 
   describe("$id", () => {
     it("should have a unique id", () => {
-      expect(scope.id < scope.$new().id).toBeTruthy();
+      expect(scope.$id < scope.$new().$id).toBeTruthy();
     });
   });
 
@@ -233,14 +233,15 @@ describe("Scope", () => {
       scope.a = 123;
       expect(isolated.a).toBeUndefined();
       expect(trans.a).toEqual(123);
-      expect(trans.$root.id).toEqual(scope.$root.id);
-      expect(trans.$parent.id).toEqual(isolated.id);
+      expect(trans.$root.$id).toBeDefined();
+      expect(trans.$root.$id).toEqual(scope.$root.$id);
+      expect(trans.$parent.$id).toEqual(isolated.$id);
     });
   });
 
   describe("$root", () => {
     it("should point to itself", () => {
-      expect(scope.$root.id).toEqual(scope.id);
+      expect(scope.$root.$id).toEqual(scope.$id);
       expect(scope.$root).toEqual(scope.$root.$root);
     });
 
@@ -259,7 +260,7 @@ describe("Scope", () => {
       const child = scope.$new();
 
       expect(scope.$parent).toEqual(null);
-      expect(child.$parent.id).toEqual(scope.id);
+      expect(child.$parent.$id).toEqual(scope.$id);
       expect(child.$parent).toEqual(scope.$handler);
       expect(child.$new().$parent).toEqual(child.$handler);
     });
@@ -2401,7 +2402,7 @@ describe("Scope", () => {
       let greatGrandChild;
 
       function logger(event) {
-        log += `${event.currentScope.id}>`;
+        log += `${event.currentScope.$id}>`;
       }
 
       beforeEach(() => {
@@ -2411,10 +2412,10 @@ describe("Scope", () => {
         grandChild = child.$new();
         greatGrandChild = grandChild.$new();
 
-        scope.id = 0;
-        child.id = 1;
-        grandChild.id = 2;
-        greatGrandChild.id = 3;
+        scope.$id = 0;
+        child.$id = 1;
+        grandChild.$id = 2;
+        greatGrandChild.$id = 3;
 
         scope.$on("myEvent", logger);
         child.$on("myEvent", logger);
@@ -2599,7 +2600,7 @@ describe("Scope", () => {
         let greatGrandChild211;
 
         function logger(event) {
-          log += `${event.currentScope.id}>`;
+          log += `${event.currentScope.$id}>`;
         }
 
         beforeEach(() => {
@@ -2613,15 +2614,15 @@ describe("Scope", () => {
           grandChild23 = child2.$new();
           greatGrandChild211 = grandChild21.$new();
 
-          scope.id = 0;
-          child1.id = 1;
-          child2.id = 2;
-          child3.id = 3;
-          grandChild11.id = 11;
-          grandChild21.id = 21;
-          grandChild22.id = 22;
-          grandChild23.id = 23;
-          greatGrandChild211.id = 211;
+          scope.$id = 0;
+          child1.$id = 1;
+          child2.$id = 2;
+          child3.$id = 3;
+          grandChild11.$id = 11;
+          grandChild21.$id = 21;
+          grandChild22.$id = 22;
+          grandChild23.$id = 23;
+          greatGrandChild211.$id = 211;
 
           scope.$on("myEvent", logger);
           child1.$on("myEvent", logger);

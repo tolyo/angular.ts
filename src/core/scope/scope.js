@@ -163,7 +163,7 @@ export class Scope {
     /**
      * @type {number} Unique model ID (monotonically increasing) useful for debugging.
      */
-    this.id = nextUid();
+    this.$id = nextUid();
 
     /**
      * @type {Scope}
@@ -438,7 +438,7 @@ export class Scope {
         $parent: this.$parent,
         $root: this.$root,
         $children: this.$children,
-        id: this.id,
+        $id: this.$id,
         registerForeignKey: this.registerForeignKey.bind(this),
         notifyListener: this.notifyListener.bind(this),
       };
@@ -562,7 +562,7 @@ export class Scope {
       originalTarget: this.$target,
       listenerFn: listenerFn,
       watchFn: get,
-      scopeId: this.id,
+      scopeId: this.$id,
       id: nextUid(),
       property: [],
     };
@@ -1037,7 +1037,7 @@ export class Scope {
     Array.from(this.watchers.entries()).forEach(([key, val]) => {
       this.watchers.set(
         key,
-        val.filter((x) => x.scopeId !== this.id),
+        val.filter((x) => x.scopeId !== this.$id),
       );
     });
 
@@ -1073,7 +1073,7 @@ export class Scope {
 
       listenerFn(newVal, originalTarget);
       this.$$asyncQueue.forEach((x) => {
-        if (x.handler.id == this.id) {
+        if (x.handler.$id == this.$id) {
           Promise.resolve().then(x.fn(x.handler, x.locals));
         }
       });
@@ -1106,7 +1106,7 @@ export class Scope {
  * @returns {number}
  */
 function calculateWatcherCount(model) {
-  const childIds = collectChildIds(model).add(model.id);
+  const childIds = collectChildIds(model).add(model.$id);
 
   return Array.from(model.watchers.values()).reduce(
     (count, watcherArray) =>
@@ -1125,7 +1125,7 @@ function calculateWatcherCount(model) {
  * @returns {Set<number>}
  */
 function collectChildIds(child) {
-  const ids = new Set([child.id]);
+  const ids = new Set([child.$id]);
   child.$children?.forEach((c) => {
     collectChildIds(c).forEach((id) => ids.add(id));
   });
