@@ -323,6 +323,7 @@ describe("ngRepeat", () => {
 
       // number
       scope.items = [12, 12, 12];
+      await wait();
       expect(element.find("li").length).toEqual(3);
       expect(element.text()).toEqual("12;12;12;");
 
@@ -388,7 +389,7 @@ describe("ngRepeat", () => {
       document.getElementById("dummy").innerHTML = "";
     });
 
-    it("should invoke track by with correct locals", () => {
+    it("should invoke track by with correct locals", async () => {
       scope.trackBy = jasmine
         .createSpy()
         .and.callFake((k, v) => [k, v].join(""));
@@ -398,13 +399,14 @@ describe("ngRepeat", () => {
           '<li ng-repeat="(k, v) in [1, 2] track by trackBy(k, v)"></li>' +
           "</ul>",
       )(scope);
+      await wait();
       expect(scope.trackBy).toHaveBeenCalledTimes(2);
       expect(scope.trackBy.calls.argsFor(0)).toEqual([0, 1]);
       expect(scope.trackBy.calls.argsFor(1)).toEqual([1, 2]);
     });
 
     // https://github.com/angular/angular.js/issues/16776
-    it("should invoke nested track by with correct locals", () => {
+    it("should invoke nested track by with correct locals", async () => {
       scope.trackBy = jasmine
         .createSpy()
         .and.callFake((k1, v1, k2, v2) => [k1, v1, k2, v2].join(""));
@@ -416,6 +418,7 @@ describe("ngRepeat", () => {
           "</li>" +
           "</ul>",
       )(scope);
+      await wait();
       expect(scope.trackBy).toHaveBeenCalledTimes(4);
       expect(scope.trackBy.calls.argsFor(0)).toEqual([0, 1, 0, 3]);
       expect(scope.trackBy.calls.argsFor(1)).toEqual([0, 1, 1, 4]);
