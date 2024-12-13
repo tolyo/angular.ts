@@ -19,7 +19,7 @@ export const ngRepeatDirective = [
     ) {
       // TODO(perf): generate setters to shave off ~40ms or 1-1.5%
       if (scope[valueIdentifier] !== value) {
-        scope.$target[valueIdentifier] = value;
+        scope[valueIdentifier] = value;
       }
 
       if (keyIdentifier) scope[keyIdentifier] = key;
