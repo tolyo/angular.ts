@@ -12,6 +12,7 @@ orderByFilter.$inject = ["$parse"];
 export function orderByFilter($parse) {
   return function (array, sortPredicate, reverseOrder, compareFn) {
     if (array == null) return array;
+    if (isFunction(array)) return array();
     if (!isArrayLike(array)) {
       throw minErr("orderBy")(
         "notarray",

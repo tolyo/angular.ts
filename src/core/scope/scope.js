@@ -1062,13 +1062,13 @@ export class Scope {
       if (isFunction(newVal)) {
         newVal = newVal(originalTarget);
       }
+
       // if (Array.isArray(newVal)) {
-      //   newVal = newVal.map((x) => {
-      //     if (isFunction(x)) {
-      //       return x(originalTarget);
-      //     }
-      //     return x;
-      //   });
+        // newVal.forEach((x, index) => {
+        //   if (isFunction(x)) {
+        //     return newVal[index] = x(originalTarget);
+        //   }
+        // });
       // }
 
       listenerFn(newVal, originalTarget);
