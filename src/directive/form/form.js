@@ -111,7 +111,6 @@ export function FormController(
 
   this.$$element = $element;
   this.$$animate = $animate;
-  debugger;
   setupValidity(this);
 }
 
@@ -166,7 +165,6 @@ FormController.prototype = {
     if (control.$name) {
       this[control.$name] = control;
     }
-    debugger;
     control.$target.$$parentForm = this;
   },
 

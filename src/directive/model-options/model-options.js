@@ -15,8 +15,8 @@ class NgModelOptionsController {
   static $inject = ["$attrs", "$scope"];
 
   /**
-   * @param {import('../../types').Attributes} $attrs
-   * @param {import('../../types').TScope} $scope
+   * @param {import('../../types.js').Attributes} $attrs
+   * @param {import('../../types.js').TScope} $scope
    */
   constructor($attrs, $scope) {
     this.$$attrs = $attrs;
@@ -117,7 +117,7 @@ export const defaultModelOptions = new ModelOptions({
 });
 
 /**
- * @returns {import('../../types').Directive}
+ * @returns {import('../../types.js').Directive}
  */
 export const ngModelOptionsDirective = function () {
   return {

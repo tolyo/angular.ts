@@ -81,7 +81,7 @@ export function createInjector(modulesToLoad, strictDi = false) {
   /**
    *
    * @param {string} name
-   * @param {import('../../types').ServiceProvider} provider
+   * @param {import('../../types.js').ServiceProvider} provider
    * @returns
    */
   function provider(name, provider) {
@@ -131,7 +131,7 @@ export function createInjector(modulesToLoad, strictDi = false) {
   /**
    * @param {String} name
    * @param {any} val
-   * @returns {import('../../types').ServiceProvider}
+   * @returns {import('../../types.js').ServiceProvider}
    */
   function value(name, val) {
     return (providerCache[name + providerSuffix] = { $get: () => val });

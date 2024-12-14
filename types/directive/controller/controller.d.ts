@@ -1,6 +1,4 @@
-export const ngControllerDirective: (() => {
-    restrict: string;
-    scope: boolean;
-    controller: string;
-    priority: number;
-})[];
+/**
+ * @returns {import("../../types.js").Directive}
+ */
+export function ngControllerDirective(): import("../../types.js").Directive;

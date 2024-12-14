@@ -126,7 +126,7 @@
 //     });
 
 //     it("should create a non prototypically inherited child scope", () => {
-//       const child = $rootScope.$new(true);
+//       const child = $rootScope.$new();
 //       $rootScope.a = 123;
 //       expect(child.a).toBeUndefined();
 //       expect(child.$parent).toEqual($rootScope);
@@ -135,7 +135,7 @@
 //     });
 
 //     it("should attach the child scope to a specified parent", () => {
-//       const isolated = $rootScope.$new(true);
+//       const isolated = $rootScope.$new();
 //       const trans = $rootScope.$transcluded(isolated);
 //       $rootScope.a = 123;
 //       expect(isolated.a).toBeUndefined();
@@ -668,7 +668,7 @@
 
 //       it("should suspend watchers on child scope", () => {
 //         const watchSpy = jasmine.createSpy("watchSpy");
-//         const scope = $rootScope.$new(true);
+//         const scope = $rootScope.$new();
 //         scope.$watch(watchSpy);
 //         $rootScope.$suspend();
 //         expect(watchSpy).not.toHaveBeenCalled();
@@ -676,7 +676,7 @@
 
 //       it("should resume watchers on child scope", () => {
 //         const watchSpy = jasmine.createSpy("watchSpy");
-//         const scope = $rootScope.$new(true);
+//         const scope = $rootScope.$new();
 //         scope.$watch(watchSpy);
 //         $rootScope.$suspend();
 //         $rootScope.$resume();
@@ -1147,7 +1147,7 @@
 
 //     it("should broadcast the $destroy only once", () => {
 //       logs = [];
-//       const isolateScope = first.$new(true);
+//       const isolateScope = first.$new();
 //       isolateScope.$on("$destroy", () => logs.push("event"));
 //       first.$destroy();
 //       isolateScope.$destroy();
@@ -1496,7 +1496,7 @@
 
 //     it("should run a $postUpdate call even if the child scope is isolated", () => {
 //       const parent = $rootScope.$new();
-//       const child = parent.$new(true);
+//       const child = parent.$new();
 //       let signature = "";
 
 //       parent.$postUpdate(() => {

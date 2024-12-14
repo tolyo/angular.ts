@@ -21,7 +21,7 @@ export const $postUpdateQueue: any[];
 export const $$applyAsyncQueue: Function[];
 export class RootScopeProvider {
     rootScope: ProxyHandler<any>;
-    $get: (string | ((exceptionHandler: import("../exception-handler").ErrorHandler, parse: import("../parse/parse.js").ParseService) => ProxyHandler<any>))[];
+    $get: (string | ((exceptionHandler: import("../exception-handler.js").ErrorHandler, parse: import("../parse/parse.js").ParseService) => ProxyHandler<any>))[];
 }
 /**
  * Listener function definition.

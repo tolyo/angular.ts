@@ -5,7 +5,7 @@ const NG_HIDE_IN_PROGRESS_CLASS = "ng-hide-animate";
 
 ngShowDirective.$inject = ["$animate"];
 /**
- * @returns {import('../../types').Directive}
+ * @returns {import('../../types.js').Directive}
  */
 export function ngShowDirective($animate) {
   return {
@@ -39,7 +39,7 @@ export function ngShowDirective($animate) {
 
 ngHideDirective.$inject = ["$animate"];
 /**
- * @returns {import('../../types').Directive}
+ * @returns {import('../../types.js').Directive}
  */
 export function ngHideDirective($animate) {
   return {

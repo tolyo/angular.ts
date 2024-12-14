@@ -357,7 +357,7 @@ function SelectController($element, $scope) {
 }
 
 /**
- * @returns {import('../../types').Directive}
+ * @returns {import('../../types.js').Directive}
  */
 export function selectDirective() {
   return {
@@ -490,7 +490,7 @@ export function selectDirective() {
 // of dynamically created (and destroyed) option elements to their containing select
 // directive via its controller.
 /**
- * @returns {import('../../types').Directive}
+ * @returns {import('../../types.js').Directive}
  */
 optionDirective.$inject = ["$interpolate"];
 export function optionDirective($interpolate) {

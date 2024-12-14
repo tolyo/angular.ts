@@ -2652,8 +2652,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
             $rootScope,
             $exceptionHandler,
             attrName,
-            eventName,
-            /* forceAsync= */ false,
+            eventName
           ),
         );
       }

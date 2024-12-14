@@ -1,4 +1,4 @@
 /**
- * @returns {import('../../types').Directive}
+ * @returns {import('../../types.js').Directive}
  */
-export function ngNonBindableDirective(): import("../../types").Directive;
+export function ngNonBindableDirective(): import("../../types.js").Directive;

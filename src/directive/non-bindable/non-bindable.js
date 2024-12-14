@@ -1,5 +1,5 @@
 /**
- * @returns {import('../../types').Directive}
+ * @returns {import('../../types.js').Directive}
  */
 export function ngNonBindableDirective() {
   return {

@@ -70,7 +70,7 @@ export const ngSwitchDirective = [
 ];
 
 /**
- * @returns {import('../../types').Directive}
+ * @returns {import('../../types.js').Directive}
  */
 export function ngSwitchWhenDirective() {
   return {
@@ -100,7 +100,7 @@ export function ngSwitchWhenDirective() {
 }
 
 /**
- * @returns {import('../../types').Directive}
+ * @returns {import('../../types.js').Directive}
  */
 export function ngSwitchDefaultDirective() {
   return {

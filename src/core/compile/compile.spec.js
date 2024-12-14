@@ -3199,7 +3199,7 @@ describe("$compile", () => {
             scope: {},
             template: "<div></div>",
             link: function (scope, element, attrs, ctrl, transclude) {
-              var mySpecialScope = scope.$new(true);
+              var mySpecialScope = scope.$new();
               mySpecialScope.specialAttr = 42;
               transclude(mySpecialScope);
             },

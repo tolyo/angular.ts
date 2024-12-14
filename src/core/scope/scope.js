@@ -16,7 +16,7 @@ import { ASTType } from "../parse/ast-type.js";
  */
 let $parse;
 
-/**@type {import('../exception-handler').ErrorHandler} */
+/**@type {import('../exception-handler.js').ErrorHandler} */
 let $exceptionHandler;
 
 /**
@@ -43,7 +43,7 @@ export class RootScopeProvider {
     "$parse",
     "$browser",
     /**
-     * @param {import('../exception-handler').ErrorHandler} exceptionHandler
+     * @param {import('../exception-handler.js').ErrorHandler} exceptionHandler
      * @param {import('../parse/parse.js').ParseService} parse
      */
     (exceptionHandler, parse) => {
@@ -355,6 +355,14 @@ export class Scope {
           foreignListeners = this.$parent.foreignListeners.get(property);
         }
         if (foreignListeners) {
+          // filter for repeaters
+          if (this.$target.$$hashKey) {
+            foreignListeners = foreignListeners.filter((x) =>
+              x.originalTarget.$$hashKey
+                ? x.originalTarget.$$hashKey == this.$target.$$hashKey
+                : false,
+            );
+          }
           assert(foreignListeners.length !== 0);
           this.scheduleListener(foreignListeners);
         }

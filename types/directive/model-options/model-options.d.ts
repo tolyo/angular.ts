@@ -1,5 +1,5 @@
 export const defaultModelOptions: ModelOptions;
-export function ngModelOptionsDirective(): import("../../types").Directive;
+export function ngModelOptionsDirective(): import("../../types.js").Directive;
 export type ModelOptionsConfig = {
     /**
      * - A string specifying which events the input should be bound to. Multiple events can be set using a space-delimited list. The special event 'default' matches the default events belonging to the control.

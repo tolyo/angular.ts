@@ -1,18 +1,10 @@
-import { directiveNormalize } from "../../shared/utils";
+import { directiveNormalize } from "../../shared/utils.js";
 
 /*
  * A collection of directives that allows creation of custom event handlers that are defined as
  * AngularJS expressions and are compiled and executed within the current scope.
  */
 export const ngEventDirectives = {};
-
-// For events that might fire synchronously during DOM manipulation
-// we need to execute their event handlers asynchronously using $evalAsync,
-// so that they are not executed in an inconsistent state.
-const forceAsyncEvents = {
-  blur: true,
-  focus: true,
-};
 
 "click dblclick submit focus blur copy cut paste"
   .split(" ")
@@ -26,7 +18,7 @@ const forceAsyncEvents = {
        *
        * @param {*} $parse
        * @param {*} $rootScope
-       * @param {import('../../core/exception-handler').ErrorHandler} $exceptionHandler
+       * @param {import('../../core/exception-handler.js').ErrorHandler} $exceptionHandler
        * @returns
        */
       ($parse, $rootScope, $exceptionHandler) => {
@@ -36,7 +28,6 @@ const forceAsyncEvents = {
           $exceptionHandler,
           directiveName,
           eventName,
-          forceAsyncEvents[eventName],
         );
       },
     ];
@@ -48,7 +39,6 @@ export function createEventDirective(
   $exceptionHandler,
   directiveName,
   eventName,
-  forceAsync,
 ) {
   return {
     restrict: "A",

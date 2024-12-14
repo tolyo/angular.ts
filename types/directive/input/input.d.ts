@@ -25,13 +25,13 @@ export namespace inputDirective {
     let $inject: string[];
 }
 /**
- * @returns {import('../../types').Directive}
+ * @returns {import('../../types.js').Directive}
  */
-export function hiddenInputBrowserCacheDirective(): import("../../types").Directive;
+export function hiddenInputBrowserCacheDirective(): import("../../types.js").Directive;
 /**
- * @returns {import('../../types').Directive}
+ * @returns {import('../../types.js').Directive}
  */
-export function ngValueDirective(): import("../../types").Directive;
+export function ngValueDirective(): import("../../types.js").Directive;
 export const ISO_DATE_REGEXP: RegExp;
 export const URL_REGEXP: RegExp;
 export const EMAIL_REGEXP: RegExp;

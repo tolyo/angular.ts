@@ -972,7 +972,7 @@ function checkboxInputType(
 }
 
 /**
- * @returns {import('../../types').Directive}
+ * @returns {import('../../types.js').Directive}
  */
 inputDirective.$inject = ["$browser", "$filter", "$parse"];
 
@@ -1005,7 +1005,7 @@ export function inputDirective($browser, $filter, $parse) {
 }
 
 /**
- * @returns {import('../../types').Directive}
+ * @returns {import('../../types.js').Directive}
  */
 export function hiddenInputBrowserCacheDirective() {
   const valueProperty = {
@@ -1051,7 +1051,7 @@ export function hiddenInputBrowserCacheDirective() {
 const CONSTANT_VALUE_REGEXP = /^(true|false|\d+)$/;
 
 /**
- * @returns {import('../../types').Directive}
+ * @returns {import('../../types.js').Directive}
  */
 export function ngValueDirective() {
   /**
