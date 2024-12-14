@@ -7,13 +7,13 @@ import {
   snakeCase,
   extend,
   isUndefined,
-} from "../../shared/utils";
+} from "../../shared/utils.js";
 import {
   PRISTINE_CLASS,
   DIRTY_CLASS,
   VALID_CLASS,
   INVALID_CLASS,
-} from "../../shared/constants";
+} from "../../shared/constants.js";
 
 export const nullFormCtrl = {
   $addControl: () => {},
@@ -111,7 +111,7 @@ export function FormController(
 
   this.$$element = $element;
   this.$$animate = $animate;
-
+  debugger;
   setupValidity(this);
 }
 
@@ -166,8 +166,8 @@ FormController.prototype = {
     if (control.$name) {
       this[control.$name] = control;
     }
-
-    control.$$parentForm = this;
+    debugger;
+    control.$target.$$parentForm = this;
   },
 
   /**

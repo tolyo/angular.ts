@@ -7,7 +7,7 @@ import {
   TOUCHED_CLASS,
   UNTOUCHED_CLASS,
   VALID_CLASS,
-} from "../../shared/constants";
+} from "../../shared/constants.js";
 import {
   minErr,
   isNumber,
@@ -18,15 +18,15 @@ import {
   hasAnimate,
   isBoolean,
   snakeCase,
-} from "../../shared/utils";
+} from "../../shared/utils.js";
 import {
   isObjectEmpty,
   nullFormCtrl,
   PENDING_CLASS,
   setupValidity,
 } from "../form/form";
-import { defaultModelOptions } from "../model-options/model-options";
-import { startingTag } from "../../shared/jqlite/jqlite";
+import { defaultModelOptions } from "../model-options/model-options.js";
+import { startingTag } from "../../shared/jqlite/jqlite.js";
 
 export const ngModelMinErr = minErr("ngModel");
 
@@ -768,7 +768,6 @@ export class NgModelController {
   }
 
   $$writeModelToScope() {
-    console.log(this.$$scope.id);
     this.$$ngModelSet(this.$$scope, this.$modelValue);
     Object.values(this.$viewChangeListeners).forEach((listener) => {
       try {
@@ -1077,8 +1076,7 @@ function setupModelWatcher(ctrl) {
   });
 }
 
-ngModelDirective.$inject = ["$rootScope"];
-export function ngModelDirective($rootScope) {
+export function ngModelDirective() {
   return {
     restrict: "A",
     require: ["ngModel", "^?form", "^?ngModelOptions"],
@@ -1091,7 +1089,6 @@ export function ngModelDirective($rootScope) {
       /** @param {import("../../shared/jqlite/jqlite.js").JQLite} element  */
       (element) => {
         // Setup initial state of the control
-
         element[0].classList.add(PRISTINE_CLASS, UNTOUCHED_CLASS, VALID_CLASS);
 
         return {

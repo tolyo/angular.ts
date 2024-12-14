@@ -1,4 +1,4 @@
-export function ngModelDirective($rootScope: any): {
+export function ngModelDirective(): {
     restrict: string;
     require: string[];
     controller: typeof NgModelController;
@@ -8,9 +8,6 @@ export function ngModelDirective($rootScope: any): {
         post: (scope: any, element: any, _attr: any, ctrls: any) => void;
     };
 };
-export namespace ngModelDirective {
-    let $inject: string[];
-}
 export const ngModelMinErr: (arg0: string, ...arg1: any[]) => Error;
 /**
  *
@@ -98,7 +95,7 @@ export class NgModelController {
         $$setSubmitted: () => void;
     };
     $options: {
-        $$options: import("../model-options/model-options").ModelOptionsConfig;
+        $$options: import("../model-options/model-options.js").ModelOptionsConfig;
         getOption(name: string): string | boolean | number | {
             [x: string]: number;
         };
@@ -122,7 +119,7 @@ export class NgModelController {
     /** @type {import('../../core/scope/scope.js').Scope} */
     $$rootScope: import("../../core/scope/scope.js").Scope;
     $$attr: import("../../core/compile/attributes").Attributes;
-    $$element: import("../../shared/jqlite/jqlite").JQLite;
+    $$element: import("../../shared/jqlite/jqlite.js").JQLite;
     $$animate: any;
     $$parse: import("../../core/parse/parse").ParseService;
     $$exceptionHandler: import("../../core/exception-handler").ErrorHandler;

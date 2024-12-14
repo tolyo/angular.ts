@@ -1064,11 +1064,11 @@ export class Scope {
       }
 
       // if (Array.isArray(newVal)) {
-        // newVal.forEach((x, index) => {
-        //   if (isFunction(x)) {
-        //     return newVal[index] = x(originalTarget);
-        //   }
-        // });
+      // newVal.forEach((x, index) => {
+      //   if (isFunction(x)) {
+      //     return newVal[index] = x(originalTarget);
+      //   }
+      // });
       // }
 
       listenerFn(newVal, originalTarget);

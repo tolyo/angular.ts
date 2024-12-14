@@ -53,8 +53,9 @@ export class Scope {
      * Initializes the handler with the target object and a context.
      *
      * @param {Scope} [context] - The context containing listeners.
+     * @param {Scope} [parent] - Custom parent.
      */
-    constructor(context?: Scope);
+    constructor(context?: Scope, parent?: Scope);
     context: Scope;
     /** @type {Map<string, Array<Listener>>} Watch listeners */
     watchers: Map<string, Array<Listener>>;
@@ -84,7 +85,7 @@ export class Scope {
     /**
      * @type {number} Unique model ID (monotonically increasing) useful for debugging.
      */
-    id: number;
+    $id: number;
     /**
      * @type {Scope}
      */
@@ -106,6 +107,7 @@ export class Scope {
      * @returns {boolean} - Returns true to indicate success of the operation.
      */
     set(target: any, property: string, value: any, proxy: any): boolean;
+    checkeListenersForAllKeys(value: any): void;
     /**
      * Intercepts property access on the target object. It checks for specific
      * properties (`watch` and `sync`) and binds their methods. For other properties,
@@ -141,7 +143,7 @@ export class Scope {
         $parent: Scope;
         $root: Scope;
         $children: Scope[];
-        id: number;
+        $id: number;
         registerForeignKey: any;
         notifyListener: any;
     };

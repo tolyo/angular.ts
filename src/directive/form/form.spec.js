@@ -1,6 +1,7 @@
-import { Angular } from "../../loader";
-import { dealoc, JQLite } from "../../shared/jqlite/jqlite";
-import { FormController } from "./form";
+import { Angular } from "../../loader.js";
+import { dealoc, JQLite } from "../../shared/jqlite/jqlite.js";
+import { wait } from "../../shared/test-utils.js";
+import { FormController } from "./form.js";
 
 describe("form", () => {
   let doc;
@@ -46,7 +47,7 @@ describe("form", () => {
     expect(doc.data("$formController") instanceof FormController).toBe(true);
   });
 
-  it("should remove form control references from the form when nested control is removed from the DOM", () => {
+  it("should remove form control references from the form when nested control is removed from the DOM", async () => {
     doc = $compile(
       '<form name="myForm">' +
         '<input ng-if="inputPresent" name="alias" ng-model="value" store-model-ctrl/>' +
@@ -55,13 +56,14 @@ describe("form", () => {
     scope.inputPresent = true;
     const form = scope.myForm;
     control.$setValidity("required", false);
+    await wait();
 
     expect(form.alias).toBe(control);
     expect(form.$error.required).toEqual([control]);
 
     // remove nested control
     scope.inputPresent = false;
-    scope.$apply();
+    await wait();
 
     expect(form.$error.required).toBeFalsy();
     expect(form.alias).toBeUndefined();

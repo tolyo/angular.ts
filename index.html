@@ -86,12 +86,10 @@
             <input type="checkbox" ng-click="todo.done = !todo.done" />
           </li>
         </ul>
-        <input type="text" ng-model="newTodo" ng-required="true" />
-        <button ng-click="$ctrl.add(newTodo)" type="submit">Add</button>
-        <!-- <form ng-submit="$ctrl.add(newTodo)">
+       <form ng-submit="$ctrl.add(newTodo)">
           <input type="text" ng-model="newTodo" ng-required="true" />
           <button type="submit">Add</button>
-        </form> -->
+        </form>
       </div>
 
       
