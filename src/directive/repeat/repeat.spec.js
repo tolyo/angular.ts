@@ -1085,7 +1085,7 @@ describe("ngRepeat", () => {
     let d;
     let lis;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       element = $compile(
         "<ul>" + '<li ng-repeat="item in items">{{item}}</li>' + "</ul>",
       )(scope);
@@ -1095,52 +1095,62 @@ describe("ngRepeat", () => {
       d = 4;
 
       scope.items = [a, b, c];
+      await wait();
       lis = element.find("li");
     });
 
-    it("should preserve the order of elements", () => {
+    it("should preserve the order of elements", async () => {
       scope.items = [a, c, d];
+      await wait();
       const newElements = element.find("li");
       expect(newElements[0]).toEqual(lis[0]);
       expect(newElements[1]).toEqual(lis[2]);
       expect(newElements[2]).not.toEqual(lis[1]);
     });
 
-    it("should throw error on adding existing duplicates and recover", () => {
+    it("should throw error on adding existing duplicates and recover", async () => {
       scope.items = [a, a, a];
+      await wait();
       expect(logs.shift().message).toMatch(/Duplicate key/);
 
       // recover
       scope.items = [a];
+      await wait();
       let newElements = element.find("li");
       expect(newElements.length).toEqual(1);
       expect(newElements[0]).toEqual(lis[0]);
 
       scope.items = [];
+      await wait();
       newElements = element.find("li");
       expect(newElements.length).toEqual(0);
     });
 
-    it("should throw error on new duplicates and recover", () => {
+    it("should throw error on new duplicates and recover", async () => {
       scope.items = [d, d, d];
+      await wait();
       expect(logs.shift().message).toMatch(/Duplicate key/);
 
       // recover
       scope.items = [a];
+      await wait();
       let newElements = element.find("li");
       expect(newElements.length).toEqual(1);
       expect(newElements[0]).toEqual(lis[0]);
 
       scope.items = [];
+      await wait();
       newElements = element.find("li");
       expect(newElements.length).toEqual(0);
     });
 
-    it("should reverse items when the collection is reversed", () => {
+    it("should reverse items when the collection is reversed", async () => {
       scope.items = [a, b, c];
+      await wait();
       lis = element.find("li");
 
       scope.items = [c, b, a];
+      await wait();
       const newElements = element.find("li");
       expect(newElements.length).toEqual(3);
       expect(newElements[0]).toEqual(lis[2]);
@@ -1148,15 +1158,17 @@ describe("ngRepeat", () => {
       expect(newElements[2]).toEqual(lis[0]);
     });
 
-    it("should reuse elements even when model is composed of primitives", () => {
+    it("should reuse elements even when model is composed of primitives", async () => {
       // rebuilding repeater from scratch can be expensive, we should try to avoid it even for
       // model that is composed of primitives.
 
       scope.items = ["hello", "cau", "ahoj"];
+      await wait();
       lis = element.find("li");
       lis[2].id = "yes";
 
       scope.items = ["ahoj", "hello", "cau"];
+      await wait();
       const newLis = element.find("li");
       expect(newLis.length).toEqual(3);
       expect(newLis[0]).toEqual(lis[2]);
@@ -1164,11 +1176,13 @@ describe("ngRepeat", () => {
       expect(newLis[2]).toEqual(lis[1]);
     });
 
-    it("should be stable even if the collection is initially undefined", () => {
+    it("should be stable even if the collection is initially undefined", async () => {
       scope.items = undefined;
       scope.items = [{ name: "A" }, { name: "B" }, { name: "C" }];
+      await wait();
       lis = element.find("li");
       scope.items.shift();
+      await wait();
       const newLis = element.find("li");
       expect(newLis.length).toBe(2);
       expect(newLis[0]).toBe(lis[1]);
