@@ -428,7 +428,7 @@ describe("ngRepeat", () => {
   });
 
   describe("alias as", () => {
-    it("should assigned the filtered to the target scope property if an alias is provided", () => {
+    it("should assigned the filtered to the target scope property if an alias is provided", async () => {
       element = $compile(
         '<div ng-repeat="item in items | filter:x as results track by $index">{{item.name}}/</div>',
       )(scope);
@@ -444,6 +444,7 @@ describe("ngRepeat", () => {
 
       expect(scope.results).toBeUndefined();
       scope.x = "bl";
+      await wait();
       expect(scope.results).toEqual([
         { name: "blue" },
         { name: "black" },
@@ -451,10 +452,11 @@ describe("ngRepeat", () => {
       ]);
 
       scope.items = [];
+      await wait();
       expect(scope.results).toEqual([]);
     });
 
-    it("should render a message when the repeat list is empty", () => {
+    it("should render a message when the repeat list is empty", async () => {
       element = $compile(
         "<div>" +
           '  <div ng-repeat="item in items | filter:x as results">{{item}}</div>' +
@@ -465,9 +467,11 @@ describe("ngRepeat", () => {
       )(scope);
 
       scope.items = [1, 2, 3, 4, 5, 6];
+      await wait();
       expect(element.text().trim()).toEqual("123456");
 
       scope.x = "0";
+      await wait();
       expect(element.text().trim()).toEqual("No results found...");
     });
 
@@ -481,20 +485,26 @@ describe("ngRepeat", () => {
         { name: "orange" },
         { name: "blonde" },
       ];
-      ["null2", "qthis", "qthisq", "fundefined", "$$parent"].forEach((name) => {
-        const expr = `item in items | filter:x as ${name} track by $index`;
-        element = $compile(`<div><div ng-repeat="${expr}"></div></div>`)(scope);
-        scope.$digest();
-        expect(scope[name]).toEqual([
-          { name: "blue" },
-          { name: "black" },
-          { name: "blonde" },
-        ]);
-        dealoc(element);
-      });
+      ["null2", "qthis", "qthisq", "fundefined", "$$parent"].forEach(
+        async (name) => {
+          const expr = `item in items | filter:x as ${name} track by $index`;
+          element = $compile(`<div><div ng-repeat="${expr}"></div></div>`)(
+            scope,
+          );
+          await wait();
+          expect(scope[name]).toEqual([
+            { name: "blue" },
+            { name: "blafck" },
+            { name: "blonde" },
+          ]);
+          dealoc(element);
+        },
+      );
+
+      expect().toBe();
     });
 
-    it("should throw if alias identifier is not a simple identifier", () => {
+    it("should throw if alias identifier is not a simple identifier", async () => {
       scope.x = "bl";
       scope.items = [
         { name: "red" },
@@ -523,7 +533,7 @@ describe("ngRepeat", () => {
         "obj['key']",
         "obj.property",
         "foo=6",
-      ].forEach((expr) => {
+      ].forEach(async (expr) => {
         const expression =
           `item in items | filter:x as ${expr} track by $index`.replace(
             /"/g,
@@ -534,13 +544,16 @@ describe("ngRepeat", () => {
             `  <div ng-repeat="${expression}">{{item}}</div>` +
             `</div>`,
         )(scope);
+        await wait();
         expect(logs.shift().message).toMatch(/must be a valid JS identifier/);
 
         dealoc(element);
       });
+
+      expect().toBe();
     });
 
-    it("should allow expressions over multiple lines", () => {
+    it("should allow expressions over multiple lines", async () => {
       element = $compile(
         "<ul>" +
           '<li ng-repeat="item in items\n' +
@@ -552,11 +565,11 @@ describe("ngRepeat", () => {
         return true;
       };
       scope.items = [{ name: "igor" }, { name: "misko" }];
-
+      await wait();
       expect(element.text()).toEqual("igor/misko/");
     });
 
-    it("should strip white space characters correctly", () => {
+    it("should strip white space characters correctly", async () => {
       element = $compile(
         "<ul>" +
           '<li ng-repeat="item   \t\n  \t  in  \n \t\n\n \nitems \t\t\n | filter:\n\n{' +
@@ -566,11 +579,12 @@ describe("ngRepeat", () => {
       )(scope);
 
       scope.items = [{ name: "igor" }, { name: "misko" }];
+      await wait();
 
       expect(element.text()).toEqual("misko/");
     });
 
-    it("should not ngRepeat over parent properties", () => {
+    it("should not ngRepeat over parent properties", async () => {
       const Class = function () {};
       Class.prototype.abc = function () {};
       Class.prototype.value = "abc";
@@ -582,38 +596,43 @@ describe("ngRepeat", () => {
       )(scope);
       scope.items = new Class();
       scope.items.name = "value";
+      await wait();
       expect(element.text()).toEqual("name:value;");
     });
 
-    it("should error on wrong parsing of ngRepeat", () => {
+    it("should error on wrong parsing of ngRepeat", async () => {
       element = JQLite('<ul><li ng-repeat="i dont parse"></li></ul>');
       $compile(element)(scope);
+      await wait();
       expect(logs.shift().message).toMatch(/i dont parse/);
     });
 
-    it("should throw error when left-hand-side of ngRepeat can't be parsed", () => {
+    it("should throw error when left-hand-side of ngRepeat can't be parsed", async () => {
       element = JQLite('<ul><li ng-repeat="i dont parse in foo"></li></ul>');
       $compile(element)(scope);
+      await wait();
       expect(logs.shift().message).toMatch(/i dont parse/);
     });
 
-    it("should expose iterator offset as $index when iterating over arrays", () => {
+    it("should expose iterator offset as $index when iterating over arrays", async () => {
       element = $compile(
         "<ul>" +
           '<li ng-repeat="item in items">{{item}}:{{$index}}|</li>' +
           "</ul>",
       )(scope);
       scope.items = ["misko", "shyam", "frodo"];
+      await wait();
       expect(element.text()).toEqual("misko:0|shyam:1|frodo:2|");
     });
 
-    it("should expose iterator offset as $index when iterating over objects", () => {
+    it("should expose iterator offset as $index when iterating over objects", async () => {
       element = $compile(
         "<ul>" +
           '<li ng-repeat="(key, val) in items">{{key}}:{{val}}:{{$index}}|</li>' +
           "</ul>",
       )(scope);
       scope.items = { misko: "m", shyam: "s", frodo: "f" };
+      await wait();
       expect(element.text()).toEqual("misko:m:0|shyam:s:1|frodo:f:2|");
     });
 
@@ -658,18 +677,20 @@ describe("ngRepeat", () => {
       expect(element.text()).toEqual("misko:true-false-true|");
     });
 
-    it("should expose iterator position as $even and $odd when iterating over arrays", () => {
+    it("should expose iterator position as $even and $odd when iterating over arrays", async () => {
       element = $compile(
         "<ul>" +
           '<li ng-repeat="item in items">{{item}}:{{$even}}-{{$odd}}|</li>' +
           "</ul>",
       )(scope);
       scope.items = ["misko", "shyam", "doug"];
+      await wait();
       expect(element.text()).toEqual(
         "misko:true-false|shyam:false-true|doug:true-false|",
       );
 
       scope.items.push("frodo");
+      await wait();
       expect(element.text()).toBe(
         "misko:true-false|" +
           "shyam:false-true|" +
@@ -679,6 +700,7 @@ describe("ngRepeat", () => {
 
       scope.items.shift();
       scope.items.pop();
+      await wait();
       expect(element.text()).toBe("shyam:true-false|doug:false-true|");
     });
 

@@ -1062,14 +1062,14 @@ export class Scope {
       if (isFunction(newVal)) {
         newVal = newVal(originalTarget);
       }
-      if (Array.isArray(newVal)) {
-        newVal = newVal.map((x) => {
-          if (isFunction(x)) {
-            return x(originalTarget);
-          }
-          return x;
-        });
-      }
+      // if (Array.isArray(newVal)) {
+      //   newVal = newVal.map((x) => {
+      //     if (isFunction(x)) {
+      //       return x(originalTarget);
+      //     }
+      //     return x;
+      //   });
+      // }
 
       listenerFn(newVal, originalTarget);
       this.$$asyncQueue.forEach((x) => {
