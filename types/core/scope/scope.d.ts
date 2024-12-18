@@ -4,10 +4,10 @@
  *
  * @param {Object} target - The object to be wrapped in a proxy.
  * @param {Scope} [context] - The context for the handler, used to track listeners.
- * @returns {ProxyHandler<Object>} - A proxy that intercepts operations on the target object,
+ * @returns {Scope<Object>} - A proxy that intercepts operations on the target object,
  *                                     or the original value if the target is not an object.
  */
-export function createScope(target?: any, context?: Scope): ProxyHandler<any>;
+export function createScope(target?: any, context?: Scope): Scope<any>;
 /**
  * @typedef {Object} AsyncQueueTask
  * @property {Scope} handler
@@ -20,8 +20,8 @@ export const $postUpdateQueue: any[];
  */
 export const $$applyAsyncQueue: Function[];
 export class RootScopeProvider {
-    rootScope: ProxyHandler<any>;
-    $get: (string | ((exceptionHandler: import("../exception-handler.js").ErrorHandler, parse: import("../parse/parse.js").ParseService) => ProxyHandler<any>))[];
+    rootScope: any;
+    $get: (string | ((exceptionHandler: import("../exception-handler.js").ErrorHandler, parse: import("../parse/parse.js").ParseService) => any))[];
 }
 /**
  * Listener function definition.
@@ -47,6 +47,7 @@ export const isProxySymbol: unique symbol;
  * Scope class for the Proxy. It intercepts operations like property access (get)
  * and property setting (set), and adds support for deep change tracking and
  * observer-like behavior.
+ * @extends {ProxyHandler}
  */
 export class Scope {
     /**
@@ -74,7 +75,9 @@ export class Scope {
     }>;
     /** Current proxy being operated on */
     $proxy: any;
-    /** @type {*} Current target begin called on */
+    /** @type {Scope} The actual proxy */
+    $handler: Scope;
+    /** @type {*} Current target being called on */
     $target: any;
     /** @type {*} Value wrapped by the proxy */
     $value: any;
@@ -184,18 +187,18 @@ export class Scope {
      * @param  {...any} args
      * @returns
      */
-    $emit(name: string, ...args: any[]): any;
+    $emit(name: string, ...args: any[]): void;
     /**
      * @param {string} name
      * @param  {...any} args
      * @returns
      */
-    $broadcast(name: string, ...args: any[]): any;
-    eventHelper({ name, event, broadcast }: {
-        name: any;
-        event: any;
-        broadcast: any;
-    }, ...args: any[]): any;
+    $broadcast(name: string, ...args: any[]): void;
+    /**
+     * @private
+     * @returns {void}
+     */
+    private eventHelper;
     /**
      * @private
      * @returns {boolean}

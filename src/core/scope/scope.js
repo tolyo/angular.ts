@@ -60,7 +60,7 @@ export class RootScopeProvider {
  *
  * @param {Object} target - The object to be wrapped in a proxy.
  * @param {Scope} [context] - The context for the handler, used to track listeners.
- * @returns {ProxyHandler<Object>} - A proxy that intercepts operations on the target object,
+ * @returns {Scope<Object>} - A proxy that intercepts operations on the target object,
  *                                     or the original value if the target is not an object.
  */
 export function createScope(target = {}, context) {
@@ -113,6 +113,7 @@ export const isProxySymbol = Symbol("isProxy");
  * Scope class for the Proxy. It intercepts operations like property access (get)
  * and property setting (set), and adds support for deep change tracking and
  * observer-like behavior.
+ * @extends {ProxyHandler}
  */
 export class Scope {
   /**
@@ -149,7 +150,10 @@ export class Scope {
     /** Current proxy being operated on */
     this.$proxy = null;
 
-    /** @type {*} Current target begin called on */
+    /** @type {Scope} The actual proxy */
+    this.$handler = this;
+
+    /** @type {*} Current target being called on */
     this.$target = null;
 
     /** @type {*} Value wrapped by the proxy */
@@ -947,6 +951,10 @@ export class Scope {
     );
   }
 
+  /**
+   * @private
+   * @returns {void}
+   */
   eventHelper({ name, event, broadcast }, ...args) {
     if (!broadcast) {
       if (!this.$$listeners.has(name)) {
@@ -1049,6 +1057,15 @@ export class Scope {
       );
     });
 
+    if (this.isRoot()) {
+      this.watchers.clear();
+    } else {
+      let i = this.$parent.$children.filter((x) => x.$id == this.$id)[0];
+      this.$parent.$children.splice(this.$parent.$children.indexOf(i), 1);
+    }
+
+    this.$$listeners.clear();
+
     if (this.$$destroyed) return;
 
     this.$broadcast("$destroy");
@@ -1116,7 +1133,8 @@ export class Scope {
 function calculateWatcherCount(model) {
   const childIds = collectChildIds(model).add(model.$id);
 
-  return Array.from(model.watchers.values()).reduce(
+  /** @type {number} */
+  const count = Array.from(model.watchers.values()).reduce(
     (count, watcherArray) =>
       count +
       watcherArray.reduce(
@@ -1126,6 +1144,7 @@ function calculateWatcherCount(model) {
       ),
     0,
   );
+  return count;
 }
 
 /**

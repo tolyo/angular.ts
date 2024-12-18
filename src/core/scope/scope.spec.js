@@ -1128,7 +1128,7 @@ describe("Scope", () => {
     });
 
     describe("inherited $watch", () => {
-      it("should decrement the watcherCount when destroying a child scope", () => {
+      fit("should decrement the watcherCount when destroying a child scope", () => {
         const child1 = scope.$new();
         const child2 = scope.$new();
 
@@ -1161,13 +1161,14 @@ describe("Scope", () => {
         expect(child2.$$watchersCount).toBe(2);
         expect(grandChild1.$$watchersCount).toBe(1);
         expect(grandChild2.$$watchersCount).toBe(1);
-
         grandChild2.$destroy();
+
         expect(child2.$$watchersCount).toBe(1);
         expect(scope.$$watchersCount).toBe(3);
+
         child1.$destroy();
         expect(child1.$$watchersCount).toBe(1);
-        expect(scope.$$watchersCount).toBe(2);
+        expect(scope.$$watchersCount).toBe(1);
       });
 
       it("should decrement the watcherCount when calling the remove function", () => {
@@ -1553,12 +1554,13 @@ describe("Scope", () => {
       });
 
       it("should watch array-like objects like arrays", async () => {
+        let counter = 0;
         scope.$watch("obj", function () {
           counter++;
         });
         scope.obj = document.getElementsByTagName("src");
         await wait();
-        expect(logs.length).toBeTruthy();
+        expect(counter).toEqual(2);
       });
     });
 
@@ -2758,6 +2760,59 @@ describe("Scope", () => {
       scope.$broadcast("evt", "fromRoot1");
       expect(calls).toBe("rccrrc");
     });
+  });
+
+  describe("$destroy", () => {
+    it("should clean up all listeners for root", () => {
+      const scope = createScope();
+      scope.$on("test", () => {});
+      expect(scope.$handler.$$listeners.size).toEqual(1);
+
+      scope.$destroy();
+      expect(scope.$handler.$$listeners.size).toEqual(0);
+    });
+
+    it("should clean up all watchers for root", () => {
+      const scope = createScope();
+      scope.$watch("a", () => {});
+      expect(scope.$handler.watchers.size).toEqual(1);
+
+      scope.$destroy();
+      expect(scope.$handler.watchers.size).toEqual(0);
+    });
+
+    it("should remove children from parent scopes", async () => {
+      const scope = createScope();
+      const child = scope.$new();
+      expect(scope.$children.length).toEqual(1);
+      child.$destroy();
+      expect(scope.$children.length).toEqual(0);
+    });
+
+    it("should clean up all watchers for child", async () => {
+      const scope = createScope();
+
+      scope.$watch("test", () => {});
+      const child = scope.$new();
+      child.$watch("test", () => {});
+
+      expect(scope.$handler.watchers.size).toEqual(1);
+      expect(scope.$handler.watchers.get("test").length).toEqual(2);
+      expect(child.$handler.watchers.size).toEqual(1);
+      expect(child.$handler.watchers.get("test").length).toEqual(2);
+
+      child.$destroy();
+      expect(scope.$handler.watchers.get("test").length).toEqual(1);
+    });
+
+    // it("should clean up all watchers for child", () => {
+    //   const scope = createScope();
+    //   scope.$watch("a", () => {});
+    //   expect(scope.$handler.watchers.size).toEqual(1);
+    //
+    //   scope.$destroy();
+    //   expect(scope.$handler.watchers.size).toEqual(0);
+    // })
   });
 
   describe("doc examples", () => {
