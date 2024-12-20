@@ -2731,6 +2731,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                     (attr.$$observers && attr.$$observers[name].$$scope) ||
                     scope
                   ).$watch(x, (newValue, oldValue) => {
+                    newValue = interpolateFn(scope);
                     // special case for class attribute addition + removal
                     // so that class changes can tap into the animation
                     // hooks provided by the $animate service. Be sure to

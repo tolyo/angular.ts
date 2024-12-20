@@ -13,10 +13,10 @@ describe("ngInclude", () => {
     let module;
     let injector;
     let angular;
-    let errorLog = []
+    let errorLog = [];
 
     beforeEach(() => {
-      errorLog = []
+      errorLog = [];
       delete window.angular;
       angular = window.angular = new Angular();
       module = angular
@@ -203,7 +203,7 @@ describe("ngInclude", () => {
       const injector = angular.bootstrap(element, ["myModule"]);
       $rootScope = injector.get("$rootScope");
       expect($rootScope.$children.length).toBe(1);
-      
+
       $rootScope.url = "/mock/hello";
       setTimeout(() => {
         expect($rootScope.$children.length).toBe(2);
