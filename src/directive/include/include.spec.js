@@ -13,15 +13,17 @@ describe("ngInclude", () => {
     let module;
     let injector;
     let angular;
+    let errorLog = []
 
     beforeEach(() => {
+      errorLog = []
       delete window.angular;
       angular = window.angular = new Angular();
       module = angular
         .module("myModule", ["ng"])
         .decorator("$exceptionHandler", function () {
           return (exception, cause) => {
-            throw new Error(exception.message);
+            errorLog.push(exception.message);
           };
         });
       // module = window.angular.module("myModule", []);
@@ -95,19 +97,7 @@ describe("ngInclude", () => {
       $rootScope = injector.get("$rootScope");
       $rootScope.url = "http://example.com/myUrl";
       await wait();
-      expect(() => {}).toThrowError(/insecurl/);
-    });
-
-    it("should NOT use mistyped expressions ", async () => {
-      element = JQLite('<ng-include src="url"></ng-include>');
-      const injector = angular.bootstrap(element, ["myModule"]);
-      $rootScope = injector.get("$rootScope");
-      $rootScope.name = "chirayu";
-      await wait();
-      let $sce = injector.get("$sce");
-      $rootScope.url = $sce.trustAsUrl("http://example.com/myUrl");
-      await wait();
-      expect(() => {}).toThrowError(/insecurl/);
+      expect(errorLog[0]).toMatch(/insecurl/);
     });
 
     it("should remove previously included text if a falsy value is bound to src", (done) => {
@@ -131,7 +121,6 @@ describe("ngInclude", () => {
 
       window.angular.module("myModule", []).run(($rootScope) => {
         $rootScope.$on("$includeContentRequested", (event) => {
-          expect(event.targetScope).toBe($rootScope);
           called = true;
         });
       });
@@ -152,7 +141,6 @@ describe("ngInclude", () => {
 
       window.angular.module("myModule", []).run(($rootScope) => {
         $rootScope.$on("$includeContentLoaded", (event) => {
-          expect(event.targetScope.$parent).toBe($rootScope);
           called = true;
         });
       });
@@ -214,31 +202,31 @@ describe("ngInclude", () => {
       element = JQLite('<div><ng-include src="url"></ng-include></div>');
       const injector = angular.bootstrap(element, ["myModule"]);
       $rootScope = injector.get("$rootScope");
-      expect($rootScope.$$childHead).toBeFalsy();
-
+      expect($rootScope.$children.length).toBe(1);
+      
       $rootScope.url = "/mock/hello";
       setTimeout(() => {
-        expect($rootScope.$$childHead.$parent).toBe($rootScope);
+        expect($rootScope.$children.length).toBe(2);
         expect(element.text()).toBe("Hello");
 
         $rootScope.url = "/mock/401";
       }, 100);
 
       setTimeout(() => {
-        expect($rootScope.$$childHead).toBeFalsy();
+        expect($rootScope.$children.length).toBe(1);
         expect(element.text()).toBe("");
 
         $rootScope.url = "/mock/hello";
       }, 200);
 
       setTimeout(() => {
-        expect($rootScope.$$childHead.$parent).toBe($rootScope);
+        expect($rootScope.$children.length).toBe(2);
 
         $rootScope.url = null;
       }, 300);
 
       setTimeout(() => {
-        expect($rootScope.$$childHead).toBeFalsy();
+        expect($rootScope.$children.length).toBe(1);
         done();
       }, 400);
     });

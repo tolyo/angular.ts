@@ -133,7 +133,7 @@ export class Scope {
     this.watchers = context ? context.watchers : new Map();
 
     /** @type {Map<String, Function[]>} Event listeners */
-    this.$$listeners = new Map();
+    this.$$listeners = context ? context.$$listeners : new Map();
 
     /** @type {Map<string, Array<Listener>>} Watch listeners from other proxies */
     this.foreignListeners = context ? context.foreignListeners : new Map();
