@@ -162,8 +162,9 @@ export class Scope {
      *
      * @param {string} watchProp - An expression to be watched in the context of this model.
      * @param {ListenerFunction} [listenerFn] - A function to execute when changes are detected on watched context.
+     * @param {boolean} [lazy] - A flag to indicate if the listener should be invoked immediately. Defaults to false.
      */
-    $watch(watchProp: string, listenerFn?: ListenerFunction): () => void;
+    $watch(watchProp: string, listenerFn?: ListenerFunction, lazy?: boolean): () => void;
     $watchGroup(watchArray: any, listenerFn: any): void;
     $watchCollection(watchProp: any, listenerFn: any): () => void;
     $new(childInstance: any): any;

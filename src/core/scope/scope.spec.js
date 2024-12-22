@@ -1128,7 +1128,7 @@ describe("Scope", () => {
     });
 
     describe("inherited $watch", () => {
-      fit("should decrement the watcherCount when destroying a child scope", () => {
+      it("should decrement the watcherCount when destroying a child scope", () => {
         const child1 = scope.$new();
         const child2 = scope.$new();
 

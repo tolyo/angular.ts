@@ -2968,11 +2968,14 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                     parentValueWatch,
                   );
                 } else {
-                  removeWatch = scope.$watch(
-                    $parse(attrs[attrName], parentValueWatch),
-                    null,
-                    parentGet.literal,
-                  );
+                  removeWatch = scope.$watch(attrs[attrName], (val) => {
+                    let res = $parse(val, parentValueWatch);
+                    return res;
+                  });
+                  //   $parse(, parentValueWatch),
+                  //   null,
+                  //   parentGet.literal,
+                  // );
                 }
                 removeWatchCollection.push(removeWatch);
                 break;
@@ -2993,7 +2996,6 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                   UNINITALIZED_VALIED,
                   destination[scopeName],
                 );
-
                 scope.attrs = attrs;
                 removeWatch = scope.$watch(
                   `attrs.${attrName}`,
@@ -3010,6 +3012,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                     recordChanges(scopeName, newValue, oldValue);
                     destination[scopeName] = newValue;
                   },
+                  true,
                 );
 
                 removeWatchCollection.push(removeWatch);
