@@ -2256,9 +2256,7 @@ describe("Scope", () => {
       it("should add listener for both $emit and $broadcast events", () => {
         logs = "";
         const child = scope.$new();
-        debugger;
         function eventFn() {
-          debugger;
           logs += "X";
         }
 

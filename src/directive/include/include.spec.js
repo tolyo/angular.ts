@@ -140,8 +140,7 @@ describe("ngInclude", () => {
       let called = false;
 
       window.angular.module("myModule", []).run(($rootScope) => {
-        $rootScope.$on("$includeContentLoaded", (event) => {
-          debugger;
+        $rootScope.$on("$includeContentLoaded", () => {
           called = true;
         });
       });

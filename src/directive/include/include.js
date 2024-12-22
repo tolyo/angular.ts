@@ -97,7 +97,6 @@ export const ngIncludeDirective = [
 
                 currentScope = newScope;
                 currentElement = clone;
-                debugger;
                 currentScope.$emit("$includeContentLoaded", src);
                 scope.$eval(onloadExp);
               },

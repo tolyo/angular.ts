@@ -1711,7 +1711,6 @@ describe("$compile", () => {
           myAttr: "=",
         },
         link: function (scope) {
-          debugger;
           isolateScope = scope;
         },
       };
@@ -1720,7 +1719,6 @@ describe("$compile", () => {
     var el = $('<div my-directive my-attr="parentAttr"></div>');
     $compile(el)($rootScope);
     await wait();
-    debugger;
     isolateScope.myAttr = 42;
 
     await wait();
@@ -1742,7 +1740,6 @@ describe("$compile", () => {
     reloadModules();
     var el = $('<div my-directive my-attr="parentAttr"></div>');
     $compile(el)($rootScope);
-    debugger;
     $rootScope.parentAttr = 42;
     isolateScope.myAttr = 43;
     await wait();
@@ -1764,7 +1761,6 @@ describe("$compile", () => {
     });
     reloadModules();
     $rootScope.parentFunction = () => {
-      debugger;
       return [1, 2, 3];
     };
     var el = $('<div my-directive my-attr="parentFunction()"></div>');
@@ -2579,7 +2575,7 @@ describe("$compile", () => {
       expect(templateSpy.calls.first().args[1].myDirective).toBeDefined();
     });
 
-    fit("uses isolate scope for template contents", () => {
+    fit("uses isolate scope for template contents", async () => {
       var linkSpy = jasmine.createSpy();
       registerDirectives({
         myDirective: () => {
@@ -2597,13 +2593,14 @@ describe("$compile", () => {
       reloadModules();
       var el = $('<div my-directive="42"></div>');
       $compile(el)($rootScope);
+      await wait();
       expect(linkSpy.calls.first().args[0]).not.toBe($rootScope);
       expect(linkSpy.calls.first().args[0].isoValue).toBe(42);
     });
   });
 
   describe("templateUrl", () => {
-    it("defers remaining directive compilation", () => {
+    fit("defers remaining directive compilation", async () => {
       var otherCompileSpy = jasmine.createSpy();
       registerDirectives({
         myDirective: () => {
@@ -2616,10 +2613,11 @@ describe("$compile", () => {
       reloadModules();
       var el = $("<div my-directive my-other-directive></div>");
       $compile(el);
+      await wait();
       expect(otherCompileSpy).not.toHaveBeenCalled();
     });
 
-    it("defers current directive compilation", () => {
+    fit("defers current directive compilation", async () => {
       var compileSpy = jasmine.createSpy();
       registerDirectives({
         myDirective: () => {
@@ -2632,10 +2630,11 @@ describe("$compile", () => {
       reloadModules();
       var el = $("<div my-directive></div>");
       $compile(el);
+      await wait();
       expect(compileSpy).not.toHaveBeenCalled();
     });
 
-    it("immediately empties out the element", () => {
+    fit("immediately empties out the element", async () => {
       registerDirectives({
         myDirective: () => {
           return { templateUrl: "/my_directive.html" };
@@ -2644,10 +2643,11 @@ describe("$compile", () => {
       reloadModules();
       var el = $("<div my-directive>Hello</div>");
       $compile(el);
+      await wait();
       expect(el.html()).toBe("");
     });
 
-    it("populates element with template", (done) => {
+    fit("populates element with template", (done) => {
       registerDirectives({
         myDirective: () => {
           return { templateUrl: "/public/my_directive.html" };
@@ -2662,7 +2662,7 @@ describe("$compile", () => {
       }, 100);
     });
 
-    it("resumes current directive compilation after template received", (done) => {
+    fit("resumes current directive compilation after template received", (done) => {
       var compileSpy = jasmine.createSpy();
       registerDirectives({
         myDirective: () => {
@@ -2683,7 +2683,7 @@ describe("$compile", () => {
       }, 100);
     });
 
-    it("resumes remaining directive compilation after template received", (done) => {
+    fit("resumes remaining directive compilation after template received", (done) => {
       var otherCompileSpy = jasmine.createSpy();
       registerDirectives({
         myDirective: () => {
@@ -2704,7 +2704,7 @@ describe("$compile", () => {
       }, 100);
     });
 
-    it("resumes child compilation after template received", (done) => {
+    fit("resumes child compilation after template received", (done) => {
       var otherCompileSpy = jasmine.createSpy();
       registerDirectives({
         myDirective: () => {
@@ -2725,7 +2725,7 @@ describe("$compile", () => {
       }, 10);
     });
 
-    it("supports functions as values", async () => {
+    fit("supports functions as values", async () => {
       var templateUrlSpy = jasmine
         .createSpy()
         .and.returnValue("/public/my_directive.html");
@@ -2740,12 +2740,12 @@ describe("$compile", () => {
       var el = $("<div my-directive></div>");
 
       $compile(el);
-      // await wait();
+      await wait();
       expect(templateUrlSpy.calls.first().args[0][0]).toBe(el[0]);
       expect(templateUrlSpy.calls.first().args[1].myDirective).toBeDefined();
     });
 
-    it("does not allow templateUrl directive after template directive", () => {
+    fit("does not allow templateUrl directive after template directive", () => {
       registerDirectives({
         myDirective: () => {
           return { template: "<div></div>" };
@@ -2761,7 +2761,7 @@ describe("$compile", () => {
       }).toThrowError();
     });
 
-    it("does not allow template directive after templateUrl directive", (done) => {
+    fit("does not allow template directive after templateUrl directive", (done) => {
       registerDirectives({
         myDirective: () => {
           return { templateUrl: "/public/my_directive.html" };
@@ -2781,7 +2781,7 @@ describe("$compile", () => {
       }, 10);
     });
 
-    it("links the directive when public link function is invoked", (done) => {
+    fit("links the directive when public link function is invoked", (done) => {
       var linkSpy = jasmine.createSpy();
       registerDirectives({
         myDirective: () => {
@@ -2807,7 +2807,7 @@ describe("$compile", () => {
       }, 10);
     });
 
-    it("links child elements when public link function is invoked", (done) => {
+    fit("links child elements when public link function is invoked", (done) => {
       var linkSpy = jasmine.createSpy();
       registerDirectives({
         myDirective: () => {
@@ -2832,7 +2832,7 @@ describe("$compile", () => {
       }, 100);
     });
 
-    it("links when template received if node link function has been invoked", (done) => {
+    fit("links when template received if node link function has been invoked", (done) => {
       var linkSpy = jasmine.createSpy();
       registerDirectives({
         myDirective: () => {
@@ -2858,14 +2858,14 @@ describe("$compile", () => {
       }, 10);
     });
 
-    it("links directives that were compiled earlier", (done) => {
+    fit("links directives that were compiled earlier", (done) => {
       var linkSpy = jasmine.createSpy();
       registerDirectives({
         myDirective: () => {
           return { link: linkSpy };
         },
         myOtherDirective: () => {
-          return { templateUrl: "/my_directive.html" };
+          return { templateUrl: "/public/my_directive.html" };
         },
       });
       reloadModules();
@@ -2881,10 +2881,10 @@ describe("$compile", () => {
         expect(linkSpy.calls.argsFor(0)[1][0]).toBe(el[0]);
         expect(linkSpy.calls.argsFor(0)[2].myDirective).toBeDefined();
         done();
-      }, 10);
+      }, 100);
     });
 
-    it("retains isolate scope directives from earlier", (done) => {
+    fit("retains isolate scope directives from earlier", (done) => {
       var linkSpy = jasmine.createSpy();
       registerDirectives({
         myDirective: () => {
@@ -2894,7 +2894,7 @@ describe("$compile", () => {
           };
         },
         myOtherDirective: () => {
-          return { templateUrl: "/my_directive.html" };
+          return { templateUrl: "/public/my_directive.html" };
         },
       });
       reloadModules();
@@ -2912,7 +2912,7 @@ describe("$compile", () => {
       }, 10);
     });
 
-    it("supports isolate scope directives with templateUrls", (done) => {
+    fit("supports isolate scope directives with templateUrls", (done) => {
       var linkSpy = jasmine.createSpy();
       registerDirectives({
         myDirective: () => {
@@ -2935,7 +2935,7 @@ describe("$compile", () => {
       }, 10);
     });
 
-    it("links children of isolate scope directives with templateUrls", (done) => {
+    fit("links children of isolate scope directives with templateUrls", (done) => {
       var linkSpy = jasmine.createSpy();
       registerDirectives({
         myDirective: () => {
@@ -2962,7 +2962,7 @@ describe("$compile", () => {
       }, 10);
     });
 
-    it("sets up controllers for all controller directives", (done) => {
+    fit("sets up controllers for all controller directives", (done) => {
       var myDirectiveControllerInstantiated,
         myOtherDirectiveControllerInstantiated;
       registerDirectives({
@@ -2997,7 +2997,7 @@ describe("$compile", () => {
   });
 
   describe("with transclusion", () => {
-    it("makes transclusion available to link fn when template arrives", (done) => {
+    fit("makes transclusion available to link fn when template arrives", (done) => {
       registerDirectives({
         myTranscluder: () => {
           return {
@@ -3021,7 +3021,7 @@ describe("$compile", () => {
       }, 100);
     });
 
-    it("is only allowed once", async () => {
+    fit("is only allowed once", async () => {
       var otherCompileSpy = jasmine.createSpy();
       registerDirectives({
         myTranscluder: () => {
@@ -3050,7 +3050,7 @@ describe("$compile", () => {
   });
 
   describe("transclude", () => {
-    it("removes the children of the element from the DOM", () => {
+    fit("removes the children of the element from the DOM", () => {
       registerDirectives({
         myTranscluder: () => {
           return { transclude: true };

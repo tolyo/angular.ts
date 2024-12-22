@@ -150,7 +150,6 @@ describe("ngIf", () => {
       let destroyed = false;
 
       childScope.$on("$destroy", () => {
-        debugger;
         destroyed = true;
       });
 
