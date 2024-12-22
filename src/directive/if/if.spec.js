@@ -149,7 +149,8 @@ describe("ngIf", () => {
       const childScope = $scope.$handler.$children[0];
       let destroyed = false;
 
-      childScope.$on("$destroy", async () => {
+      childScope.$on("$destroy", () => {
+        debugger;
         destroyed = true;
       });
 

@@ -2268,8 +2268,8 @@ describe("Scope", () => {
         child.$emit("abc");
         expect(logs).toEqual("X");
 
-        // child.$broadcast("abc");
-        // expect(logs).toEqual("XX");
+        child.$broadcast("abc");
+        expect(logs).toEqual("XX");
       });
 
       describe("deregistration", () => {

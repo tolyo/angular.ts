@@ -962,7 +962,7 @@ export class Scope {
     if (!broadcast) {
       if (!this.$$listeners.has(name)) {
         if (this.$parent) {
-          return this.$parent?.eventHelper(
+          return this.$parent.$handler.eventHelper(
             { name: name, event: event, broadcast: broadcast },
             ...args,
           );
@@ -1059,6 +1059,9 @@ export class Scope {
   }
 
   $destroy() {
+    if (this.$$destroyed) return;
+
+    this.$broadcast("$destroy");
     Array.from(this.watchers.entries()).forEach(([key, val]) => {
       this.watchers.set(
         key,
@@ -1075,9 +1078,6 @@ export class Scope {
 
     this.$$listeners.clear();
 
-    if (this.$$destroyed) return;
-
-    this.$broadcast("$destroy");
     this.$$destroyed = true;
   }
 

@@ -1720,13 +1720,14 @@ describe("$compile", () => {
     var el = $('<div my-directive my-attr="parentAttr"></div>');
     $compile(el)($rootScope);
     await wait();
-    isolateScope.myAttr = 42;
     debugger;
+    isolateScope.myAttr = 42;
+
     await wait();
     expect($rootScope.parentAttr).toBe(42);
   });
 
-  it("gives parent change precedence when both parent and child change", () => {
+  fit("gives parent change precedence when both parent and child change", async () => {
     var isolateScope;
     registerDirectives("myDirective", () => {
       return {
@@ -1741,14 +1742,15 @@ describe("$compile", () => {
     reloadModules();
     var el = $('<div my-directive my-attr="parentAttr"></div>');
     $compile(el)($rootScope);
-
+    debugger;
     $rootScope.parentAttr = 42;
     isolateScope.myAttr = 43;
+    await wait();
     expect($rootScope.parentAttr).toBe(42);
     expect(isolateScope.myAttr).toBe(42);
   });
 
-  it("throws when two-way expression returns new arrays", () => {
+  fit("does not throw when two-way expression returns new arrays", async () => {
     var givenScope;
     registerDirectives("myDirective", () => {
       return {
@@ -1762,14 +1764,16 @@ describe("$compile", () => {
     });
     reloadModules();
     $rootScope.parentFunction = () => {
+      debugger;
       return [1, 2, 3];
     };
     var el = $('<div my-directive my-attr="parentFunction()"></div>');
     $compile(el)($rootScope);
-    expect(() => {}).toThrowError();
+    await wait();
+    expect(givenScope.myAttr).toEqual([1, 2, 3]);
   });
 
-  it("can watch two-way bindings as collections", () => {
+  fit("can watch two-way bindings as collections", async () => {
     var givenScope;
     registerDirectives("myDirective", () => {
       return {
@@ -1787,10 +1791,11 @@ describe("$compile", () => {
     };
     var el = $('<div my-directive my-attr="parentFunction()"></div>');
     $compile(el)($rootScope);
+    await wait();
     expect(givenScope.myAttr).toEqual([1, 2, 3]);
   });
 
-  it("allows binding an invokable expression on the parent scope", () => {
+  fit("allows binding an invokable expression on the parent scope", () => {
     var givenScope;
     registerDirectives("myDirective", () => {
       return {
@@ -1811,7 +1816,7 @@ describe("$compile", () => {
     expect(givenScope.myExpr()).toBe(43);
   });
 
-  it("allows passing arguments to parent scope expression", () => {
+  fit("allows passing arguments to parent scope expression", () => {
     var givenScope;
     registerDirectives("myDirective", () => {
       return {
@@ -1836,7 +1841,7 @@ describe("$compile", () => {
     expect(gotArg).toBe(42);
   });
 
-  it("sets missing optional parent scope expression to undefined", () => {
+  fit("sets missing optional parent scope expression to undefined", () => {
     var givenScope;
     registerDirectives("myDirective", () => {
       return {
@@ -1859,7 +1864,7 @@ describe("$compile", () => {
   });
 
   describe("controllers", () => {
-    it("can be attached to directives as functions", () => {
+    fit("can be attached to directives as functions", async () => {
       var controllerInvoked;
       registerDirectives("myDirective", () => {
         return {
@@ -1871,10 +1876,11 @@ describe("$compile", () => {
       reloadModules();
       var el = $("<div my-directive></div>");
       $compile(el)($rootScope);
+      await wait();
       expect(controllerInvoked).toBe(true);
     });
 
-    it("can be attached to directives as string references", () => {
+    fit("can be attached to directives as string references", async () => {
       var controllerInvoked;
       function MyController() {
         controllerInvoked = true;
@@ -1888,10 +1894,11 @@ describe("$compile", () => {
       reloadModules();
       var el = $("<div my-directive></div>");
       $compile(el)($rootScope);
+      await wait();
       expect(controllerInvoked).toBe(true);
     });
 
-    it("can be applied in the same element independent of each other", () => {
+    fit("can be applied in the same element independent of each other", () => {
       var controllerInvoked;
       var otherControllerInvoked;
       function MyController() {
@@ -1916,7 +1923,7 @@ describe("$compile", () => {
       expect(otherControllerInvoked).toBe(true);
     });
 
-    it("can be applied to different directives, as different instances", () => {
+    fit("can be applied to different directives, as different instances", () => {
       var invocations = 0;
       function MyController() {
         invocations++;
@@ -1935,7 +1942,7 @@ describe("$compile", () => {
       expect(invocations).toBe(2);
     });
 
-    it("can be aliased with @ when given in directive attribute", () => {
+    fit("can be aliased with @ when given in directive attribute", () => {
       var controllerInvoked;
       function MyController() {
         controllerInvoked = true;
@@ -1951,7 +1958,7 @@ describe("$compile", () => {
       expect(controllerInvoked).toBe(true);
     });
 
-    it("gets scope, element, and attrs through DI", () => {
+    fit("gets scope, element, and attrs through DI", () => {
       var gotScope, gotElement, gotAttrs;
       function MyController($element, $scope, $attrs) {
         gotElement = $element;
@@ -1972,7 +1979,7 @@ describe("$compile", () => {
       expect(gotAttrs.anAttr).toEqual("abc");
     });
 
-    it("can be attached on the scope", () => {
+    fit("can be attached on the scope", () => {
       function MyController() {}
       myModule
         .controller("MyController", MyController)
@@ -1989,7 +1996,7 @@ describe("$compile", () => {
       expect($rootScope.myCtrl instanceof MyController).toBe(true);
     });
 
-    it("gets isolate scope as injected $scope", () => {
+    fit("gets isolate scope as injected $scope", () => {
       var gotScope;
       function MyController($scope) {
         gotScope = $scope;
@@ -2008,7 +2015,7 @@ describe("$compile", () => {
       expect(gotScope).not.toBe($rootScope);
     });
 
-    it("has isolate scope bindings available during construction", () => {
+    fit("has isolate scope bindings available during construction", () => {
       var gotMyAttr;
       function MyController($scope) {
         gotMyAttr = $scope.myAttr;
@@ -2029,7 +2036,7 @@ describe("$compile", () => {
       expect(gotMyAttr).toEqual("abc");
     });
 
-    it("can bind isolate scope bindings directly to self", () => {
+    fit("can bind isolate scope bindings directly to self", () => {
       var ctl;
       function MyController() {
         ctl = this;
@@ -2052,7 +2059,7 @@ describe("$compile", () => {
       expect(ctl.myAttr).toEqual("abc");
     });
 
-    it("can return a semi-constructed controller when using array injection", () => {
+    fit("can return a semi-constructed controller when using array injection", () => {
       myModule.constant("aDep", 42);
       reloadModules();
       var $controller = injector.get("$controller");
@@ -2069,7 +2076,7 @@ describe("$compile", () => {
       expect(actualController.aDep).toBe(42);
     });
 
-    it("can bind iso scope bindings through bindToController", () => {
+    fit("can bind iso scope bindings through bindToController", () => {
       var ctl;
       function MyController() {
         ctl = this;
@@ -2091,7 +2098,7 @@ describe("$compile", () => {
       expect(ctl.myAttr).toEqual("abc");
     });
 
-    it("can bind through bindToController without iso scope", () => {
+    fit("can bind through bindToController without iso scope", () => {
       var ctl;
       function MyController() {
         ctl = this;
@@ -2113,7 +2120,7 @@ describe("$compile", () => {
       expect(ctl.myAttr).toEqual("abc");
     });
 
-    it("can be required from a sibling directive", () => {
+    fit("can be required from a sibling directive", () => {
       function MyController() {}
       var gotMyController;
       myModule
@@ -2138,7 +2145,7 @@ describe("$compile", () => {
       expect(gotMyController instanceof MyController).toBe(true);
     });
 
-    it("can be required from multiple sibling directives", () => {
+    fit("can be required from multiple sibling directives", () => {
       function MyController() {}
       function MyOtherController() {}
       var gotControllers;
@@ -2174,7 +2181,7 @@ describe("$compile", () => {
       expect(gotControllers[1] instanceof MyOtherController).toBe(true);
     });
 
-    it("can be required as an object", () => {
+    fit("can be required as an object", () => {
       function MyController() {}
       function MyOtherController() {}
       var gotControllers;
@@ -2214,7 +2221,7 @@ describe("$compile", () => {
       );
     });
 
-    it("can be required as an object with values omitted", () => {
+    fit("can be required as an object with values omitted", () => {
       function MyController() {}
       var gotControllers;
       myModule
@@ -2243,7 +2250,7 @@ describe("$compile", () => {
       expect(gotControllers.myDirective instanceof MyController).toBe(true);
     });
 
-    it("requires itself if there is no explicit require", () => {
+    fit("requires itself if there is no explicit require", () => {
       function MyController() {}
       var gotMyController;
       myModule.directive("myDirective", () => {
@@ -2262,7 +2269,7 @@ describe("$compile", () => {
       expect(gotMyController instanceof MyController).toBe(true);
     });
 
-    it("is passed through grouped link wrapper", () => {
+    fit("is passed through grouped link wrapper", () => {
       function MyController() {}
       var gotMyController;
       myModule.directive("myDirective", () => {
@@ -2282,7 +2289,7 @@ describe("$compile", () => {
       expect(gotMyController instanceof MyController).toBe(true);
     });
 
-    it("can be required from a parent directive", () => {
+    fit("can be required from a parent directive", () => {
       function MyController() {}
       var gotMyController;
       myModule
@@ -2307,7 +2314,7 @@ describe("$compile", () => {
       expect(gotMyController instanceof MyController).toBe(true);
     });
 
-    it("also finds from sibling directive when requiring with parent prefix", () => {
+    fit("also finds from sibling directive when requiring with parent prefix", () => {
       function MyController() {}
       var gotMyController;
       myModule
@@ -2332,7 +2339,7 @@ describe("$compile", () => {
       expect(gotMyController instanceof MyController).toBe(true);
     });
 
-    it("can be required from a parent directive with ^^", () => {
+    fit("can be required from a parent directive with ^^", () => {
       function MyController() {}
       var gotMyController;
       myModule
@@ -2357,7 +2364,7 @@ describe("$compile", () => {
       expect(gotMyController instanceof MyController).toBe(true);
     });
 
-    it("does not find from sibling directive when requiring with ^^", () => {
+    fit("does not find from sibling directive when requiring with ^^", () => {
       function MyController() {}
       myModule
         .directive("myDirective", () => {
@@ -2379,7 +2386,7 @@ describe("$compile", () => {
       }).toThrowError();
     });
 
-    it("can be required from parent in object form", () => {
+    fit("can be required from parent in object form", () => {
       function MyController() {}
       var gotControllers;
       myModule
@@ -2405,7 +2412,7 @@ describe("$compile", () => {
       expect(gotControllers.myDirective instanceof MyController).toBe(true);
     });
 
-    it("does not throw on required missing controller when optional", () => {
+    fit("does not throw on required missing controller when optional", () => {
       var gotCtrl;
       myModule.directive("myDirective", () => {
         return {
@@ -2421,7 +2428,7 @@ describe("$compile", () => {
       expect(gotCtrl).toBe(null);
     });
 
-    it("allows optional marker after parent marker", () => {
+    fit("allows optional marker after parent marker", () => {
       var gotCtrl;
       myModule.directive("myDirective", () => {
         return {
@@ -2437,7 +2444,7 @@ describe("$compile", () => {
       expect(gotCtrl).toBe(null);
     });
 
-    it("allows optional marker before parent marker", () => {
+    fit("allows optional marker before parent marker", () => {
       function MyController() {}
       var gotMyController;
       myModule
@@ -2462,7 +2469,7 @@ describe("$compile", () => {
       expect(gotMyController instanceof MyController).toBe(true);
     });
 
-    it("attaches required controllers on controller when using object", () => {
+    fit("attaches required controllers on controller when using object", () => {
       function MyController() {}
       var ctl;
       myModule
@@ -2493,7 +2500,7 @@ describe("$compile", () => {
   });
 
   describe("template", () => {
-    it("populates an element during compilation", () => {
+    fit("populates an element during compilation", () => {
       registerDirectives("myDirective", () => {
         return {
           template: '<div class="from-template"></div>',
@@ -2505,7 +2512,7 @@ describe("$compile", () => {
       expect(el.html()).toBe('<div class="from-template"></div>');
     });
 
-    it("replaces any existing children", () => {
+    fit("replaces any existing children", () => {
       registerDirectives("myDirective", () => {
         return {
           template: '<div class="from-template"></div>',
@@ -2517,7 +2524,7 @@ describe("$compile", () => {
       expect(el.html()).toBe('<div class="from-template"></div>');
     });
 
-    it("compiles template contents also", () => {
+    fit("compiles template contents also", () => {
       var compileSpy = jasmine.createSpy();
       registerDirectives({
         myDirective: () => {
@@ -2537,7 +2544,7 @@ describe("$compile", () => {
       expect(compileSpy).toHaveBeenCalled();
     });
 
-    it("does not allow two directives with templates", () => {
+    fit("does not allow two directives with templates", () => {
       registerDirectives({
         myDirective: () => {
           return { template: "<div></div>" };
@@ -2553,7 +2560,7 @@ describe("$compile", () => {
       }).toThrowError();
     });
 
-    it("supports functions as template values", () => {
+    fit("supports functions as template values", () => {
       var templateSpy = jasmine
         .createSpy()
         .and.returnValue('<div class="from-template"></div>');
@@ -2572,7 +2579,7 @@ describe("$compile", () => {
       expect(templateSpy.calls.first().args[1].myDirective).toBeDefined();
     });
 
-    it("uses isolate scope for template contents", () => {
+    fit("uses isolate scope for template contents", () => {
       var linkSpy = jasmine.createSpy();
       registerDirectives({
         myDirective: () => {

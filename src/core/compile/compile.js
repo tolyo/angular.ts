@@ -2968,14 +2968,15 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                     parentValueWatch,
                   );
                 } else {
-                  removeWatch = scope.$watch(attrs[attrName], (val) => {
-                    let res = $parse(val, parentValueWatch);
-                    return res;
+                  removeWatch = scope.$watch(attrName, (val) => {
+                    if (val) {
+                      scope[attrs[attrName]] = val;
+                    }
                   });
-                  //   $parse(, parentValueWatch),
-                  //   null,
-                  //   parentGet.literal,
-                  // );
+                  removeWatchCollection.push(removeWatch);
+                  removeWatch = scope.$watch(attrs[attrName], (val) => {
+                    destination[attrName] = val;
+                  });
                 }
                 removeWatchCollection.push(removeWatch);
                 break;
