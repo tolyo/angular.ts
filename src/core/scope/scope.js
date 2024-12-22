@@ -133,7 +133,7 @@ export class Scope {
     this.watchers = context ? context.watchers : new Map();
 
     /** @type {Map<String, Function[]>} Event listeners */
-    this.$$listeners = context ? context.$$listeners : new Map();
+    this.$$listeners = new Map();
 
     /** @type {Map<string, Array<Listener>>} Watch listeners from other proxies */
     this.foreignListeners = context ? context.foreignListeners : new Map();
@@ -961,6 +961,12 @@ export class Scope {
   eventHelper({ name, event, broadcast }, ...args) {
     if (!broadcast) {
       if (!this.$$listeners.has(name)) {
+        if (this.$parent) {
+          return this.$parent?.eventHelper(
+            { name: name, event: event, broadcast: broadcast },
+            ...args,
+          );
+        }
         return;
       }
     }
