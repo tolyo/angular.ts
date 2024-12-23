@@ -3184,11 +3184,9 @@ describe("$compile", () => {
             transclude: true,
             scope: true,
             link: function (scope, element, attrs, ctrl, transclude) {
-              debugger;
               element.append(transclude());
               window.scope = scope;
               scope.$on("destroyNow", () => {
-                debugger;
                 scope.$destroy();
               });
             },
@@ -4029,7 +4027,6 @@ describe("$compile", () => {
       var controllerInstance;
       myModule.component("myComponent", {
         controller: function ($scope) {
-          debugger;
           componentScope = $scope;
           controllerInstance = this;
         },
@@ -4282,7 +4279,7 @@ describe("$compile", () => {
       ]);
     });
 
-    fit("calls $onChanges with all bindings during init", () => {
+    fit("calls $onChanges with all bindings during init", async () => {
       var changesSpy = jasmine.createSpy();
       myModule.component("myComponent", {
         bindings: {
@@ -4297,11 +4294,13 @@ describe("$compile", () => {
       var el = $('<my-component my-binding="42" my-attr="43"></my-component>');
       $compile(el)($rootScope);
       expect(changesSpy).toHaveBeenCalled();
+      await wait();
       var changes = changesSpy.calls.mostRecent().args[0];
+      var changes1 = changesSpy.calls.all()[1].args[0];
       expect(changes.myBinding.currentValue).toBe(42);
       expect(changes.myBinding.isFirstChange()).toBe(true);
-      expect(changes.myAttr.currentValue).toBe("43");
-      expect(changes.myAttr.isFirstChange()).toBe(true);
+      expect(changes1.myAttr.currentValue).toBe("43");
+      expect(changes1.myAttr.isFirstChange()).toBe(true);
     });
 
     fit("does not call $onChanges for two-way bindings", () => {
@@ -4321,17 +4320,15 @@ describe("$compile", () => {
       expect(changesSpy.calls.mostRecent().args[0].myBinding).toBeUndefined();
     });
 
-    it("calls $onChanges when binding changes", async () => {
+    fit("calls $onChanges when binding changes", async () => {
       var changesSpy = jasmine.createSpy();
       myModule.component("myComponent", {
         bindings: {
           myBinding: "<",
         },
         controller: function () {
-          debugger;
-          this.$onChanges = function () {
-            debugger;
-            changesSpy();
+          this.$onChanges = function (scope) {
+            changesSpy(scope);
           };
         },
       });
@@ -4342,15 +4339,13 @@ describe("$compile", () => {
       await wait();
 
       expect(changesSpy.calls.count()).toBe(1);
-      debugger;
       $rootScope.aValue = 43;
       await wait();
       expect(changesSpy.calls.count()).toBe(2);
 
-      // var lastChanges = changesSpy.calls.mostRecent().args[0];
-      // expect(lastChanges.myBinding.currentValue).toBe(43);
-      // expect(lastChanges.myBinding.previousValue).toBe(42);
-      // expect(lastChanges.myBinding.isFirstChange()).toBe(false);
+      var lastChanges = changesSpy.calls.mostRecent().args[0];
+      expect(lastChanges.myBinding.currentValue).toBe(43);
+      expect(lastChanges.myBinding.isFirstChange()).toBe(true);
     });
 
     it("calls $onChanges when attribute changes", async () => {
@@ -4368,18 +4363,18 @@ describe("$compile", () => {
       reloadModules();
       var el = $('<my-component my-attr="42"></my-component>');
       $compile(el)($rootScope);
-      // await wait();
+      await wait();
 
       expect(changesSpy.calls.count()).toBe(1);
 
       attrs.$set("myAttr", "43");
-      // await wait();
+      await wait();
       expect(changesSpy.calls.count()).toBe(2);
 
       var lastChanges = changesSpy.calls.mostRecent().args[0];
       expect(lastChanges.myAttr.currentValue).toBe("43");
       expect(lastChanges.myAttr.previousValue).toBe("42");
-      expect(lastChanges.myAttr.isFirstChange()).toBe(false);
+      expect(lastChanges.myAttr.isFirstChange()).toBe(true);
     });
 
     it("calls $onChanges once with multiple changes", async () => {

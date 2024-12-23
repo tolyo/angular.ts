@@ -548,31 +548,15 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
 
       // This function is called in a $postUpdate to trigger all the onChanges hooks in a single digest
       function flushOnChangesQueue() {
-        try {
-          if (!--ttl) {
-            // We have hit the TTL limit so reset everything
-            onChangesQueue = undefined;
-            throw $compileMinErr(
-              "infchng",
-              "{0} $onChanges() iterations reached. Aborting!\n",
-              ttl,
-            );
+        for (let i = 0, ii = onChangesQueue.length; i < ii; ++i) {
+          try {
+            onChangesQueue[i]();
+          } catch (e) {
+            $exceptionHandler(e);
           }
-          // We must run this hook in an apply since the $postUpdate runs outside apply
-          $rootScope.$apply(() => {
-            for (let i = 0, ii = onChangesQueue.length; i < ii; ++i) {
-              try {
-                onChangesQueue[i]();
-              } catch (e) {
-                $exceptionHandler(e);
-              }
-            }
-            // Reset the queue to trigger a new schedule next time there is a change
-            onChangesQueue = undefined;
-          });
-        } finally {
-          ttl++;
         }
+        // Reset the queue to trigger a new schedule next time there is a change
+        onChangesQueue = undefined;
       }
 
       const startSymbol = $interpolate.startSymbol();
@@ -1391,7 +1375,6 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                 }
               }
               if (isFunction(controllerInstance.$doCheck)) {
-                debugger;
                 // this will throw
                 controllerScope.$watch(() => {
                   controllerInstance.$doCheck();
@@ -2999,19 +2982,18 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                 );
                 scope.attrs = attrs;
                 removeWatch = scope.$watch(
+                  attrs[attrName],
+                  (val) => {
+                    scope.attrs[attrName] = val;
+                  },
+                  true,
+                );
+                removeWatchCollection.push(removeWatch);
+                removeWatch = scope.$watch(
                   `attrs.${attrName}`,
-                  (newValue, oldValue) => {
-                    if (oldValue === newValue) {
-                      if (
-                        oldValue === initialValue ||
-                        (isLiteral && equals(oldValue, initialValue))
-                      ) {
-                        return;
-                      }
-                      oldValue = initialValue;
-                    }
-                    recordChanges(scopeName, newValue, oldValue);
-                    destination[scopeName] = newValue;
+                  (val) => {
+                    recordChanges(scopeName, val);
+                    destination[scopeName] = val;
                   },
                   true,
                 );
@@ -3042,11 +3024,8 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
             }
           });
         }
-        function recordChanges(key, currentValue, previousValue) {
-          if (
-            isFunction(destination.$onChanges) &&
-            !simpleCompare(currentValue, previousValue)
-          ) {
+        function recordChanges(key, currentValue) {
+          if (isFunction(destination.$onChanges)) {
             // If we have not already scheduled the top level onChangesQueue handler then do so now
             if (!onChangesQueue) {
               scope.$postUpdate(flushOnChangesQueue);
@@ -3057,12 +3036,8 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
               changes = {};
               onChangesQueue.push(triggerOnChangesHook);
             }
-            // If the has been a change on this property already then we need to reuse the previous value
-            if (changes[key]) {
-              previousValue = changes[key].previousValue;
-            }
             // Store this change
-            changes[key] = new SimpleChange(previousValue, currentValue);
+            changes[key] = new SimpleChange(currentValue);
           }
         }
 
@@ -3088,16 +3063,15 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
 }
 
 class SimpleChange {
-  constructor(previous, current) {
-    this.previousValue = previous;
+  constructor(current) {
     this.currentValue = current;
+    this.firstChange = false;
   }
-
   /**
    * @returns {boolean}
    */
   isFirstChange() {
-    return this.previousValue === UNINITALIZED_VALIED;
+    return !this.firstChange;
   }
 }
 
