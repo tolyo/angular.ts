@@ -296,6 +296,17 @@ export class Attributes {
   }
 }
 
+/**
+ * Computes the difference between two space-separated token strings.
+ * 
+ * @param {string} str1 - The first string containing space-separated tokens.
+ * @param {string} str2 - The second string containing space-separated tokens.
+ * @returns {string} A string containing tokens that are in str1 but not in str2, separated by spaces.
+ * 
+ * @example
+ * // returns "apple orange"
+ * tokenDifference("apple banana orange", "banana grape");
+ */
 function tokenDifference(str1, str2) {
   let values = "";
   const tokens1 = str1.split(/\s+/);

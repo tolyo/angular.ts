@@ -2713,16 +2713,16 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                   (
                     (attr.$$observers && attr.$$observers[name].$$scope) ||
                     scope
-                  ).$watch(x, (newValue, oldValue) => {
-                    newValue = interpolateFn(scope);
+                  ).$watch(x, () => {
+                    let newValue = interpolateFn(scope);
                     // special case for class attribute addition + removal
                     // so that class changes can tap into the animation
                     // hooks provided by the $animate service. Be sure to
                     // skip animations when the first digest occurs (when
                     // both the new and the old values are the same) since
                     // the CSS classes are the non-interpolated values
-                    if (name === "class" && newValue !== oldValue) {
-                      attr.$updateClass(newValue, oldValue);
+                    if (name === "class") {
+                      attr.$updateClass(newValue, attr.$$element[0].classList.value);
                     } else {
                       attr.$set(name, newValue);
                     }

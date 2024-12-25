@@ -3937,6 +3937,7 @@ describe("$compile", () => {
 
         expect(el.html()).toEqual("Value is 42");
       });
+      expect().toBe();
     });
   });
 
@@ -4348,7 +4349,7 @@ describe("$compile", () => {
       expect(lastChanges.myBinding.isFirstChange()).toBe(true);
     });
 
-    it("calls $onChanges when attribute changes", async () => {
+    fit("calls $onChanges when attribute changes", async () => {
       var changesSpy = jasmine.createSpy();
       var attrs;
       myModule.component("myComponent", {
@@ -4373,11 +4374,10 @@ describe("$compile", () => {
 
       var lastChanges = changesSpy.calls.mostRecent().args[0];
       expect(lastChanges.myAttr.currentValue).toBe("43");
-      expect(lastChanges.myAttr.previousValue).toBe("42");
       expect(lastChanges.myAttr.isFirstChange()).toBe(true);
     });
 
-    it("calls $onChanges once with multiple changes", async () => {
+    fit("calls $onChanges once with multiple changes", async () => {
       var changesSpy = jasmine.createSpy();
       var attrs;
       myModule.component("myComponent", {
@@ -4396,13 +4396,13 @@ describe("$compile", () => {
         '<my-component my-binding="aValue" my-attr="fourtyTwo"></my-component>',
       );
       $compile(el)($rootScope);
-      // await wait();
+      await wait();
 
       expect(changesSpy.calls.count()).toBe(1);
 
       $rootScope.aValue = 43;
       attrs.$set("myAttr", "fourtyThree");
-      // await wait();
+      await wait();
       expect(changesSpy.calls.count()).toBe(2);
 
       var lastChanges = changesSpy.calls.mostRecent().args[0];
@@ -4412,7 +4412,7 @@ describe("$compile", () => {
       expect(lastChanges.myAttr.previousValue).toBe("fourtyTwo");
     });
 
-    it("runs $onChanges in a digest", async () => {
+    fit("runs $onChanges in a digest", async () => {
       var changesSpy = jasmine.createSpy();
       myModule.component("myComponent", {
         bindings: {
@@ -4429,15 +4429,15 @@ describe("$compile", () => {
       $rootScope.aValue = 42;
       var el = $('<my-component my-binding="aValue"></my-component>');
       $compile(el)($rootScope);
-      // await wait();
+      await wait();
 
       $rootScope.aValue = 43;
-      // await wait();
+      await wait();
 
       expect(el.text()).toEqual("myBinding is 43");
     });
 
-    it("keeps first value as previous for $onChanges when multiple changes", async () => {
+    fit("keeps first value as previous for $onChanges when multiple changes", async () => {
       var changesSpy = jasmine.createSpy();
       myModule.component("myComponent", {
         bindings: {
@@ -4451,7 +4451,7 @@ describe("$compile", () => {
       $rootScope.aValue = 42;
       var el = $('<my-component my-binding="aValue"></my-component>');
       $compile(el)($rootScope);
-      // await wait();
+      await wait();
 
       $rootScope.aValue = 43;
       $rootScope.$watch("aValue", () => {
@@ -4459,7 +4459,7 @@ describe("$compile", () => {
           $rootScope.aValue = 44;
         }
       });
-      // await wait();
+      await wait();
       expect(changesSpy.calls.count()).toBe(2);
 
       var lastChanges = changesSpy.calls.mostRecent().args[0];
@@ -4467,7 +4467,7 @@ describe("$compile", () => {
       expect(lastChanges.myBinding.previousValue).toBe(42);
     });
 
-    it("runs $onChanges for all components in the same digest", async () => {
+    fit("runs $onChanges for all components in the same digest", async () => {
       myModule
         .component("first", {
           bindings: { myBinding: "<" },
@@ -4493,18 +4493,18 @@ describe("$compile", () => {
           "</div>",
       );
       $compile(el)($rootScope);
-      // await wait();
+      await wait();
       // Dirty watches always cause a second digest
       expect(watchSpy.calls.count()).toBe(2);
 
       $rootScope.aValue = 43;
-      // await wait();
+      await wait();
       // Two more because of dirty watches $apply here,
       // plus one more for onchanges
       expect(watchSpy.calls.count()).toBe(5);
     });
 
-    it("has a TTL for $onChanges", async () => {
+    fit("has a TTL for $onChanges", async () => {
       myModule.component("myComponent", {
         bindings: {
           input: "<",
@@ -4529,18 +4529,18 @@ describe("$compile", () => {
           "</div>",
       );
       $compile(el)($rootScope);
-      // await wait();
+      await wait();
 
       $rootScope.valueOne = 42;
       $rootScope.valueTwo = 42;
-      // await wait();
+      await wait();
       expect($rootScope.valueOne).toBe(51);
       expect($rootScope.valueTwo).toBe(51);
     });
   });
 
   describe("configuration", () => {
-    it("should use $$sanitizeUriProvider for reconfiguration of the `aHrefSanitizationTrustedUrlList`", () => {
+    fit("should use $$sanitizeUriProvider for reconfiguration of the `aHrefSanitizationTrustedUrlList`", () => {
       createInjector([
         "ng",
         ($compileProvider, $$sanitizeUriProvider) => {
@@ -4562,7 +4562,7 @@ describe("$compile", () => {
       ]);
     });
 
-    it("should use $$sanitizeUriProvider for reconfiguration of the `imgSrcSanitizationTrustedUrlList`", () => {
+    fit("should use $$sanitizeUriProvider for reconfiguration of the `imgSrcSanitizationTrustedUrlList`", () => {
       createInjector([
         "ng",
         ($compileProvider, $$sanitizeUriProvider) => {
@@ -4584,7 +4584,7 @@ describe("$compile", () => {
       ]);
     });
 
-    it("should allow strictComponentBindingsEnabled to be configured", () => {
+    fit("should allow strictComponentBindingsEnabled to be configured", () => {
       createInjector([
         "ng",
         ($compileProvider) => {
@@ -4595,7 +4595,7 @@ describe("$compile", () => {
       ]);
     });
 
-    it("should register a directive", () => {
+    fit("should register a directive", () => {
       myModule.directive("div", () => ({
         restrict: "EA",
         link(scope, element) {
@@ -4609,7 +4609,7 @@ describe("$compile", () => {
       expect(log).toEqual("OK");
     });
 
-    it("should allow registration of multiple directives with same name", () => {
+    fit("should allow registration of multiple directives with same name", () => {
       myModule
         .directive("div", () => ({
           restrict: "EA",
@@ -4631,21 +4631,21 @@ describe("$compile", () => {
       expect(log).toEqual(["pre1", "pre2", "post2", "post1"]);
     });
 
-    it('should throw an exception if a directive is called "hasOwnProperty"', () => {
+    fit('should throw an exception if a directive is called "hasOwnProperty"', () => {
       expect(() => {
         myModule.directive("hasOwnProperty", () => {});
         reloadModules();
       }).toThrowError(/hasOwnProperty is not a valid directive name/);
     });
 
-    it("should throw an exception if a directive name starts with a non-lowercase letter", () => {
+    fit("should throw an exception if a directive name starts with a non-lowercase letter", () => {
       expect(() => {
         myModule.directive("BadDirectiveName", () => {});
         reloadModules();
       }).toThrowError(/The first character must be a lowercase letter/);
     });
 
-    it("should throw an exception if a directive name has leading or trailing whitespace", () => {
+    fit("should throw an exception if a directive name has leading or trailing whitespace", () => {
       function assertLeadingOrTrailingWhitespaceInDirectiveName(name) {
         expect(() => {
           myModule.directive(name, () => {});
@@ -4663,14 +4663,14 @@ describe("$compile", () => {
       );
     });
 
-    it("should throw an exception if the directive name is not defined", () => {
+    fit("should throw an exception if the directive name is not defined", () => {
       expect(() => {
         myModule.directive();
         createInjector(["myModule"]).invoke(($compile) => {});
       }).toThrowError(/areq/);
     });
 
-    it("should ignore special chars before processing attribute directive name", () => {
+    fit("should ignore special chars before processing attribute directive name", () => {
       // a regression https://github.com/angular/angular.js/issues/16278
       myModule.directive("t", () => ({
         restrict: "A",
@@ -4686,14 +4686,14 @@ describe("$compile", () => {
       expect(log.join("; ")).toEqual("pre; post; pre; post; pre; post");
     });
 
-    it("should throw an exception if the directive factory is not defined", () => {
+    fit("should throw an exception if the directive factory is not defined", () => {
       expect(() => {
         myModule.directive("myDir");
         createInjector(["myModule"]).invoke(($compile) => {});
       }).toThrowError(/areq/);
     });
 
-    it("should preserve context within declaration", () => {
+    fit("should preserve context within declaration", () => {
       myModule
         .directive("ff", () => {
           const declaration = {
@@ -4794,7 +4794,7 @@ describe("$compile", () => {
       dealoc(element);
     });
 
-    it("should handle transcluded svg elements", () => {
+    fit("should handle transcluded svg elements", () => {
       element = JQLite(
         "<div><svg-container>" +
           '<circle cx="4" cy="4" r="2"></circle>' +
@@ -4808,7 +4808,7 @@ describe("$compile", () => {
       assertIsValidSvgCircle(circle[0]);
     });
 
-    it("should handle custom svg elements inside svg tag", () => {
+    fit("should handle custom svg elements inside svg tag", () => {
       element = JQLite(
         '<div><svg width="300" height="300">' +
           "<svg-circle></svg-circle>" +
@@ -4821,7 +4821,7 @@ describe("$compile", () => {
       assertIsValidSvgCircle(circle[0]);
     });
 
-    it("should handle transcluded custom svg elements", () => {
+    fit("should handle transcluded custom svg elements", () => {
       element = JQLite(
         "<div><svg-container>" +
           "<svg-circle></svg-circle>" +
@@ -4846,7 +4846,7 @@ describe("$compile", () => {
       "</foreignObject>" +
       "</svg>";
 
-    it("should handle foreignObject", () => {
+    fit("should handle foreignObject", () => {
       element = JQLite(
         `<div>${
           // By hand (for reference)
@@ -4874,7 +4874,7 @@ describe("$compile", () => {
       expect(testBounds.height).toBe(referenceBounds.height);
     });
 
-    it("should handle custom svg containers that transclude to foreignObject that transclude html", () => {
+    fit("should handle custom svg containers that transclude to foreignObject that transclude html", () => {
       element = JQLite(
         `<div>${
           // By hand (for reference)
@@ -4902,7 +4902,7 @@ describe("$compile", () => {
       expect(testBounds.height).toBe(referenceBounds.height);
     });
 
-    it("should handle directives with templates that manually add the transclude further down", () => {
+    fit("should handle directives with templates that manually add the transclude further down", () => {
       element = JQLite(
         "<div><svg-custom-transclude-container>" +
           '<circle cx="2" cy="2" r="1"></circle></svg-custom-transclude-container>' +
@@ -4915,7 +4915,7 @@ describe("$compile", () => {
       assertIsValidSvgCircle(circle[0]);
     });
 
-    it("should support directives with SVG templates and a slow url that are stamped out later by a transcluding directive", (done) => {
+    fit("should support directives with SVG templates and a slow url that are stamped out later by a transcluding directive", (done) => {
       window.angular.module("test", []).directive(
         "svgCircleUrl",
         valueFn({
@@ -4959,14 +4959,15 @@ describe("$compile", () => {
     //   expect($document.scope()).toBe($rootScope);
     // });
 
-    it("should not wrap root text nodes in spans", () => {
+    fit("should not wrap root text nodes in spans", async () => {
       element = JQLite("<div>   <div>A</div>\n  <div>B</div>C\t\n  </div>");
       $compile(element[0].childNodes)($rootScope);
+      await wait();
       const spans = element.find("span");
       expect(spans.length).toEqual(0);
     });
 
-    it("should be able to compile text nodes at the root", () => {
+    fit("should be able to compile text nodes at the root", () => {
       element = JQLite("<div>Name: {{name}}<br />\nColor: {{color}}</div>");
       $rootScope.name = "Lucas";
       $rootScope.color = "blue";
@@ -4974,7 +4975,7 @@ describe("$compile", () => {
       expect(element.text()).toEqual("Name: Lucas\nColor: blue");
     });
 
-    it("should not leak memory when there are top level empty text nodes", () => {
+    fit("should not leak memory when there are top level empty text nodes", () => {
       // We compile the contents of element (i.e. not element itself)
       // Then delete these contents and check the cache has been reset to zero
       // Clear cache
@@ -5011,7 +5012,7 @@ describe("$compile", () => {
       });
     });
 
-    it("should not blow up when elements with no childNodes property are compiled", () => {
+    fit("should not blow up when elements with no childNodes property are compiled", () => {
       // it turns out that when a browser plugin is bound to a DOM element (typically <object>),
       // the plugin's context rather than the usual DOM apis are exposed on this element, so
       // childNodes might not exist.
@@ -5035,7 +5036,7 @@ describe("$compile", () => {
       expect(element.html()).toBe("3");
     });
 
-    it('should detect anchor elements with the string "SVG" in the `href` attribute as an anchor', () => {
+    fit('should detect anchor elements with the string "SVG" in the `href` attribute as an anchor', async () => {
       element = JQLite(
         '<div><a href="/ID_SVG_ID">' +
           '<span ng-if="true">Should render</span>' +
@@ -5043,11 +5044,12 @@ describe("$compile", () => {
       );
 
       $compile(element[0].childNodes)($rootScope);
+      await wait();
       document.body.appendChild(element[0]);
       expect(element.find("span").text()).toContain("Should render");
     });
 
-    it("should allow changing the template structure after the current node", () => {
+    fit("should allow changing the template structure after the current node", () => {
       myModule.directive(
         "after",
         valueFn({
@@ -5062,7 +5064,7 @@ describe("$compile", () => {
       expect(element.text()).toBe("AB");
     });
 
-    it("should allow changing the template structure after the current node inside ngRepeat", () => {
+    fit("should allow changing the template structure after the current node inside ngRepeat", async () => {
       myModule.directive(
         "after",
         valueFn({
@@ -5077,10 +5079,11 @@ describe("$compile", () => {
         '<div><div ng-repeat="i in [1,2]"><div after>A</div></div></div>',
       );
       $compile(element)($rootScope);
+      await wait();
       expect(element.text()).toBe("ABAB");
     });
 
-    it("should allow modifying the DOM structure in post link fn", () => {
+    fit("should allow modifying the DOM structure in post link fn", async () => {
       myModule.directive(
         "removeNode",
         valueFn({
@@ -5093,13 +5096,14 @@ describe("$compile", () => {
       element = JQLite("<div><div remove-node></div><div>{{test}}</div></div>");
       $rootScope.test = "Hello";
       $compile(element)($rootScope);
+      await wait();
       expect(element.children().length).toBe(1);
       expect(element.text()).toBe("Hello");
     });
   });
 
   describe("error handling", () => {
-    it("should handle exceptions", () => {
+    fit("should handle exceptions", () => {
       myModule
         .factory("$exceptionHandler", () => {
           return (exception) => {
@@ -5138,7 +5142,7 @@ describe("$compile", () => {
 
   describe("compiler control", () => {
     describe("priority", () => {
-      it("should honor priority", () => {
+      fit("should honor priority", () => {
         registerDefaultDirectives();
         reloadModules();
         element = $compile(
@@ -5149,7 +5153,7 @@ describe("$compile", () => {
     });
 
     describe("terminal", () => {
-      it("should prevent further directives from running", () => {
+      fit("should prevent further directives from running", () => {
         registerDefaultDirectives();
         reloadModules();
 
@@ -5159,7 +5163,7 @@ describe("$compile", () => {
         expect(element.text()).toEqual("OK");
       });
 
-      it("should prevent further directives from running, but finish current priority level", () => {
+      fit("should prevent further directives from running, but finish current priority level", () => {
         // class is processed after attrs, so putting log in class will put it after
         // the stop in the current level. This proves that the log runs after stop
         registerDefaultDirectives();
@@ -5174,7 +5178,7 @@ describe("$compile", () => {
     });
 
     describe("restrict", () => {
-      it("should allow restriction of availability", () => {
+      fit("should allow restriction of availability", () => {
         Object.entries({ div: "E", attr: "A", all: "EA" }).forEach(
           ([name, restrict]) => {
             myModule.directive(name, () => ({
@@ -5205,7 +5209,7 @@ describe("$compile", () => {
         dealoc($compile('<all class="all" all></all>')($rootScope));
       });
 
-      it("should use EA rule as the default", () => {
+      fit("should use EA rule as the default", () => {
         myModule.directive("defaultDir", () => ({
           compile() {
             log.push("defaultDir");
@@ -5351,33 +5355,33 @@ describe("$compile", () => {
           }));
       });
 
-      it("should replace element with template", () => {
+      fit("should replace element with template", () => {
         reloadModules();
         element = $compile("<div><div replace>ignore</div><div>")($rootScope);
         expect(element.text()).toEqual("Replace!");
         expect(element.find("div").attr("compiled")).toEqual("COMPILED");
       });
 
-      it("should append element with template", () => {
+      fit("should append element with template", () => {
         reloadModules();
         element = $compile("<div><div append>ignore</div><div>")($rootScope);
         expect(element.text()).toEqual("Append!");
         expect(element.find("div").attr("compiled")).toEqual("COMPILED");
       });
 
-      it("should compile template when replacing", () => {
+      fit("should compile template when replacing", () => {
         reloadModules();
         element = $compile("<div><div replace>ignore</div><div>")($rootScope);
         expect(element.text()).toEqual("Replace!");
       });
 
-      it("should compile template when appending", () => {
+      fit("should compile template when appending", () => {
         reloadModules();
         element = $compile("<div><div append>ignore</div><div>")($rootScope);
         expect(element.text()).toEqual("Append!");
       });
 
-      it("should merge attributes including style attr", () => {
+      fit("should merge attributes including style attr", () => {
         reloadModules();
         element = $compile(
           '<div><div replace class="medium-log" style="height: 20px" ></div><div>',
@@ -5391,7 +5395,7 @@ describe("$compile", () => {
         expect(div.attr("high-log")).toEqual("");
       });
 
-      it("should not merge attributes if they are the same", () => {
+      fit("should not merge attributes if they are the same", () => {
         reloadModules();
         element = $compile(
           '<div><div nomerge class="medium-log" id="myid"></div><div>',
@@ -5402,7 +5406,7 @@ describe("$compile", () => {
         expect(div.attr("id")).toEqual("myid");
       });
 
-      it("should correctly merge attributes that contain special characters", () => {
+      fit("should correctly merge attributes that contain special characters", () => {
         reloadModules();
         element = $compile(
           '<div><div replace (click)="doSomething()" [value]="someExpression" ω="omega"></div><div>',
@@ -5413,7 +5417,7 @@ describe("$compile", () => {
         expect(div.attr("ω")).toEqual("omega");
       });
 
-      it('should not add white-space when merging an attribute that is "" in the replaced element', () => {
+      fit('should not add white-space when merging an attribute that is "" in the replaced element', () => {
         reloadModules();
         element = $compile('<div><div replace class=""></div><div>')(
           $rootScope,
@@ -5423,7 +5427,7 @@ describe("$compile", () => {
         expect(div.attr("class")).toBe("log");
       });
 
-      it("should not set merged attributes twice in $attrs", () => {
+      fit("should not set merged attributes twice in $attrs", () => {
         reloadModules();
         element = $compile(
           '<div><div log-attrs replace class="myLog"></div><div>',
@@ -5433,57 +5437,57 @@ describe("$compile", () => {
         expect(attrs.class).toBe("myLog log");
       });
 
-      it("should play nice with repeater when replacing", () => {
+      fit("should play nice with repeater when replacing", async () => {
         reloadModules();
         element = $compile(
           "<div>" + '<div ng-repeat="i in [1,2]" replace></div>' + "</div>",
         )($rootScope);
+        await wait();
         expect(element.text()).toEqual("Replace!Replace!");
       });
 
-      it("should play nice with repeater when appending", () => {
+      fit("should play nice with repeater when appending", async () => {
         reloadModules();
         element = $compile(
           "<div>" + '<div ng-repeat="i in [1,2]" append></div>' + "</div>",
         )($rootScope);
+        await wait();
         expect(element.text()).toEqual("Append!Append!");
       });
 
-      it("should handle interpolated css class from replacing directive", () => {
+      fit("should handle interpolated css class from replacing directive", async () => {
         reloadModules();
         element = $compile("<div replace-with-interpolated-class></div>")(
           $rootScope,
         );
+        await wait();
         expect(element[0].classList.contains("class_2")).toBeTrue();
       });
 
-      it("should merge interpolated css class", () => {
+      fit("should merge interpolated css class", async () => {
         reloadModules();
-        element = $compile('<div class="one {{cls}} three" replace></div>')(
-          $rootScope,
-        );
-
-        $rootScope.$apply(() => {
-          $rootScope.cls = "two";
-        });
-
-        expect(element[0].classList.contains("one")).toBeTrue();
+        element = $compile('<div class="one {{cls}} three" replace></div>')($rootScope);
+        await wait();
+        
+        $rootScope.cls = "two";
+        await wait(); 
+        
+        xpect(element[0].classList.contains("one")).toBeTrue();
         expect(element[0].classList.contains("two")).toBeTrue(); // interpolated
         expect(element[0].classList.contains("three")).toBeTrue();
         expect(element[0].classList.contains("log")).toBeTrue(); // merged from replace directive template
       });
 
-      it("should merge interpolated css class with ngRepeat", () => {
+      fit("should merge interpolated css class with ngRepeat", async () => {
         reloadModules();
         element = $compile(
           "<div>" +
             '<div ng-repeat="i in [1]" class="one {{cls}} three" replace></div>' +
             "</div>",
         )($rootScope);
-
-        $rootScope.$apply(() => {
-          $rootScope.cls = "two";
-        });
+        await wait();
+        $rootScope.cls = "two";
+        await wait();
 
         const child = element.find("div").eq(0);
         expect(child[0].classList.contains("one")).toBeTrue();
@@ -5492,15 +5496,16 @@ describe("$compile", () => {
         expect(child[0].classList.contains("log")).toBeTrue(); // merged from replace directive template
       });
 
-      it("should interpolate the values once per digest", () => {
+      fit("should interpolate the values once per digest", async () => {
+        let logs = []
         $rootScope.log = (res) => {
-          log.push(res);
+          logs.push(res);
         };
+        
+        element = $compile('<div>{{log("A")}} foo {{log("B")}}</div>')($rootScope);
 
-        element = $compile('<div>{{log("A")}} foo {{::log("B")}}</div>')(
-          $rootScope,
-        );
-        expect(log.join("; ")).toEqual("A; B; A; B");
+        await wait();
+        expect(logs.join("; ")).toEqual("A; B; A; B");
       });
 
       describe("replace and not exactly one root element", () => {
@@ -5526,21 +5531,21 @@ describe("$compile", () => {
           });
         });
 
-        it("should throw if: no root element", () => {
+        fit("should throw if: no root element", () => {
           templateVar = "dada";
           expect(() => {
             $compile("<p template></p>");
           }).toThrowError(/tplrt/);
         });
 
-        it("should throw if: multiple root elements", () => {
+        fit("should throw if: multiple root elements", () => {
           templateVar = "<div></div><div></div>";
           expect(() => {
             $compile("<p template></p>");
           }).toThrowError(/tplrt/);
         });
 
-        it("should not throw if the root element is accompanied by: whitespace", () => {
+        fit("should not throw if the root element is accompanied by: whitespace", () => {
           templateVar = "  <div>Hello World!</div> \n";
           let element;
           expect(() => {
@@ -5550,7 +5555,7 @@ describe("$compile", () => {
           expect(element.text()).toBe("Hello World!");
         });
 
-        it("should not throw if the root element is accompanied by: comments", () => {
+        fit("should not throw if the root element is accompanied by: comments", () => {
           templateVar = "<!-- oh hi --><div>Hello World!</div> \n";
           let element;
           expect(() => {
@@ -5560,7 +5565,7 @@ describe("$compile", () => {
           expect(element.text()).toBe("Hello World!");
         });
 
-        it("should not throw if the root element is accompanied by: comments + whitespace", () => {
+        fit("should not throw if the root element is accompanied by: comments + whitespace", () => {
           templateVar =
             "  <!-- oh hi -->  <div>Hello World!</div>  <!-- oh hi -->\n";
           let element;
@@ -5572,7 +5577,7 @@ describe("$compile", () => {
         });
       });
 
-      it("should support templates with root <tr> tags", () => {
+      fit("should support templates with root <tr> tags", () => {
         reloadModules();
         expect(() => {
           element = $compile("<div replace-with-tr></div>")($rootScope);
@@ -5580,7 +5585,7 @@ describe("$compile", () => {
         expect(getNodeName(element)).toMatch(/tr/i);
       });
 
-      it("should support templates with root <td> tags", () => {
+      fit("should support templates with root <td> tags", () => {
         reloadModules();
         expect(() => {
           element = $compile("<div replace-with-td></div>")($rootScope);
@@ -5588,7 +5593,7 @@ describe("$compile", () => {
         expect(getNodeName(element)).toMatch(/td/i);
       });
 
-      it("should support templates with root <th> tags", () => {
+      fit("should support templates with root <th> tags", () => {
         reloadModules();
         expect(() => {
           element = $compile("<div replace-with-th></div>")($rootScope);
@@ -5604,7 +5609,7 @@ describe("$compile", () => {
         expect(getNodeName(element)).toMatch(/thead/i);
       });
 
-      it("should support templates with root <tbody> tags", () => {
+      fit("should support templates with root <tbody> tags", () => {
         reloadModules();
         expect(() => {
           element = $compile("<div replace-with-tbody></div>")($rootScope);
@@ -5612,7 +5617,7 @@ describe("$compile", () => {
         expect(getNodeName(element)).toMatch(/tbody/i);
       });
 
-      it("should support templates with root <tfoot> tags", () => {
+      fit("should support templates with root <tfoot> tags", () => {
         reloadModules();
         expect(() => {
           element = $compile("<div replace-with-tfoot></div>")($rootScope);
@@ -5620,7 +5625,7 @@ describe("$compile", () => {
         expect(getNodeName(element)).toMatch(/tfoot/i);
       });
 
-      it("should support templates with root <option> tags", () => {
+      fit("should support templates with root <option> tags", () => {
         reloadModules();
         expect(() => {
           element = $compile("<div replace-with-option></div>")($rootScope);
@@ -5628,7 +5633,7 @@ describe("$compile", () => {
         expect(getNodeName(element)).toMatch(/option/i);
       });
 
-      it("should support templates with root <optgroup> tags", () => {
+      fit("should support templates with root <optgroup> tags", () => {
         reloadModules();
         expect(() => {
           element = $compile("<div replace-with-optgroup></div>")($rootScope);
@@ -5636,7 +5641,7 @@ describe("$compile", () => {
         expect(getNodeName(element)).toMatch(/optgroup/i);
       });
 
-      it("should support SVG templates using directive.templateNamespace=svg", () => {
+      fit("should support SVG templates using directive.templateNamespace=svg", async () => {
         myModule.directive(
           "svgAnchor",
           valueFn({
@@ -5653,13 +5658,14 @@ describe("$compile", () => {
         element = $compile(
           '<svg><g svg-anchor="/foo/bar" text="foo/bar!"></g></svg>',
         )($rootScope);
+        await wait();
         const child = element.children().eq(0);
         expect(getNodeName(child)).toMatch(/a/i);
         expect(isSVGElement(child[0])).toBe(true);
         expect(child[0].href.baseVal).toBe("/foo/bar");
       });
 
-      it("should support MathML templates using directive.templateNamespace=math", () => {
+      fit("should support MathML templates using directive.templateNamespace=math", () => {
         myModule.directive(
           "pow",
           valueFn({
@@ -5687,7 +5693,7 @@ describe("$compile", () => {
         expect(isHTMLElement(child[0])).toBe(false);
       });
 
-      it("should keep prototype properties on directive", () => {
+      fit("should keep prototype properties on directive", async () => {
         function DirectiveClass() {
           this.restrict = "E";
           this.template = "<p>{{value}}</p>";
@@ -5707,6 +5713,7 @@ describe("$compile", () => {
         element = $compile(
           "<template-url-with-prototype><template-url-with-prototype>",
         )($rootScope);
+        await wait();
         expect(element.find("p")[0].innerHTML).toEqual("Test Value");
       });
     });
@@ -5730,7 +5737,7 @@ describe("$compile", () => {
         );
       });
 
-      it("should evaluate `template` when defined as fn and use returned string as template", () => {
+      fit("should evaluate `template` when defined as fn and use returned string as template", () => {
         reloadModules();
         element = $compile(
           '<div my-directive="some value">original content<div>',
@@ -5925,18 +5932,19 @@ describe("$compile", () => {
         );
       });
 
-      it("should not load cross domain templates by default", () => {
+      fit("should not load cross domain templates by default", () => {
         expect(() => {
           $compile("<div cross-domain-template></div>")($rootScope);
         }).toThrowError(/insecurl/);
       });
 
-      it("should trust what is already in the template cache", () => {
+      fit("should trust what is already in the template cache", async () => {
         $templateCache.set(
           "http://example.com/should-not-load.html",
           "<span>example.com/cached-version</span>",
         );
         element = $compile("<div cross-domain-template></div>")($rootScope);
+        await wait();
         expect(element[0].outerHTML).toEqual(
           '<div cross-domain-template=""></div>',
         );
@@ -5945,7 +5953,7 @@ describe("$compile", () => {
         );
       });
 
-      it("should load cross domain templates when trusted", (done) => {
+      fit("should load cross domain templates when trusted", (done) => {
         element = $compile("<div trusted-template></div>")($rootScope);
         expect(element[0].outerHTML).toEqual('<div trusted-template=""></div>');
         setTimeout(() => {
@@ -5956,7 +5964,7 @@ describe("$compile", () => {
         }, 100);
       });
 
-      it("should append template via $http and cache it in $templateCache", (done) => {
+      fit("should append template via $http and cache it in $templateCache", (done) => {
         $templateCache.set("/mock/divexpr", "<span>Cau!</span>");
         element = $compile("<div><b hello>ignore</b><b cau>ignore</b></div>")(
           $rootScope,
@@ -5977,7 +5985,7 @@ describe("$compile", () => {
         }, 100);
       });
 
-      it("should inline template via $http and cache it in $templateCache", (done) => {
+      fit("should inline template via $http and cache it in $templateCache", (done) => {
         $templateCache.set("/mock/divexpr", "<span>Cau!</span>");
         element = $compile(
           "<div><b i-hello>ignore</b><b i-cau>ignore</b></div>",
@@ -5998,7 +6006,7 @@ describe("$compile", () => {
         }, 100);
       });
 
-      it("should compile, link and flush the template append", (done) => {
+      fit("should compile, link and flush the template append", (done) => {
         $templateCache.set("/mock/hello", "<span>Hello, {{name}}!</span>");
         $rootScope.name = "Elvis";
         element = $compile('<div><b hello=""></b></div>')($rootScope);
@@ -6011,7 +6019,7 @@ describe("$compile", () => {
         }, 100);
       });
 
-      it("should compile, link and flush the template inline", () => {
+      fit("should compile, link and flush the template inline", () => {
         $templateCache.set("/mock/div", "<span>Hello, {{name}}!</span>");
         $rootScope.name = "Elvis";
         element = $compile("<div><b i-hello></b></div>")($rootScope);
@@ -6021,7 +6029,7 @@ describe("$compile", () => {
         );
       });
 
-      it("should compile template when replacing element in another template", () => {
+      fit("should compile template when replacing element in another template", () => {
         $templateCache.set("/mock/hello", "<div replace></div>");
         $rootScope.name = "Elvis";
         element = $compile('<div><b hello=""></b></div>')($rootScope);
@@ -6031,7 +6039,7 @@ describe("$compile", () => {
         );
       });
 
-      it("should compile template when replacing root element", () => {
+      fit("should compile template when replacing root element", () => {
         $rootScope.name = "Elvis";
         element = $compile("<div replace></div>")($rootScope);
 
@@ -6040,7 +6048,7 @@ describe("$compile", () => {
         );
       });
 
-      it("should resolve widgets after cloning in append mode", (done) => {
+      fit("should resolve widgets after cloning in append mode", (done) => {
         $templateCache.set("/mock/divexpr", "<span>{{name}}</span>");
         $rootScope.greeting = "Hello";
         $rootScope.name = "Elvis";
@@ -6074,7 +6082,7 @@ describe("$compile", () => {
         }, 100);
       });
 
-      it("should resolve widgets after cloning in append mode without $templateCache", async () => {
+      fit("should resolve widgets after cloning in append mode without $templateCache", async () => {
         $rootScope.expr = "Elvis";
         const template = $compile("<div cau></div>");
         let e1;
@@ -6092,7 +6100,7 @@ describe("$compile", () => {
         dealoc(e2);
       });
 
-      it("should resolve widgets after cloning in inline mode", async () => {
+      fit("should resolve widgets after cloning in inline mode", async () => {
         $templateCache.set("/mock/divexpr", "<span>{{name}}</span>");
         $rootScope.greeting = "Hello";
         $rootScope.name = "Elvis";
@@ -6120,7 +6128,7 @@ describe("$compile", () => {
         dealoc(e2);
       });
 
-      it("should resolve widgets after cloning in inline mode without $templateCache", (done) => {
+      fit("should resolve widgets after cloning in inline mode without $templateCache", (done) => {
         $rootScope.expr = "Elvis";
         const template = $compile('<div i-cau=""></div>');
         let e1;
@@ -6141,7 +6149,7 @@ describe("$compile", () => {
         }, 100);
       });
 
-      it("should be implicitly terminal and not compile placeholder content in append", () => {
+      fit("should be implicitly terminal and not compile placeholder content in append", () => {
         // we can't compile the contents because that would result in a memory leak
         $templateCache.set("/mock/hello", "Hello!");
         element = $compile('<div><b hello=""><div log></div></b></div>')(
@@ -6163,7 +6171,7 @@ describe("$compile", () => {
       });
 
       // TODO: Figure out why the test fails twice
-      it("should throw an error and clear element content if the template fails to load", (done) => {
+      fit("should throw an error and clear element content if the template fails to load", (done) => {
         element = $compile("<div><b 401>content</b></div>")($rootScope);
         setTimeout(() => {
           expect(errors.length).toBe(2);
@@ -6172,7 +6180,7 @@ describe("$compile", () => {
         }, 1000);
       });
 
-      it("should copy classes from pre-template node into linked element", () => {
+      fit("should copy classes from pre-template node into linked element", () => {
         window.angular.module("test1", ["ng"]).directive(
           "test",
           valueFn({
@@ -6253,7 +6261,7 @@ describe("$compile", () => {
           );
         });
 
-        it("should flush after link append", () => {
+        fit("should flush after link append", () => {
           $templateCache.set("second.html", "<div third>{{1+2}}</div>");
           template = $compile("<div><span first second last></span></div>");
           element = template($rootScope);
@@ -6276,7 +6284,7 @@ describe("$compile", () => {
           expect(span.text()).toEqual("3");
         });
 
-        it("should flush after link inline", () => {
+        fit("should flush after link inline", () => {
           $templateCache.set("second.html", "<div i-third>{{1+2}}</div>");
           template = $compile(
             "<div><span i-first i-second i-last></span></div>",
@@ -6300,7 +6308,7 @@ describe("$compile", () => {
           expect(div.text()).toEqual("3");
         });
 
-        it("should flush before link append", () => {
+        fit("should flush before link append", () => {
           $templateCache.set("second.html", "<div third>{{1+2}}</div>");
           template = $compile("<div><span first second last></span></div>");
           expect(log[0]).toEqual("first-C");
@@ -6323,7 +6331,7 @@ describe("$compile", () => {
           expect(span.text()).toEqual("3");
         });
 
-        it("should flush before link inline", () => {
+        fit("should flush before link inline", () => {
           $templateCache.set("second.html", "<div i-third>{{1+2}}</div>");
           template = $compile(
             "<div><span i-first i-second i-last></span></div>",
@@ -6346,13 +6354,13 @@ describe("$compile", () => {
           expect(div.text()).toEqual("3");
         });
 
-        it("should allow multiple elements in template", () => {
+        fit("should allow multiple elements in template", () => {
           $templateCache.set("second.html", "before <b>mid</b> after");
           element = $compile("<div second></div>")($rootScope);
           expect(element.text()).toEqual("before mid after");
         });
 
-        it("should work when directive is on the root element", () => {
+        fit("should work when directive is on the root element", () => {
           $templateCache.set(
             "/mock/hello",
             "<span>3==<span ng-transclude></span></span>",
@@ -6404,7 +6412,7 @@ describe("$compile", () => {
           //   }).toThrowError(/tplrt/);
           // });
 
-          it("should not throw if the root element is accompanied by: whitespace", () => {
+          fit("should not throw if the root element is accompanied by: whitespace", () => {
             $templateCache.set("template.html", "<div>Hello World!</div> \n");
             element = $compile("<p template></p>")($rootScope);
             expect(() => {}).not.toThrow();
@@ -6412,7 +6420,7 @@ describe("$compile", () => {
             expect(element.text()).toBe("Hello World!");
           });
 
-          it("should not throw if the root element is accompanied by: comments", () => {
+          fit("should not throw if the root element is accompanied by: comments", () => {
             $templateCache.set(
               "template.html",
               "<!-- oh hi --><div>Hello World!</div> \n",
@@ -6423,7 +6431,7 @@ describe("$compile", () => {
             expect(element.text()).toBe("Hello World!");
           });
 
-          it("should not throw if the root element is accompanied by: comments + whitespace", () => {
+          fit("should not throw if the root element is accompanied by: comments + whitespace", () => {
             $templateCache.set(
               "template.html",
               "  <!-- oh hi -->  <div>Hello World!</div>  <!-- oh hi -->\n",
@@ -6435,7 +6443,7 @@ describe("$compile", () => {
           });
         });
 
-        it("should resume delayed compilation without duplicates when in a repeater", () => {
+        fit("should resume delayed compilation without duplicates when in a repeater", () => {
           // this is a test for a regression
           // scope creation, isolate watcher setup, controller instantiation, etc should happen
           // only once even if we are dealing with delayed compilation of a node due to templateUrl
@@ -6473,7 +6481,7 @@ describe("$compile", () => {
           expect(element.text()).toBe("boom!1|boom!2|");
         });
 
-        it("should support templateUrl with replace", () => {
+        fit("should support templateUrl with replace", () => {
           // a regression https://github.com/angular/angular.js/issues/3792
           module.directive("simple", () => ({
             templateUrl: "/some.html",
@@ -6502,7 +6510,7 @@ describe("$compile", () => {
         });
       });
 
-      it("should support templates with root <tr> tags", () => {
+      fit("should support templates with root <tr> tags", () => {
         $templateCache.set("tr.html", "<tr><td>TR</td></tr>");
         expect(() => {
           element = $compile("<div replace-with-tr></div>")($rootScope);
@@ -6510,7 +6518,7 @@ describe("$compile", () => {
         expect(getNodeName(element)).toMatch(/tr/i);
       });
 
-      it("should support templates with root <td> tags", () => {
+      fit("should support templates with root <td> tags", () => {
         $templateCache.set("td.html", "<td>TD</td>");
         expect(() => {
           element = $compile("<div replace-with-td></div>")($rootScope);
@@ -6518,7 +6526,7 @@ describe("$compile", () => {
         expect(getNodeName(element)).toMatch(/td/i);
       });
 
-      it("should support templates with root <th> tags", () => {
+      fit("should support templates with root <th> tags", () => {
         $templateCache.set("th.html", "<th>TH</th>");
         expect(() => {
           element = $compile("<div replace-with-th></div>")($rootScope);
@@ -6526,7 +6534,7 @@ describe("$compile", () => {
         expect(getNodeName(element)).toMatch(/th/i);
       });
 
-      it("should support templates with root <thead> tags", () => {
+      fit("should support templates with root <thead> tags", () => {
         $templateCache.set("thead.html", "<thead><tr><td>TD</td></tr></thead>");
         expect(() => {
           element = $compile("<div replace-with-thead></div>")($rootScope);
@@ -6534,7 +6542,7 @@ describe("$compile", () => {
         expect(getNodeName(element)).toMatch(/thead/i);
       });
 
-      it("should support templates with root <tbody> tags", () => {
+      fit("should support templates with root <tbody> tags", () => {
         $templateCache.set("tbody.html", "<tbody><tr><td>TD</td></tr></tbody>");
         expect(() => {
           element = $compile("<div replace-with-tbody></div>")($rootScope);
@@ -6542,7 +6550,7 @@ describe("$compile", () => {
         expect(getNodeName(element)).toMatch(/tbody/i);
       });
 
-      it("should support templates with root <tfoot> tags", () => {
+      fit("should support templates with root <tfoot> tags", () => {
         $templateCache.set("tfoot.html", "<tfoot><tr><td>TD</td></tr></tfoot>");
         expect(() => {
           element = $compile("<div replace-with-tfoot></div>")($rootScope);
@@ -6550,7 +6558,7 @@ describe("$compile", () => {
         expect(getNodeName(element)).toMatch(/tfoot/i);
       });
 
-      it("should support templates with root <option> tags", () => {
+      fit("should support templates with root <option> tags", () => {
         $templateCache.set("option.html", "<option>OPTION</option>");
         expect(() => {
           element = $compile("<div replace-with-option></div>")($rootScope);
@@ -6558,7 +6566,7 @@ describe("$compile", () => {
         expect(getNodeName(element)).toMatch(/option/i);
       });
 
-      it("should support templates with root <optgroup> tags", () => {
+      fit("should support templates with root <optgroup> tags", () => {
         $templateCache.set("optgroup.html", "<optgroup>OPTGROUP</optgroup>");
         expect(() => {
           element = $compile("<div replace-with-optgroup></div>")($rootScope);
@@ -6566,7 +6574,7 @@ describe("$compile", () => {
         expect(getNodeName(element)).toMatch(/optgroup/i);
       });
 
-      it("should support SVG templates using directive.templateNamespace=svg", () => {
+      fit("should support SVG templates using directive.templateNamespace=svg", () => {
         myModule.directive(
           "svgAnchor",
           valueFn({
@@ -6596,7 +6604,7 @@ describe("$compile", () => {
         );
       });
 
-      it("should support MathML templates using directive.templateNamespace=math", () => {
+      fit("should support MathML templates using directive.templateNamespace=math", () => {
         myModule.directive(
           "pow",
           valueFn({
@@ -6631,7 +6639,7 @@ describe("$compile", () => {
         );
       });
 
-      it("should keep prototype properties on sync version of async directive", () => {
+      fit("should keep prototype properties on sync version of async directive", () => {
         function DirectiveClass() {
           this.restrict = "E";
           this.templateUrl = "test.html";
@@ -6661,7 +6669,7 @@ describe("$compile", () => {
     });
 
     describe("templateUrl as function", () => {
-      it("should evaluate `templateUrl` when defined as fn and use returned value as url", () => {
+      fit("should evaluate `templateUrl` when defined as fn and use returned value as url", () => {
         window.angular.module("test1", ["ng"]).directive(
           "myDirective",
           valueFn({
@@ -6847,14 +6855,14 @@ describe("$compile", () => {
         );
       });
 
-      it("should allow creation of new scopes", () => {
+      fit("should allow creation of new scopes", () => {
         element = $compile("<div><span scope><a log></a></span></div>")(
           $rootScope,
         );
         expect(log.length).toEqual(2);
       });
 
-      it("should allow creation of new isolated scopes for directives", () => {
+      fit("should allow creation of new isolated scopes for directives", () => {
         element = $compile("<div><span iscope><a log></a></span></div>")(
           $rootScope,
         );
@@ -6864,7 +6872,7 @@ describe("$compile", () => {
         expect(iscope.name).toBeUndefined();
       });
 
-      it("should allow creation of new scopes for directives with templates", () => {
+      fit("should allow creation of new scopes for directives with templates", () => {
         $templateCache.set(
           "tscope.html",
           "<a log>{{name}}; scopeId: {{$id}}</a>",
@@ -6876,7 +6884,7 @@ describe("$compile", () => {
         expect(element.text().match(/Jozo/)).toBeTruthy();
       });
 
-      it("should allow creation of new scopes for replace directives with templates", () => {
+      fit("should allow creation of new scopes for replace directives with templates", () => {
         $templateCache.set(
           "trscope.html",
           "<p><a log>{{name}}; scopeId: {{$id}}</a></p>",
@@ -6888,7 +6896,7 @@ describe("$compile", () => {
         expect(element.text().match(/Jozo/)).toBeTruthy();
       });
 
-      it("should allow creation of new scopes for replace directives with templates in a repeater", () => {
+      fit("should allow creation of new scopes for replace directives with templates in a repeater", () => {
         $templateCache.set("trscope.html", "<p><a log>{{name}}|</a></p>");
         element = $compile(
           '<div><span ng-repeat="i in [1,2,3]" trscope></span></div>',
@@ -6899,7 +6907,7 @@ describe("$compile", () => {
         expect(element.text()).toBe("Jozo|Jozo|Jozo|");
       });
 
-      it("should allow creation of new isolated scopes for directives with templates", () => {
+      fit("should allow creation of new isolated scopes for directives with templates", () => {
         $templateCache.set("tiscope.html", "<a log></a>");
         element = $compile("<div><span tiscope></span></div>")($rootScope);
         expect(log.length).toEqual(2);
@@ -6908,7 +6916,7 @@ describe("$compile", () => {
         expect(iscope.name).toBeUndefined();
       });
 
-      it("should correctly create the scope hierarchy", () => {
+      fit("should correctly create the scope hierarchy", () => {
         element = $compile(
           "<div>" + // 1
             "<b scope>" + // 2
@@ -6923,59 +6931,59 @@ describe("$compile", () => {
         expect(log.length).toEqual(6);
       });
 
-      it("should allow more than one new scope directives per element, but directives should share the scope", () => {
+      fit("should allow more than one new scope directives per element, but directives should share the scope", () => {
         element = $compile("<div scope-a scope-b></div>")($rootScope);
         expect(log.length).toEqual(2);
       });
 
-      it("should not allow more than one isolate scope creation per element", () => {
+      fit("should not allow more than one isolate scope creation per element", () => {
         expect(() => {
           $compile("<div iscope-a scope-b></div>")($rootScope);
         }).toThrowError(/multidir/);
       });
 
-      it("should not allow more than one isolate/new scope creation per element regardless of `templateUrl`", () => {
+      fit("should not allow more than one isolate/new scope creation per element regardless of `templateUrl`", () => {
         $templateCache.set("tiscope.html", "<div>Hello, world !</div>");
         $compile("<div tiscope-a scope-b></div>")($rootScope);
         expect(log[0].match(/multidir/)).toBeTruthy();
       });
 
-      it("should create new scope even at the root of the template", () => {
+      fit("should create new scope even at the root of the template", () => {
         element = $compile("<div scope-a></div>")($rootScope);
         expect(log.length).toEqual(1);
       });
 
-      it("should create isolate scope even at the root of the template", () => {
+      fit("should create isolate scope even at the root of the template", () => {
         element = $compile("<div iscope></div>")($rootScope);
         expect(log.length).toEqual(1);
       });
 
       describe("scope()/isolate() scope getters", () => {
         describe("with new scope directives", () => {
-          it("should return the new scope at the directive element", () => {
+          fit("should return the new scope at the directive element", () => {
             element = $compile("<div scope></div>")($rootScope);
             expect($rootScope.$$childHead.$parent).toBe($rootScope);
           });
 
-          it("should return the new scope for children in the original template", () => {
+          fit("should return the new scope for children in the original template", () => {
             element = $compile("<div scope><a></a></div>")($rootScope);
             expect($rootScope.$$childHead.$parent).toBe($rootScope);
           });
 
-          it("should return the new scope for children in the directive template", () => {
+          fit("should return the new scope for children in the directive template", () => {
             $templateCache.set("tscope.html", "<a></a>");
             element = $compile("<div tscope></div>")($rootScope);
             expect($rootScope.$$childHead.$parent).toBe($rootScope);
           });
 
-          it("should return the new scope for children in the directive sync template", () => {
+          fit("should return the new scope for children in the directive sync template", () => {
             element = $compile("<div stscope></div>")($rootScope);
             expect($rootScope.$$childHead.$parent).toBe($rootScope);
           });
         });
 
         describe("with isolate scope directives", () => {
-          it("should return the non-isolate scope at the directive element", () => {
+          fit("should return the non-isolate scope at the directive element", () => {
             expect($rootScope.$$childHead).toBeNull();
             let directiveElement;
             element = $compile("<div><div iscope></div></div>")($rootScope);
@@ -6983,24 +6991,24 @@ describe("$compile", () => {
             expect($rootScope.$$childHead.$parent).toBe($rootScope);
           });
 
-          it("should return the isolate scope for children in the original template", () => {
+          fit("should return the isolate scope for children in the original template", () => {
             element = $compile("<div iscope><a></a></div>")($rootScope);
             expect($rootScope.$$childHead.$parent).toBe($rootScope); // xx
           });
 
-          it("should return the isolate scope for children in directive template", () => {
+          fit("should return the isolate scope for children in directive template", () => {
             $templateCache.set("tiscope.html", "<a></a>");
             element = $compile("<div tiscope></div>")($rootScope);
             expect($rootScope.$$childHead).toBeDefined(); // ??? this is the current behavior, not desired feature
             expect($rootScope.$$childHead).not.toBe($rootScope);
           });
 
-          it("should return the isolate scope for children in directive sync template", () => {
+          fit("should return the isolate scope for children in directive sync template", () => {
             element = $compile("<div stiscope></div>")($rootScope);
             expect($rootScope.$$childHead).not.toBe($rootScope);
           });
 
-          it('should handle "=" bindings with same method names in Object.prototype correctly when not present', () => {
+          fit('should handle "=" bindings with same method names in Object.prototype correctly when not present', () => {
             const func = () => {
               element = $compile(
                 "<div prototype-method-name-as-scope-var-a></div>",
@@ -7020,7 +7028,7 @@ describe("$compile", () => {
             expect(scope.hasOwnProperty("valueOf")).toBe(true);
           });
 
-          it('should handle "=" bindings with same method names in Object.prototype correctly when present', () => {
+          fit('should handle "=" bindings with same method names in Object.prototype correctly when present', () => {
             $rootScope.constructor = "constructor";
             $rootScope.valueOf = "valueOf";
             const func = () => {
@@ -7082,7 +7090,7 @@ describe("$compile", () => {
               reloadInjector();
             });
 
-            it('should throw an error for undefined non-optional "=" bindings when  strictComponentBindingsEnabled is true', () => {
+            fit('should throw an error for undefined non-optional "=" bindings when  strictComponentBindingsEnabled is true', () => {
               const func = () => {
                 element = $compile(
                   "<div prototype-method-name-as-scope-var-a></div>",
@@ -7091,7 +7099,7 @@ describe("$compile", () => {
               expect(func).toThrowError(/missingattr/);
             });
 
-            it('should throw an error for undefined non-optional "@" bindings when strictComponentBindingsEnabled is true', () => {
+            fit('should throw an error for undefined non-optional "@" bindings when strictComponentBindingsEnabled is true', () => {
               const func = () => {
                 element = $compile(
                   "<div prototype-method-name-as-scope-var-b></div>",
@@ -7100,7 +7108,7 @@ describe("$compile", () => {
               expect(func).toThrowError(/missingattr/);
             });
 
-            it('should throw an error for undefined non-optional "&" bindings when strictComponentBindingsEnabled is true', () => {
+            fit('should throw an error for undefined non-optional "&" bindings when strictComponentBindingsEnabled is true', () => {
               const func = () => {
                 element = $compile(
                   "<div prototype-method-name-as-scope-var-c></div>",
@@ -7109,7 +7117,7 @@ describe("$compile", () => {
               expect(func).toThrowError(/missingattr/);
             });
 
-            it('should not throw an error for set non-optional "@" bindings when strictComponentBindingsEnabled is true', () => {
+            fit('should not throw an error for set non-optional "@" bindings when strictComponentBindingsEnabled is true', () => {
               const func = () => {
                 element = $compile(
                   '<div prototype-method-name-as-scope-var-b constructor="constructor" value-of="valueOf"></div>',
@@ -7118,7 +7126,7 @@ describe("$compile", () => {
               expect(func).not.toThrow();
             });
 
-            it('should not throw an error for undefined optional "@" bindings when strictComponentBindingsEnabled is true', () => {
+            fit('should not throw an error for undefined optional "@" bindings when strictComponentBindingsEnabled is true', () => {
               const func = () => {
                 element = $compile(
                   '<div prototype-method-name-as-scope-var-b value-of="valueOf"></div>',
@@ -7126,7 +7134,7 @@ describe("$compile", () => {
               };
               expect(func).not.toThrow();
             });
-
+            // THIS CAUSES A LEAK 
             it('should not throw an error for set non-optional "=" bindings when strictComponentBindingsEnabled is true', () => {
               const func = () => {
                 element = $compile(

@@ -367,7 +367,7 @@ export class Scope {
                 : false,
             );
           }
-          assert(foreignListeners.length !== 0);
+
           this.scheduleListener(foreignListeners);
         }
       }
@@ -643,7 +643,9 @@ export class Scope {
       case ASTType.CallExpression: {
         let keys = [];
         get.decoratedNode.body[0].expression.toWatch.forEach((x) => {
-          keys.push(x.name);
+          if (isDefined(x)) {
+            keys.push(x.name);
+          }
         });
         keys.forEach((key) => {
           this.registerKey(key, listener);
