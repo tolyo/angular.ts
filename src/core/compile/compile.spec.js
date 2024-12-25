@@ -5466,12 +5466,14 @@ describe("$compile", () => {
 
       fit("should merge interpolated css class", async () => {
         reloadModules();
-        element = $compile('<div class="one {{cls}} three" replace></div>')($rootScope);
+        element = $compile('<div class="one {{cls}} three" replace></div>')(
+          $rootScope,
+        );
         await wait();
-        
+
         $rootScope.cls = "two";
-        await wait(); 
-        
+        await wait();
+
         xpect(element[0].classList.contains("one")).toBeTrue();
         expect(element[0].classList.contains("two")).toBeTrue(); // interpolated
         expect(element[0].classList.contains("three")).toBeTrue();
@@ -5497,12 +5499,14 @@ describe("$compile", () => {
       });
 
       fit("should interpolate the values once per digest", async () => {
-        let logs = []
+        let logs = [];
         $rootScope.log = (res) => {
           logs.push(res);
         };
-        
-        element = $compile('<div>{{log("A")}} foo {{log("B")}}</div>')($rootScope);
+
+        element = $compile('<div>{{log("A")}} foo {{log("B")}}</div>')(
+          $rootScope,
+        );
 
         await wait();
         expect(logs.join("; ")).toEqual("A; B; A; B");
@@ -7134,7 +7138,7 @@ describe("$compile", () => {
               };
               expect(func).not.toThrow();
             });
-            // THIS CAUSES A LEAK 
+            // THIS CAUSES A LEAK
             it('should not throw an error for set non-optional "=" bindings when strictComponentBindingsEnabled is true', () => {
               const func = () => {
                 element = $compile(

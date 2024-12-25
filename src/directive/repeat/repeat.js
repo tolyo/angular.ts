@@ -23,6 +23,9 @@ export const ngRepeatDirective = [
       }
 
       if (keyIdentifier) scope[keyIdentifier] = key;
+      if (value) {
+        scope.$target.$$hashKey = value.$$hashKey;
+      }
       scope.$index = index;
       scope.$first = index === 0;
       scope.$last = index === arrayLength - 1;

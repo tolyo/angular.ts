@@ -2722,7 +2722,10 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                     // both the new and the old values are the same) since
                     // the CSS classes are the non-interpolated values
                     if (name === "class") {
-                      attr.$updateClass(newValue, attr.$$element[0].classList.value);
+                      attr.$updateClass(
+                        newValue,
+                        attr.$$element[0].classList.value,
+                      );
                     } else {
                       attr.$set(name, newValue);
                     }
