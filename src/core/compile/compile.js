@@ -2881,8 +2881,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                 }
                 removeWatch = attrs.$observe(attrName, (value) => {
                   if (isString(value) || isBoolean(value)) {
-                    const oldValue = destination[scopeName];
-                    recordChanges(scopeName, value, oldValue);
+                    recordChanges(scopeName, value);
                     destination[scopeName] = value;
                   }
                 });
@@ -2899,7 +2898,6 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                   destination[scopeName] = lastValue;
                 }
                 initialChanges[scopeName] = new SimpleChange(
-                  UNINITALIZED_VALIED,
                   destination[scopeName],
                 );
                 removeWatchCollection.push(removeWatch);
@@ -2980,7 +2978,6 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
 
                 var initialValue = (destination[scopeName] = parentGet(scope));
                 initialChanges[scopeName] = new SimpleChange(
-                  UNINITALIZED_VALIED,
                   destination[scopeName],
                 );
                 scope.attrs = attrs;
@@ -3068,13 +3065,19 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
 class SimpleChange {
   constructor(current) {
     this.currentValue = current;
+    this.firstChange = true;
+  }
+
+  updateCurrentValue(value) {
+    this.currentValue = value;
     this.firstChange = false;
   }
+
   /**
    * @returns {boolean}
    */
   isFirstChange() {
-    return !this.firstChange;
+    return this.firstChange;
   }
 }
 

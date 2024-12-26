@@ -1099,13 +1099,13 @@ export class Scope {
         newVal = newVal(originalTarget);
       }
 
-      // if (Array.isArray(newVal)) {
-      // newVal.forEach((x, index) => {
-      //   if (isFunction(x)) {
-      //     return newVal[index] = x(originalTarget);
-      //   }
-      // });
-      // }
+      if (Array.isArray(newVal)) {
+        newVal.forEach((x, index) => {
+          if (isFunction(x)) {
+            newVal[index] = x(originalTarget);
+          }
+        });
+      }
 
       listenerFn(newVal, originalTarget);
       this.$$asyncQueue.forEach((x) => {
