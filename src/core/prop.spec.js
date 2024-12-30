@@ -3,7 +3,7 @@ import { createInjector } from "./di/injector";
 import { valueFn } from "../shared/utils";
 import { dealoc } from "../shared/jqlite/jqlite";
 
-fdescribe("ngProp*", () => {
+describe("ngProp*", () => {
   let $compile, $rootScope, compileProvider, $sce;
   let logs = [];
 
