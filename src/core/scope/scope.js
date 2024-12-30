@@ -425,36 +425,34 @@ export class Scope {
     if (property === "$$watchersCount") return calculateWatcherCount(this);
     if (property === isProxySymbol) return true;
 
-    if (!this.propertyMap) {
-      this.propertyMap = {
-        $watch: this.$watch.bind(this),
-        $watchGroup: this.$watchGroup.bind(this),
-        $watchCollection: this.$watchCollection.bind(this),
-        $new: this.$new.bind(this),
-        $newIsolate: this.$newIsolate.bind(this),
-        $deproxy: this.$deproxy.bind(this),
-        $destroy: this.$destroy.bind(this),
-        $eval: this.$eval.bind(this),
-        $apply: this.$apply.bind(this),
-        $evalAsync: this.$evalAsync.bind(this),
-        $postUpdate: this.$postUpdate.bind(this),
-        $isRoot: this.isRoot.bind(this),
-        $target: this.$target,
-        $proxy: this.$proxy,
-        $digest: this.$digest.bind(this),
-        $on: this.$on.bind(this),
-        $emit: this.$emit.bind(this),
-        $broadcast: this.$broadcast.bind(this),
-        $transcluded: this.$transcluded.bind(this),
-        $handler: this,
-        $parent: this.$parent,
-        $root: this.$root,
-        $children: this.$children,
-        $id: this.$id,
-        registerForeignKey: this.registerForeignKey.bind(this),
-        notifyListener: this.notifyListener.bind(this),
-      };
-    }
+    this.propertyMap = {
+      $watch: this.$watch.bind(this),
+      $watchGroup: this.$watchGroup.bind(this),
+      $watchCollection: this.$watchCollection.bind(this),
+      $new: this.$new.bind(this),
+      $newIsolate: this.$newIsolate.bind(this),
+      $deproxy: this.$deproxy.bind(this),
+      $destroy: this.$destroy.bind(this),
+      $eval: this.$eval.bind(this),
+      $apply: this.$apply.bind(this),
+      $evalAsync: this.$evalAsync.bind(this),
+      $postUpdate: this.$postUpdate.bind(this),
+      $isRoot: this.isRoot.bind(this),
+      $target: target,
+      $proxy: this.$proxy,
+      $digest: this.$digest.bind(this),
+      $on: this.$on.bind(this),
+      $emit: this.$emit.bind(this),
+      $broadcast: this.$broadcast.bind(this),
+      $transcluded: this.$transcluded.bind(this),
+      $handler: this,
+      $parent: this.$parent,
+      $root: this.$root,
+      $children: this.$children,
+      $id: this.$id,
+      registerForeignKey: this.registerForeignKey.bind(this),
+      notifyListener: this.notifyListener.bind(this),
+    };
 
     if (
       Array.isArray(target) &&
@@ -471,9 +469,10 @@ export class Scope {
       }
     }
 
-    return Object.prototype.hasOwnProperty.call(this.propertyMap, property)
+    let res = Object.prototype.hasOwnProperty.call(this.propertyMap, property)
       ? this.propertyMap[property]
       : target[property];
+    return res;
   }
 
   /**
@@ -643,14 +642,20 @@ export class Scope {
       case ASTType.CallExpression: {
         let keys = [];
         get.decoratedNode.body[0].expression.toWatch.forEach((x) => {
-          if (isDefined(x)) {
+          if (isDefined(x.name)) {
             keys.push(x.name);
+          } else {
+            // Promise.resolve().then(() => {
+            //   debugger
+            //   listenerFn(this.$target)
+            // });
           }
         });
         keys.forEach((key) => {
           this.registerKey(key, listener);
           this.scheduleListener([listener]);
         });
+
         return () => {
           keys.forEach((key) => {
             this.deregisterKey(key, listener.id);

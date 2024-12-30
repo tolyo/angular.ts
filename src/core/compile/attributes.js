@@ -209,16 +209,14 @@ export class Attributes {
     const listeners = $$observers[key] || ($$observers[key] = []);
 
     listeners.push(fn);
-    this.$rootScope.$evalAsync(() => {
-      if (
-        !listeners.$$inter &&
-        Object.prototype.hasOwnProperty.call(this, key) &&
-        !isUndefined(this[key])
-      ) {
-        // no one registered attribute interpolation function, so lets call it manually
-        fn(this[key]);
-      }
-    });
+    if (
+      !listeners.$$inter &&
+      Object.prototype.hasOwnProperty.call(this, key) &&
+      !isUndefined(this[key])
+    ) {
+      // no one registered attribute interpolation function, so lets call it manually
+      fn(this[key]);
+    }
 
     return function () {
       arrayRemove(listeners, fn);

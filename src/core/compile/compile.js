@@ -2448,9 +2448,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
             compile: () => (scope, node) => {
               interpolateFn.expressions.forEach((x) => {
                 scope.$watch(x, () => {
-                  node[0].nodeValue = interpolateFn(scope, (val) => {
-                    node[0].nodeValue = val;
-                  });
+                  node[0].nodeValue = interpolateFn(scope);
                 });
               });
             },
@@ -2872,6 +2870,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
             let parentSet;
             let compare;
             let removeWatch;
+            let firstCall = true;
 
             switch (mode) {
               case "@":
@@ -2879,10 +2878,16 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                   strictBindingsCheck(attrName, directive.name);
                   destination[scopeName] = attrs[attrName] = undefined;
                 }
+
                 removeWatch = attrs.$observe(attrName, (value) => {
                   if (isString(value) || isBoolean(value)) {
                     recordChanges(scopeName, value);
                     destination[scopeName] = value;
+                    if (firstCall) {
+                      firstCall = false;
+                    } else {
+                      triggerOnChangesHook();
+                    }
                   }
                 });
                 attrs.$$observers[attrName].$$scope = scope;

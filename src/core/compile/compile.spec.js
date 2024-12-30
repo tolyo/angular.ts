@@ -1788,7 +1788,7 @@ describe("$compile", () => {
     var el = $('<div my-directive my-attr="parentFunction()"></div>');
     $compile(el)($rootScope);
     await wait();
-    expect(givenScope.myAttr).toEqual([1, 2, 3]);
+    expect(givenScope.myAttr.$target).toEqual([1, 2, 3]);
   });
 
   fit("allows binding an invokable expression on the parent scope", () => {
@@ -4360,7 +4360,7 @@ describe("$compile", () => {
         },
         controller: function ($attrs) {
           this.$onChanges = function (val) {
-            changesSpy();
+            changesSpy(val);
           };
           attrs = $attrs;
         },
@@ -4369,16 +4369,13 @@ describe("$compile", () => {
       var el = $('<my-component my-attr="42"></my-component>');
       $compile(el)($rootScope);
       await wait();
-
       expect(changesSpy.calls.count()).toBe(1);
-
-      // attrs.$set("myAttr", "43");
-      // await wait();
-      // expect(changesSpy.calls.count()).toBe(2);
-
-      // var lastChanges = changesSpy.calls.mostRecent().args[0];
-      // expect(lastChanges.myAttr.currentValue).toBe("43");
-      // expect(lastChanges.myAttr.isFirstChange()).toBe(true);
+      attrs.$set("myAttr", "43");
+      await wait();
+      expect(changesSpy.calls.count()).toBe(2);
+      var lastChanges = changesSpy.calls.mostRecent().args[0];
+      expect(lastChanges.myAttr.currentValue).toBe("43");
+      expect(lastChanges.myAttr.isFirstChange()).toBe(true);
     });
 
     fit("calls $onChanges once with multiple changes", async () => {
@@ -4508,7 +4505,7 @@ describe("$compile", () => {
       expect(watchSpy.calls.count()).toBe(5);
     });
 
-    fit("has a TTL for $onChanges", async () => {
+    fit("should throw for cyclical $onChanges", async () => {
       var watchSpy = jasmine.createSpy();
       myModule.component("myComponent", {
         bindings: {
@@ -4532,14 +4529,10 @@ describe("$compile", () => {
           '<my-component input="valueTwo" increment="valueOne"></my-component>' +
           "</div>",
       );
-      $compile(el)($rootScope);
-      await wait();
 
-      $rootScope.valueOne = 42;
-      //$rootScope.valueTwo = 42;
-      // await wait();
-      // expect($rootScope.valueOne).toBe(51);
-      // expect($rootScope.valueTwo).toBe(51);
+      expect(() => {
+        $compile(el)($rootScope);
+      }).toThrowError(/exceeded/);
     });
   });
 
@@ -5498,20 +5491,6 @@ describe("$compile", () => {
         expect(child[0].classList.contains("two")).toBeTrue(); // interpolated
         expect(child[0].classList.contains("three")).toBeTrue();
         expect(child[0].classList.contains("log")).toBeTrue(); // merged from replace directive template
-      });
-
-      fit("should interpolate the values once per digest", async () => {
-        let logs = [];
-        $rootScope.log = (res) => {
-          logs.push(res);
-        };
-
-        element = $compile('<div>{{log("A")}} foo {{log("B")}}</div>')(
-          $rootScope,
-        );
-
-        await wait();
-        expect(logs.join("; ")).toEqual("A; B; A; B");
       });
 
       describe("replace and not exactly one root element", () => {

@@ -219,6 +219,7 @@ export function AnimateQueueProvider($animateProvider) {
             });
           }
         },
+        true,
       );
 
       const callbackRegistry = Object.create(null);
