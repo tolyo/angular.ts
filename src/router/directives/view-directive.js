@@ -236,9 +236,8 @@ export let ngView = [
           }
           function updateView(config) {
             const newScope = scope.$new();
-
-            const animEnter = $q.defer(),
-              animLeave = $q.defer();
+            const animEnter = Promise.withResolvers();
+            const animLeave = Promise.withResolvers();
             const $ngViewData = {
               $cfg: config,
               $ngView: activeUIView,

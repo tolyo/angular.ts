@@ -193,7 +193,7 @@ describe("$httpBackend", () => {
   // });
 
   // it("should abort request on canceler promise resolution", () => {
-  //   const canceler = $q.defer();
+  //   const canceler = Promise.withResolvers();
 
   //   callback.and.callFake(
   //     (status, response, headers, statusText, xhrStatus) => {

@@ -1065,7 +1065,7 @@ describe("$http", function () {
   });
 
   it("allows aborting a request with a Promise", async function () {
-    const timeout = $q.defer();
+    const timeout = Promise.withResolvers();
     $http
       .get("/mock/never", {
         timeout: timeout.promise,
@@ -3130,7 +3130,7 @@ describe("$http", function () {
 
 //     describe("timeout", () => {
 //       it("should abort requests when timeout promise resolves", inject(($q) => {
-//         const canceler = $q.defer();
+//         const canceler = Promise.withResolvers();
 
 //         $httpBackend.expect("GET", "/some").respond(200);
 

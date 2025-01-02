@@ -923,7 +923,7 @@ describe("ngModelOptions", () => {
           $rootScope.form.input.$asyncValidators.promiseValidator = function (
             value,
           ) {
-            defer = $q.defer();
+            defer = Promise.withResolvers();
             return defer.promise;
           };
           changeGivenInputTo(inputElm, "12345");
@@ -945,7 +945,7 @@ describe("ngModelOptions", () => {
           $rootScope.form.input.$asyncValidators.promiseValidator = function (
             value,
           ) {
-            defer = $q.defer();
+            defer = Promise.withResolvers();
             return defer.promise;
           };
           $rootScope.$apply("value = '12345'");

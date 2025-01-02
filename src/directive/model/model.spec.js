@@ -406,7 +406,7 @@ describe("ngModel", () => {
       it("should update the model after all async validators resolve", () => {
         let defer;
         ctrl.$asyncValidators.promiseValidator = function (value) {
-          defer = $q.defer();
+          defer = Promise.withResolvers();
           return defer.promise;
         };
 
@@ -945,7 +945,7 @@ describe("ngModel", () => {
       it("should render a validator asynchronously when a promise is returned", () => {
         let defer;
         ctrl.$asyncValidators.promiseValidator = function (value) {
-          defer = $q.defer();
+          defer = Promise.withResolvers();
           return defer.promise;
         };
 
@@ -997,7 +997,7 @@ describe("ngModel", () => {
           modelValue,
           viewValue,
         ) {
-          stages.async.defer = $q.defer();
+          stages.async.defer = Promise.withResolvers();
           stages.async.count++;
           return stages.async.defer.promise;
         };
@@ -1036,7 +1036,7 @@ describe("ngModel", () => {
         let oldDefer;
         let newDefer;
         ctrl.$asyncValidators.async = function (value) {
-          defer = $q.defer();
+          defer = Promise.withResolvers();
           return defer.promise;
         };
 
@@ -1059,7 +1059,7 @@ describe("ngModel", () => {
 
         const defers = [];
         ctrl.$asyncValidators.async = function (value) {
-          const defer = $q.defer();
+          const defer = Promise.withResolvers();
           defers.push(defer);
           return defer.promise;
         };
@@ -1090,7 +1090,7 @@ describe("ngModel", () => {
 
         let defer;
         ctrl.$asyncValidators.async = function (value) {
-          defer = $q.defer();
+          defer = Promise.withResolvers();
           return defer.promise;
         };
 
@@ -1185,7 +1185,7 @@ describe("ngModel", () => {
 
         let usernameDefer;
         usernameCtrl.$asyncValidators.usernameAvailability = function () {
-          usernameDefer = $q.defer();
+          usernameDefer = Promise.withResolvers();
           return usernameDefer.promise;
         };
 

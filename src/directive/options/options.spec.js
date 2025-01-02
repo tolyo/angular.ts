@@ -3360,7 +3360,7 @@ describe("ngOptions", () => {
       });
 
       scope.form.select.$asyncValidators.async = function () {
-        defer = $q.defer();
+        defer = Promise.withResolvers();
         return defer.promise;
       };
 
@@ -3384,7 +3384,7 @@ describe("ngOptions", () => {
       });
 
       scope.form.select.$asyncValidators.async = function () {
-        defer = $q.defer();
+        defer = Promise.withResolvers();
         return defer.promise;
       };
 

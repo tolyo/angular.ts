@@ -68,7 +68,7 @@ describe("ngStateRef", () => {
 
   describe("links with promises", () => {
     it("should update the href when promises on parameters change before scope is applied", async () => {
-      const defer = $q.defer();
+      const defer = Promise.withResolvers();
       el = JQLite(
         '<a ng-sref="contacts.item.detail({ id: contact.id })">Details</a>',
       );
