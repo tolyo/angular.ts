@@ -1,5 +1,5 @@
 import { createInjector } from "../../core/di/injector";
-import { dealoc } from "../../shared/jqlite/jqlite";
+import { dealoc } from "../../shared/jqlite/jqlite.js";
 import { Angular } from "../../loader";
 
 describe("ngChange", () => {

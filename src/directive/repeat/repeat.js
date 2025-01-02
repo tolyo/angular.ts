@@ -1,5 +1,5 @@
 import { minErr, hashKey, isArrayLike } from "../../shared/utils";
-import { getBlockNodes } from "../../shared/jqlite/jqlite";
+import { getBlockNodes } from "../../shared/jqlite/jqlite.js";
 
 export const ngRepeatDirective = [
   "$parse",

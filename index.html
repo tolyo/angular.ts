@@ -76,19 +76,8 @@
       </script>
     </head>
     <body ng-app="todo" ng-init="hide = false">
-      <div ng-controller="TodoCtrl as $ctrl">
-        <h3>Todos</h3>
-        <button ng-click="$ctrl.archive()">Archive</button>
-        <ul>
-          <li ng-repeat="todo in $ctrl.tasks">
-            {{ todo.task }} {{ todo.done }}
-            <input type="checkbox" ng-click="todo.done = !todo.done" />
-          </li>
-        </ul>
-       <form ng-submit="$ctrl.add(newTodo)">
-          <input type="text" ng-model="newTodo" ng-required="true" />
-          <button type="submit">Add</button>
-        </form>
+      <div id="test" ng-controller="TodoCtrl as $ctrl">
+          {{ $ctrl.greeting }}
       </div>
 
       

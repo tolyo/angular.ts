@@ -1,4 +1,4 @@
-import { JQLite, dealoc } from "../../shared/jqlite/jqlite";
+import { JQLite, dealoc } from "../../shared/jqlite/jqlite.js";
 import { Angular } from "../../loader";
 import { NgModelController } from "./model";
 import { isDefined, valueFn, isObject } from "../../shared/utils";

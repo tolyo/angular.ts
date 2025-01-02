@@ -2,7 +2,7 @@ import { createInjector } from "../../core/di/injector";
 import { countWatchers } from "../../core/scope/scope";
 import { Angular } from "../../loader";
 import { isString } from "../../shared/utils";
-import { JQLite } from "../../shared/jqlite/jqlite";
+import { JQLite } from "../../shared/jqlite/jqlite.js";
 
 describe("ngMessages", () => {
   let $rootScope, $compile, $templateCache;

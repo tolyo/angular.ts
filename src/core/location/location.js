@@ -1,4 +1,4 @@
-import { JQLite } from "../../shared/jqlite/jqlite";
+import { JQLite } from "../../shared/jqlite/jqlite.js";
 import { urlResolve } from "../url-utils/url-utils";
 import {
   encodeUriSegment,

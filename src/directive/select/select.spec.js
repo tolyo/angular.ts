@@ -1,5 +1,5 @@
 import { Angular } from "../../loader";
-import { dealoc, JQLite } from "../../shared/jqlite/jqlite";
+import { dealoc, JQLite } from "../../shared/jqlite/jqlite.js";
 import { hashKey, equals, isNumberNaN } from "../../shared/utils";
 import { browserTrigger } from "../../shared/test-utils";
 

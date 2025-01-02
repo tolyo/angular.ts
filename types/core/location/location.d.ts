@@ -304,4 +304,4 @@ export type Html5Mode = {
      */
     rewriteLinks: boolean | string;
 };
-import { JQLite } from "../../shared/jqlite/jqlite";
+import { JQLite } from "../../shared/jqlite/jqlite.js";

@@ -5,8 +5,8 @@ import {
   getOrSetCacheData,
   isTextNode,
   startingTag,
-} from "../../shared/jqlite/jqlite";
-import { identifierForController } from "../controller/controller";
+} from "../../shared/jqlite/jqlite.js";
+import { identifierForController } from "../controller/controller.js";
 import {
   minErr,
   assertArg,
@@ -30,12 +30,12 @@ import {
   simpleCompare,
   isError,
   directiveNormalize,
-} from "../../shared/utils";
-import { SCE_CONTEXTS } from "../sce/sce";
-import { PREFIX_REGEXP } from "../../shared/constants";
-import { createEventDirective } from "../../directive/events/events";
-import { CACHE, EXPANDO } from "../cache/cache";
-import { Attributes } from "./attributes";
+} from "../../shared/utils.js";
+import { SCE_CONTEXTS } from "../sce/sce.js";
+import { PREFIX_REGEXP } from "../../shared/constants.js";
+import { createEventDirective } from "../../directive/events/events.js";
+import { CACHE, EXPANDO } from "../cache/cache.js";
+import { Attributes } from "./attributes.js";
 
 /**
  * Function that aggregates all linking fns for a compilation root (nodeList)
@@ -1038,6 +1038,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                   nName,
                   isNgAttr,
                 );
+
                 addDirective(
                   directives,
                   nName,
@@ -2447,7 +2448,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
             priority: 0,
             compile: () => (scope, node) => {
               interpolateFn.expressions.forEach((x) => {
-                scope.$watch(x, () => {
+                scope.$watch(x.trim(), () => {
                   node[0].nodeValue = interpolateFn(scope);
                 });
               });
@@ -2963,6 +2964,9 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                     }
                   });
                   removeWatchCollection.push(removeWatch);
+                  if (!attrs[attrName]) {
+                    return;
+                  }
                   removeWatch = scope.$watch(attrs[attrName], (val) => {
                     destination[attrName] = val;
                   });
@@ -2979,21 +2983,21 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                 if (optional && !attrs[attrName]) break;
 
                 parentGet = $parse(attrs[attrName]);
-                var isLiteral = parentGet.literal;
-
-                var initialValue = (destination[scopeName] = parentGet(scope));
+                destination[scopeName] = parentGet(scope);
                 initialChanges[scopeName] = new SimpleChange(
                   destination[scopeName],
                 );
-                scope.attrs = attrs;
+                scope.$target.attrs = attrs;
                 removeWatch = scope.$watch(
                   attrs[attrName],
                   (val) => {
                     scope.attrs[attrName] = val;
+                    recordChanges(scopeName, val);
                   },
                   true,
                 );
                 removeWatchCollection.push(removeWatch);
+
                 removeWatch = scope.$watch(
                   `attrs.${attrName}`,
                   (val) => {

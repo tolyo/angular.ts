@@ -1,5 +1,5 @@
 import { createInjector } from "../../core/di/injector";
-import { JQLite, dealoc } from "../../shared/jqlite/jqlite";
+import { JQLite, dealoc } from "../../shared/jqlite/jqlite.js";
 import { Angular } from "../../loader";
 import {
   isBoolean,

@@ -1,4 +1,4 @@
-import { getOrSetCacheData, JQLite } from "../shared/jqlite/jqlite";
+import { getOrSetCacheData, JQLite } from "../shared/jqlite/jqlite.js";
 import {
   isUndefined,
   isObject,

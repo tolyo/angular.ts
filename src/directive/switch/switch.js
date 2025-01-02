@@ -1,4 +1,4 @@
-import { getBlockNodes } from "../../shared/jqlite/jqlite";
+import { getBlockNodes } from "../../shared/jqlite/jqlite.js";
 
 export const ngSwitchDirective = [
   "$animate",

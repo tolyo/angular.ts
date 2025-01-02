@@ -6,7 +6,7 @@
 //   }
 // }
 
-import { dealoc, JQLite } from "../../shared/jqlite/jqlite";
+import { dealoc, JQLite } from "../../shared/jqlite/jqlite.js";
 import { Angular } from "../../loader";
 import { wait } from "../../shared/test-utils";
 

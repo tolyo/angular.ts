@@ -108,4 +108,4 @@ export namespace CompileProvider {
  * Function that aggregates all linking fns for a compilation root (nodeList)
  */
 export type CompositeLinkFn = Function;
-import { JQLite } from "../../shared/jqlite/jqlite";
+import { JQLite } from "../../shared/jqlite/jqlite.js";

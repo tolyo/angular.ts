@@ -346,8 +346,10 @@ export class Scope {
               if (!x.watchProp) return true;
               // Compute the expected target based on `watchProp`
               const wrapperExpr = x.watchProp.split(".").slice(0, -1).join(".");
-              const expectedTarget = $parse(wrapperExpr)(x.originalTarget)
-                ?.$handler.$target;
+              const expectedHandler = $parse(wrapperExpr)(
+                x.originalTarget,
+              )?.$handler;
+              const expectedTarget = expectedHandler?.$target;
               return expectedTarget === target;
             });
           });
@@ -663,10 +665,8 @@ export class Scope {
         };
       }
       case ASTType.MemberExpression: {
-        listener.property.push(
-          get.decoratedNode.body[0].expression.property.name,
-        );
         key = get.decoratedNode.body[0].expression.property.name;
+        listener.property.push(key);
         if (watchProp !== key) {
           // Handle nested expression call
           listener.watchProp = watchProp;
@@ -1111,7 +1111,6 @@ export class Scope {
           }
         });
       }
-
       listenerFn(newVal, originalTarget);
       this.$$asyncQueue.forEach((x) => {
         if (x.handler.$id == this.$id) {

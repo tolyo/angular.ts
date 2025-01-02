@@ -1,4 +1,4 @@
-import { JQLite, dealoc } from "../shared/jqlite/jqlite";
+import { JQLite, dealoc } from "../shared/jqlite/jqlite.js";
 import { Angular } from "../loader";
 
 describe("$rootElement", () => {

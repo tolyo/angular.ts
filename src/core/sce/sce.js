@@ -13,7 +13,7 @@ import {
   shallowCopy,
 } from "../../shared/utils";
 
-import { snakeToCamel } from "../../shared/jqlite/jqlite";
+import { snakeToCamel } from "../../shared/jqlite/jqlite.js";
 
 const $sceMinErr = minErr("$sce");
 

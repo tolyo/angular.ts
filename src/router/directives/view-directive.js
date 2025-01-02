@@ -5,7 +5,7 @@ import { parse } from "../../shared/hof";
 import { ResolveContext } from "../resolve/resolve-context";
 import { trace } from "../common/trace";
 import { Ng1ViewConfig } from "../state/views";
-import { JQLite } from "../../shared/jqlite/jqlite";
+import { JQLite } from "../../shared/jqlite/jqlite.js";
 import { getLocals } from "../state/state-registry";
 /**
  * `ui-view`: A viewport directive which is filled in by a view from the active state.

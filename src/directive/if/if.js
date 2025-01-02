@@ -1,5 +1,5 @@
 import { domInsert } from "../../animations/animate";
-import { getBlockNodes } from "../../shared/jqlite/jqlite";
+import { getBlockNodes } from "../../shared/jqlite/jqlite.js";
 import { hasAnimate } from "../../shared/utils";
 
 ngIfDirective.$inject = ["$animate"];
@@ -19,18 +19,18 @@ export function ngIfDirective($animate) {
     /**
      *
      * @param {import("../../core/scope/scope").Scope} $scope
-     * @param {import("../../shared/jqlite/jqlite").JQLite} $element
+     * @param {import("../../shared/jqlite/jqlite.js").JQLite} $element
      * @param {import("../../core/compile/attributes").Attributes} $attr
      * @param {Object} _ctrl
      * @param {*} $transclude
      */
     link($scope, $element, $attr, _ctrl, $transclude) {
-      /** @type {{clone: import("../../shared/jqlite/jqlite").JQLite }} */
+      /** @type {{clone: import("../../shared/jqlite/jqlite.js").JQLite }} */
       let block;
 
       /** @type {import('../../core/scope/scope').Scope} */
       let childScope;
-      /** @type {import("../../shared/jqlite/jqlite").JQLite} */
+      /** @type {import("../../shared/jqlite/jqlite.js").JQLite} */
       let previousElements;
 
       $scope.$watch($attr["ngIf"], (value) => {

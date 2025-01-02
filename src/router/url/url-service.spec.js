@@ -1,4 +1,4 @@
-import { dealoc } from "../../shared/jqlite/jqlite";
+import { dealoc } from "../../shared/jqlite/jqlite.js";
 import { Angular } from "../../loader";
 import { map, find } from "../../shared/common";
 

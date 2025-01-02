@@ -1,4 +1,4 @@
-import { dealoc, JQLite } from "../../shared/jqlite/jqlite";
+import { dealoc, JQLite } from "../../shared/jqlite/jqlite.js";
 import { Angular } from "../../loader";
 import { isObject } from "../../shared/utils";
 import { isFunction } from "../../shared/utils";

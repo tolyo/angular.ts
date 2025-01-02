@@ -1,4 +1,4 @@
-import { dealoc } from "../../shared/jqlite/jqlite";
+import { dealoc } from "../../shared/jqlite/jqlite.js";
 import { Angular } from "../../loader";
 import { createInjector } from "../../core/di/injector";
 import { wait } from "../../shared/test-utils";

@@ -1,6 +1,6 @@
 import { Angular } from "../../loader";
 import { createInjector } from "../../core/di/injector";
-import { dealoc } from "../../shared/jqlite/jqlite";
+import { dealoc } from "../../shared/jqlite/jqlite.js";
 
 describe("ngSrcset", () => {
   let $scope;

@@ -108,4 +108,4 @@ export class BrowserProvider {
     $get: (string | (($$taskTrackerFactory: import("../core/task-tracker-factory").TaskTracker) => Browser))[];
 }
 export type UrlChangeListener = (arg0: string, arg1: string | null) => any;
-import { JQLite } from "../shared/jqlite/jqlite";
+import { JQLite } from "../shared/jqlite/jqlite.js";

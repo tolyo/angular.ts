@@ -1,5 +1,5 @@
 import { isDefined } from "../../shared/utils";
-import { buildFragment } from "../../shared/jqlite/jqlite";
+import { buildFragment } from "../../shared/jqlite/jqlite.js";
 import { hasAnimate } from "../../shared/utils";
 import { domInsert } from "../../animations/animate";
 

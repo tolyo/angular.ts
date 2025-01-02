@@ -82,7 +82,7 @@ export type Attributes = {
     [x: string]: any;
 };
 export type TScope = import("./core/scope/scope").Scope;
-export type TElement = import("./shared/jqlite/jqlite").JQLite;
+export type TElement = import("./shared/jqlite/jqlite.js").JQLite;
 export type TAttributes = Attributes;
 export type TController = DirectiveController | NgModelController;
 export type DirectiveController = Controller | Controller[] | {
@@ -96,23 +96,23 @@ export type DirectiveCompileFn = (templateElement: TElement, templateAttributes:
  * Link function for an AngularJS directive.
  */
 export type DirectiveLinkFn = (scope: TScope, instanceElement: TElement, instanceAttributes: TAttributes, controller?: TController, transclude?: TranscludeFunction) => void;
-export type CloneAttachFunction = (clonedElement?: import("./shared/jqlite/jqlite").JQLite, scope?: import("./core/scope/scope").Scope) => any;
+export type CloneAttachFunction = (clonedElement?: import("./shared/jqlite/jqlite.js").JQLite, scope?: import("./core/scope/scope").Scope) => any;
 /**
  * This corresponds to $transclude passed to controllers and to the transclude function passed to link functions.
  * https://docs.angularjs.org/api/ng/service/$compile#-controller-
  * http://teropa.info/blog/2015/06/09/transclusion.html
  */
 export type TranscludeFunctionObject = {
-    transcludeWithScope: (arg0: TScope, arg1: CloneAttachFunction, arg2: import("./shared/jqlite/jqlite").JQLite | undefined, arg3: string | undefined) => import("./shared/jqlite/jqlite").JQLite;
-    transcludeWithoutScope: (arg0: CloneAttachFunction | undefined, arg1: import("./shared/jqlite/jqlite").JQLite | undefined, arg2: string | undefined) => import("./shared/jqlite/jqlite").JQLite;
+    transcludeWithScope: (arg0: TScope, arg1: CloneAttachFunction, arg2: import("./shared/jqlite/jqlite.js").JQLite | undefined, arg3: string | undefined) => import("./shared/jqlite/jqlite.js").JQLite;
+    transcludeWithoutScope: (arg0: CloneAttachFunction | undefined, arg1: import("./shared/jqlite/jqlite.js").JQLite | undefined, arg2: string | undefined) => import("./shared/jqlite/jqlite.js").JQLite;
     /**
      * - Returns true if the specified slot contains content (i.e., one or more DOM nodes)
      */
     isSlotFilled: (arg0: string) => boolean;
 };
-export type TranscludeFunction = (arg0: TScope | Function, arg1: CloneAttachFunction | undefined, arg2: import("./shared/jqlite/jqlite").JQLite | undefined, arg3: string | undefined) => import("./shared/jqlite/jqlite").JQLite;
-export type transcludeWithScope = (arg0: TScope, arg1: CloneAttachFunction, arg2: import("./shared/jqlite/jqlite").JQLite | undefined, arg3: string | undefined) => import("./shared/jqlite/jqlite").JQLite;
-export type transcludeWithoutScope = (arg0: CloneAttachFunction | undefined, arg1: import("./shared/jqlite/jqlite").JQLite | undefined, arg2: string | undefined) => import("./shared/jqlite/jqlite").JQLite;
+export type TranscludeFunction = (arg0: TScope | Function, arg1: CloneAttachFunction | undefined, arg2: import("./shared/jqlite/jqlite.js").JQLite | undefined, arg3: string | undefined) => import("./shared/jqlite/jqlite.js").JQLite;
+export type transcludeWithScope = (arg0: TScope, arg1: CloneAttachFunction, arg2: import("./shared/jqlite/jqlite.js").JQLite | undefined, arg3: string | undefined) => import("./shared/jqlite/jqlite.js").JQLite;
+export type transcludeWithoutScope = (arg0: CloneAttachFunction | undefined, arg1: import("./shared/jqlite/jqlite.js").JQLite | undefined, arg2: string | undefined) => import("./shared/jqlite/jqlite.js").JQLite;
 /**
  * Represents the pre and post linking functions of a directive.
  */

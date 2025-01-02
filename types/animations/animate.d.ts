@@ -401,4 +401,4 @@ export type AnimationOptions = {
      */
     to: string;
 };
-import { JQLite } from "../shared/jqlite/jqlite";
+import { JQLite } from "../shared/jqlite/jqlite.js";

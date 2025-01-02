@@ -1,5 +1,5 @@
 import { Angular } from "../../loader";
-import { dealoc } from "../../shared/jqlite/jqlite";
+import { dealoc } from "../../shared/jqlite/jqlite.js";
 
 describe("ngSwitch", () => {
   let $scope;

@@ -1,4 +1,4 @@
-import { getBooleanAttrName } from "../../shared/jqlite/jqlite";
+import { getBooleanAttrName } from "../../shared/jqlite/jqlite.js";
 import {
   isString,
   snakeCase,

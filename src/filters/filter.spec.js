@@ -1,7 +1,7 @@
 import { Angular } from "../loader";
 import { createInjector } from "../core/di/injector";
 import { isString, includes } from "../shared/utils";
-import { JQLite } from "../shared/jqlite/jqlite";
+import { JQLite } from "../shared/jqlite/jqlite.js";
 
 describe("Filter: filter", () => {
   let filter;

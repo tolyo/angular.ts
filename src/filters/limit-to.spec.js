@@ -1,6 +1,6 @@
 import { Angular } from "../loader";
 import { createInjector } from "../core/di/injector";
-import { JQLite } from "../shared/jqlite/jqlite";
+import { JQLite } from "../shared/jqlite/jqlite.js";
 
 describe("Filter: limitTo", () => {
   let items;

@@ -1,4 +1,4 @@
-import { BOOLEAN_ATTR } from "../../shared/jqlite/jqlite";
+import { BOOLEAN_ATTR } from "../../shared/jqlite/jqlite.js";
 import { directiveNormalize } from "../../shared/utils";
 import { ALIASED_ATTR } from "../../shared/constants";
 

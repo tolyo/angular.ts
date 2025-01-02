@@ -5,7 +5,7 @@ import {
   assertNotHasOwnProperty,
   errorHandlingConfig,
 } from "./shared/utils";
-import { JQLite } from "./shared/jqlite/jqlite";
+import { JQLite } from "./shared/jqlite/jqlite.js";
 import { annotate, createInjector } from "./core/di/injector";
 import { NgModule } from "./core/di/ng-module";
 import { CACHE } from "./core/cache/cache";

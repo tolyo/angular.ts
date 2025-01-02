@@ -1,7 +1,7 @@
 import { Angular } from "../loader";
 import { createInjector } from "./di/injector";
 import { valueFn } from "../shared/utils";
-import { dealoc } from "../shared/jqlite/jqlite";
+import { dealoc } from "../shared/jqlite/jqlite.js";
 
 describe("ngProp*", () => {
   let $compile, $rootScope, compileProvider, $sce;

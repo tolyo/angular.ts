@@ -15,7 +15,7 @@ function classDirective(name, selector) {
       restrict: "EA",
       /**
        * @param {import("../../core/scope/scope").Scope} scope
-       * @param {import("../../shared/jqlite/jqlite").JQLite} element
+       * @param {import("../../shared/jqlite/jqlite.js").JQLite} element
        * @param {import("../../core/compile/attributes").Attributes} attr
        */
       link(scope, element, attr) {

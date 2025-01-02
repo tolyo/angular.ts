@@ -1,5 +1,5 @@
 import { Angular } from "../../loader";
-import { dealoc, JQLite } from "../../shared/jqlite/jqlite";
+import { dealoc, JQLite } from "../../shared/jqlite/jqlite.js";
 import { valueFn } from "../../shared/utils";
 import { wait } from "../../shared/test-utils";
 

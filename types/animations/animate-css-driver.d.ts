@@ -9,4 +9,4 @@ export class AnimateCssDriverProvider {
 export namespace AnimateCssDriverProvider {
     let $inject: string[];
 }
-import { JQLite } from "../shared/jqlite/jqlite";
+import { JQLite } from "../shared/jqlite/jqlite.js";
