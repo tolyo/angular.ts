@@ -1,7 +1,6 @@
 import { pick, tail } from "../../shared/common";
 import { isDefined, isString } from "../../shared/utils";
 import { isInjectable } from "../../shared/predicates";
-import { services } from "../common/coreservices";
 import { trace } from "../common/trace";
 import { ResolveContext } from "../resolve/resolve-context";
 import { Resolvable } from "../resolve/resolvable";
@@ -11,7 +10,7 @@ export function getNg1ViewConfigFactory() {
   let templateFactory = null;
   return (path, view) => {
     templateFactory =
-      templateFactory || services.$injector.get("$templateFactory"); // TODO: remove static injector
+      templateFactory || window.angular.$injector.get("$templateFactory"); // TODO: remove static injector
     return [new Ng1ViewConfig(path, view, templateFactory)];
   };
 }
@@ -95,7 +94,6 @@ let id = 0;
 
 export class Ng1ViewConfig {
   constructor(path, viewDecl, factory) {
-    debugger
     this.path = path;
     this.viewDecl = viewDecl;
     this.factory = factory;

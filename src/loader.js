@@ -231,7 +231,7 @@ export class Angular {
     });
     if (appElement) {
       config.strictDi = getNgAttribute(appElement, "strict-di") !== null;
-      this.bootstrap(appElement, module ? [module] : [], config);
+      this.$injector = this.bootstrap(appElement, module ? [module] : [], config);
     }
   }
 
