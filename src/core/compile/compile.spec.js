@@ -4384,11 +4384,59 @@ describe("$compile", () => {
       expect(lastChanges.myAttr.currentValue).toBe("fourtyTwo");
 
       attrs.$set("myAttr", "fourtyThree");
+      await wait();
       expect(changesSpy.calls.count()).toBe(3);
       lastChanges = changesSpy.calls.mostRecent().args[0];
       expect(lastChanges.myAttr.currentValue).toBe("fourtyThree");
       lastChanges = changesSpy.calls.mostRecent().args[0];
       expect(lastChanges.myAttr.currentValue).toBe("fourtyThree");
+    });
+
+    fit("runs $onChanges that tracks first changes", async () => {
+      let $val;
+      myModule.component("myComponent", {
+        bindings: {
+          myBinding: "<",
+          yourBinding: "<",
+        },
+        controller: function () {
+          this.$onChanges = function (val) {
+            $val = val;
+            this.innerValue = "myBinding is " + this.myBinding;
+          };
+        },
+        template: "{{ $ctrl.innerValue }}",
+      });
+      reloadModules();
+      $rootScope.aValue = 42;
+      var el = $(
+        '<my-component my-binding="aValue" your-binding="bValue" ></my-component>',
+      );
+      $compile(el)($rootScope);
+      await wait();
+      expect(el.text()).toEqual("myBinding is 42");
+
+      $rootScope.aValue = 43;
+      await wait();
+
+      expect(el.text()).toEqual("myBinding is 43");
+      expect($val.myBinding.isFirstChange()).toBe(true);
+
+      $rootScope.aValue = 44;
+      await wait();
+
+      expect(el.text()).toEqual("myBinding is 44");
+      expect($val.myBinding.isFirstChange()).toBe(false);
+
+      $rootScope.bValue = 43;
+      await wait();
+
+      expect($val.yourBinding.isFirstChange()).toBe(true);
+
+      $rootScope.bValue = 44;
+      await wait();
+
+      expect($val.yourBinding.isFirstChange()).toBe(false);
     });
 
     fit("runs $onChanges for all components in the same digest", async () => {
@@ -4397,7 +4445,7 @@ describe("$compile", () => {
         .component("first", {
           bindings: { myBinding: "<" },
           controller: function () {
-            this.$onChanges = () => {
+            this.$onChanges = function () {
               watchSpy();
             };
           },
@@ -4405,7 +4453,7 @@ describe("$compile", () => {
         .component("second", {
           bindings: { myBinding: "<" },
           controller: function () {
-            this.$onChanges = () => {
+            this.$onChanges = function () {
               watchSpy();
             };
           },
@@ -4424,11 +4472,10 @@ describe("$compile", () => {
       // // Dirty watches always cause a second digest
       expect(watchSpy.calls.count()).toBe(2);
 
-      // $rootScope.aValue = 43;
-      // await wait();
-      // // Two more because of dirty watches $apply here,
-      // // plus one more for onchanges
-      // expect(watchSpy.calls.count()).toBe(5);
+      $rootScope.aValue = 43;
+      await wait();
+      // plus one more for onchanges
+      expect(watchSpy.calls.count()).toBe(4);
     });
   });
 

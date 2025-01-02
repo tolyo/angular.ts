@@ -52,8 +52,8 @@ declare class NgMessageCtrl {
      * @param {import('../../core/compile/attributes').Attributes} $attrs
      * @param {*} $animate
      */
-    constructor($element: import("../../shared/jqlite/jqlite.js").JQLite, $scope: import("../../core/scope/scope").Scope, $attrs: import("../../core/compile/attributes").Attributes, $animate: any);
-    $element: import("../../shared/jqlite/jqlite.js").JQLite;
+    constructor($element: import("../../shared/jqlite/jqlite").JQLite, $scope: import("../../core/scope/scope").Scope, $attrs: import("../../core/compile/attributes").Attributes, $animate: any);
+    $element: import("../../shared/jqlite/jqlite").JQLite;
     $scope: import("../../core/scope/scope").Scope;
     $attrs: import("../../core/compile/attributes").Attributes;
     $animate: any;

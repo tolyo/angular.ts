@@ -56,7 +56,7 @@ export class NgModelController {
      * @param {*} $animate
      * @param {*} $interpolate
      */
-    constructor($scope: import("../../core/scope/scope").Scope, $exceptionHandler: import("../../core/exception-handler").ErrorHandler, $attr: import("../../core/compile/attributes").Attributes, $element: import("../../shared/jqlite/jqlite.js").JQLite, $parse: import("../../core/parse/parse").ParseService, $animate: any, $interpolate: any);
+    constructor($scope: import("../../core/scope/scope").Scope, $exceptionHandler: import("../../core/exception-handler").ErrorHandler, $attr: import("../../core/compile/attributes").Attributes, $element: import("../../shared/jqlite/jqlite").JQLite, $parse: import("../../core/parse/parse").ParseService, $animate: any, $interpolate: any);
     /** @type {any} The actual value from the control's view  */
     $viewValue: any;
     /** @type {any} The value in the model that the control is bound to. */

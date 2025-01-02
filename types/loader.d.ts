@@ -10,7 +10,7 @@ export class Angular {
     /** @type {string} */
     version: string;
     /** @type {typeof import('./shared/jqlite/jqlite').JQLite} */
-    element: typeof import("./shared/jqlite/jqlite.js").JQLite;
+    element: typeof import("./shared/jqlite/jqlite").JQLite;
     /** @type {!Array<string|any>} */
     bootsrappedModules: Array<string | any>;
     /** @type {Function} */

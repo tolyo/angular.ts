@@ -2448,7 +2448,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
             priority: 0,
             compile: () => (scope, node) => {
               interpolateFn.expressions.forEach((x) => {
-                scope.$watch(x.trim(), () => {
+                scope.$watch(x, () => {
                   node[0].nodeValue = interpolateFn(scope);
                 });
               });
@@ -2872,6 +2872,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
             let compare;
             let removeWatch;
             let firstCall = true;
+            let firstChange = true;
 
             switch (mode) {
               case "@":
@@ -2882,12 +2883,14 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
 
                 removeWatch = attrs.$observe(attrName, (value) => {
                   if (isString(value) || isBoolean(value)) {
-                    recordChanges(scopeName, value);
+                    recordChanges(scopeName, value, firstChange);
+
                     destination[scopeName] = value;
                     if (firstCall) {
                       firstCall = false;
                     } else {
                       triggerOnChangesHook();
+                      firstChange = false;
                     }
                   }
                 });
@@ -2905,6 +2908,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                 }
                 initialChanges[scopeName] = new SimpleChange(
                   destination[scopeName],
+                  true,
                 );
                 removeWatchCollection.push(removeWatch);
                 break;
@@ -2986,28 +2990,32 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                 destination[scopeName] = parentGet(scope);
                 initialChanges[scopeName] = new SimpleChange(
                   destination[scopeName],
+                  firstChange,
                 );
                 scope.$target.attrs = attrs;
                 removeWatch = scope.$watch(
                   attrs[attrName],
                   (val) => {
-                    scope.attrs[attrName] = val;
-                    recordChanges(scopeName, val);
-                  },
-                  true,
-                );
-                removeWatchCollection.push(removeWatch);
-
-                removeWatch = scope.$watch(
-                  `attrs.${attrName}`,
-                  (val) => {
-                    recordChanges(scopeName, val);
                     destination[scopeName] = val;
+                    recordChanges(scopeName, val, firstChange);
+                    if (firstChange) {
+                      firstChange = false;
+                    }
                   },
                   true,
                 );
-
                 removeWatchCollection.push(removeWatch);
+
+                // removeWatch = scope.$watch(
+                //   `attrs.${attrName}`,
+                //   (val) => {
+                //     recordChanges(scopeName, val);
+                //     destination[scopeName] = val;
+                //   },
+                //   true,
+                // );
+
+                // removeWatchCollection.push(removeWatch);
                 break;
 
               case "&":
@@ -3033,7 +3041,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
             }
           });
         }
-        function recordChanges(key, currentValue) {
+        function recordChanges(key, currentValue, initial) {
           if (isFunction(destination.$onChanges)) {
             // If we have not already scheduled the top level onChangesQueue handler then do so now
             if (!onChangesQueue) {
@@ -3046,7 +3054,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
               onChangesQueue.push(triggerOnChangesHook);
             }
             // Store this change
-            changes[key] = new SimpleChange(currentValue);
+            changes[key] = new SimpleChange(currentValue, initial);
           }
         }
 
@@ -3072,14 +3080,9 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
 }
 
 class SimpleChange {
-  constructor(current) {
+  constructor(current, firstChange) {
     this.currentValue = current;
-    this.firstChange = true;
-  }
-
-  updateCurrentValue(value) {
-    this.currentValue = value;
-    this.firstChange = false;
+    this.firstChange = firstChange;
   }
 
   /**

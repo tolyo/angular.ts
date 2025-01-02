@@ -14,7 +14,7 @@ export class Attributes {
      * @param {import('../../shared/jqlite/jqlite').JQLite} [element]
      * @param {*} [attributesToCopy]
      */
-    constructor($rootScope: import("../scope/scope").Scope, $animate: any, $exceptionHandler: import("../exception-handler").ErrorHandler, $sce: any, element?: import("../../shared/jqlite/jqlite.js").JQLite, attributesToCopy?: any);
+    constructor($rootScope: import("../scope/scope").Scope, $animate: any, $exceptionHandler: import("../exception-handler").ErrorHandler, $sce: any, element?: import("../../shared/jqlite/jqlite").JQLite, attributesToCopy?: any);
     $rootScope: import("../scope/scope").Scope;
     $animate: any;
     $exceptionHandler: import("../exception-handler").ErrorHandler;

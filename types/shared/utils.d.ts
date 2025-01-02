@@ -255,7 +255,7 @@ export function isElement(node: any): boolean;
  * @param {import('../shared/jqlite/jqlite').JQLite|Element} element
  * @returns
  */
-export function getNodeName(element: import("../shared/jqlite/jqlite.js").JQLite | Element): string;
+export function getNodeName(element: import("../shared/jqlite/jqlite").JQLite | Element): string;
 export function includes(array: any, obj: any): boolean;
 /**
  * Removes the first occurrence of a specified value from an array.
