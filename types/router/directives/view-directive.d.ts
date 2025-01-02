@@ -7,16 +7,16 @@ export namespace $ViewDirectiveFill {
     let $inject: string[];
 }
 /**
- * `ui-view`: A viewport directive which is filled in by a view from the active state.
+ * `ng-view`: A viewport directive which is filled in by a view from the active state.
  *
  * ### Attributes
  *
  * - `name`: (Optional) A view name.
  *   The name should be unique amongst the other views in the same state.
  *   You can have views of the same name that live in different states.
- *   The ui-view can be targeted in a View using the name ([[Ng1StateDeclaration.views]]).
+ *   The ng-view can be targeted in a View using the name ([[Ng1StateDeclaration.views]]).
  *
- * - `autoscroll`: an expression. When it evaluates to true, the `ui-view` will be scrolled into view when it is activated.
+ * - `autoscroll`: an expression. When it evaluates to true, the `ng-view` will be scrolled into view when it is activated.
  *   Uses [[$ngViewScroll]] to do the scrolling.
  *
  * - `onload`: Expression to evaluate whenever the view updates.
@@ -25,20 +25,20 @@ export namespace $ViewDirectiveFill {
  * A view can be unnamed or named.
  * ```html
  * <!-- Unnamed -->
- * <div ui-view></div>
+ * <div ng-view></div>
  *
  * <!-- Named -->
- * <div ui-view="viewName"></div>
+ * <div ng-view="viewName"></div>
  *
  * <!-- Named (different style) -->
- * <ui-view name="viewName"></ui-view>
+ * <ng-view name="viewName"></ng-view>
  * ```
  *
  * You can only have one unnamed view within any template (or root html). If you are only using a
  * single view and it is unnamed then you can populate it like so:
  *
  * ```html
- * <div ui-view></div>
+ * <div ng-view></div>
  * $stateProvider.state("home", {
  *   template: "<h1>HELLO!</h1>"
  * })
@@ -62,7 +62,7 @@ export namespace $ViewDirectiveFill {
  * but you could if you wanted, like so:
  *
  * ```html
- * <div ui-view="main"></div>
+ * <div ng-view="main"></div>
  * ```
  *
  * ```js
@@ -78,9 +78,9 @@ export namespace $ViewDirectiveFill {
  * Really though, you'll use views to set up multiple views:
  *
  * ```html
- * <div ui-view></div>
- * <div ui-view="chart"></div>
- * <div ui-view="data"></div>
+ * <div ng-view></div>
+ * <div ng-view="chart"></div>
+ * <div ng-view="data"></div>
  * ```
  *
  * ```js
@@ -102,14 +102,14 @@ export namespace $ViewDirectiveFill {
  * #### Examples for `autoscroll`:
  * ```html
  * <!-- If autoscroll present with no expression,
- *      then scroll ui-view into view -->
- * <ui-view autoscroll/>
+ *      then scroll ng-view into view -->
+ * <ng-view autoscroll/>
  *
  * <!-- If autoscroll present with valid expression,
- *      then scroll ui-view into view if expression evaluates to true -->
- * <ui-view autoscroll='true'/>
- * <ui-view autoscroll='false'/>
- * <ui-view autoscroll='scopeVariable'/>
+ *      then scroll ng-view into view if expression evaluates to true -->
+ * <ng-view autoscroll='true'/>
+ * <ng-view autoscroll='false'/>
+ * <ng-view autoscroll='scopeVariable'/>
  * ```
  *
  * Resolve data:

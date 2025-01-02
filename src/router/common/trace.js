@@ -41,16 +41,16 @@ import {
   padString,
 } from "../../shared/strings";
 function ngViewString(uiview) {
-  if (!uiview) return "ui-view (defunct)";
+  if (!uiview) return "ng-view (defunct)";
   const state = uiview.creationContext
     ? uiview.creationContext.name || "(root)"
     : "(none)";
-  return `[ui-view#${uiview.id} ${uiview.$type}:${uiview.fqn} (${uiview.name}@${state})]`;
+  return `[ng-view#${uiview.id} ${uiview.$type}:${uiview.fqn} (${uiview.name}@${state})]`;
 }
 const viewConfigString = (viewConfig) => {
   const view = viewConfig.viewDecl;
   const state = view.$context.name || "(root)";
-  return `[View#${viewConfig.$id} from '${state}' state]: target ui-view: '${view.$ngViewName}@${view.$ngViewContextAnchor}'`;
+  return `[View#${viewConfig.$id} from '${state}' state]: target ng-view: '${view.$ngViewName}@${view.$ngViewContextAnchor}'`;
 };
 function normalizedCat(input) {
   return isNumber(input) ? Category[input] : Category[Category[input]];
@@ -178,7 +178,7 @@ export class Trace {
   traceUIViewEvent(event, viewData, extra = "") {
     if (!this.enabled(Category.UIVIEW)) return;
     console.log(
-      `ui-view: ${padString(30, event)} ${ngViewString(viewData)}${extra}`,
+      `ng-view: ${padString(30, event)} ${ngViewString(viewData)}${extra}`,
     );
   }
   /** @internal called by ui-router code */

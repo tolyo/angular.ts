@@ -95,6 +95,7 @@ let id = 0;
 
 export class Ng1ViewConfig {
   constructor(path, viewDecl, factory) {
+    debugger
     this.path = path;
     this.viewDecl = viewDecl;
     this.factory = factory;

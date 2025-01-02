@@ -64,7 +64,7 @@ export class TemplateFactoryProvider {
    * that string,or `null` if no template is configured.
    */
   fromConfig(config, params, context) {
-    const defaultTemplate = "<ui-view></ui-view>";
+    const defaultTemplate = "<ng-view></ng-view>";
     const asTemplate = (result) =>
       Promise.resolve(result).then((str) => ({ template: str }));
     const asComponent = (result) =>
@@ -172,7 +172,7 @@ export class TemplateFactoryProvider {
    * It analyses the component's bindings, then constructs a template that instantiates the component.
    * The template wires input and output bindings to resolves or from the parent component.
    *
-   * @param {any} ngView {object} The parent ui-view (for binding outputs to callbacks)
+   * @param {any} ngView {object} The parent ng-view (for binding outputs to callbacks)
    * @param {import("./resolve/resolve-context").ResolveContext} context The ResolveContext (for binding outputs to callbacks returned from resolves)
    * @param {string} component {string} Component's name in camel case.
    * @param {any} [bindings] An object defining the component's bindings: {foo: '<'}
@@ -190,9 +190,9 @@ export class TemplateFactoryProvider {
     const attributeTpl = /** @param {BindingTuple} input*/ (input) => {
       const { name, type } = input;
       const attrName = kebob(name);
-      // If the ui-view has an attribute which matches a binding on the routed component
+      // If the ng-view has an attribute which matches a binding on the routed component
       // then pass that attribute through to the routed component template.
-      // Prefer ui-view wired mappings to resolve data, unless the resolve was explicitly bound using `bindings:`
+      // Prefer ng-view wired mappings to resolve data, unless the resolve was explicitly bound using `bindings:`
       if (ngView.attr(attrName) && !bindings[name])
         return `${attrName}='${ngView.attr(attrName)}'`;
       const resolveName = bindings[name] || name;

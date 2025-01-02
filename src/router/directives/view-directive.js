@@ -8,16 +8,16 @@ import { Ng1ViewConfig } from "../state/views";
 import { JQLite } from "../../shared/jqlite/jqlite.js";
 import { getLocals } from "../state/state-registry";
 /**
- * `ui-view`: A viewport directive which is filled in by a view from the active state.
+ * `ng-view`: A viewport directive which is filled in by a view from the active state.
  *
  * ### Attributes
  *
  * - `name`: (Optional) A view name.
  *   The name should be unique amongst the other views in the same state.
  *   You can have views of the same name that live in different states.
- *   The ui-view can be targeted in a View using the name ([[Ng1StateDeclaration.views]]).
+ *   The ng-view can be targeted in a View using the name ([[Ng1StateDeclaration.views]]).
  *
- * - `autoscroll`: an expression. When it evaluates to true, the `ui-view` will be scrolled into view when it is activated.
+ * - `autoscroll`: an expression. When it evaluates to true, the `ng-view` will be scrolled into view when it is activated.
  *   Uses [[$ngViewScroll]] to do the scrolling.
  *
  * - `onload`: Expression to evaluate whenever the view updates.
@@ -26,20 +26,20 @@ import { getLocals } from "../state/state-registry";
  * A view can be unnamed or named.
  * ```html
  * <!-- Unnamed -->
- * <div ui-view></div>
+ * <div ng-view></div>
  *
  * <!-- Named -->
- * <div ui-view="viewName"></div>
+ * <div ng-view="viewName"></div>
  *
  * <!-- Named (different style) -->
- * <ui-view name="viewName"></ui-view>
+ * <ng-view name="viewName"></ng-view>
  * ```
  *
  * You can only have one unnamed view within any template (or root html). If you are only using a
  * single view and it is unnamed then you can populate it like so:
  *
  * ```html
- * <div ui-view></div>
+ * <div ng-view></div>
  * $stateProvider.state("home", {
  *   template: "<h1>HELLO!</h1>"
  * })
@@ -63,7 +63,7 @@ import { getLocals } from "../state/state-registry";
  * but you could if you wanted, like so:
  *
  * ```html
- * <div ui-view="main"></div>
+ * <div ng-view="main"></div>
  * ```
  *
  * ```js
@@ -79,9 +79,9 @@ import { getLocals } from "../state/state-registry";
  * Really though, you'll use views to set up multiple views:
  *
  * ```html
- * <div ui-view></div>
- * <div ui-view="chart"></div>
- * <div ui-view="data"></div>
+ * <div ng-view></div>
+ * <div ng-view="chart"></div>
+ * <div ng-view="data"></div>
  * ```
  *
  * ```js
@@ -103,14 +103,14 @@ import { getLocals } from "../state/state-registry";
  * #### Examples for `autoscroll`:
  * ```html
  * <!-- If autoscroll present with no expression,
- *      then scroll ui-view into view -->
- * <ui-view autoscroll/>
+ *      then scroll ng-view into view -->
+ * <ng-view autoscroll/>
  *
  * <!-- If autoscroll present with valid expression,
- *      then scroll ui-view into view if expression evaluates to true -->
- * <ui-view autoscroll='true'/>
- * <ui-view autoscroll='false'/>
- * <ui-view autoscroll='scopeVariable'/>
+ *      then scroll ng-view into view if expression evaluates to true -->
+ * <ng-view autoscroll='true'/>
+ * <ng-view autoscroll='false'/>
+ * <ng-view autoscroll='scopeVariable'/>
  * ```
  *
  * Resolve data:
@@ -173,19 +173,19 @@ export let ngView = [
           let previousEl, currentEl, currentScope, viewConfig;
           const activeUIView = {
             $type: "ng1",
-            id: directive.count++, // Global sequential ID for ui-view tags added to DOM
-            name: name, // ui-view name (<div ui-view="name"></div>
+            id: directive.count++, // Global sequential ID for ng-view tags added to DOM
+            name: name, // ng-view name (<div ng-view="name"></div>
             fqn: inherited.$ngView.fqn
               ? inherited.$ngView.fqn + "." + name
               : name, // fully qualified name, describes location in DOM
             config: null, // The ViewConfig loaded (from a state.views definition)
             configUpdated: configUpdatedCallback, // Called when the matching ViewConfig changes
             get creationContext() {
-              // The context in which this ui-view "tag" was created
+              // The context in which this ng-view "tag" was created
               const fromParentTagConfig = parse("$cfg.viewDecl.$context")(
                 inherited,
               );
-              // Allow <ui-view name="foo"><ui-view name="bar"></ui-view></ui-view>
+              // Allow <ng-view name="foo"><ng-view name="bar"></ng-view></ng-view>
               // See https://github.com/angular-ui/ui-router/issues/3355
               const fromParentTag = parse("$ngView.creationContext")(inherited);
               return fromParentTagConfig || fromParentTag;
