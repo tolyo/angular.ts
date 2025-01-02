@@ -69,13 +69,13 @@ describe("form", () => {
     expect(form.alias).toBeUndefined();
   });
 
-  it("should ignore changes in manually removed controls", () => {
+  it("should ignore changes in manually removed controls", async () => {
     doc = $compile(
       '<form name="myForm">' +
         '<input name="control" ng-maxlength="1" ng-model="value" store-model-ctrl/>' +
         "</form>",
     )(scope);
-
+    await wait();
     const form = scope.myForm;
 
     const input = doc.find("input").eq(0);
@@ -84,8 +84,8 @@ describe("form", () => {
     input[0].setAttribute("value", "ab");
     input[0].dispatchEvent(new Event("change"));
 
-    scope.$apply();
-
+    // scope.$apply();
+    await wait(10);
     expect(form.$error.maxlength).toBeTruthy();
     expect(form.$dirty).toBe(true);
     expect(form.$error.maxlength[0].$name).toBe("control");
@@ -102,8 +102,8 @@ describe("form", () => {
 
     input[0].setAttribute("value", "ab");
     input[0].dispatchEvent(new Event("change"));
-    scope.$apply();
-
+    // scope.$apply();
+    await wait();
     expect(form.$error.maxlength).toBeFalsy();
     expect(form.$dirty).toBe(false);
   });
@@ -1286,12 +1286,14 @@ describe("form", () => {
     expect(form2.$name).toBe("ngformB");
   });
 
-  it("should rename forms with an initially blank name", () => {
+  it("should rename forms with an initially blank name", async () => {
     const element = $compile('<form name="{{name}}"></form>')(scope);
+    await wait();
     const form = element.controller("form");
     expect(scope[""]).toBe(form);
     expect(form.$name).toBe("");
     scope.name = "foo";
+    await wait();
     expect(scope.foo).toBe(form);
     expect(form.$name).toBe("foo");
     expect(scope.foo).toBe(form);
