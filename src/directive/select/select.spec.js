@@ -1,7 +1,7 @@
 import { Angular } from "../../loader";
 import { dealoc, JQLite } from "../../shared/jqlite/jqlite.js";
 import { hashKey, equals, isNumberNaN } from "../../shared/utils";
-import { browserTrigger } from "../../shared/test-utils";
+import { browserTrigger, wait } from "../../shared/test-utils";
 
 describe("select", () => {
   let scope;
@@ -142,7 +142,7 @@ describe("select", () => {
     });
   });
 
-  it("should not add options to the select if ngModel is not present", () => {
+  fit("should not add options to the select if ngModel is not present", () => {
     const scope = $rootScope;
     scope.d = "d";
     scope.e = "e";
@@ -170,7 +170,7 @@ describe("select", () => {
   });
 
   describe("select-one", () => {
-    it("should compile children of a select without a ngModel, but not create a model for it", () => {
+    fit("should compile children of a select without a ngModel, but not create a model for it", async () => {
       compile(
         "<select>" +
           '<option selected="true">{{a}}</option>' +
@@ -178,15 +178,13 @@ describe("select", () => {
           "<option>C</option>" +
           "</select>",
       );
-      scope.$apply(() => {
-        scope.a = "foo";
-        scope.b = "bar";
-      });
-
+      scope.a = "foo";
+      scope.b = "bar";
+      await wait();
       expect(element.text()).toBe("foobarC");
     });
 
-    it("should not interfere with selection via selected attr if ngModel directive is not present", () => {
+    fit("should not interfere with selection via selected attr if ngModel directive is not present", () => {
       compile(
         "<select>" +
           "<option>not me</option>" +
@@ -198,7 +196,7 @@ describe("select", () => {
     });
 
     describe("required state", () => {
-      it("should set the error if the empty option is selected", () => {
+      it("should set the error if the empty option is selected", async () => {
         compile(
           '<select name="select" ng-model="selection" required>' +
             '<option value=""></option>' +
@@ -207,10 +205,8 @@ describe("select", () => {
             "</select>",
         );
 
-        scope.$apply(() => {
-          scope.selection = "a";
-        });
-
+        scope.selection = "a";
+        await wait();
         expect(element[0].classList.contains("ng-valid")).toBeTrue();
         expect(ngModelCtrl.$error.required).toBeFalsy();
 

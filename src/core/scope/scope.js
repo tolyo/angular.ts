@@ -651,7 +651,6 @@ export class Scope {
             keys.push(x.name);
           } else {
             // Promise.resolve().then(() => {
-            //   debugger
             //   listenerFn(this.$target)
             // });
           }

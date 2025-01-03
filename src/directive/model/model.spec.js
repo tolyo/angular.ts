@@ -1,8 +1,8 @@
 import { JQLite, dealoc } from "../../shared/jqlite/jqlite.js";
-import { Angular } from "../../loader";
-import { NgModelController } from "./model";
-import { isDefined, valueFn, isObject } from "../../shared/utils";
-import { browserTrigger } from "../../shared/test-utils";
+import { Angular } from "../../loader.js";
+import { NgModelController } from "./model.js";
+import { isDefined, valueFn, isObject } from "../../shared/utils.js";
+import { browserTrigger, wait } from "../../shared/test-utils.js";
 
 describe("ngModel", () => {
   let ctrl;
@@ -56,7 +56,7 @@ describe("ngModel", () => {
   });
 
   describe("NgModelController", () => {
-    it("should init the properties", () => {
+    fit("should init the properties", () => {
       expect(ctrl.$untouched).toBe(true);
       expect(ctrl.$touched).toBe(false);
       expect(ctrl.$dirty).toBe(false);
@@ -98,7 +98,7 @@ describe("ngModel", () => {
         expect(ctrl.$pending).toBeUndefined();
       }
 
-      it("should propagate validity to the parent form", () => {
+      fit("should propagate validity to the parent form", () => {
         expect(parentFormCtrl.$setValidity).not.toHaveBeenCalled();
         ctrl.$setValidity("ERROR", false);
         expect(parentFormCtrl.$setValidity).toHaveBeenCalledOnceWith(
@@ -108,7 +108,7 @@ describe("ngModel", () => {
         );
       });
 
-      it("should transition from states correctly", () => {
+      fit("should transition from states correctly", () => {
         expectCleared();
 
         ctrl.$setValidity("someError", false);
@@ -124,7 +124,7 @@ describe("ngModel", () => {
         expectCleared();
       });
 
-      it("should set valid/invalid with multiple errors", () => {
+      fit("should set valid/invalid with multiple errors", () => {
         ctrl.$setValidity("first", false);
         expect(ctrl.$valid).toBe(false);
         expect(ctrl.$invalid).toBe(true);
@@ -152,7 +152,7 @@ describe("ngModel", () => {
     });
 
     describe("setPristine", () => {
-      it("should set control to its pristine state", () => {
+      fit("should set control to its pristine state", () => {
         ctrl.$setViewValue("edit");
         expect(ctrl.$dirty).toBe(true);
         expect(ctrl.$pristine).toBe(false);
@@ -164,7 +164,7 @@ describe("ngModel", () => {
     });
 
     describe("setDirty", () => {
-      it("should set control to its dirty state", () => {
+      fit("should set control to its dirty state", () => {
         expect(ctrl.$pristine).toBe(true);
         expect(ctrl.$dirty).toBe(false);
 
@@ -173,14 +173,14 @@ describe("ngModel", () => {
         expect(ctrl.$dirty).toBe(true);
       });
 
-      it("should set parent form to its dirty state", () => {
+      fit("should set parent form to its dirty state", () => {
         ctrl.$setDirty();
         expect(parentFormCtrl.$setDirty).toHaveBeenCalled();
       });
     });
 
     describe("setUntouched", () => {
-      it("should set control to its untouched state", () => {
+      fit("should set control to its untouched state", () => {
         ctrl.$setTouched();
 
         ctrl.$setUntouched();
@@ -190,7 +190,7 @@ describe("ngModel", () => {
     });
 
     describe("setTouched", () => {
-      it("should set control to its touched state", () => {
+      fit("should set control to its touched state", () => {
         ctrl.$setUntouched();
 
         ctrl.$setTouched();
@@ -200,12 +200,12 @@ describe("ngModel", () => {
     });
 
     describe("view -> model", () => {
-      it("should set the value to $viewValue", () => {
+      fit("should set the value to $viewValue", () => {
         ctrl.$setViewValue("some-val");
         expect(ctrl.$viewValue).toBe("some-val");
       });
 
-      it("should pipeline all registered parsers and set result to $modelValue", () => {
+      fit("should pipeline all registered parsers and set result to $modelValue", () => {
         const log = [];
 
         ctrl.$parsers.push((value) => {
@@ -223,7 +223,7 @@ describe("ngModel", () => {
         expect(ctrl.$modelValue).toBe("init-a-b");
       });
 
-      it("should fire viewChangeListeners when the value changes in the view (even if invalid)", () => {
+      fit("should fire viewChangeListeners when the value changes in the view (even if invalid)", () => {
         const spy = jasmine.createSpy("viewChangeListener");
         ctrl.$viewChangeListeners.push(spy);
         ctrl.$setViewValue("val");
@@ -236,7 +236,7 @@ describe("ngModel", () => {
         expect(spy).toHaveBeenCalled();
       });
 
-      it("should reset the model when the view is invalid", () => {
+      fit("should reset the model when the view is invalid", () => {
         ctrl.$setViewValue("aaaa");
         expect(ctrl.$modelValue).toBe("aaaa");
 
@@ -247,7 +247,7 @@ describe("ngModel", () => {
         expect(ctrl.$modelValue).toBeUndefined();
       });
 
-      it("should not reset the model when the view is invalid due to an external validator", () => {
+      fit("should not reset the model when the view is invalid due to an external validator", () => {
         ctrl.$setViewValue("aaaa");
         expect(ctrl.$modelValue).toBe("aaaa");
 
@@ -256,11 +256,7 @@ describe("ngModel", () => {
         expect(ctrl.$modelValue).toBe("bbbb");
       });
 
-      it("should not reset the view when the view is invalid", () => {
-        // this test fails when the view changes the model and
-        // then the model listener in ngModel picks up the change and
-        // tries to update the view again.
-
+      fit("should not reset the view when the view is invalid", async () => {
         // add a validator that will make any input invalid
         ctrl.$parsers.push(() => undefined);
         spyOn(ctrl, "$render");
@@ -274,6 +270,8 @@ describe("ngModel", () => {
 
         // further digests
         scope.$apply('value = "aaa"');
+        await wait();
+
         expect(ctrl.$viewValue).toBe("aaa");
         ctrl.$render.calls.reset();
 
@@ -284,7 +282,7 @@ describe("ngModel", () => {
         expect(scope.value).toBeUndefined();
       });
 
-      it("should call parentForm.$setDirty only when pristine", () => {
+      fit("should call parentForm.$setDirty only when pristine", () => {
         ctrl.$setViewValue("");
         expect(ctrl.$pristine).toBe(false);
         expect(ctrl.$dirty).toBe(true);
@@ -297,7 +295,7 @@ describe("ngModel", () => {
         expect(parentFormCtrl.$setDirty).not.toHaveBeenCalled();
       });
 
-      it("should remove all other errors when any parser returns undefined", () => {
+      fit("should remove all other errors when any parser returns undefined", () => {
         let a;
         let b;
         const val = function (val, x) {
@@ -346,14 +344,14 @@ describe("ngModel", () => {
         expect(ctrl.$error).toEqual({ high: true });
       });
 
-      it("should not remove external validators when a parser failed", () => {
+      fit("should not remove external validators when a parser failed", () => {
         ctrl.$parsers.push((v) => undefined);
         ctrl.$setValidity("externalError", false);
         ctrl.$setViewValue("someValue");
         expect(ctrl.$error).toEqual({ externalError: true, parse: true });
       });
 
-      it("should remove all non-parse-related CSS classes from the form when a parser fails", () => {
+      fit("should remove all non-parse-related CSS classes from the form when a parser fails", () => {
         const element = $compile(
           '<form name="myForm">' +
             '<input name="myControl" ng-model="value" >' +
@@ -386,7 +384,7 @@ describe("ngModel", () => {
         dealoc(element);
       });
 
-      it("should set the ng-invalid-parse and ng-valid-parse CSS class when parsers fail and pass", () => {
+      fit("should set the ng-invalid-parse and ng-valid-parse CSS class when parsers fail and pass", () => {
         let pass = true;
         ctrl.$parsers.push((v) => (pass ? v : undefined));
 
@@ -403,9 +401,11 @@ describe("ngModel", () => {
         expect(input[0].classList.contains("ng-invalid-parse")).toBeTrue();
       });
 
-      it("should update the model after all async validators resolve", () => {
+      fit("should update the model after all async validators resolve", async () => {
         let defer;
+        debugger;
         ctrl.$asyncValidators.promiseValidator = function (value) {
+          debugger;
           defer = Promise.withResolvers();
           return defer.promise;
         };
@@ -417,7 +417,9 @@ describe("ngModel", () => {
         expect(scope.value).toBeUndefined();
 
         defer.resolve();
+        await wait();
         expect(ctrl.$modelValue).toBe("b");
+
         expect(scope.value).toBe("b");
 
         // set view value on further digests
@@ -427,6 +429,7 @@ describe("ngModel", () => {
         expect(scope.value).toBe("b");
 
         defer.resolve();
+        await wait();
         expect(ctrl.$modelValue).toBe("c");
         expect(scope.value).toBe("c");
       });

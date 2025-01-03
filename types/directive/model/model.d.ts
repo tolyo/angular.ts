@@ -48,15 +48,15 @@ export const ngModelMinErr: (arg0: string, ...arg1: any[]) => Error;
 export class NgModelController {
     static $inject: string[];
     /**
-     * @param {import('../../core/scope/scope').Scope} $scope
-     * @param {import('../../core/exception-handler').ErrorHandler} $exceptionHandler
-     * @param {import('../../core/compile/attributes').Attributes} $attr
-     * @param {import('../../shared/jqlite/jqlite').JQLite} $element
-     * @param {import("../../core/parse/parse").ParseService} $parse
+     * @param {import('../../core/scope/scope.js').Scope} $scope
+     * @param {import('../../core/exception-handler.js').ErrorHandler} $exceptionHandler
+     * @param {import('../../core/compile/attributes.js').Attributes} $attr
+     * @param {import('../../shared/jqlite/jqlite.js').JQLite} $element
+     * @param {import("../../core/parse/parse.js").ParseService} $parse
      * @param {*} $animate
      * @param {*} $interpolate
      */
-    constructor($scope: import("../../core/scope/scope").Scope, $exceptionHandler: import("../../core/exception-handler").ErrorHandler, $attr: import("../../core/compile/attributes").Attributes, $element: import("../../shared/jqlite/jqlite").JQLite, $parse: import("../../core/parse/parse").ParseService, $animate: any, $interpolate: any);
+    constructor($scope: import("../../core/scope/scope.js").Scope, $exceptionHandler: import("../../core/exception-handler.js").ErrorHandler, $attr: import("../../core/compile/attributes.js").Attributes, $element: import("../../shared/jqlite/jqlite.js").JQLite, $parse: import("../../core/parse/parse.js").ParseService, $animate: any, $interpolate: any);
     /** @type {any} The actual value from the control's view  */
     $viewValue: any;
     /** @type {any} The value in the model that the control is bound to. */
@@ -103,7 +103,7 @@ export class NgModelController {
     };
     $$updateEvents: string;
     $$updateEventHandler(ev: any): void;
-    $$parsedNgModel: import("../../core/parse/parse").CompiledExpression;
+    $$parsedNgModel: import("../../core/parse/parse.js").CompiledExpression;
     $$parsedNgModelAssign: (arg0: any, arg1: any) => any;
     /** @type {import("../../core/parse/parse").CompiledExpression|((Scope) => any)} */
     $$ngModelGet: import("../../core/parse/parse").CompiledExpression | ((Scope: any) => any);
@@ -118,11 +118,11 @@ export class NgModelController {
     $$scope: import("../../core/scope/scope.js").Scope;
     /** @type {import('../../core/scope/scope.js').Scope} */
     $$rootScope: import("../../core/scope/scope.js").Scope;
-    $$attr: import("../../core/compile/attributes").Attributes;
+    $$attr: import("../../core/compile/attributes.js").Attributes;
     $$element: import("../../shared/jqlite/jqlite.js").JQLite;
     $$animate: any;
-    $$parse: import("../../core/parse/parse").ParseService;
-    $$exceptionHandler: import("../../core/exception-handler").ErrorHandler;
+    $$parse: import("../../core/parse/parse.js").ParseService;
+    $$exceptionHandler: import("../../core/exception-handler.js").ErrorHandler;
     $$hasNativeValidators: boolean;
     set(object: any, property: any): void;
     unset(object: any, property: any): void;

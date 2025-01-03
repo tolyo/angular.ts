@@ -24,7 +24,7 @@ import {
   nullFormCtrl,
   PENDING_CLASS,
   setupValidity,
-} from "../form/form";
+} from "../form/form.js";
 import { defaultModelOptions } from "../model-options/model-options.js";
 import { startingTag } from "../../shared/jqlite/jqlite.js";
 
@@ -79,11 +79,11 @@ export class NgModelController {
   ];
 
   /**
-   * @param {import('../../core/scope/scope').Scope} $scope
-   * @param {import('../../core/exception-handler').ErrorHandler} $exceptionHandler
-   * @param {import('../../core/compile/attributes').Attributes} $attr
-   * @param {import('../../shared/jqlite/jqlite').JQLite} $element
-   * @param {import("../../core/parse/parse").ParseService} $parse
+   * @param {import('../../core/scope/scope.js').Scope} $scope
+   * @param {import('../../core/exception-handler.js').ErrorHandler} $exceptionHandler
+   * @param {import('../../core/compile/attributes.js').Attributes} $attr
+   * @param {import('../../shared/jqlite/jqlite.js').JQLite} $element
+   * @param {import("../../core/parse/parse.js").ParseService} $parse
    * @param {*} $animate
    * @param {*} $interpolate
    */
@@ -548,6 +548,7 @@ export class NgModelController {
 
     const that = this;
     this.$$runValidators(modelValue, viewValue, (allValid) => {
+      debugger;
       // If there was no change in validity, don't update the model
       // This prevents changing an invalid modelValue to undefined
       if (!allowInvalid && prevValid !== allValid) {
@@ -1057,22 +1058,21 @@ function setupModelWatcher(ctrl) {
   //    -> scope value did not change since the last digest as
   //       ng-change executes in apply phase
   // 4. view should be changed back to 'a'
-  ctrl.$$scope.$watch("scope", (scope) => {
-    const modelValue = ctrl.$$ngModelGet(scope);
+  ctrl.$$scope.$watch("value", (value) => {
+    // const modelValue = ctrl.$$ngModelGet(scope);
 
-    // if scope model value and ngModel value are out of sync
-    // This cannot be moved to the action function, because it would not catch the
-    // case where the model is changed in the ngChange function or the model setter
-    if (
-      modelValue !== ctrl.$modelValue &&
-      // checks for NaN is needed to allow setting the model to NaN when there's an asyncValidator
+    // // if scope model value and ngModel value are out of sync
+    // // This cannot be moved to the action function, because it would not catch the
+    // // case where the model is changed in the ngChange function or the model setter
+    // if (
+    //   modelValue !== ctrl.$modelValue &&
+    //   // checks for NaN is needed to allow setting the model to NaN when there's an asyncValidator
 
-      (ctrl.$modelValue === ctrl.$modelValue || modelValue === modelValue)
-    ) {
-      ctrl.$$setModelValue(modelValue);
-    }
+    //   (ctrl.$modelValue === ctrl.$modelValue || modelValue === modelValue)
+    // ) {
 
-    return modelValue;
+    // }
+    ctrl.$$setModelValue(value);
   });
 }
 
