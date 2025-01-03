@@ -197,6 +197,9 @@ export class Scope {
    * @returns {boolean} - Returns true to indicate success of the operation.
    */
   set(target, property, value, proxy) {
+    if (property === "undefined") {
+      throw new Error("Attempting to set undefined property")
+    }
     this.$proxy = proxy;
     this.$target = target;
     const oldValue = target[property];

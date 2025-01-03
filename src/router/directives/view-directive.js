@@ -321,7 +321,9 @@ export function $ViewDirectiveFill($compile, $controller, $transitions, $view) {
         const controllerAs = getControllerAs(cfg);
         const resolveAs = getResolveAs(cfg);
         const locals = resolveCtx && getLocals(resolveCtx);
-        scope[resolveAs] = locals;
+        if (resolveAs) {
+          scope.$target[resolveAs] = locals;
+        }
         if (controller) {
           const controllerInstance = $controller(
             controller,
