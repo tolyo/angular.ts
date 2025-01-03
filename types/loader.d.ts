@@ -86,6 +86,7 @@ export class Angular {
      * @param {Element|Document} element
      */
     init(element: Element | Document): void;
+    $injector: any;
     /**
      *
      * The `angular.module` is a global place for creating, registering and retrieving AngularJS

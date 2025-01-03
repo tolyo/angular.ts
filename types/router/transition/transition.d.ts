@@ -17,12 +17,13 @@ export class Transition {
      * @param fromPath The path of [[PathNode]]s from which the transition is leaving.  The last node in the `fromPath`
      *        encapsulates the "from state".
      * @param targetState The target state and parameters being transitioned to (also, the transition options)
-     * @param {import('../transition/transition-service').TransitionProvider} transitionService The [[TransitionService]] instance
+     * @param {import('../transition/transition-service.js').TransitionProvider} transitionService The [[TransitionService]] instance
      * @internal
      */
-    constructor(fromPath: any, targetState: any, transitionService: import("../transition/transition-service").TransitionProvider, globals: any);
+    constructor(fromPath: any, targetState: any, transitionService: import("../transition/transition-service.js").TransitionProvider, globals: any);
     globals: any;
-    transitionService: import("../transition/transition-service").TransitionProvider;
+    transitionService: import("../transition/transition-service.js").TransitionProvider;
+    _deferred: any;
     /**
      * This promise is resolved or rejected based on the outcome of the Transition.
      *
@@ -30,8 +31,6 @@ export class Transition {
      * When the transition is unsuccessful, the promise is rejected with the [[Rejection]] or javascript error
      */
     promise: any;
-    resolve: any;
-    reject: any;
     /** @internal Holds the hook registration functions such as those passed to Transition.onStart() */
     _registeredHooks: {};
     _hookBuilder: HookBuilder;
@@ -152,7 +151,7 @@ export class Transition {
      * @returns a [[UIInjector]]
      */
     injector(state: any, pathName?: string): {
-        native: import("../../core/di/internal-injector").InjectorService;
+        native: import("../../core/di/internal-injector.js").InjectorService;
         get(token: any): any;
         getAsync(token: any): any;
         getNative(token: any): any;
@@ -379,4 +378,4 @@ export class Transition {
 export namespace Transition {
     export { Transition as diToken };
 }
-import { HookBuilder } from "./hook-builder";
+import { HookBuilder } from "./hook-builder.js";

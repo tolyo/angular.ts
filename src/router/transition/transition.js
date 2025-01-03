@@ -1,6 +1,6 @@
-import { trace } from "../common/trace";
-import { services } from "../common/coreservices";
-import { stringify } from "../../shared/strings";
+import { trace } from "../common/trace.js";
+import { services } from "../common/coreservices.js";
+import { stringify } from "../../shared/strings.js";
 import {
   map,
   find,
@@ -11,18 +11,18 @@ import {
   anyTrueR,
   flattenR,
   uniqR,
-} from "../../shared/common";
-import { isUndefined, isObject, assert } from "../../shared/utils";
-import { propEq, val, is } from "../../shared/hof";
-import { TransitionHookPhase } from "./interface"; // has or is using
-import { TransitionHook } from "./transition-hook";
-import { matchState, makeEvent } from "./hook-registry";
-import { HookBuilder } from "./hook-builder";
-import { PathUtils } from "../path/path-utils";
-import { Param } from "../params/param";
-import { Resolvable } from "../resolve/resolvable";
-import { ResolveContext } from "../resolve/resolve-context";
-import { Rejection } from "./reject-factory";
+} from "../../shared/common.js";
+import { isUndefined, isObject, assert } from "../../shared/utils.js";
+import { propEq, val, is } from "../../shared/hof.js";
+import { TransitionHookPhase } from "./interface.js"; // has or is using
+import { TransitionHook } from "./transition-hook.js";
+import { matchState, makeEvent } from "./hook-registry.js";
+import { HookBuilder } from "./hook-builder.js";
+import { PathUtils } from "../path/path-utils.js";
+import { Param } from "../params/param.js";
+import { Resolvable } from "../resolve/resolvable.js";
+import { ResolveContext } from "../resolve/resolve-context.js";
+import { Rejection } from "./reject-factory.js";
 
 /**
  * Represents a transition between two states.
@@ -43,22 +43,20 @@ export class Transition {
    * @param fromPath The path of [[PathNode]]s from which the transition is leaving.  The last node in the `fromPath`
    *        encapsulates the "from state".
    * @param targetState The target state and parameters being transitioned to (also, the transition options)
-   * @param {import('../transition/transition-service').TransitionProvider} transitionService The [[TransitionService]] instance
+   * @param {import('../transition/transition-service.js').TransitionProvider} transitionService The [[TransitionService]] instance
    * @internal
    */
   constructor(fromPath, targetState, transitionService, globals) {
     this.globals = globals;
     this.transitionService = transitionService;
-    const { promise, resolve, reject } = Promise.withResolvers();
+    this._deferred = Promise.withResolvers();
     /**
      * This promise is resolved or rejected based on the outcome of the Transition.
      *
      * When the transition is successful, the promise is resolved
      * When the transition is unsuccessful, the promise is rejected with the [[Rejection]] or javascript error
      */
-    this.promise = promise;
-    this.resolve = resolve;
-    this.reject = reject;
+    this.promise = this._deferred.promise;
     /** @internal Holds the hook registration functions such as those passed to Transition.onStart() */
     this._registeredHooks = {};
 
@@ -607,13 +605,13 @@ export class Transition {
     const transitionSuccess = () => {
       trace.traceSuccess(this.$to(), this);
       this.success = true;
-      this.resolve(this.to());
+      this._deferred.resolve(this.to());
       runAllHooks(getHooksFor(TransitionHookPhase.SUCCESS));
     };
     const transitionError = (reason) => {
       trace.traceError(reason, this);
       this.success = false;
-      this.reject(reason);
+      this._deferred.reject(reason);
       this._error = reason;
       runAllHooks(getHooksFor(TransitionHookPhase.ERROR));
     };

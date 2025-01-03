@@ -150,7 +150,7 @@ export class Angular {
         services.$injector = $injector;
         el.data("$injector", $injector);
         compile(el)(scope);
-        
+
         // https://github.com/angular-ui/ui-router/issues/3678
         if (!Object.prototype.hasOwnProperty.call($injector, "strictDi")) {
           try {
@@ -229,7 +229,11 @@ export class Angular {
     });
     if (appElement) {
       config.strictDi = getNgAttribute(appElement, "strict-di") !== null;
-      this.$injector = this.bootstrap(appElement, module ? [module] : [], config);
+      this.$injector = this.bootstrap(
+        appElement,
+        module ? [module] : [],
+        config,
+      );
     }
   }
 
