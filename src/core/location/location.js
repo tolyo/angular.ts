@@ -790,6 +790,7 @@ export class LocationProvider {
 
       // update browser
       (() => {
+        debugger;
         if (initializing || $location.$$urlUpdatedByLocation) {
           $location.$$urlUpdatedByLocation = false;
 
@@ -803,7 +804,7 @@ export class LocationProvider {
           if (initializing || urlOrStateChanged) {
             initializing = false;
 
-            $rootScope.$evalAsync(() => {
+            setTimeout(() => {
               const newUrl = $location.absUrl();
               const { defaultPrevented } = $rootScope.$broadcast(
                 "$locationChangeStart",
