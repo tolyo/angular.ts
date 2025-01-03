@@ -790,7 +790,6 @@ export class LocationProvider {
 
       // update browser
       (() => {
-        debugger;
         if (initializing || $location.$$urlUpdatedByLocation) {
           $location.$$urlUpdatedByLocation = false;
 

@@ -1,5 +1,4 @@
 import { trace } from "../common/trace.js";
-import { services } from "../common/coreservices.js";
 import { stringify } from "../../shared/strings.js";
 import {
   map,
@@ -619,7 +618,7 @@ export class Transition {
       // Wait to build the RUN hook chain until the BEFORE hooks are done
       // This allows a BEFORE hook to dynamically add additional RUN hooks via the Transition object.
       const allRunHooks = getHooksFor(TransitionHookPhase.RUN);
-      const done = () => services.$q.resolve(undefined);
+      const done = () => Promise.resolve(undefined);
       return TransitionHook.invokeHooks(allRunHooks, done);
     };
     const startTransition = () => {
@@ -628,7 +627,7 @@ export class Transition {
       globals.transition = this;
       globals.transitionHistory.enqueue(this);
       trace.traceTransitionStart(this);
-      return services.$q.resolve(undefined);
+      return Promise.resolve(undefined);
     };
     const allBeforeHooks = getHooksFor(TransitionHookPhase.BEFORE);
     TransitionHook.invokeHooks(allBeforeHooks, startTransition)

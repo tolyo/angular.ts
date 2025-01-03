@@ -94,9 +94,9 @@ export class ResolveContext {
 }
 import { Resolvable } from "./resolvable";
 declare class UIInjectorImpl {
-    native: import("../../core/di/internal-injector").InjectorService;
+    native: any;
     get(token: any): any;
-    getAsync(token: any): any;
+    getAsync(token: any): Promise<any>;
     getNative(token: any): any;
 }
 export {};

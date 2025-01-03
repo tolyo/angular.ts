@@ -1,7 +1,6 @@
 import { find, tail, uniqR, unnestR } from "../../shared/common";
 import { propEq } from "../../shared/hof";
 import { trace } from "../common/trace";
-import { services } from "../common/coreservices";
 import { Resolvable } from "./resolvable";
 import { PathUtils } from "../path/path-utils";
 import { stringify } from "../../shared/strings";
@@ -183,7 +182,7 @@ export class ResolveContext {
     return resolvable.deps.map((token) => {
       const matching = availableResolvables.filter((r) => r.token === token);
       if (matching.length) return tail(matching);
-      const fromInjector = services.$injector.get(token);
+      const fromInjector = window.angular.$injector.get(token);
       if (isUndefined(fromInjector)) {
         throw new Error(
           "Could not find Dependency Injection token: " + stringify(token),
@@ -202,7 +201,7 @@ class UIInjectorImpl {
     return services.$injector.get(token);
   }
   getAsync(token) {
-    return services.$q.resolve(services.$injector.get(token));
+    return Promise.resolve(services.$injector.get(token));
   }
   getNative(token) {
     return services.$injector.get(token);

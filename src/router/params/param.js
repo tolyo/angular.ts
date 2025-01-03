@@ -1,7 +1,6 @@
 import { filter, map, allTrueR, find } from "../../shared/common";
 import { isInjectable } from "../../shared/predicates";
 import { isDefined, isUndefined, isString } from "../../shared/utils";
-import { services } from "../common/coreservices";
 import { ParamType } from "./param-type";
 
 const isShorthand = (cfg) =>
@@ -141,11 +140,11 @@ export class Param {
      */
     const getDefaultValue = () => {
       if (this._defaultValueCache) return this._defaultValueCache.defaultValue;
-      if (!services.$injector)
+      if (!window.angular.$injector)
         throw new Error(
           "Injectable functions cannot be called at configuration time",
         );
-      const defaultValue = services.$injector.invoke(this.config.$$fn);
+      const defaultValue = window.angular.$injector.invoke(this.config.$$fn);
       if (
         defaultValue !== null &&
         defaultValue !== undefined &&

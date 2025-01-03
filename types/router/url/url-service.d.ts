@@ -13,7 +13,7 @@ export class UrlService {
     stateService: import("../../router/state/state-service.js").StateProvider;
     $locationProvider: import("../../core/location/location").LocationProvider;
     $location: import("../../core/location/location").Location;
-    $browser: import("../../services/browser").Browser;
+    $browser: import("../../services/browser.js").Browser;
     /** Provides services related to the URL */
     urlRuleFactory: UrlRuleFactory;
     /**
@@ -57,7 +57,7 @@ export class UrlService {
      */
     hash: () => string | import("../../core/location/location").Location;
     _urlListeners: any[];
-    $get: (string | (($location: import("../../core/location/location").Location, $browser: import("../../services/browser").Browser, $rootScope: import("../../core/scope/scope").Scope) => UrlService))[];
+    $get: (string | (($location: import("../../core/location/location.js").Location, $browser: import("../../services/browser.js").Browser, $rootScope: import("../../core/scope/scope.js").Scope) => UrlService))[];
     /**
      * @returns {boolean}
      */
@@ -244,7 +244,7 @@ export class UrlService {
      */
     isMatcher(object: any): boolean;
 }
-import { UrlRuleFactory } from "./url-rule";
-import { UrlRules } from "./url-rules";
-import { ParamFactory } from "../params/param-factory";
-import { UrlMatcher } from "./url-matcher";
+import { UrlRuleFactory } from "./url-rule.js";
+import { UrlRules } from "./url-rules.js";
+import { ParamFactory } from "../params/param-factory.js";
+import { UrlMatcher } from "./url-matcher.js";

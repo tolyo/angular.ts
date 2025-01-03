@@ -1,4 +1,3 @@
-import { services } from "../common/coreservices";
 /**
  * A [[TransitionHookFn]] that performs lazy loading
  *
@@ -88,8 +87,9 @@ export function lazyLoadState(transition, state, stateRegistry) {
       delete lazyLoadFn["_promise"];
       return Promise.reject(err);
     };
-    promise = lazyLoadFn["_promise"] = services.$q
-      .resolve(lazyLoadFn(transition, state))
+    promise = lazyLoadFn["_promise"] = Promise.resolve(
+      lazyLoadFn(transition, state),
+    )
       .then(updateStateRegistry)
       .then(success, error);
   }

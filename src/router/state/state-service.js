@@ -7,7 +7,6 @@ import {
 } from "../../shared/common";
 import { isDefined, isObject, isString, minErr } from "../../shared/utils";
 import { Queue } from "../common/queue";
-import { services } from "../common/coreservices";
 import { makeTargetState } from "../path/path-utils";
 import { PathNode } from "../path/path-node";
 import { defaultTransOpts } from "../transition/transition-service";

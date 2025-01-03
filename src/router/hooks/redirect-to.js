@@ -1,5 +1,4 @@
 import { isString, isFunction } from "../../shared/utils";
-import { services } from "../common/coreservices";
 import { TargetState } from "../state/target-state";
 
 export const registerRedirectToHook = (transitionService, stateService) => {
@@ -27,7 +26,7 @@ export const registerRedirectToHook = (transitionService, stateService) => {
         );
     }
     if (isFunction(redirect)) {
-      return services.$q.resolve(redirect(trans)).then(handleResult);
+      return Promise.resolve(redirect(trans)).then(handleResult);
     }
     return handleResult(redirect);
   };

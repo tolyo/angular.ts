@@ -151,9 +151,9 @@ export class Transition {
      * @returns a [[UIInjector]]
      */
     injector(state: any, pathName?: string): {
-        native: import("../../core/di/internal-injector.js").InjectorService;
+        native: any;
         get(token: any): any;
-        getAsync(token: any): any;
+        getAsync(token: any): Promise<any>;
         getNative(token: any): any;
     };
     /**

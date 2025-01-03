@@ -4,7 +4,6 @@ import { fnToString, maxLength } from "../../shared/strings";
 import { isPromise } from "../../shared/predicates";
 import { parse } from "../../shared/hof";
 import { trace } from "../common/trace";
-import { services } from "../common/coreservices";
 import { Rejection } from "./reject-factory";
 import { TargetState } from "../state/target-state";
 import { EventBus } from "../../core/pubsub/pubsub";
