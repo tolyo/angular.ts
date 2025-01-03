@@ -702,7 +702,7 @@ describe("ngInclude", () => {
     //   it("should destroy the previous leave animation if a new one takes place", () => {
     //     module(($provide) => {
     //       $provide.decorator("$animate", ($delegate, $$q) => {
-    //         const emptyPromise = $$q.defer().promise;
+    //         const emptyPromise = Promise.withResolvers().promise;
     //         emptyPromise.done = () => {};
 
     //         $delegate.leave = function () {

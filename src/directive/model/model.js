@@ -1059,20 +1059,19 @@ function setupModelWatcher(ctrl) {
   //       ng-change executes in apply phase
   // 4. view should be changed back to 'a'
   ctrl.$$scope.$watch("value", (value) => {
-    // const modelValue = ctrl.$$ngModelGet(scope);
+    const modelValue = ctrl.$$ngModelGet(ctrl.$$scope);
 
-    // // if scope model value and ngModel value are out of sync
-    // // This cannot be moved to the action function, because it would not catch the
-    // // case where the model is changed in the ngChange function or the model setter
-    // if (
-    //   modelValue !== ctrl.$modelValue &&
-    //   // checks for NaN is needed to allow setting the model to NaN when there's an asyncValidator
+    // if scope model value and ngModel value are out of sync
+    // This cannot be moved to the action function, because it would not catch the
+    // case where the model is changed in the ngChange function or the model setter
+    if (
+      modelValue !== ctrl.$modelValue &&
+      // checks for NaN is needed to allow setting the model to NaN when there's an asyncValidator
 
-    //   (ctrl.$modelValue === ctrl.$modelValue || modelValue === modelValue)
-    // ) {
-
-    // }
-    ctrl.$$setModelValue(value);
+      (ctrl.$modelValue === ctrl.$modelValue || modelValue === modelValue)
+    ) {
+      ctrl.$$setModelValue(value);
+    }
   });
 }
 
@@ -1111,9 +1110,13 @@ export function ngModelDirective() {
                 modelCtrl.$$parentForm.$$renameControl(modelCtrl, newValue);
               }
             });
+            let deregisterWatch = scope.$watch(attr["ngModel"], (val) => {
+              modelCtrl.$$setModelValue(val);
+            });
 
             scope.$on("$destroy", () => {
               modelCtrl.$$parentForm.$removeControl(modelCtrl);
+              deregisterWatch();
             });
           },
           post: (scope, element, _attr, ctrls) => {

@@ -3389,14 +3389,14 @@ describe("$http", function () {
 
 //           $httpProvider.interceptors.push(($q) => ({
 //             request(config) {
-//               return (reqInterceptorDeferred = $q.defer()).promise
+//               return (reqInterceptorDeferred = Promise.withResolvers().promise
 //                 .finally(() => {
 //                   reqInterceptorFulfilled = true;
 //                 })
 //                 .then(valueFn(config));
 //             },
 //             response() {
-//               return (resInterceptorDeferred = $q.defer()).promise.finally(
+//               return (resInterceptorDeferred = Promise.withResolvers().promise.finally(
 //                 () => {
 //                   resInterceptorFulfilled = true;
 //                 },
