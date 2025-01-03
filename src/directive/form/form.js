@@ -476,11 +476,8 @@ const formDirectiveFactory = function (isNgForm) {
                 // page reload if the form was destroyed by submission of the form via a click handler
                 // on a button in the form. Looks like an IE9 specific bug.
                 const handleFormSubmission = function (event) {
-                  scope.$apply(() => {
-                    controller.$commitViewValue();
-                    controller.$setSubmitted();
-                  });
-
+                  controller.$commitViewValue();
+                  controller.$setSubmitted();
                   event.preventDefault();
                 };
 

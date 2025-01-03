@@ -148,11 +148,9 @@ export class Angular {
       function (scope, el, compile, $injector) {
         // ng-route deps
         services.$injector = $injector;
-        scope.$apply(() => {
-          el.data("$injector", $injector);
-          compile(el)(scope);
-        });
-
+        el.data("$injector", $injector);
+        compile(el)(scope);
+        
         // https://github.com/angular-ui/ui-router/issues/3678
         if (!Object.prototype.hasOwnProperty.call($injector, "strictDi")) {
           try {
