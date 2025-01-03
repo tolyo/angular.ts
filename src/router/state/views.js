@@ -125,8 +125,8 @@ export class Ng1ViewConfig {
     ];
     return Promise.all(promises).then((results) => {
       trace.traceViewServiceEvent("Loaded", this);
-      this.controller = results[0];
-      Object.assign(this, results[1]); // Either { template: "tpl" } or { component: "cmpName" }
+      this.controller = results[1];
+      Object.assign(this, results[0]); // Either { template: "tpl" } or { component: "cmpName" }
       return this;
     });
   }

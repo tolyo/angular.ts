@@ -32,7 +32,9 @@ export const registerActivateViews = (transitionService, viewService) => {
     const exitingViews = transition.views("exiting");
     if (!enteringViews.length && !exitingViews.length) return;
     exitingViews.forEach((vc) => viewService.deactivateViewConfig(vc));
-    enteringViews.forEach((vc) => viewService.activateViewConfig(vc));
+    enteringViews.forEach((vc) => {
+      viewService.activateViewConfig(vc);
+    });
     viewService.sync();
   };
   transitionService.onSuccess({}, activateViews);

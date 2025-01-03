@@ -118,8 +118,9 @@ export class ViewService {
     const configureUIView = (tuple) => {
       // If a parent ng-view is reconfigured, it could destroy child ng-views.
       // Before configuring a child ng-view, make sure it's still in the active ngViews array.
-      if (this._ngViews.indexOf(tuple.ngView) !== -1)
+      if (this._ngViews.indexOf(tuple.ngView) !== -1) {
         tuple.ngView.configUpdated(tuple.viewConfig);
+      }
     };
     // Sort views by FQN and state depth. Process uiviews nearest the root first.
     const ngViewTuples = this._ngViews
@@ -129,7 +130,9 @@ export class ViewService {
     const unmatchedConfigTuples = this._viewConfigs
       .filter((config) => !matchedViewConfigs.includes(config))
       .map((viewConfig) => ({ ngView: undefined, viewConfig }));
-    ngViewTuples.forEach(configureUIView);
+    ngViewTuples.forEach((tuple) => {
+      configureUIView(tuple);
+    });
     const allTuples = ngViewTuples.concat(unmatchedConfigTuples);
     this._listeners.forEach((cb) => cb(allTuples));
     trace.traceViewSync(allTuples);

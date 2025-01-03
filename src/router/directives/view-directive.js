@@ -1,12 +1,12 @@
-import { filter, tail, unnestR } from "../../shared/common";
-import { isDefined, isFunction, isString } from "../../shared/utils";
-import { kebobString } from "../../shared/strings";
-import { parse } from "../../shared/hof";
-import { ResolveContext } from "../resolve/resolve-context";
-import { trace } from "../common/trace";
-import { Ng1ViewConfig } from "../state/views";
+import { filter, tail, unnestR } from "../../shared/common.js";
+import { isDefined, isFunction, isString } from "../../shared/utils.js";
+import { kebobString } from "../../shared/strings.js";
+import { parse } from "../../shared/hof.js";
+import { ResolveContext } from "../resolve/resolve-context.js";
+import { trace } from "../common/trace.js";
+import { Ng1ViewConfig } from "../state/views.js";
 import { JQLite } from "../../shared/jqlite/jqlite.js";
-import { getLocals } from "../state/state-registry";
+import { getLocals } from "../state/state-registry.js";
 /**
  * `ng-view`: A viewport directive which is filled in by a view from the active state.
  *
@@ -202,6 +202,7 @@ export let ngView = [
             viewConfig = config;
             updateView(config);
           }
+
           $element.data("$ngView", { $ngView: activeUIView });
           updateView();
           const unregister = $view.registerUIView(activeUIView);

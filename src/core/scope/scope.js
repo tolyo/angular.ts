@@ -198,7 +198,7 @@ export class Scope {
    */
   set(target, property, value, proxy) {
     if (property === "undefined") {
-      throw new Error("Attempting to set undefined property")
+      throw new Error("Attempting to set undefined property");
     }
     this.$proxy = proxy;
     this.$target = target;
