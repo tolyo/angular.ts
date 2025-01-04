@@ -14,6 +14,7 @@ import {
   VALID_CLASS,
   INVALID_CLASS,
 } from "../../shared/constants.js";
+import { isProxy } from "../../core/scope/scope.js";
 
 export const nullFormCtrl = {
   $addControl: () => {},
@@ -336,6 +337,9 @@ addSetValidityMethod({
   set(object, property, controller) {
     const list = object[property];
     if (!list) {
+      if (isProxy(object)) {
+        object = object.$target;
+      }
       object[property] = [controller];
     } else {
       const index = list.indexOf(controller);

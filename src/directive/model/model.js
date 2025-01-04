@@ -271,14 +271,14 @@ export class NgModelController {
       const invokeModelGetter = this.$$parse(`${this.$$attr["ngModel"]}()`);
       const invokeModelSetter = this.$$parse(`${this.$$attr["ngModel"]}($$$p)`);
 
-      this.$$ngModelGet = function ($scope) {
+      this.$$ngModelGet = ($scope) => {
         let modelValue = this.$$parsedNgModel($scope);
         if (isFunction(modelValue)) {
           modelValue = invokeModelGetter($scope);
         }
         return modelValue;
       };
-      this.$$ngModelSet = function ($scope, newValue) {
+      this.$$ngModelSet = ($scope, newValue) => {
         if (isFunction(this.$$parsedNgModel($scope))) {
           invokeModelSetter($scope, { $$$p: newValue });
         } else {
@@ -548,7 +548,6 @@ export class NgModelController {
 
     const that = this;
     this.$$runValidators(modelValue, viewValue, (allValid) => {
-      debugger;
       // If there was no change in validity, don't update the model
       // This prevents changing an invalid modelValue to undefined
       if (!allowInvalid && prevValid !== allValid) {
@@ -1099,7 +1098,6 @@ export function ngModelDirective() {
             if (optionsCtrl) {
               modelCtrl.$options = optionsCtrl.$options;
             }
-
             modelCtrl.$$initGetterSetters();
 
             // notify others, especially parent forms
