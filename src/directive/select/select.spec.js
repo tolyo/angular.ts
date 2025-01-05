@@ -1181,7 +1181,7 @@ describe("select", () => {
         });
       });
 
-      it("should be able to detect when an element is removed", () => {
+      fit("should be able to detect when an element is removed", async () => {
         scope.values = [{ name: "A" }];
         scope.groups = [
           {
@@ -1195,12 +1195,11 @@ describe("select", () => {
         ];
 
         compileGroupedOptions();
-
+        await wait();
         const selectCtrl = element.controller("select");
 
-        scope.$apply(() => {
-          scope.groups[1].values.shift();
-        });
+        scope.groups[1].values.shift();
+        await wait();
         expect(selectCtrl.hasOption("A")).toBe(true);
         expect(selectCtrl.hasOption("B")).toBe(true);
         expect(selectCtrl.hasOption("C")).toBe(true);

@@ -11,7 +11,6 @@ import { NgModule } from "./core/di/ng-module";
 import { CACHE } from "./core/cache/cache";
 import { publishExternalAPI } from "./public";
 import { VERSION } from "./public";
-import { services } from "./router/common/coreservices";
 import { unnestR } from "./shared/common";
 
 const ngMinErr = minErr("ng");
@@ -145,9 +144,9 @@ export class Angular {
        * @param {*} compile
        * @param {import("./core/di/internal-injector").InjectorService} $injector
        */
-      function (scope, el, compile, $injector) {
+      (scope, el, compile, $injector) => {
         // ng-route deps
-        services.$injector = $injector;
+        this.$injector = $injector;
         el.data("$injector", $injector);
         compile(el)(scope);
 
@@ -229,11 +228,7 @@ export class Angular {
     });
     if (appElement) {
       config.strictDi = getNgAttribute(appElement, "strict-di") !== null;
-      this.$injector = this.bootstrap(
-        appElement,
-        module ? [module] : [],
-        config,
-      );
+      this.bootstrap(appElement, module ? [module] : [], config);
     }
   }
 

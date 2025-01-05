@@ -303,12 +303,15 @@ function SelectController($element, $scope) {
         }
       });
     } else if (interpolateTextFn) {
+      optionScope.value = interpolateTextFn(optionScope);
+      let oldVal;
       // The text content is interpolated
-      optionScope.$watch(interpolateTextFn, (newVal, oldVal) => {
+      optionScope.$watch("value", (newVal) => {
         optionAttrs.$set("value", newVal);
         const previouslySelected = optionElement[0].selected;
         if (oldVal !== newVal) {
           self.removeOption(oldVal);
+          oldVal = newVal;
         }
         self.addOption(newVal, optionElement);
 

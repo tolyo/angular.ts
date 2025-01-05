@@ -1,9 +1,8 @@
-import { isDefined, isFunction, isObject } from "../shared/utils";
-import { services } from "./common/coreservices";
-import { tail, unnestR } from "../shared/common";
-import { Resolvable } from "./resolve/resolvable";
-import { kebobString } from "../shared/strings";
-import { annotate } from "../core/di/injector";
+import { isDefined, isFunction, isObject } from "../shared/utils.js";
+import { tail, unnestR } from "../shared/common.js";
+import { Resolvable } from "./resolve/resolvable.js";
+import { kebobString } from "../shared/strings.js";
+import { annotate } from "../core/di/injector.js";
 
 /**
  * @typedef BindingTuple
@@ -27,9 +26,9 @@ export class TemplateFactoryProvider {
     "$injector",
     /**
      * @param {any} $http
-     * @param {import("../core/cache/cache-factory").TemplateCache} $templateCache
+     * @param {import("../core/cache/cache-factory.js").TemplateCache} $templateCache
      * @param {any} $templateRequest
-     * @param {import("../core/di/internal-injector").InjectorService} $injector
+     * @param {import("../core/di/internal-injector.js").InjectorService} $injector
      * @returns
      */
     ($http, $templateCache, $templateRequest, $injector) => {
@@ -58,7 +57,7 @@ export class TemplateFactoryProvider {
    *
    * @param {any} config
    * @param {any} params  Parameters to pass to the template function.
-   * @param {import("./resolve/resolve-context").ResolveContext} context The resolve context associated with the template's view
+   * @param {import("./resolve/resolve-context.js").ResolveContext} context The resolve context associated with the template's view
    *
    * @return {string|object}  The template html as a string, or a promise for
    * that string,or `null` if no template is configured.
@@ -139,9 +138,9 @@ export class TemplateFactoryProvider {
   /**
    * Creates a template by invoking an injectable provider function.
    *
-   * @param {import('../types').Injectable<any>} provider Function to invoke via `locals`
+   * @param {import('../types.js').Injectable<any>} provider Function to invoke via `locals`
    * @param {Function} params a function used to invoke the template provider
-   * @param {import("./resolve/resolve-context").ResolveContext} context
+   * @param {import("./resolve/resolve-context.js").ResolveContext} context
    * @return {string|Promise.<string>} The template html as a string, or a promise
    * for that string.
    */
@@ -154,7 +153,7 @@ export class TemplateFactoryProvider {
   /**
    * Creates a component's template by invoking an injectable provider function.
    *
-   * @param {import('../types').Injectable<any>} provider Function to invoke via `locals`
+   * @param {import('../types.js').Injectable<any>} provider Function to invoke via `locals`
    * @param {Function} params a function used to invoke the template provider
    * @return {string} The template html as a string: "<component-name input1='::$resolve.foo'></component-name>".
    */
@@ -173,7 +172,7 @@ export class TemplateFactoryProvider {
    * The template wires input and output bindings to resolves or from the parent component.
    *
    * @param {any} ngView {object} The parent ng-view (for binding outputs to callbacks)
-   * @param {import("./resolve/resolve-context").ResolveContext} context The ResolveContext (for binding outputs to callbacks returned from resolves)
+   * @param {import("./resolve/resolve-context.js").ResolveContext} context The ResolveContext (for binding outputs to callbacks returned from resolves)
    * @param {string} component {string} Component's name in camel case.
    * @param {any} [bindings] An object defining the component's bindings: {foo: '<'}
    * @return {string} The template as a string: "<component-name input1='$resolve.foo'></component-name>".
@@ -213,7 +212,9 @@ export class TemplateFactoryProvider {
       // some-attr="::$resolve.someResolveName"
       return `${attrName}='$resolve.${resolveName}'`;
     };
-    const attrs = getComponentBindings(component).map(attributeTpl).join(" ");
+    const attrs = getComponentBindings(this.$injector, component)
+      .map(attributeTpl)
+      .join(" ");
     const kebobName = kebob(component);
     return `<${kebobName} ${attrs}></${kebobName}>`;
   }
@@ -221,11 +222,9 @@ export class TemplateFactoryProvider {
 
 /**
  * Gets all the directive(s)' inputs ('@', '=', and '<') and outputs ('&')
- * @param {string} name
- * @returns
  */
-function getComponentBindings(name) {
-  const cmpDefs = services.$injector.get(name + "Directive"); // could be multiple
+function getComponentBindings($injector, name) {
+  const cmpDefs = $injector.get(name + "Directive"); // could be multiple
   if (!cmpDefs || !cmpDefs.length)
     throw new Error(`Unable to find component named '${name}'`);
   return cmpDefs.map(getBindings).reduce(unnestR, []);

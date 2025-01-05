@@ -19,8 +19,8 @@ describe("view", () => {
     $controllerProvider,
     $urlServiceProvider,
     $view,
-    $q;
-  let root, states;
+    root,
+    states;
 
   beforeEach(() => {
     dealoc(document.getElementById("dummy"));
@@ -42,7 +42,7 @@ describe("view", () => {
       "defaultModule",
     ]);
 
-    $injector.invoke(($rootScope, _$compile_, _$injector_, _$view_, _$q_) => {
+    $injector.invoke(($rootScope, _$compile_, _$injector_, _$view_) => {
       scope = $rootScope.$new();
       $compile = _$compile_;
       $injector = _$injector_;
@@ -54,7 +54,6 @@ describe("view", () => {
       stateBuilder.builder("views", ng1ViewsBuilder);
       register = registerState(states, stateBuilder);
       root = register({ name: "" });
-      $q = _$q_;
       $view = _$view_;
     });
   });
@@ -96,7 +95,7 @@ describe("view", () => {
     it("uses the controllerProvider to get controller dynamically", async () => {
       $controllerProvider.register("AcmeFooController", () => {});
       elem.append($compile("<div><ng-view></ng-view></div>")(scope));
-
+      await wait();
       const view = tail(path).views[0];
       view.load();
       await wait(100);
