@@ -14,10 +14,11 @@ describe("select", () => {
   let $rootScope;
   const optionAttributesList = [];
 
-  function compile(html) {
+  async function compile(html) {
     formElement = JQLite(`<form name="form">${html}</form>`);
     element = formElement.find("select");
     $compile(formElement)(scope);
+    await wait();
     ngModelCtrl = element.controller("ngModel");
   }
 
@@ -142,7 +143,7 @@ describe("select", () => {
     });
   });
 
-  fit("should not add options to the select if ngModel is not present", () => {
+  it("should not add options to the select if ngModel is not present", () => {
     const scope = $rootScope;
     scope.d = "d";
     scope.e = "e";
@@ -170,7 +171,7 @@ describe("select", () => {
   });
 
   describe("select-one", () => {
-    fit("should compile children of a select without a ngModel, but not create a model for it", async () => {
+    it("should compile children of a select without a ngModel, but not create a model for it", async () => {
       compile(
         "<select>" +
           '<option selected="true">{{a}}</option>' +
@@ -184,7 +185,7 @@ describe("select", () => {
       expect(element.text()).toBe("foobarC");
     });
 
-    fit("should not interfere with selection via selected attr if ngModel directive is not present", () => {
+    it("should not interfere with selection via selected attr if ngModel directive is not present", () => {
       compile(
         "<select>" +
           "<option>not me</option>" +
@@ -197,6 +198,7 @@ describe("select", () => {
 
     describe("required state", () => {
       it("should set the error if the empty option is selected", async () => {
+        debugger;
         compile(
           '<select name="select" ng-model="selection" required>' +
             '<option value=""></option>' +
@@ -223,13 +225,14 @@ describe("select", () => {
 
         // // model -> view
         scope.$apply("selection = null");
+        await wait();
         options = element.find("option");
         expect(options[0].selected).toBe(true);
         expect(element[0].classList.contains("ng-invalid")).toBeTrue();
         expect(ngModelCtrl.$error.required).toBeTruthy();
       });
 
-      it("should validate with empty option and bound ngRequired", () => {
+      it("should validate with empty option and bound ngRequired", async () => {
         compile(
           '<select name="select" ng-model="selection" ng-required="required">' +
             '<option value=""></option>' +
@@ -238,19 +241,19 @@ describe("select", () => {
             "</select>",
         );
 
-        scope.$apply(() => {
-          scope.required = false;
-        });
-
+        scope.required = false;
+        await wait();
         const options = element.find("option");
 
         setSelectValue(element, 0);
         expect(element[0].classList.contains("ng-valid")).toBeTrue();
 
         scope.$apply("required = true");
+        await wait();
         expect(element[0].classList.contains("ng-invalid")).toBeTrue();
 
         scope.$apply('selection = "a"');
+        await wait();
         expect(element[0].classList.contains("ng-valid")).toBeTrue();
         expect(element[0].value).toBe("a");
 
@@ -258,22 +261,23 @@ describe("select", () => {
         expect(element[0].classList.contains("ng-invalid")).toBeTrue();
 
         scope.$apply("required = false");
+        await wait();
         expect(element[0].classList.contains("ng-valid")).toBeTrue();
       });
 
-      it("should not be invalid if no required attribute is present", () => {
+      it("should not be invalid if no required attribute is present", async () => {
         compile(
           '<select name="select" ng-model="selection">' +
             '<option value=""></option>' +
             '<option value="c">C</option>' +
             "</select>",
         );
-
+        await wait();
         expect(element[0].classList.contains("ng-valid")).toBeTrue();
         expect(element[0].classList.contains("ng-pristine")).toBeTrue();
       });
 
-      it("should NOT set the error if the unknown option is selected", () => {
+      it("should NOT set the error if the unknown option is selected", async () => {
         compile(
           '<select name="select" ng-model="selection" required>' +
             '<option value="a">A</option>' +
@@ -281,21 +285,21 @@ describe("select", () => {
             "</select>",
         );
 
-        scope.$apply(() => {
-          scope.selection = "a";
-        });
+        scope.selection = "a";
+        await wait();
 
         expect(element[0].classList.contains("ng-valid")).toBeTrue();
         expect(ngModelCtrl.$error.required).toBeFalsy();
 
         scope.$apply('selection = "c"');
+        await wait();
         expect(element[0].value).toBe(unknownValue("c"));
         expect(element[0].classList.contains("ng-valid")).toBeTrue();
         expect(ngModelCtrl.$error.required).toBeFalsy();
       });
     });
 
-    it("should work with repeated value options", () => {
+    it("should work with repeated value options", async () => {
       scope.robots = ["c3p0", "r2d2"];
       scope.robot = "r2d2";
       compile(
@@ -303,22 +307,21 @@ describe("select", () => {
           '<option ng-repeat="r in robots">{{r}}</option>' +
           "</select>",
       );
+      await wait();
       expect(element[0].value).toBe("r2d2");
 
       setSelectValue(element, 0);
       expect(element[0].value).toBe("c3p0");
       expect(scope.robot).toBe("c3p0");
 
-      scope.$apply(() => {
-        scope.robots.unshift("wallee");
-      });
+      scope.robots.unshift("wallee");
+      await wait();
       expect(element[0].value).toBe("c3p0");
       expect(scope.robot).toBe("c3p0");
 
-      scope.$apply(() => {
-        scope.robots = ["c3p0+", "r2d2+"];
-        scope.robot = "r2d2+";
-      });
+      scope.robots = ["c3p0+", "r2d2+"];
+      scope.robot = "r2d2+";
+      await wait();
       expect(element[0].value).toBe("r2d2+");
       expect(scope.robot).toBe("r2d2+");
     });
@@ -339,20 +342,21 @@ describe("select", () => {
       expect(scope.name).toBe("c3p0");
     });
 
-    it("should rename select controls in form when interpolated name changes", () => {
+    it("should rename select controls in form when interpolated name changes", async () => {
       scope.nameID = "A";
       compile('<select ng-model="name" name="name{{nameID}}"></select>');
       expect(scope.form.nameA.$name).toBe("nameA");
       const oldModel = scope.form.nameA;
       scope.nameID = "B";
+      await wait();
       expect(scope.form.nameA).toBeUndefined();
       expect(scope.form.nameB).toBe(oldModel);
       expect(scope.form.nameB.$name).toBe("nameB");
     });
 
-    it("should select options in a group when there is a linebreak before an option", () => {
+    it("should select options in a group when there is a linebreak before an option", async () => {
       scope.mySelect = "B";
-      scope.$apply();
+      await wait();
 
       const select = JQLite(
         '<select ng-model="mySelect">' +
@@ -366,7 +370,7 @@ describe("select", () => {
       );
 
       $compile(select)(scope);
-      scope.$apply();
+      await wait();
       expect(select).toEqualSelectWithOptions({
         first: ["A"],
         second: [["B"]],
@@ -374,10 +378,9 @@ describe("select", () => {
       dealoc(select);
     });
 
-    it("should only call selectCtrl.writeValue after a digest has occurred", () => {
+    it("should only call selectCtrl.writeValue after a digest has occurred", async () => {
       scope.mySelect = "B";
-      scope.$apply();
-
+      await wait();
       const select = JQLite(
         '<select spy-on-write-value ng-model="mySelect">' +
           '<optgroup label="first">' +
@@ -391,12 +394,13 @@ describe("select", () => {
 
       $compile(select)(scope);
       expect(selectCtrl.writeValue).not.toHaveBeenCalled();
+      await wait();
 
       expect(selectCtrl.writeValue).toHaveBeenCalled();
       dealoc(select);
     });
 
-    it('should remove the "selected" attribute from the previous option when the model changes', () => {
+    it('should remove the "selected" attribute from the previous option when the model changes', async () => {
       compile(
         '<select name="select" ng-model="selected">' +
           '<option value="">--empty--</option>' +
@@ -404,13 +408,14 @@ describe("select", () => {
           '<option value="b">B</option>' +
           "</select>",
       );
-
+      await wait();
       let options = element.find("option");
       expect(options[0].selected).toBeTrue();
       expect(options[1].selected).toBeFalse();
       expect(options[2].selected).toBeFalse();
 
       scope.selected = "a";
+      await wait();
       options = element.find("option");
       expect(options.length).toBe(3);
       expect(options[0].selected).toBeFalse();
@@ -418,6 +423,7 @@ describe("select", () => {
       expect(options[2].selected).toBeFalse();
 
       scope.selected = "b";
+      await wait();
       options = element.find("option");
       expect(options[0].selected).toBeFalse();
       expect(options[1].selected).toBeFalse();
@@ -425,12 +431,14 @@ describe("select", () => {
 
       // This will select the empty option
       scope.selected = null;
+      await wait();
       expect(options[0].selected).toBeTrue();
       expect(options[1].selected).toBeFalse();
       expect(options[2].selected).toBeFalse();
 
       // This will add and select the unknown option
       scope.selected = "unmatched value";
+      await wait();
       options = element.find("option");
 
       expect(options[0].selected).toBeTrue();
@@ -440,6 +448,7 @@ describe("select", () => {
 
       // Back to matched value
       scope.selected = "b";
+      await wait();
       options = element.find("option");
 
       expect(options[0].selected).toBeFalse();
