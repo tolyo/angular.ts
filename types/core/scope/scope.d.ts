@@ -9,6 +9,12 @@
  */
 export function createScope(target?: any, context?: Scope): Scope<any>;
 /**
+ *
+ * @param {*} value
+ * @returns {boolean}
+ */
+export function isProxy(value: any): boolean;
+/**
  * @typedef {Object} AsyncQueueTask
  * @property {Scope} handler
  * @property {Function} fn

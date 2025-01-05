@@ -6,36 +6,42 @@ import { directiveNormalize } from "../../shared/utils.js";
  */
 export const ngEventDirectives = {};
 
-"click dblclick submit focus blur copy cut paste"
+"click copy cut dblclick focus blur keydown keyup keypress load mouseover mousein mouseout mouseleave paste submit touchstart touchend touchmove"
   .split(" ")
-  .forEach((eventName) => {
-    const directiveName = directiveNormalize(`ng-${eventName}`);
-    ngEventDirectives[directiveName] = [
-      "$parse",
-      "$rootScope",
-      "$exceptionHandler",
-      /**
-       *
-       * @param {*} $parse
-       * @param {*} $rootScope
-       * @param {import('../../core/exception-handler.js').ErrorHandler} $exceptionHandler
-       * @returns
-       */
-      ($parse, $rootScope, $exceptionHandler) => {
-        return createEventDirective(
-          $parse,
-          $rootScope,
-          $exceptionHandler,
-          directiveName,
-          eventName,
-        );
-      },
-    ];
-  });
+  .forEach(
+    /** @param { string } eventName */
+    (eventName) => {
+      const directiveName = directiveNormalize(`ng-${eventName}`);
+      ngEventDirectives[directiveName] = [
+        "$parse",
+        "$exceptionHandler",
+        /**
+         * @param {import("../../core/parse/parse.js").ParseService} $parse
+         * @param {import('../../core/exception-handler.js').ErrorHandler} $exceptionHandler
+         * @returns
+         */
+        ($parse, $exceptionHandler) => {
+          return createEventDirective(
+            $parse,
+            $exceptionHandler,
+            directiveName,
+            eventName,
+          );
+        },
+      ];
+    },
+  );
 
+/**
+ *
+ * @param {import("../../core/parse/parse.js").ParseService} $parse
+ * @param {import('../../core/exception-handler.js').ErrorHandler} $exceptionHandler
+ * @param {string} directiveName
+ * @param {string} eventName
+ * @returns {import("../../types.js").Directive}
+ */
 export function createEventDirective(
   $parse,
-  $rootScope,
   $exceptionHandler,
   directiveName,
   eventName,
