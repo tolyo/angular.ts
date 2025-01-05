@@ -198,7 +198,6 @@ describe("select", () => {
 
     describe("required state", () => {
       it("should set the error if the empty option is selected", async () => {
-        debugger;
         compile(
           '<select name="select" ng-model="selection" required>' +
             '<option value=""></option>' +

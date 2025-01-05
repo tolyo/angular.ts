@@ -381,7 +381,6 @@ export function selectDirective() {
       selectCtrl.registerOption = () => {};
       return;
     }
-    debugger;
     selectCtrl.$target["ngModelCtrl"] = ngModelCtrl;
 
     // When the selected item(s) changes we delegate getting the value of the select control
@@ -445,18 +444,14 @@ export function selectDirective() {
       // we need to work of an array, so we need to see if anything was inserted/removed
       let lastView;
       let lastViewRef = NaN;
-      debugger;
-      // this will throw
-      scope.$watch(() => {
-        if (
-          lastViewRef === ngModelCtrl.$viewValue &&
-          !equals(lastView, ngModelCtrl.$viewValue)
-        ) {
-          lastView = shallowCopy(ngModelCtrl.$viewValue);
-          ngModelCtrl.$render();
-        }
-        lastViewRef = ngModelCtrl.$viewValue;
-      });
+      if (
+        lastViewRef === ngModelCtrl.$viewValue &&
+        !equals(lastView, ngModelCtrl.$viewValue)
+      ) {
+        lastView = shallowCopy(ngModelCtrl.$viewValue);
+        ngModelCtrl.$render();
+      }
+      lastViewRef = ngModelCtrl.$viewValue;
 
       // If we are a multiple select then value is now a collection
       // so the meaning of $isEmpty changes
@@ -466,7 +461,7 @@ export function selectDirective() {
     }
   }
 
-  function selectPostLink(scope, element, attrs, ctrls) {
+  function selectPostLink(_scope, _element, _attrs, ctrls) {
     // if ngModel is not defined, we don't need to do anything
     const ngModelCtrl = ctrls[1];
     if (!ngModelCtrl) return;
