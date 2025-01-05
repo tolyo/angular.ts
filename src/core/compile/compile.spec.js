@@ -2847,8 +2847,6 @@ describe("$compile", () => {
 
       var linkFunction = $compile(el)($rootScope); // link first
 
-      // await wait();
-
       setTimeout(() => {
         expect(linkSpy).toHaveBeenCalled();
         expect(linkSpy.calls.argsFor(0)[0]).toBe($rootScope);
@@ -3043,7 +3041,7 @@ describe("$compile", () => {
       var el = $("<div my-transcluder my-second-transcluder></div>");
 
       $compile(el);
-      // await wait();
+      await wait();
 
       expect(otherCompileSpy).not.toHaveBeenCalled();
     });
@@ -7041,7 +7039,7 @@ describe("$compile", () => {
       //           element = $compile('<div><a ng-if="true" iscope></a></div>')(
       //             $rootScope,
       //           );
-      //           // await wait();
+      //          await wait();
       //           directiveElement = element.find("a");
       //           expect(directiveElement.scope().$parent).toBe($rootScope);
       //           expect(directiveElement.scope()).not.toBe(
@@ -7056,7 +7054,7 @@ describe("$compile", () => {
       //           element = $compile('<div><a ng-if="true" tiscope></a></div>')(
       //             $rootScope,
       //           );
-      //           // await wait();
+      //          await wait();
       //           ;
       //           directiveElement = element.find("a");
       //           child = directiveElement.find("span");
@@ -7069,7 +7067,7 @@ describe("$compile", () => {
       //           element = $compile('<div><a ng-if="true" stiscope></a></div>')(
       //             $rootScope,
       //           );
-      //           // await wait();
+      //          await wait();
       //           directiveElement = element.find("a");
       //           child = directiveElement.find("span");
       //           expect(child.scope()).toBe(directiveElement.isolateScope());
@@ -7617,7 +7615,7 @@ describe("$compile", () => {
         expect(element.text()).toEqual("WORKS");
       });
 
-      it("should support $observe inside link function on directive object", () => {
+      it("should support $observe inside link function on directive object", async () => {
         module.directive(
           "testLink",
           valueFn({
@@ -7640,7 +7638,7 @@ describe("$compile", () => {
 
         $templateCache.set("test-link.html", "{{testAttr}}");
         element = $compile('<div test-link="{{1+2}}"></div>')($rootScope);
-        // await wait();
+        await wait();
         expect(element.text()).toBe("3");
       });
 
@@ -8245,7 +8243,7 @@ describe("$compile", () => {
           // Clear log
           log = [];
 
-          // await wait();
+          await wait();
           expect(log).toEqual(["$doCheck", "$doCheck"]);
 
           //Clear log
@@ -8284,7 +8282,7 @@ describe("$compile", () => {
           // Clear log
           log = [];
 
-          // await wait();
+          await wait();
           expect(log).toEqual(["$doCheck", "$doCheck"]);
 
           // Clear log
@@ -9228,7 +9226,7 @@ describe("$compile", () => {
         expect($rootScope.value).toBe(true);
       });
 
-      it("should be able to interpolate attribute names which are present in Object.prototype", () => {
+      it("should be able to interpolate attribute names which are present in Object.prototype", async () => {
         let attrs;
         module.directive(
           "attrExposer",
@@ -9245,7 +9243,7 @@ describe("$compile", () => {
         });
 
         $compile('<div attr-exposer to-string="{{1 + 1}}">')($rootScope);
-        // await wait();
+        await wait();
         expect(attrs.toString).toBe("2");
       });
 
@@ -9419,7 +9417,7 @@ describe("$compile", () => {
           )($rootScope);
 
           $rootScope.name = "igor";
-          // await wait();
+          await wait();
 
           expect(componentScope.attr).toEqual("hello igor");
           expect(componentScope.attrAlias).toEqual("hello igor");
@@ -9428,7 +9426,7 @@ describe("$compile", () => {
       });
 
       describe("object reference", () => {
-        it("should update local when origin changes", async () => {
+        fit("should update local when origin changes", async () => {
           $compile('<div><span my-component ref="name" $ref$="name">')(
             $rootScope,
           );
@@ -9437,7 +9435,7 @@ describe("$compile", () => {
           expect(componentScope.$refAlias).toBe(componentScope.ref);
 
           $rootScope.name = "misko";
-          // await wait();
+          await wait();
 
           expect($rootScope.name).toBe("misko");
           expect(componentScope.ref).toBe("misko");
@@ -9445,20 +9443,20 @@ describe("$compile", () => {
           expect(componentScope.$refAlias).toBe("misko");
 
           $rootScope.name = {};
-          // await wait();
+          await wait();
           expect(componentScope.ref).toBe($rootScope.name);
           expect(componentScope.refAlias).toBe($rootScope.name);
           expect(componentScope.$refAlias).toBe($rootScope.name);
         });
 
-        it("should update local when both change", async () => {
+        fit("should update local when both change", async () => {
           $compile('<div><span my-component ref="name" $ref$="name">')(
             $rootScope,
           );
           $rootScope.name = { mark: 123 };
           componentScope.ref = "misko";
 
-          // await wait();
+          await wait();
           expect($rootScope.name).toEqual({ mark: 123 });
           expect(componentScope.ref).toBe($rootScope.name);
           expect(componentScope.refAlias).toBe($rootScope.name);
@@ -9466,7 +9464,7 @@ describe("$compile", () => {
 
           $rootScope.name = "igor";
           componentScope.ref = {};
-          // await wait();
+          await wait();
           expect($rootScope.name).toEqual("igor");
           expect(componentScope.ref).toBe($rootScope.name);
           expect(componentScope.refAlias).toBe($rootScope.name);
@@ -9481,50 +9479,50 @@ describe("$compile", () => {
           // change both sides to the same item within the same digest cycle
           componentScope.ref = "same";
           $rootScope.name = "same";
-          // await wait();
+          await wait();
 
           // change origin back to its previous value
           $rootScope.name = "aaa";
-          // await wait();
+          await wait();
 
           expect($rootScope.name).toBe("aaa");
           expect(componentScope.ref).toBe("aaa");
         });
 
-        it("should complain on non assignable changes", async () => {
+        fit("should complain on non assignable changes", async () => {
           $compile("<div><span my-component ref=\"'hello ' + name\">")(
             $rootScope,
           );
           $rootScope.name = "world";
-          // await wait();
+          await wait();
           expect(componentScope.ref).toBe("hello world");
 
           componentScope.ref = "ignore me";
           expect(async () => {
-            // await wait();
+            await wait();
           }).toThrowError(/nonassign/);
           expect(componentScope.ref).toBe("hello world");
           // reset since the exception was rethrown which prevented phase clearing
           $rootScope.$$phase = 0;
 
           $rootScope.name = "misko";
-          // await wait();
+          await wait();
           expect(componentScope.ref).toBe("hello misko");
         });
 
         it("should complain if assigning to undefined", async () => {
           $compile("<div><span my-component>")($rootScope);
-          // await wait();
+          await wait();
           expect(componentScope.ref).toBeUndefined();
 
           componentScope.ref = "ignore me";
           expect(async () => {
-            // await wait();
+            await wait();
           }).toThrowError(/nonassign/);
           expect(componentScope.ref).toBeUndefined();
 
           $rootScope.$$phase = 0; // reset since the exception was rethrown which prevented phase clearing
-          // await wait();
+          await wait();
           expect(componentScope.ref).toBeUndefined();
         });
 
@@ -9538,10 +9536,10 @@ describe("$compile", () => {
           });
 
           $rootScope.name = "aaa";
-          // await wait();
+          await wait();
 
           componentScope.reference = "new";
-          // await wait();
+          await wait();
 
           expect(lastRefValueInParent).toBe("new");
         });
@@ -9553,11 +9551,11 @@ describe("$compile", () => {
             );
 
             $rootScope.name = "a";
-            // await wait();
+            await wait();
             expect(componentScope.reference).toEqual({ name: "a" });
 
             $rootScope.name = "b";
-            // await wait();
+            await wait();
             expect(componentScope.reference).toEqual({ name: "b" });
           });
 
@@ -9567,9 +9565,9 @@ describe("$compile", () => {
             );
 
             $rootScope.name = "a";
-            // await wait();
+            await wait();
             const lastComponentValue = componentScope.reference;
-            // await wait();
+            await wait();
             expect(componentScope.reference).toBe(lastComponentValue);
           });
 
@@ -9579,10 +9577,10 @@ describe("$compile", () => {
             );
 
             $rootScope.name = "a";
-            // await wait();
+            await wait();
             componentScope.reference = { name: "b" };
             expect(async () => {
-              // await wait();
+              await wait();
             }).toThrowError(/nonassign/);
           });
 
@@ -9598,7 +9596,7 @@ describe("$compile", () => {
                 $rootScope,
               );
 
-              // await wait();
+              await wait();
               expect(componentScope.reference).toBe(literalValue);
               dealoc(element);
             }
@@ -9607,7 +9605,7 @@ describe("$compile", () => {
       });
 
       describe("optional object reference", () => {
-        it("should update local when origin changes", async () => {
+        fit("should update local when origin changes", async () => {
           $compile('<div><span my-component optref="name" $optref$="name">')(
             $rootScope,
           );
@@ -9616,21 +9614,21 @@ describe("$compile", () => {
           expect(componentScope.$optRefAlias).toBe(componentScope.optRef);
 
           $rootScope.name = "misko";
-          // await wait();
+          await wait();
           expect(componentScope.optref).toBe($rootScope.name);
           expect(componentScope.optrefAlias).toBe($rootScope.name);
           expect(componentScope.$optrefAlias).toBe($rootScope.name);
 
           $rootScope.name = {};
-          // await wait();
+          await wait();
           expect(componentScope.optref).toBe($rootScope.name);
           expect(componentScope.optrefAlias).toBe($rootScope.name);
           expect(componentScope.$optrefAlias).toBe($rootScope.name);
         });
 
-        it("should not throw exception when reference does not exist", () => {
+        fit("should not throw exception when reference does not exist", async () => {
           $compile("<div><span my-component>")($rootScope);
-
+          await wait();
           expect(componentScope.optref).toBeUndefined();
           expect(componentScope.optrefAlias).toBeUndefined();
           expect(componentScope.$optrefAlias).toBeUndefined();
@@ -9639,7 +9637,7 @@ describe("$compile", () => {
       });
 
       describe("collection object reference", () => {
-        it("should update isolate scope when origin scope changes", async () => {
+        fit("should update isolate scope when origin scope changes", async () => {
           $rootScope.collection = [
             {
               name: "Gabriel",
@@ -9651,7 +9649,7 @@ describe("$compile", () => {
             },
           ];
           $rootScope.query = "";
-          // await wait();
+          await wait();
 
           $compile(
             '<div><span my-component colref="collection | filter:query" $colref$="collection | filter:query">',
@@ -9662,7 +9660,7 @@ describe("$compile", () => {
           expect(componentScope.$colrefAlias).toEqual(componentScope.colref);
 
           $rootScope.query = "Gab";
-          // await wait();
+          await wait();
 
           expect(componentScope.colref).toEqual([$rootScope.collection[0]]);
           expect(componentScope.colrefAlias).toEqual([
@@ -9709,7 +9707,7 @@ describe("$compile", () => {
           expect(componentScope.$owRefAlias).toBe(componentScope.owRef);
 
           $rootScope.obj = { value: "initial" };
-          // await wait();
+          await wait();
 
           expect($rootScope.obj).toEqual({ value: "initial" });
           expect(componentScope.owRef).toEqual({ value: "initial" });
@@ -9718,7 +9716,7 @@ describe("$compile", () => {
 
           // This changes in both scopes because of reference
           $rootScope.obj.value = "origin1";
-          // await wait();
+          await wait();
           expect(componentScope.owRef.value).toBe("origin1");
           expect(componentScope.owRefAlias.value).toBe("origin1");
           expect(componentScope.$owRefAlias.value).toBe("origin1");
@@ -9729,14 +9727,14 @@ describe("$compile", () => {
 
           // Change does not propagate because object identity hasn't changed
           $rootScope.obj.value = "origin2";
-          // await wait();
+          await wait();
           expect(componentScope.owRef.value).toBe("isolate1");
           expect(componentScope.owRefAlias.value).toBe("origin2");
           expect(componentScope.$owRefAlias.value).toBe("origin2");
 
           // Change does propagate because object identity changes
           $rootScope.obj = { value: "origin3" };
-          // await wait();
+          await wait();
           expect(componentScope.owRef.value).toBe("origin3");
           expect(componentScope.owRef).toBe($rootScope.obj);
           expect(componentScope.owRefAlias).toBe($rootScope.obj);
@@ -9751,7 +9749,7 @@ describe("$compile", () => {
           $rootScope.name = { mark: 123 };
           componentScope.owRef = "misko";
 
-          // await wait();
+          await wait();
           expect($rootScope.name).toEqual({ mark: 123 });
           expect(componentScope.owRef).toBe($rootScope.name);
           expect(componentScope.owRefAlias).toBe($rootScope.name);
@@ -9759,7 +9757,7 @@ describe("$compile", () => {
 
           $rootScope.name = "igor";
           componentScope.owRef = {};
-          // await wait();
+          await wait();
           expect($rootScope.name).toEqual("igor");
           expect(componentScope.owRef).toBe($rootScope.name);
           expect(componentScope.owRefAlias).toBe($rootScope.name);
@@ -9966,11 +9964,11 @@ describe("$compile", () => {
             // change both sides to the same item within the same digest cycle
             componentScope.owRef = "same";
             $rootScope.name = "same";
-            // await wait();
+            await wait();
 
             // change origin back to its previous value
             $rootScope.name = "aaa";
-            // await wait();
+            await wait();
 
             expect($rootScope.name).toBe("aaa");
             expect(componentScope.owRef).toBe("aaa");
@@ -9988,7 +9986,7 @@ describe("$compile", () => {
             expect(componentScope.$owRefAlias).toBe($rootScope.name);
 
             componentScope.owRef = "martin";
-            // await wait();
+            await wait();
             expect($rootScope.name).toEqual({ mark: 123 });
             expect(componentScope.owRef).toBe("martin");
             expect(componentScope.owRefAlias).toEqual({ mark: 123 });
@@ -10003,7 +10001,7 @@ describe("$compile", () => {
             expect(componentScope.owRef).toBe($rootScope.obj);
 
             componentScope.owRef.mark = 789;
-            // await wait();
+            await wait();
             expect($rootScope.obj).toEqual({ mark: 789 });
             expect(componentScope.owRef).toBe($rootScope.obj);
           });
@@ -10014,7 +10012,7 @@ describe("$compile", () => {
             );
 
             $rootScope.name = "world";
-            // await wait();
+            await wait();
             expect(componentScope.owRef).toBe("hello world");
 
             componentScope.owRef = "ignore me";
@@ -10022,7 +10020,7 @@ describe("$compile", () => {
             expect($rootScope.name).toBe("world");
 
             $rootScope.name = "misko";
-            // await wait();
+            await wait();
             expect(componentScope.owRef).toBe("hello misko");
           });
 
@@ -10034,7 +10032,7 @@ describe("$compile", () => {
             componentScope.owRef = "ignore me";
             expect(componentScope.owRef).toBe("ignore me");
 
-            // await wait();
+            await wait();
             expect(componentScope.owRef).toBe("ignore me");
           });
 
@@ -10048,7 +10046,7 @@ describe("$compile", () => {
             expect(isolateScope.owRef).toBeNaN();
 
             $rootScope.num = 64;
-            // await wait();
+            await wait();
             expect(isolateScope.owRef).toBe(64);
           });
         });
@@ -10060,11 +10058,11 @@ describe("$compile", () => {
             );
 
             $rootScope.name = "a";
-            // await wait();
+            await wait();
             expect(componentScope.owRef).toEqual({ name: "a" });
 
             $rootScope.name = "b";
-            // await wait();
+            await wait();
             expect(componentScope.owRef).toEqual({ name: "b" });
           });
 
@@ -10072,9 +10070,9 @@ describe("$compile", () => {
             $compile('<div><span my-component ref="{name: name}">')($rootScope);
 
             $rootScope.name = "a";
-            // await wait();
+            await wait();
             const lastComponentValue = componentScope.owRef;
-            // await wait();
+            await wait();
             expect(componentScope.owRef).toBe(lastComponentValue);
           });
 
@@ -10092,7 +10090,7 @@ describe("$compile", () => {
 
             $rootScope.name = "lucas";
             $rootScope.obj = { name: "martin" };
-            // await wait();
+            await wait();
             expect(componentScope.owRef).toEqual([
               { name: "lucas" },
               { name: "martin" },
@@ -10113,7 +10111,7 @@ describe("$compile", () => {
 
             $rootScope.name = "lucas";
             $rootScope.obj = { name: "martin" };
-            // await wait();
+            await wait();
             expect(componentScope.owRef).toEqual({
               name: "lucas",
               item: { name: "martin" },
@@ -10121,7 +10119,7 @@ describe("$compile", () => {
           });
 
           // https://github.com/angular/angular.js/issues/15833
-          it("should work with ng-model inputs", async () => {
+          fit("should work with ng-model inputs", async () => {
             let componentScope;
 
             module.directive("undi", () => ({
@@ -10142,47 +10140,47 @@ describe("$compile", () => {
             element = $compile(
               '<form name="f" undi="[f.i]"><input name="i" ng-model="a"/></form>',
             )($rootScope);
-            // await wait();
+            await wait();
             expect(componentScope.undi).toBeDefined();
           });
 
-          it("should not complain when the isolated scope changes", async () => {
+          fit("should not complain when the isolated scope changes", async () => {
             $compile('<div><span my-component ow-ref="{name: name}">')(
               $rootScope,
             );
 
             $rootScope.name = "a";
-            // await wait();
+            await wait();
             componentScope.owRef = { name: "b" };
-            componentScope.$apply();
+            await wait();
 
             expect(componentScope.owRef).toEqual({ name: "b" });
             expect($rootScope.name).toBe("a");
 
             $rootScope.name = "c";
-            // await wait();
+            await wait();
             expect(componentScope.owRef).toEqual({ name: "c" });
           });
 
-          it("should work for primitive literals", () => {
+          fit("should work for primitive literals", () => {
             test("1", 1);
             test("null", null);
             test("undefined", undefined);
             test("'someString'", "someString");
             test("true", true);
 
-            function test(literalString, literalValue) {
+            async function test(literalString, literalValue) {
               $compile(`<div><span my-component ow-ref="${literalString}">`)(
                 $rootScope,
               );
-
+              await wait();
               expect(componentScope.owRef).toBe(literalValue);
               dealoc(element);
             }
           });
 
           describe("optional one-way binding", () => {
-            it("should update local when origin changes", async () => {
+            fit("should update local when origin changes", async () => {
               $compile(
                 '<div><span my-component ow-optref="name" $ow-optref$="name">',
               )($rootScope);
@@ -10196,21 +10194,21 @@ describe("$compile", () => {
               );
 
               $rootScope.name = "misko";
-              // await wait();
+              await wait();
               expect(componentScope.owOptref).toBe($rootScope.name);
               expect(componentScope.owOptrefAlias).toBe($rootScope.name);
               expect(componentScope.$owOptrefAlias).toBe($rootScope.name);
 
               $rootScope.name = {};
-              // await wait();
+              await wait();
               expect(componentScope.owOptref).toBe($rootScope.name);
               expect(componentScope.owOptrefAlias).toBe($rootScope.name);
               expect(componentScope.$owOptrefAlias).toBe($rootScope.name);
             });
 
-            it("should not throw exception when reference does not exist", () => {
+            fit("should not throw exception when reference does not exist", async () => {
               $compile("<div><span my-component>")($rootScope);
-
+              await wait();
               expect(componentScope.owOptref).toBeUndefined();
               expect(componentScope.owOptrefAlias).toBeUndefined();
               expect(componentScope.$owOptrefAlias).toBeUndefined();
@@ -10232,7 +10230,7 @@ describe("$compile", () => {
             },
           ];
           $rootScope.query = "";
-          // await wait();
+          await wait();
 
           $compile(
             '<div><span my-component ow-colref="collection | filter:query" $ow-colref$="collection | filter:query">',
@@ -10245,7 +10243,7 @@ describe("$compile", () => {
           );
 
           $rootScope.query = "Gab";
-          // await wait();
+          await wait();
 
           expect(componentScope.owColref).toEqual([$rootScope.collection[0]]);
           expect(componentScope.owColrefAlias).toEqual([
@@ -10267,7 +10265,7 @@ describe("$compile", () => {
               value: 91,
             },
           ];
-          // await wait();
+          await wait();
 
           $compile(
             '<div><span my-component ow-colref="collection" $ow-colref$="collection">',
@@ -10284,7 +10282,7 @@ describe("$compile", () => {
             componentScope.$owColrefAlias =
               undefined;
           $rootScope.collection[0].name = "Joe";
-          // await wait();
+          await wait();
 
           expect(componentScope.owColref).toBeUndefined();
           expect(componentScope.owColrefAlias).toBeUndefined();
@@ -10301,7 +10299,7 @@ describe("$compile", () => {
             value: 91,
           };
           $rootScope.query = "";
-          // await wait();
+          await wait();
 
           $compile(
             '<div><span my-component ow-colref="[gab, tony] | filter:query" $ow-colref$="[gab, tony] | filter:query">',
@@ -10321,7 +10319,7 @@ describe("$compile", () => {
           ]);
 
           $rootScope.query = "Gab";
-          // await wait();
+          await wait();
 
           expect(componentScope.owColref).toEqual([$rootScope.gab]);
           expect(componentScope.owColrefAlias).toEqual([$rootScope.gab]);
@@ -10337,7 +10335,7 @@ describe("$compile", () => {
             name: "Tony",
             value: 91,
           };
-          // await wait();
+          await wait();
 
           $compile(
             '<div><span my-component ow-colref="[gab, tony]" $ow-colref$="[gab, tony]">',
@@ -10360,7 +10358,7 @@ describe("$compile", () => {
             name: "Bob",
             value: 42,
           };
-          // await wait();
+          await wait();
 
           expect(componentScope.owColref).toEqual([
             $rootScope.gab,
@@ -11474,7 +11472,7 @@ describe("$compile", () => {
         expect(element.data("$nestedController")).toBe(expectedController);
       });
 
-      it("should respect explicit controller return value when using controllerAs", () => {
+      it("should respect explicit controller return value when using controllerAs", async () => {
         module.directive("main", () => ({
           templateUrl: "main.html",
           scope: {},
@@ -11490,11 +11488,11 @@ describe("$compile", () => {
           "<span>template:{{mainCtrl.name}}</span>",
         );
         element = $compile("<main/>")($rootScope);
-        // await wait();
+        await wait();
         expect(element.text()).toBe("template:george");
       });
 
-      it("transcluded children should receive explicit return value of parent controller", () => {
+      it("transcluded children should receive explicit return value of parent controller", async () => {
         let expectedController;
         module
           .directive(
@@ -11524,7 +11522,7 @@ describe("$compile", () => {
           }));
         initInjector("test1");
         element = $compile("<div nester><div nested></div></div>")($rootScope);
-        // await wait();
+        await wait();
         expect(log.toString()).toBe("done");
         expect(element.data("$nesterController")).toBe(expectedController);
       });
@@ -12003,7 +12001,7 @@ describe("$compile", () => {
         expect(element.text()).toEqual("WORKS");
       });
 
-      it("should share isolate scope with replaced directives (templateUrl)", () => {
+      fit("should share isolate scope with replaced directives (templateUrl)", async () => {
         let normalScope;
         let isolateScope;
 
@@ -12027,7 +12025,7 @@ describe("$compile", () => {
           "<span ng-init=\"name='WORKS'\">{{name}}</span>",
         );
         element = $compile("<div isolate non-isolate></div>")($rootScope);
-        // await wait();
+        await wait();
 
         expect(normalScope).toBe($rootScope);
         expect(normalScope.name).toEqual(undefined);
@@ -12096,7 +12094,7 @@ describe("$compile", () => {
         },
       );
 
-      it("should support controllerAs", () => {
+      it("should support controllerAs", async () => {
         module.directive("main", () => ({
           templateUrl: "main.html",
           transclude: true,
@@ -12114,11 +12112,11 @@ describe("$compile", () => {
         element = $compile("<div main>transclude:{{mainCtrl.name}}</div>")(
           $rootScope,
         );
-        // await wait();
+        await wait();
         expect(element.text()).toBe("template:lucas transclude:");
       });
 
-      it("should support controller alias", () => {
+      it("should support controller alias", async () => {
         module
           .controller("MainCtrl", function () {
             this.name = "lucas";
@@ -12131,7 +12129,7 @@ describe("$compile", () => {
         initInjector("test1");
         $templateCache.set("main.html", "<span>{{mainCtrl.name}}</span>");
         element = $compile("<div main></div>")($rootScope);
-        // await wait();
+        await wait();
         expect(element.text()).toBe("lucas");
       });
 
@@ -12327,7 +12325,7 @@ describe("$compile", () => {
         expect(syncCtrlSpy).not.toHaveBeenCalled();
         expect(asyncCtrlSpy).not.toHaveBeenCalled();
 
-        // await wait();
+        await wait();
 
         // expect(syncCtrlSpy).toHaveBeenCalled();
         expect(asyncCtrlSpy).toHaveBeenCalled();
@@ -12370,7 +12368,7 @@ describe("$compile", () => {
         element = $compile(
           "<div parent-directive><div child-directive></div>childContentText;</div>",
         )($rootScope);
-        // await wait();
+        await wait();
         expect(log.join("; ")).toEqual("parentController; childController");
         expect(element.text()).toBe("childTemplateText;childContentText;");
       });
@@ -12391,7 +12389,7 @@ describe("$compile", () => {
         $rootScope.foo = "bar";
 
         element = $compile('<div my-directive my-foo="foo"></div>')($rootScope);
-        // await wait();
+        await wait();
         expect(log[0]).toEqual("myFoo=bar");
       });
 
@@ -12412,7 +12410,7 @@ describe("$compile", () => {
         $rootScope.foo = "bar";
 
         element = $compile('<div my-directive my-foo="foo"></div>')($rootScope);
-        // await wait();
+        await wait();
         expect(log[0]).toEqual("myFoo=bar");
       });
 
@@ -12466,14 +12464,14 @@ describe("$compile", () => {
             "</div>" +
             "</div>",
         )($rootScope);
-        // await wait();
+        await wait();
         expect(log.join("; ")).toEqual(
           "parentController; childController; babyController",
         );
         expect(element.text()).toBe("childContentText;babyTemplateText;");
       });
 
-      it("should allow controller usage in pre-link directive functions with templateUrl", () => {
+      it("should allow controller usage in pre-link directive functions with templateUrl", async () => {
         const Ctrl = () => {
           log.push("instance");
         };
@@ -12493,13 +12491,13 @@ describe("$compile", () => {
         $templateCache.set("/mock/hello", "<p>Hello</p>");
 
         element = $compile("<div my-directive></div>")($rootScope);
-        // await wait();
+        await wait();
 
         expect(log[0]).toEqual("instance");
         expect(element.text()).toBe("Hello");
       });
 
-      it("should allow controller usage in pre-link directive functions with a template", () => {
+      it("should allow controller usage in pre-link directive functions with a template", async () => {
         const Ctrl = () => {
           log.push("instance");
         };
@@ -12517,7 +12515,7 @@ describe("$compile", () => {
         }));
         initInjector("test1");
         element = $compile("<div my-directive></div>")($rootScope);
-        // await wait();
+        await wait();
 
         expect(log[0]).toEqual("instance");
         expect(element.text()).toBe("Hello");
@@ -12566,7 +12564,7 @@ describe("$compile", () => {
 
     describe("transclude", () => {
       describe("content transclusion", () => {
-        it("should support transclude directive", () => {
+        it("should support transclude directive", async () => {
           module.directive("trans", () => ({
             transclude: "content",
             replace: true,
@@ -12581,7 +12579,7 @@ describe("$compile", () => {
             "<div><div trans>T:{{x}}<span>;</span></div></div>",
           )($rootScope);
           $rootScope.x = "root";
-          // await wait();
+          await wait();
           expect(element.text()).toEqual("W:isoT:root;");
           expect(
             JQLite(JQLite(element.find("li")[1])[0].childNodes[0]).text(),
@@ -12589,7 +12587,7 @@ describe("$compile", () => {
           expect(JQLite(element.find("span")[0]).text()).toEqual(";");
         });
 
-        it("should transclude transcluded content", () => {
+        it("should transclude transcluded content", async () => {
           module
             .directive(
               "book",
@@ -12624,13 +12622,13 @@ describe("$compile", () => {
             $rootScope,
           );
           expect(element.text()).toEqual("book-");
-          // await wait();
+          await wait();
           expect(element.text()).toEqual(
             "book-chapter-section-![(paragraph)]!",
           );
         });
 
-        it("should compile directives with lower priority than ngTransclude", () => {
+        it("should compile directives with lower priority than ngTransclude", async () => {
           let ngTranscludePriority;
           const lowerPriority = -1;
 
@@ -12662,13 +12660,13 @@ describe("$compile", () => {
 
           expect(lowerPriority).toBeLessThan(ngTranscludePriority);
 
-          // await wait();
+          await wait();
 
           expect(element.text()).toEqual("transcluded content");
           expect(log.join("; ")).toEqual("pre; post");
         });
 
-        it("should not merge text elements from transcluded content", () => {
+        it("should not merge text elements from transcluded content", async () => {
           module.directive(
             "foo",
             valueFn({
@@ -12689,7 +12687,7 @@ describe("$compile", () => {
           )($rootScope);
           $rootScope.before = "BEFORE";
           $rootScope.after = "AFTER";
-          // await wait();
+          await wait();
           expect(element.text()).toEqual(
             "This is before BEFORE. This is after AFTER",
           );
@@ -12698,7 +12696,7 @@ describe("$compile", () => {
           $rootScope.after = "AfTeR";
           $rootScope.$children[0].before = "BeFoRe";
           $rootScope.$children[0].after = "Not-After";
-          // await wait();
+          await wait();
           expect(element.text()).toEqual(
             "This is before BeFoRe. This is after AfTeR",
           );
@@ -12769,7 +12767,7 @@ describe("$compile", () => {
         });
 
         // see issue https://github.com/angular/angular.js/issues/12936
-        it("should use the proper scope when it is on the root element of a replaced directive template", () => {
+        it("should use the proper scope when it is on the root element of a replaced directive template", async () => {
           module
             .directive(
               "isolate",
@@ -12796,12 +12794,12 @@ describe("$compile", () => {
           initInjector("test1");
           element = $compile("<isolate></isolate>")($rootScope);
           $rootScope.x = "root";
-          // await wait();
+          await wait();
           expect(element.text()).toEqual("iso");
         });
 
         // see issue https://github.com/angular/angular.js/issues/12936
-        it("should use the proper scope when it is on the root element of a replaced directive template with child scope", () => {
+        it("should use the proper scope when it is on the root element of a replaced directive template with child scope", async () => {
           module
             .directive(
               "child",
@@ -12828,7 +12826,7 @@ describe("$compile", () => {
           initInjector("test1");
           element = $compile("<child></child>")($rootScope);
           $rootScope.x = "root";
-          // await wait();
+          await wait();
           expect(element.text()).toEqual("child");
         });
 
@@ -12993,7 +12991,7 @@ describe("$compile", () => {
           );
         });
 
-        it("should add a $$transcluded property onto the transcluded scope", () => {
+        it("should add a $$transcluded property onto the transcluded scope", async () => {
           module.directive("trans", () => ({
             transclude: true,
             replace: true,
@@ -13005,38 +13003,38 @@ describe("$compile", () => {
           element = $compile("<div><div trans>T:{{$$transcluded}}</div></div>")(
             $rootScope,
           );
-          // await wait();
+          await wait();
           expect(JQLite(element.find("span")[0]).text()).toEqual("I:");
           expect(JQLite(element.find("span")[1]).text()).toEqual("T:true");
         });
 
-        it("should clear contents of the ng-transclude element before appending transcluded content if transcluded content exists", () => {
+        it("should clear contents of the ng-transclude element before appending transcluded content if transcluded content exists", async () => {
           module.directive("trans", () => ({
             transclude: true,
             template: "<div ng-transclude>old stuff!</div>",
           }));
           initInjector("test1");
           element = $compile("<div trans>unicorn!</div>")($rootScope);
-          // await wait();
+          await wait();
           expect(element.html()).toEqual(
             '<div ng-transclude="">unicorn!</div>',
           );
         });
 
-        it("should NOT clear contents of the ng-transclude element before appending transcluded content if transcluded content does NOT exist", () => {
+        it("should NOT clear contents of the ng-transclude element before appending transcluded content if transcluded content does NOT exist", async () => {
           module.directive("trans", () => ({
             transclude: true,
             template: "<div ng-transclude>old stuff!</div>",
           }));
           initInjector("test1");
           element = $compile("<div trans></div>")($rootScope);
-          // await wait();
+          await wait();
           expect(element.html()).toEqual(
             '<div ng-transclude="">old stuff!</div>',
           );
         });
 
-        it("should clear the fallback content from the element during compile and before linking", () => {
+        it("should clear the fallback content from the element during compile and before linking", async () => {
           module.directive("trans", () => ({
             transclude: true,
             template: "<div ng-transclude>fallback content</div>",
@@ -13046,13 +13044,13 @@ describe("$compile", () => {
           const linkfn = $compile(element);
           expect(element.html()).toEqual('<div ng-transclude=""></div>');
           linkfn($rootScope);
-          // await wait();
+          await wait();
           expect(element.html()).toEqual(
             '<div ng-transclude="">fallback content</div>',
           );
         });
 
-        it("should allow cloning of the fallback via ngRepeat", () => {
+        it("should allow cloning of the fallback via ngRepeat", async () => {
           module.directive("trans", () => ({
             transclude: true,
             template:
@@ -13060,11 +13058,11 @@ describe("$compile", () => {
           }));
           initInjector("test1");
           element = $compile("<div trans></div>")($rootScope);
-          // await wait();
+          await wait();
           expect(element.text()).toEqual("012");
         });
 
-        it("should not link the fallback content if transcluded content is provided", () => {
+        it("should not link the fallback content if transcluded content is provided", async () => {
           const linkSpy = jasmine.createSpy("postlink");
 
           module
@@ -13079,14 +13077,14 @@ describe("$compile", () => {
             }));
           initInjector("test1");
           element = $compile("<div trans>unicorn!</div>")($rootScope);
-          // await wait();
+          await wait();
           expect(element.html()).toEqual(
             '<div ng-transclude="">unicorn!</div>',
           );
           expect(linkSpy).not.toHaveBeenCalled();
         });
 
-        it("should compile and link the fallback content if no transcluded content is provided", () => {
+        it("should compile and link the fallback content if no transcluded content is provided", async () => {
           const linkSpy = jasmine.createSpy("postlink");
 
           module
@@ -13101,14 +13099,14 @@ describe("$compile", () => {
             }));
           initInjector("test1");
           element = $compile("<div trans></div>")($rootScope);
-          // await wait();
+          wait();
           expect(element.html()).toEqual(
             '<div ng-transclude=""><inner>old stuff! </inner></div>',
           );
           expect(linkSpy).toHaveBeenCalled();
         });
 
-        it("should compile and link the fallback content if only whitespace transcluded content is provided", () => {
+        it("should compile and link the fallback content if only whitespace transcluded content is provided", async () => {
           const linkSpy = jasmine.createSpy("postlink");
 
           module
@@ -13123,14 +13121,14 @@ describe("$compile", () => {
             }));
           initInjector("test1");
           element = $compile("<div trans>\n  \n</div>")($rootScope);
-          // await wait();
+          await wait();
           expect(element.html()).toEqual(
             '<div ng-transclude=""><inner>old stuff! </inner></div>',
           );
           expect(linkSpy).toHaveBeenCalled();
         });
 
-        it("should not link the fallback content if only whitespace and comments are provided as transclude content", () => {
+        it("should not link the fallback content if only whitespace and comments are provided as transclude content", async () => {
           const linkSpy = jasmine.createSpy("postlink");
 
           module
@@ -13147,14 +13145,14 @@ describe("$compile", () => {
           element = $compile("<div trans>\n<!-- some comment -->  \n</div>")(
             $rootScope,
           );
-          // await wait();
+          await wait();
           expect(element.html()).toEqual(
             '<div ng-transclude="">\n<!-- some comment -->  \n</div>',
           );
           expect(linkSpy).not.toHaveBeenCalled();
         });
 
-        it("should compile and link the fallback content if an optional transclusion slot is not provided", () => {
+        it("should compile and link the fallback content if an optional transclusion slot is not provided", async () => {
           const linkSpy = jasmine.createSpy("postlink");
 
           module
@@ -13171,25 +13169,25 @@ describe("$compile", () => {
             }));
           initInjector("test1");
           element = $compile("<div trans></div>")($rootScope);
-          // await wait();
+          await wait();
           expect(element.html()).toEqual(
             '<div ng-transclude="optionalSlot"><inner>old stuff! </inner></div>',
           );
           expect(linkSpy).toHaveBeenCalled();
         });
 
-        it("should cope if there is neither transcluded content nor fallback content", () => {
+        it("should cope if there is neither transcluded content nor fallback content", async () => {
           module.directive("trans", () => ({
             transclude: true,
             template: "<div ng-transclude></div>",
           }));
           initInjector("test1");
           element = $compile("<div trans></div>")($rootScope);
-          // await wait();
+          await wait();
           expect(element.html()).toEqual('<div ng-transclude=""></div>');
         });
 
-        it("should throw on an ng-transclude element inside no transclusion directive", () => {
+        it("should throw on an ng-transclude element inside no transclusion directive", async () => {
           let error;
           module.decorator("$exceptionHandler", () => {
             return (exception, cause) => {
@@ -13199,6 +13197,7 @@ describe("$compile", () => {
           initInjector("test1");
           try {
             $compile("<div><div ng-transclude></div></div>")($rootScope);
+            await wait();
           } catch (e) {
             error = e;
           }
@@ -13282,7 +13281,7 @@ describe("$compile", () => {
           $compile("<div trans-foo>content</div>")($rootScope);
         });
 
-        it("should expose transcludeFn in compile fn even for templateUrl", () => {
+        it("should expose transcludeFn in compile fn even for templateUrl", async () => {
           module.directive(
             "transInCompile",
             valueFn({
@@ -13305,12 +13304,12 @@ describe("$compile", () => {
           element = $compile("<div trans-in-compile>transcluded content</div>")(
             $rootScope,
           );
-          // await wait();
+          await wait();
 
           expect(element.text()).toBe("transcluded content");
         });
 
-        it("should make the result of a transclusion available to the parent directive in post-linking phase (template)", () => {
+        it("should make the result of a transclusion available to the parent directive in post-linking phase (template)", async () => {
           module.directive("trans", () => ({
             transclude: true,
             template: "<div ng-transclude></div>",
@@ -13327,11 +13326,11 @@ describe("$compile", () => {
           element = $compile("<div trans><span>unicorn!</span></div>")(
             $rootScope,
           );
-          // await wait();
+          await wait();
           expect(log.join("; ")).toEqual("pre(); post(unicorn!)");
         });
 
-        it("should make the result of a transclusion available to the parent directive in post-linking phase (templateUrl)", () => {
+        it("should make the result of a transclusion available to the parent directive in post-linking phase (templateUrl)", async () => {
           // when compiling an async directive the transclusion is always processed before the directive
           // this is different compared to sync directive. delaying the transclusion makes little sense.
 
@@ -13353,11 +13352,11 @@ describe("$compile", () => {
           element = $compile("<div trans><span>unicorn!</span></div>")(
             $rootScope,
           );
-          // await wait();
+          await wait();
           expect(log.join("; ")).toEqual("pre(); post(unicorn!)");
         });
 
-        it("should make the result of a transclusion available to the parent *replace* directive in post-linking phase (template)", () => {
+        it("should make the result of a transclusion available to the parent *replace* directive in post-linking phase (template)", async () => {
           module.directive("replacedTrans", () => ({
             transclude: true,
             replace: true,
@@ -13375,37 +13374,33 @@ describe("$compile", () => {
           element = $compile("<div replaced-trans><span>unicorn!</span></div>")(
             $rootScope,
           );
-          // await wait();
+          await wait();
           expect(log.join("; ")).toEqual("pre(); post(unicorn!)");
         });
 
-        it(
-          "should make the result of a transclusion available to the parent *replace* directive in post-linking phase" +
-            " (templateUrl)",
-          () => {
-            module.directive("replacedTrans", () => ({
-              transclude: true,
-              replace: true,
-              templateUrl: "trans.html",
-              link: {
-                pre($scope, $element) {
-                  log.push(`pre(${$element.text()})`);
-                },
-                post($scope, $element) {
-                  log.push(`post(${$element.text()})`);
-                },
+        it("should make the result of a transclusion available to the parent *replace* directive in post-linking phase (templateUrl)", async () => {
+          module.directive("replacedTrans", () => ({
+            transclude: true,
+            replace: true,
+            templateUrl: "trans.html",
+            link: {
+              pre($scope, $element) {
+                log.push(`pre(${$element.text()})`);
               },
-            }));
-            initInjector("test1");
-            $templateCache.set("trans.html", "<div ng-transclude></div>");
+              post($scope, $element) {
+                log.push(`post(${$element.text()})`);
+              },
+            },
+          }));
+          initInjector("test1");
+          $templateCache.set("trans.html", "<div ng-transclude></div>");
 
-            element = $compile(
-              "<div replaced-trans><span>unicorn!</span></div>",
-            )($rootScope);
-            // await wait();
-            expect(log.join("; ")).toEqual("pre(); post(unicorn!)");
-          },
-        );
+          element = $compile("<div replaced-trans><span>unicorn!</span></div>")(
+            $rootScope,
+          );
+          await wait();
+          expect(log.join("; ")).toEqual("pre(); post(unicorn!)");
+        });
 
         it("should copy the directive controller to all clones", () => {
           let transcludeCtrl;
@@ -13473,7 +13468,7 @@ describe("$compile", () => {
           expect(ctrlTransclude).toBe(postLinkTransclude);
         });
 
-        it("should allow an optional scope argument in $transclude", () => {
+        it("should allow an optional scope argument in $transclude", async () => {
           let capturedChildCtrl;
           module.directive(
             "transclude",
@@ -13488,7 +13483,7 @@ describe("$compile", () => {
           );
           initInjector("test1");
           element = $compile("<div transclude>{{$id}}</div>")($rootScope);
-          // await wait();
+          await wait();
           expect(element.text()).toBe(`${$rootScope.$id}`);
         });
 
@@ -13866,7 +13861,7 @@ describe("$compile", () => {
             expect(element.text()).toEqual("transcluded content");
           });
 
-          it("should not leak memory with nested transclusion", () => {
+          it("should not leak memory with nested transclusion", async () => {
             let size;
             const initialSize = CACHE.size;
 
@@ -13876,11 +13871,11 @@ describe("$compile", () => {
             $compile(element)($rootScope.$new());
 
             $rootScope.nums = [0, 1, 2];
-            // await wait();
+            await wait();
             size = CACHE.size;
 
             $rootScope.nums = [3, 4, 5];
-            // await wait();
+            await wait();
             expect(CACHE.size).toEqual(size);
 
             element.remove();
@@ -14002,7 +13997,7 @@ describe("$compile", () => {
     });
 
     describe("element transclusion", () => {
-      it("should support basic element transclusion", () => {
+      it("should support basic element transclusion", async () => {
         module.directive("trans", () => ({
           transclude: "element",
           template: "<div ng-transclude></div>",
@@ -14028,7 +14023,7 @@ describe("$compile", () => {
         element = $compile('<div><div trans="text">{{$id}}</div></div>')(
           $rootScope,
         );
-        // await wait();
+        await wait();
 
         expect(log.join("; ")).toEqual("compile; link");
         expect(element.text()).not.toEqual("");
@@ -14705,7 +14700,7 @@ describe("$compile", () => {
   });
 
   describe("multi-slot transclude", () => {
-    it("should only include elements without a matching transclusion element in default transclusion slot", () => {
+    it("should only include elements without a matching transclusion element in default transclusion slot", async () => {
       module.directive("minionComponent", () => ({
         restrict: "E",
         scope: {},
@@ -14723,11 +14718,11 @@ describe("$compile", () => {
           "<span>kevin</span>" +
           "</minion-component>",
       )($rootScope);
-      // await wait();
+      await wait();
       expect(element.text()).toEqual("stuartbobkevin");
     });
 
-    it("should use the default transclusion slot if the ng-transclude attribute has the same value as its key", () => {
+    it("should use the default transclusion slot if the ng-transclude attribute has the same value as its key", async () => {
       module.directive("minionComponent", () => ({
         restrict: "E",
         scope: {},
@@ -14745,7 +14740,7 @@ describe("$compile", () => {
           "<span>kevin</span>" +
           "</minion-component>",
       )($rootScope);
-      // await wait();
+      await wait();
       const a = element.children().eq(0);
       const b = element.children().eq(1);
       const c = element.children().eq(2);
@@ -14757,7 +14752,7 @@ describe("$compile", () => {
       expect(c.text()).toEqual("stuartbobkevin");
     });
 
-    it("should include non-element nodes in the default transclusion", () => {
+    it("should include non-element nodes in the default transclusion", async () => {
       module.directive("minionComponent", () => ({
         restrict: "E",
         scope: {},
@@ -14777,11 +14772,11 @@ describe("$compile", () => {
           "<span>kevin</span>" +
           "</minion-component>",
       )($rootScope);
-      // await wait();
+      await wait();
       expect(element.text()).toEqual("text1stuartbobtext2kevin");
     });
 
-    it("should transclude elements to an `ng-transclude` with a matching transclusion slot name", () => {
+    it("should transclude elements to an `ng-transclude` with a matching transclusion slot name", async () => {
       module.directive("minionComponent", () => ({
         restrict: "E",
         scope: {},
@@ -14803,13 +14798,13 @@ describe("$compile", () => {
           "<minion>kevin</minion>" +
           "</minion-component>",
       )($rootScope);
-      // await wait();
+      await wait();
       expect(element.children().eq(0).text()).toEqual("gru");
       expect(element.children().eq(1).text()).toEqual("stuartkevin");
       expect(element.children().eq(2).text()).toEqual("dorothy");
     });
 
-    it("should use the `ng-transclude-slot` attribute if ng-transclude is used as an element", () => {
+    it("should use the `ng-transclude-slot` attribute if ng-transclude is used as an element", async () => {
       module.directive("minionComponent", () => ({
         restrict: "E",
         scope: {},
@@ -14831,7 +14826,7 @@ describe("$compile", () => {
           "<minion>kevin</minion>" +
           "</minion-component>",
       )($rootScope);
-      // await wait();
+      await wait();
       expect(element.children().eq(0).text()).toEqual("gru");
       expect(element.children().eq(1).text()).toEqual("stuartkevin");
       expect(element.children().eq(2).text()).toEqual("dorothy");
@@ -14861,7 +14856,7 @@ describe("$compile", () => {
       }).toThrowError(/reqslot/);
     });
 
-    it("should not error if an optional transclude slot is not filled", () => {
+    it("should not error if an optional transclude slot is not filled", async () => {
       module.directive("minionComponent", () => ({
         restrict: "E",
         scope: {},
@@ -14881,7 +14876,7 @@ describe("$compile", () => {
           "<span>dorothy</span>" +
           "</minion-component>",
       )($rootScope);
-      // await wait();
+      await wait();
       expect(element.children().eq(1).text()).toEqual("stuart");
       expect(element.children().eq(2).text()).toEqual("dorothy");
     });
@@ -14915,7 +14910,7 @@ describe("$compile", () => {
       }).toThrowError(/noslot/);
     });
 
-    it("should allow the slot name to equal the element name", () => {
+    it("should allow the slot name to equal the element name", async () => {
       module.directive("foo", () => ({
         restrict: "E",
         scope: {},
@@ -14926,11 +14921,11 @@ describe("$compile", () => {
       }));
       initInjector("test1");
       element = $compile("<foo><bar>baz</bar></foo>")($rootScope);
-      // await wait();
+      await wait();
       expect(element.text()).toEqual("baz");
     });
 
-    it("should match the normalized form of the element name", () => {
+    it("should match the normalized form of the element name", async () => {
       module.directive("foo", () => ({
         restrict: "E",
         scope: {},
@@ -14951,12 +14946,12 @@ describe("$compile", () => {
           "<data-moo-kar>baz2</data-moo-kar>" +
           "</foo>",
       )($rootScope);
-      // await wait();
+      await wait();
       expect(element.children().eq(0).text()).toEqual("bar1bar2");
       expect(element.children().eq(1).text()).toEqual("baz1baz2");
     });
 
-    it("should return true from `isSlotFilled(slotName) for slots that have content in the transclusion", () => {
+    it("should return true from `isSlotFilled(slotName) for slots that have content in the transclusion", async () => {
       let capturedTranscludeFn;
       module.directive("minionComponent", () => ({
         restrict: "E",
@@ -14981,7 +14976,7 @@ describe("$compile", () => {
           "  <span>dorothy</span>" +
           "</minion-component>",
       )($rootScope);
-      // await wait();
+      await wait();
 
       const hasMinions = capturedTranscludeFn.isSlotFilled("minionSlot");
       const hasBosses = capturedTranscludeFn.isSlotFilled("bossSlot");
@@ -14990,7 +14985,7 @@ describe("$compile", () => {
       expect(hasBosses).toBe(false);
     });
 
-    it("should not overwrite the contents of an `ng-transclude` element, if the matching optional slot is not filled", () => {
+    it("should not overwrite the contents of an `ng-transclude` element, if the matching optional slot is not filled", async () => {
       module.directive("minionComponent", () => ({
         restrict: "E",
         scope: {},
@@ -15011,7 +15006,7 @@ describe("$compile", () => {
           "<minion>kevin</minion>" +
           "</minion-component>",
       )($rootScope);
-      // await wait();
+      await wait();
       expect(element.children().eq(0).text()).toEqual("default boss content");
       expect(element.children().eq(1).text()).toEqual("stuartkevin");
       expect(element.children().eq(2).text()).toEqual("dorothy");
@@ -15139,7 +15134,7 @@ describe("$compile", () => {
     it("should not sanitize attributes other than src", async () => {
       element = $compile('<img title="{{testUrl}}"></img>')($rootScope);
       $rootScope.testUrl = "javascript:doEvilStuff()";
-      // await wait();
+      await wait();
       expect(element.attr("title")).toBe("javascript:doEvilStuff()");
     });
 
@@ -15151,7 +15146,7 @@ describe("$compile", () => {
       initInjector("test1");
       $rootScope.testUrl = "someUrl";
       element = $compile('<img src="{{testUrl}}"></img>')($rootScope);
-      // await wait();
+      await wait();
       expect(element.attr("src")).toBe("someSanitizedUrl");
       expect($$sanitizeUri).toHaveBeenCalledWith($rootScope.testUrl, true);
     });
@@ -15184,7 +15179,7 @@ describe("$compile", () => {
       // Assigning javascript:foo to src makes at least IE9-11 complain, so use another
       // protocol name.
       $rootScope.testUrl = $sce.trustAsMediaUrl("untrusted:foo();");
-      // await wait();
+      await wait();
       expect(element.attr("src")).toEqual("untrusted:foo();");
     });
   });
@@ -15248,7 +15243,7 @@ describe("$compile", () => {
       initInjector("test1");
       element = $compile('<img srcset="{{testUrl}}"></img>')($rootScope);
       $rootScope.testUrl = "someUrl";
-      // await wait();
+      await wait();
       expect(element.attr("srcset")).toBe("someSanitizedUrl");
       expect($$sanitizeUri).toHaveBeenCalledWith($rootScope.testUrl, true);
 
@@ -15256,14 +15251,14 @@ describe("$compile", () => {
         $rootScope,
       );
       $rootScope.testUrl = "javascript:yay";
-      // await wait();
+      await wait();
       expect(element.attr("srcset")).toEqual(
         "someSanitizedUrl ,someSanitizedUrl",
       );
 
       element = $compile('<img srcset="java{{testUrl}}"></img>')($rootScope);
       $rootScope.testUrl = "script:yay, javascript:nay";
-      // await wait();
+      await wait();
       expect(element.attr("srcset")).toEqual(
         "someSanitizedUrl ,someSanitizedUrl",
       );
@@ -15344,18 +15339,18 @@ describe("$compile", () => {
     it("should sanitize non-trusted values", async () => {
       $rootScope.testUrl = "javascript:foo()"; // `javascript` is not trusted
       element = $compile('<a href="{{testUrl}}"></a>')($rootScope);
-      // await wait();
+      await wait();
       expect(element.attr("href")).toEqual("unsafe:javascript:foo()");
 
       element = $compile('<a ng-href="{{testUrl}}"></a>')($rootScope);
-      // await wait();
+      await wait();
       expect(element.attr("href")).toEqual("unsafe:javascript:foo()");
     });
 
     it("should not sanitize href on elements other than anchor", async () => {
       element = $compile('<div href="{{testUrl}}"></div>')($rootScope);
       $rootScope.testUrl = "javascript:doEvilStuff()";
-      // await wait();
+      await wait();
 
       expect(element.attr("href")).toBe("javascript:doEvilStuff()");
     });
@@ -15363,7 +15358,7 @@ describe("$compile", () => {
     it("should not sanitize attributes other than href/ng-href", async () => {
       element = $compile('<a title="{{testUrl}}"></a>')($rootScope);
       $rootScope.testUrl = "javascript:doEvilStuff()";
-      // await wait();
+      await wait();
 
       expect(element.attr("title")).toBe("javascript:doEvilStuff()");
     });
@@ -15378,19 +15373,19 @@ describe("$compile", () => {
       initInjector("test1");
       element = $compile('<a href="{{testUrl}}"></a>')($rootScope);
       $rootScope.testUrl = "someUrl";
-      // await wait();
+      await wait();
       expect(element.attr("href")).toBe("someSanitizedUrl");
       expect($$sanitizeUri).toHaveBeenCalledWith($rootScope.testUrl, false);
 
       $$sanitizeUri.calls.reset();
 
       element = $compile('<a ng-href="{{testUrl}}"></a>')($rootScope);
-      // await wait();
+      await wait();
       expect(element.attr("href")).toBe("someSanitizedUrl");
       expect($$sanitizeUri).toHaveBeenCalledWith($rootScope.testUrl, false);
     });
 
-    it("should use $$sanitizeUri when working with svg and xlink-href", () => {
+    it("should use $$sanitizeUri when working with svg and xlink-href", async () => {
       const $$sanitizeUri = jasmine
         .createSpy("$$sanitizeUri")
         .and.returnValue("https://clean.example.org");
@@ -15405,7 +15400,7 @@ describe("$compile", () => {
       const elementA = $compile(
         "<svg><a xlink-href=\"{{ testUrl + 'aTag' }}\"></a></svg>",
       )($rootScope);
-      // await wait();
+      await wait();
       expect(elementA.find("a").attr("xlink-href")).toBe(
         "https://clean.example.org",
       );
@@ -15417,7 +15412,7 @@ describe("$compile", () => {
       const elementImage = $compile(
         "<svg><image xlink-href=\"{{ testUrl + 'imageTag' }}\"></image></svg>",
       )($rootScope);
-      // await wait();
+      await wait();
       expect(elementImage.find("image").attr("xlink-href")).toBe(
         "https://clean.example.org",
       );
@@ -15427,7 +15422,7 @@ describe("$compile", () => {
       );
     });
 
-    it("should use $$sanitizeUri when working with svg and xlink:href through ng-href", () => {
+    it("should use $$sanitizeUri when working with svg and xlink:href through ng-href", async () => {
       const $$sanitizeUri = jasmine
         .createSpy("$$sanitizeUri")
         .and.returnValue("https://clean.example.org");
@@ -15442,7 +15437,7 @@ describe("$compile", () => {
       element = $compile(
         '<svg><a xlink:href="" ng-href="{{ testUrl }}"></a></svg>',
       )($rootScope);
-      // await wait();
+      await wait();
       expect(element.find("a")[0].href.baseVal).toBe(
         "https://clean.example.org",
       );
@@ -15461,8 +15456,8 @@ describe("$compile", () => {
       )($rootScope);
       $rootScope.testUrl = "https://bad.example.org";
 
-      expect(() => {
-        // await wait();
+      expect(async () => {
+        await wait();
       }).toThrowError(/interr/);
     });
   });
@@ -15491,26 +15486,26 @@ describe("$compile", () => {
       }).toThrowError(/nodomevents/);
     });
 
-    it("should pass through arbitrary values on onXYZ event attributes that contain a hyphen", () => {
+    it("should pass through arbitrary values on onXYZ event attributes that contain a hyphen", async () => {
       element = $compile('<button on-click="{{onClickJs}}"></button>')(
         $rootScope,
       );
       $rootScope.onClickJs = "javascript:doSomething()";
-      // await wait();
+      await wait();
       expect(element.attr("on-click")).toEqual("javascript:doSomething()");
     });
 
-    it('should pass through arbitrary values on "on" and "data-on" attributes', () => {
+    it('should pass through arbitrary values on "on" and "data-on" attributes', async () => {
       element = $compile('<button data-on="{{dataOnVar}}"></button>')(
         $rootScope,
       );
       $rootScope.dataOnVar = "data-on text";
-      // await wait();
+      await wait();
       expect(element.attr("data-on")).toEqual("data-on text");
 
       element = $compile('<button on="{{onVar}}"></button>')($rootScope);
       $rootScope.onVar = "on text";
-      // await wait();
+      await wait();
       expect(element.attr("on")).toEqual("on text");
     });
   });
@@ -15525,50 +15520,50 @@ describe("$compile", () => {
       initInjector("test1");
     });
 
-    it("should pass through src attributes for the same domain", () => {
+    it("should pass through src attributes for the same domain", async () => {
       element = $compile('<iframe src="{{testUrl}}"></iframe>')($rootScope);
       $rootScope.testUrl = "different_page";
-      // await wait();
+      await wait();
       expect(element.attr("src")).toEqual("different_page");
     });
 
     it("should clear out src attributes for a different domain", () => {
       element = $compile('<iframe src="{{testUrl}}"></iframe>')($rootScope);
       $rootScope.testUrl = "http://a.different.domain.example.com";
-      expect(() => {
-        // await wait();
+      expect(async () => {
+        await wait();
       }).toThrowError(/interr/);
     });
 
     it("should clear out JS src attributes", () => {
       element = $compile('<iframe src="{{testUrl}}"></iframe>')($rootScope);
       $rootScope.testUrl = "javascript:alert(1);";
-      expect(() => {
-        // await wait();
+      expect(async () => {
+        await wait();
       }).toThrowError(/interr/);
     });
 
     it("should clear out non-resource_url src attributes", () => {
       element = $compile('<iframe src="{{testUrl}}"></iframe>')($rootScope);
       $rootScope.testUrl = $sce.trustAsUrl("javascript:doTrustedStuff()");
-      expect(() => {
-        // await wait();
+      expect(async () => {
+        await wait();
       }).toThrowError(/interr/);
     });
 
-    it("should pass through $sce.trustAs() values in src attributes", () => {
+    it("should pass through $sce.trustAs() values in src attributes", async () => {
       element = $compile('<iframe src="{{testUrl}}"></iframe>')($rootScope);
       $rootScope.testUrl = $sce.trustAsResourceUrl(
         "javascript:doTrustedStuff()",
       );
-      // await wait();
+      await wait();
 
       expect(element.attr("src")).toEqual("javascript:doTrustedStuff()");
     });
   });
 
   describe("base[href]", () => {
-    it("should be a RESOURCE_URL context", () => {
+    it("should be a RESOURCE_URL context", async () => {
       module.decorator("$exceptionHandler", () => {
         return (exception, cause) => {
           throw new Error(exception.message);
@@ -15578,12 +15573,12 @@ describe("$compile", () => {
       element = $compile('<base href="{{testUrl}}"/>')($rootScope);
 
       $rootScope.testUrl = $sce.trustAsResourceUrl("https://example.com/");
-      // await wait();
+      await wait();
       expect(element.attr("href")).toContain("https://example.com/");
 
       $rootScope.testUrl = "https://not.example.com/";
-      expect(() => {
-        // await wait();
+      expect(async () => {
+        await wait();
       }).toThrowError(/interr/);
     });
   });
@@ -15598,43 +15593,43 @@ describe("$compile", () => {
       initInjector("test1");
     });
 
-    it("should pass through action attribute for the same domain", () => {
+    it("should pass through action attribute for the same domain", async () => {
       element = $compile('<form action="{{testUrl}}"></form>')($rootScope);
       $rootScope.testUrl = "different_page";
-      // await wait();
+      await wait();
       expect(element.attr("action")).toEqual("different_page");
     });
 
     it("should clear out action attribute for a different domain", () => {
       element = $compile('<form action="{{testUrl}}"></form>')($rootScope);
       $rootScope.testUrl = "http://a.different.domain.example.com";
-      expect(() => {
-        // await wait();
+      expect(async () => {
+        await wait();
       }).toThrowError(/interr/);
     });
 
     it("should clear out JS action attribute", () => {
       element = $compile('<form action="{{testUrl}}"></form>')($rootScope);
       $rootScope.testUrl = "javascript:alert(1);";
-      expect(() => {
-        // await wait();
+      expect(async () => {
+        await wait();
       }).toThrowError(/interr/);
     });
 
     it("should clear out non-resource_url action attribute", () => {
       element = $compile('<form action="{{testUrl}}"></form>')($rootScope);
       $rootScope.testUrl = $sce.trustAsUrl("javascript:doTrustedStuff()");
-      expect(() => {
-        // await wait();
+      expect(async () => {
+        await wait();
       }).toThrowError(/interr/);
     });
 
-    it("should pass through $sce.trustAsResourceUrl() values in action attribute", () => {
+    it("should pass through $sce.trustAsResourceUrl() values in action attribute", async () => {
       element = $compile('<form action="{{testUrl}}"></form>')($rootScope);
       $rootScope.testUrl = $sce.trustAsResourceUrl(
         "javascript:doTrustedStuff()",
       );
-      // await wait();
+      await wait();
 
       expect(element.attr("action")).toEqual("javascript:doTrustedStuff()");
     });
@@ -15655,35 +15650,35 @@ describe("$compile", () => {
         $rootScope,
       );
       $rootScope.testUrl = "https://evil.example.org/css.css";
-      expect(() => {
-        // await wait();
+      expect(async () => {
+        await wait();
       }).toThrowError(/interr/);
     });
 
-    it("should accept valid RESOURCE_URLs", () => {
+    it("should accept valid RESOURCE_URLs", async () => {
       element = $compile('<link href="{{testUrl}}" rel="stylesheet" />')(
         $rootScope,
       );
 
       $rootScope.testUrl = "./css1.css";
-      // await wait();
+      await wait();
       expect(element.attr("href")).toContain("css1.css");
 
       $rootScope.testUrl = $sce.trustAsResourceUrl(
         "https://elsewhere.example.org/css2.css",
       );
-      // await wait();
+      await wait();
       expect(element.attr("href")).toContain(
         "https://elsewhere.example.org/css2.css",
       );
     });
 
-    it("should accept valid constants", () => {
+    it("should accept valid constants", async () => {
       element = $compile(
         '<link href="https://elsewhere.example.org/css2.css" rel="stylesheet" />',
       )($rootScope);
 
-      // await wait();
+      await wait();
       expect(element.attr("href")).toContain(
         "https://elsewhere.example.org/css2.css",
       );
@@ -15812,7 +15807,7 @@ describe("$compile", () => {
       expect(element.attr("test3")).toBe("Misko");
     });
 
-    it("should use the non-prefixed name in $attr mappings", () => {
+    it("should use the non-prefixed name in $attr mappings", async () => {
       let attrs;
       module.directive(
         "attrExposer",
@@ -15827,7 +15822,7 @@ describe("$compile", () => {
       $compile(
         '<div attr-exposer ng-attr-title="12" ng-attr-super-title="34" ng-attr-my-camel_title="56">',
       )($rootScope);
-      // await wait();
+      await wait();
 
       expect(attrs.title).toBe("12");
       expect(attrs.$attr.title).toBe("title");
@@ -16050,7 +16045,7 @@ describe("$compile", () => {
       expect(true).toBeTrue();
     });
 
-    it("should enforce the specified sce type for properties added for specific elements", () => {
+    it("should enforce the specified sce type for properties added for specific elements", async () => {
       injector = createInjector([
         "ng",
         "defaultModule",
@@ -16063,19 +16058,19 @@ describe("$compile", () => {
       const element = $compile('<div ng-prop-foo="bar"></div>')($rootScope);
 
       $rootScope.bar = "untrusted:test1";
-      // await wait();
+      await wait();
       expect(element[0].foo).toBe("unsafe:untrusted:test1");
 
       $rootScope.bar = $sce.trustAsCss("untrusted:test2");
-      // await wait();
+      await wait();
       expect(element[0].foo).toBe("unsafe:untrusted:test2");
 
       $rootScope.bar = $sce.trustAsMediaUrl("untrusted:test3");
-      // await wait();
+      await wait();
       expect(element[0].foo).toBe("untrusted:test3");
     });
 
-    it("should enforce the specified sce type for properties added for all elements (*)", () => {
+    it("should enforce the specified sce type for properties added for all elements (*)", async () => {
       injector = createInjector([
         "ng",
         "defaultModule",
@@ -16088,19 +16083,19 @@ describe("$compile", () => {
       const element = $compile('<div ng-prop-foo="bar"></div>')($rootScope);
 
       $rootScope.bar = "untrusted:test1";
-      // await wait();
+      await wait();
       expect(element[0].foo).toBe("unsafe:untrusted:test1");
 
       $rootScope.bar = $sce.trustAsCss("untrusted:test2");
-      // await wait();
+      await wait();
       expect(element[0].foo).toBe("unsafe:untrusted:test2");
 
       $rootScope.bar = $sce.trustAsMediaUrl("untrusted:test3");
-      // await wait();
+      await wait();
       expect(element[0].foo).toBe("untrusted:test3");
     });
 
-    it("should enforce the specific sce type when both an element specific and generic exist", () => {
+    it("should enforce the specific sce type when both an element specific and generic exist", async () => {
       injector = createInjector([
         "ng",
         "defaultModule",
@@ -16114,15 +16109,15 @@ describe("$compile", () => {
       const element = $compile('<div ng-prop-foo="bar"></div>')($rootScope);
 
       $rootScope.bar = "untrusted:test1";
-      // await wait();
+      await wait();
       expect(element[0].foo).toBe("unsafe:untrusted:test1");
 
       $rootScope.bar = $sce.trustAsCss("untrusted:test2");
-      // await wait();
+      await wait();
       expect(element[0].foo).toBe("unsafe:untrusted:test2");
 
       $rootScope.bar = $sce.trustAsMediaUrl("untrusted:test3");
-      // await wait();
+      await wait();
       expect(element[0].foo).toBe("untrusted:test3");
     });
   });
@@ -16538,7 +16533,7 @@ describe("$compile", () => {
   // });
 
   describe("element replacement", () => {
-    it("should broadcast $destroy only on removed elements, not replaced", () => {
+    it("should broadcast $destroy only on removed elements, not replaced", async () => {
       const linkCalls = [];
       const destroyCalls = [];
 
@@ -16568,7 +16563,7 @@ describe("$compile", () => {
 
       expect(linkCalls).toEqual(["2", "3"]);
       expect(destroyCalls).toEqual([]);
-      // await wait();
+      await wait();
       expect(linkCalls).toEqual(["2", "3", "1"]);
       expect(destroyCalls).toEqual(["2", "3"]);
     });
@@ -16586,7 +16581,7 @@ describe("$compile", () => {
       );
     }
 
-    function testCompileLinkDataCleanup(template) {
+    async function testCompileLinkDataCleanup(template) {
       const toCompile = JQLite(template);
 
       const preCompiledChildren = getAll(toCompile);
@@ -16595,7 +16590,7 @@ describe("$compile", () => {
       });
 
       const linkedElements = $compile(toCompile)($rootScope);
-      // await wait();
+      await wait();
       linkedElements.remove();
 
       Object.entries(preCompiledChildren).forEach(([i, element]) => {

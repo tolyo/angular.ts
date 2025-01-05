@@ -1261,7 +1261,7 @@ describe("ngModel", () => {
         // };
         // usernameCtrl.$setViewValue("another-valid-username");
         // usernameDefer.resolve();
-        // await wait();
+        await wait();
         // expect(usernameCtrl.$invalid).toBe(false);
         // expect(formCtrl.$invalid).toBe(false);
         // expect(formCtrl.$pending).toBeFalsy();
