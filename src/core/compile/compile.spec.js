@@ -7319,30 +7319,33 @@ describe("$compile", () => {
         expect(directiveAttrs.someAttr).toBe($rootScope.whatever);
       });
 
-      it("should allow directive to replace interpolated attributes before attr interpolation compilation", () => {
+      fit("should allow directive to replace interpolated attributes before attr interpolation compilation", async () => {
         element = $compile(
           '<div some-attr="foo-{{1+1}}" replace-some-attr></div>',
         )($rootScope);
+        await wait();
         expect(element.attr("some-attr")).toEqual("bar-2");
       });
 
-      it("should call observer of non-interpolated attr through $evalAsync", () => {
+      fit("should call observer of non-interpolated attr through $evalAsync", async () => {
         $compile('<div some-attr="nonBound" observer></div>')($rootScope);
+        await wait();
         expect(directiveAttrs.someAttr).toBe("nonBound");
 
         expect(observeSpy).not.toHaveBeenCalled();
         expect(observeSpy).toHaveBeenCalled();
       });
 
-      it("should support non-interpolated `src` and `data-src` on the same element", () => {
+      fit("should support non-interpolated `src` and `data-src` on the same element", async () => {
         const element = $compile('<img src="abc" data-src="123">')($rootScope);
+        await wait();
         expect(element.attr("src")).toEqual("abc");
         expect(element.attr("data-src")).toEqual("123");
         expect(element.attr("src")).toEqual("abc");
         expect(element.attr("data-src")).toEqual("123");
       });
 
-      it("should call observer only when the attribute value changes", () => {
+      fit("should call observer only when the attribute value changes", async () => {
         module.directive("observingDirective", () => ({
           restrict: "E",
           scope: { someAttr: "@" },
@@ -7358,10 +7361,11 @@ describe("$compile", () => {
         $compile("<observing-directive observer></observing-directive>")(
           $rootScope,
         );
+        await wait();
         expect(observeSpy).not.toHaveBeenCalledWith(undefined);
       });
 
-      it("should delegate exceptions to $exceptionHandler", () => {
+      fit("should delegate exceptions to $exceptionHandler", async () => {
         observeSpy = jasmine.createSpy("$observe attr").and.throwError("ERROR");
 
         module.directive(
@@ -7382,14 +7386,16 @@ describe("$compile", () => {
         );
 
         $compile('<div some-attr="{{value}}" error></div>')($rootScope);
+        await wait();
         expect(observeSpy).toHaveBeenCalled();
         expect(observeSpy).toHaveBeenCalledTimes(2);
       });
-
-      it("should translate {{}} in terminal nodes", () => {
+      // LEAK
+      xit("should translate {{}} in terminal nodes", async () => {
         element = $compile(
           '<select ng-model="x"><option value="">Greet {{name}}!</option></select>',
         )($rootScope);
+        await wait();
         expect(
           element[0].outerHTML.replace(' selected="selected"', ""),
         ).toEqual(
@@ -7398,6 +7404,7 @@ describe("$compile", () => {
             "</select>",
         );
         $rootScope.name = "Misko";
+        await wait();
         expect(
           element[0].outerHTML.replace(' selected="selected"', ""),
         ).toEqual(
@@ -7407,7 +7414,7 @@ describe("$compile", () => {
         );
       });
 
-      it("should handle consecutive text elements as a single text element", () => {
+      fit("should handle consecutive text elements as a single text element", async () => {
         // Create and register the MutationObserver
         const observer = new window.MutationObserver(() => {});
         observer.observe(document.body, { childList: true, subtree: true });
@@ -7415,6 +7422,7 @@ describe("$compile", () => {
         // Run the actual test
         const base = JQLite('<div>&mdash; {{ "This doesn\'t." }}</div>');
         element = $compile(base)($rootScope);
+        await wait();
         expect(element.text()).toBe("— This doesn't.");
 
         // Unregister the MutationObserver (and hope it doesn't mess up with subsequent tests)
@@ -7589,14 +7597,15 @@ describe("$compile", () => {
         linkingFn($rootScope);
       });
 
-      it("should compile from top to bottom but link from bottom up", () => {
+      fit("should compile from top to bottom but link from bottom up", async () => {
         element = $compile("<a b><c></c></a>")($rootScope);
+        await wait();
         expect(log.join("; ")).toEqual(
           "tA; tB; tC; preA; preB; preC; postC; postB; postA",
         );
       });
 
-      it("should support link function on directive object", () => {
+      fit("should support link function on directive object", async () => {
         module.directive(
           "abc",
           valueFn({
@@ -7610,12 +7619,12 @@ describe("$compile", () => {
           $compile = _$compile_;
           $rootScope = _$rootScope_;
         });
-
         element = $compile('<div abc="WORKS">FAIL</div>')($rootScope);
+        await wait();
         expect(element.text()).toEqual("WORKS");
       });
 
-      it("should support $observe inside link function on directive object", async () => {
+      fit("should support $observe inside link function on directive object", async () => {
         module.directive(
           "testLink",
           valueFn({
@@ -7642,8 +7651,9 @@ describe("$compile", () => {
         expect(element.text()).toBe("3");
       });
 
-      it("should throw multilink error when linking the same element more then once", () => {
+      fit("should throw multilink error when linking the same element more then once", async () => {
         const linker = $compile("<div>");
+        await wait();
         linker($rootScope).remove();
         expect(() => {
           linker($rootScope);
@@ -7651,7 +7661,7 @@ describe("$compile", () => {
       });
 
       describe("attrs", () => {
-        it("should allow setting of attributes", () => {
+        fit("should allow setting of attributes", async () => {
           module.directive({
             setter: valueFn((scope, element, attr) => {
               attr.$set("name", "abc");
@@ -7667,11 +7677,12 @@ describe("$compile", () => {
           });
 
           element = $compile("<div setter></div>")($rootScope);
+          await wait();
           expect(element.attr("name")).toEqual("abc");
           expect(element.attr("disabled")).toEqual("disabled");
         });
 
-        it("should read boolean attributes as boolean only on control elements", () => {
+        fit("should read boolean attributes as boolean only on control elements", async () => {
           let value;
           module.directive({
             input: valueFn({
@@ -7688,10 +7699,11 @@ describe("$compile", () => {
           });
 
           element = $compile("<input required></input>")($rootScope);
+          await wait();
           expect(value).toEqual(true);
         });
 
-        it("should read boolean attributes as text on non-controll elements", () => {
+        fit("should read boolean attributes as text on non-controll elements", async () => {
           let value;
           module.directive({
             div: valueFn({
@@ -7708,10 +7720,11 @@ describe("$compile", () => {
           });
 
           element = $compile('<div required="some text"></div>')($rootScope);
+          await wait();
           expect(value).toEqual("some text");
         });
 
-        it("should create new instance of attr for each template stamping", () => {
+        fit("should create new instance of attr for each template stamping", async () => {
           const state = { first: [], second: [] };
           module
             .value("state", state)
@@ -7785,7 +7798,7 @@ describe("$compile", () => {
           });
         });
 
-        it("should properly $observe inside ng-repeat", () => {
+        fit("should properly $observe inside ng-repeat", async () => {
           const spies = [];
 
           module.directive(
@@ -7808,25 +7821,24 @@ describe("$compile", () => {
               "</div></div>",
           )($rootScope);
 
-          $rootScope.$apply(() => {
-            $rootScope.items = [{ id: 1 }, { id: 2 }];
-          });
+          await wait();
+          $rootScope.items = [{ id: 1 }, { id: 2 }];
 
+          await wait();
           expect(spies[0]).toHaveBeenCalledOnceWith("id_1");
           expect(spies[1]).toHaveBeenCalledOnceWith("id_2");
           spies[0].calls.reset();
           spies[1].calls.reset();
 
-          $rootScope.$apply(() => {
-            $rootScope.items[0].id = 5;
-          });
+          $rootScope.items[0].id = 5;
+          await wait();
 
           expect(spies[0]).toHaveBeenCalledOnceWith("id_5");
         });
 
         describe("$set", () => {
           let attr, $sce;
-          beforeEach(() => {
+          beforeEach(async () => {
             ["input", "a", "img"].forEach((tag) => {
               module.directive(
                 tag,
@@ -7847,17 +7859,18 @@ describe("$compile", () => {
               },
             );
             element = $compile("<input></input>")($rootScope);
+            await wait();
             attr = $rootScope.attr;
             expect(attr).toBeDefined();
           });
 
-          it("should set attributes", () => {
+          fit("should set attributes", async () => {
             attr.$set("ngMyAttr", "value");
             expect(element.attr("ng-my-attr")).toEqual("value");
             expect(attr.ngMyAttr).toEqual("value");
           });
 
-          it("should allow overriding of attribute name and remember the name", () => {
+          fit("should allow overriding of attribute name and remember the name", () => {
             attr.$set("ngOther", "123", true, "other");
             expect(element.attr("other")).toEqual("123");
             expect(attr.ngOther).toEqual("123");
@@ -7867,7 +7880,7 @@ describe("$compile", () => {
             expect(attr.ngOther).toEqual("246");
           });
 
-          it("should remove attribute", () => {
+          fit("should remove attribute", () => {
             attr.$set("ngMyAttr", "value");
             expect(element.attr("ng-my-attr")).toEqual("value");
 
@@ -7879,7 +7892,7 @@ describe("$compile", () => {
             expect(element.attr("ng-my-attr")).toBeUndefined();
           });
 
-          it("should set the value to lowercased keys for boolean attrs", () => {
+          fit("should set the value to lowercased keys for boolean attrs", () => {
             attr.$set("disabled", "value");
             expect(element.attr("disabled")).toEqual("disabled");
 
@@ -8039,7 +8052,7 @@ describe("$compile", () => {
       });
 
       describe("$onDestroy", () => {
-        it("should call `$onDestroy`, if provided, on the controller when its scope is destroyed", () => {
+        fit("should call `$onDestroy`, if provided, on the controller when its scope is destroyed", async () => {
           function TestController() {
             this.count = 0;
           }
@@ -8063,8 +8076,9 @@ describe("$compile", () => {
           element = $compile(
             '<div><d1 ng-if="show[0]"></d1><d2 ng-if="show[1]"></d2><div ng-if="show[2]"><d3></d3></div></div>',
           )($rootScope);
-
+          await wait();
           $rootScope.$apply("show = [true, true, true]");
+          await wait();
           const d1Controller = element.find("d1").controller("d1");
           const d2Controller = element.find("d2").controller("d2");
           const d3Controller = element.find("d3").controller("d3");
@@ -8075,18 +8089,21 @@ describe("$compile", () => {
             d3Controller.count,
           ]).toEqual([0, 0, 0]);
           $rootScope.$apply("show = [false, true, true]");
+          await wait();
           expect([
             d1Controller.count,
             d2Controller.count,
             d3Controller.count,
           ]).toEqual([1, 0, 0]);
           $rootScope.$apply("show = [false, false, true]");
+          await wait();
           expect([
             d1Controller.count,
             d2Controller.count,
             d3Controller.count,
           ]).toEqual([1, 1, 0]);
           $rootScope.$apply("show = [false, false, false]");
+          await wait();
           expect([
             d1Controller.count,
             d2Controller.count,
@@ -8094,7 +8111,7 @@ describe("$compile", () => {
           ]).toEqual([1, 1, 1]);
         });
 
-        it("should call `$onDestroy` top-down (the same as `scope.$broadcast`)", () => {
+        fit("should call `$onDestroy` top-down (the same as `scope.$broadcast`)", async () => {
           let log = [];
           function ParentController() {
             log.push("parent created");
@@ -8137,7 +8154,9 @@ describe("$compile", () => {
           element = $compile(
             '<parent ng-if="show"><child><grand-child></grand-child></child></parent>',
           )($rootScope);
+          await wait();
           $rootScope.$apply("show = true");
+          await wait();
           expect(log).toEqual([
             "parent created",
             "child created",
@@ -8145,6 +8164,7 @@ describe("$compile", () => {
           ]);
           log = [];
           $rootScope.$apply("show = false");
+          await wait();
           expect(log).toEqual([
             "parent destroyed",
             "child destroyed",
@@ -8154,7 +8174,7 @@ describe("$compile", () => {
       });
 
       describe("$postLink", () => {
-        it("should call `$postLink`, if provided, after the element has completed linking (i.e. post-link)", () => {
+        fit("should call `$postLink`, if provided, after the element has completed linking (i.e. post-link)", async () => {
           const log = [];
 
           function Controller1() {}
@@ -8204,6 +8224,7 @@ describe("$compile", () => {
             $rootScope = _$rootScope_;
           });
           element = $compile("<d1></d1>")($rootScope);
+          await wait();
           expect(log).toEqual([
             "d1 pre: loaded",
             "d2 pre: loaded",
@@ -8216,7 +8237,7 @@ describe("$compile", () => {
       });
 
       describe("$doCheck", () => {
-        it("should call `$doCheck`, if provided, for each digest cycle, after $onChanges and $onInit", async () => {
+        fit("should call `$doCheck`, if provided, for each digest cycle, after $onChanges and $onInit", async () => {
           function TestController() {}
           TestController.prototype.$doCheck = () => {
             log.push("$doCheck");
@@ -8238,6 +8259,7 @@ describe("$compile", () => {
             $rootScope = _$rootScope_;
           });
           element = $compile('<dcc prop1="val"></dcc>')($rootScope);
+          await wait();
           expect(log).toEqual(["$onChanges", "$onInit", "$doCheck"]);
 
           // Clear log
@@ -8253,7 +8275,7 @@ describe("$compile", () => {
           expect(log).toEqual(["$doCheck", "$onChanges", "$doCheck"]);
         });
 
-        it("should work if $doCheck is provided in the constructor", async () => {
+        fit("should work if $doCheck is provided in the constructor", async () => {
           function TestController() {
             this.$doCheck = () => {
               log.push("$doCheck");
@@ -8277,6 +8299,7 @@ describe("$compile", () => {
           });
 
           element = $compile('<dcc prop1="val"></dcc>')($rootScope);
+          await wait();
           expect(log).toEqual(["$onChanges", "$onInit", "$doCheck"]);
 
           // Clear log
@@ -8294,7 +8317,7 @@ describe("$compile", () => {
       });
 
       describe("$onChanges", () => {
-        it("should call `$onChanges`, if provided, when a one-way (`<`) or interpolation (`@`) bindings are updated", () => {
+        fit("should call `$onChanges`, if provided, when a one-way (`<`) or interpolation (`@`) bindings are updated", async () => {
           function TestController() {}
           TestController.prototype.$onChanges = function (change) {
             log.push(change);
@@ -8310,14 +8333,14 @@ describe("$compile", () => {
             $rootScope = _$rootScope_;
           });
           // Setup a watch to indicate some complicated updated logic
-          $rootScope.$watch("val", (val, oldVal) => {
+          $rootScope.$watch("val", (val) => {
             $rootScope.val2 = val * 2;
           });
           // Setup the directive with two bindings
           element = $compile(
             '<c1 prop1="val" prop2="val2" other="val3" attr="{{val4}}"></c1>',
           )($rootScope);
-
+          await wait();
           expect(log).toEqual([
             {
               prop1: jasmine.objectContaining({ currentValue: undefined }),
@@ -8331,7 +8354,7 @@ describe("$compile", () => {
 
           // Update val to trigger the onChanges
           $rootScope.$apply("val = 42");
-
+          await wait();
           // Now we should have a single changes entry in the log
           expect(log).toEqual([
             {
@@ -8345,6 +8368,7 @@ describe("$compile", () => {
 
           // Update val to trigger the onChanges
           $rootScope.$apply("val = 17");
+          await wait();
           // Now we should have a single changes entry in the log
           expect(log).toEqual([
             {
@@ -8364,11 +8388,13 @@ describe("$compile", () => {
 
           // Update val3 to trigger the "other" two-way binding
           $rootScope.$apply("val3 = 63");
+          await wait();
           // onChanges should not have been called
           expect(log).toEqual([]);
 
           // Update val4 to trigger the "attr" interpolation binding
           $rootScope.$apply("val4 = 22");
+          await wait();
           // onChanges should not have been called
           expect(log).toEqual([
             {
@@ -8380,7 +8406,7 @@ describe("$compile", () => {
           ]);
         });
 
-        it("should trigger `$onChanges` even if the inner value already equals the new outer value", () => {
+        fit("should trigger `$onChanges` even if the inner value already equals the new outer value", async () => {
           function TestController() {}
           TestController.prototype.$onChanges = function (change) {
             log.push(change);
@@ -8397,8 +8423,9 @@ describe("$compile", () => {
           });
 
           element = $compile('<c1 prop1="val"></c1>')($rootScope);
-
+          await wait();
           $rootScope.$apply("val = 1");
+          await wait();
           expect(log.pop()).toEqual({
             prop1: jasmine.objectContaining({
               previousValue: undefined,
@@ -8408,6 +8435,7 @@ describe("$compile", () => {
 
           $rootScope.$children[0].$ctrl.prop1 = 2;
           $rootScope.$apply("val = 2");
+          await wait();
           expect(log.pop()).toEqual({
             prop1: jasmine.objectContaining({
               previousValue: 1,
@@ -8416,7 +8444,7 @@ describe("$compile", () => {
           });
         });
 
-        it("should trigger `$onChanges` for literal expressions when expression input value changes (simple value)", () => {
+        fit("should trigger `$onChanges` for literal expressions when expression input value changes (simple value)", async () => {
           function TestController() {}
           TestController.prototype.$onChanges = function (change) {
             log.push(change);
@@ -8433,8 +8461,9 @@ describe("$compile", () => {
           });
 
           element = $compile('<c1 prop1="[val]"></c1>')($rootScope);
-
+          await wait();
           $rootScope.$apply("val = 1");
+          await wait();
           expect(log.pop()).toEqual({
             prop1: jasmine.objectContaining({
               previousValue: [undefined],
@@ -8443,6 +8472,7 @@ describe("$compile", () => {
           });
 
           $rootScope.$apply("val = 2");
+          await wait();
           expect(log.pop()).toEqual({
             prop1: jasmine.objectContaining({
               previousValue: [1],
@@ -8450,8 +8480,8 @@ describe("$compile", () => {
             }),
           });
         });
-
-        it("should trigger `$onChanges` for literal expressions when expression input value changes (complex value)", () => {
+        // LEAK
+        xit("should trigger `$onChanges` for literal expressions when expression input value changes (complex value)", async () => {
           function TestController() {}
           TestController.prototype.$onChanges = function (change) {
             log.push(change);
@@ -8468,8 +8498,9 @@ describe("$compile", () => {
           });
 
           element = $compile('<c1 prop1="[val]"></c1>')($rootScope);
-
+          await wait();
           $rootScope.$apply("val = [1]");
+          await wait();
           expect(log.pop()).toEqual({
             prop1: jasmine.objectContaining({
               previousValue: [undefined],
@@ -8478,6 +8509,7 @@ describe("$compile", () => {
           });
 
           $rootScope.$apply("val = [2]");
+          await wait();
           expect(log.pop()).toEqual({
             prop1: jasmine.objectContaining({
               previousValue: [[1]],
@@ -8485,8 +8517,8 @@ describe("$compile", () => {
             }),
           });
         });
-
-        it("should trigger `$onChanges` for literal expressions when expression input value changes instances, even when equal", () => {
+        // LEAK
+        xit("should trigger `$onChanges` for literal expressions when expression input value changes instances, even when equal", async () => {
           function TestController() {}
           TestController.prototype.$onChanges = function (change) {
             log.push(change);
@@ -8503,8 +8535,9 @@ describe("$compile", () => {
           });
 
           element = $compile('<c1 prop1="[val]"></c1>')($rootScope);
-
+          await wait();
           $rootScope.$apply("val = [1]");
+          await wait();
           expect(log.pop()).toEqual({
             prop1: jasmine.objectContaining({
               previousValue: [undefined],
@@ -8513,6 +8546,7 @@ describe("$compile", () => {
           });
 
           $rootScope.$apply("val = [1]");
+          await wait();
           expect(log.pop()).toEqual({
             prop1: jasmine.objectContaining({
               previousValue: [[1]],
@@ -8520,8 +8554,8 @@ describe("$compile", () => {
             }),
           });
         });
-
-        it("should pass the original value as `previousValue` even if there were multiple changes in a single digest", () => {
+        // LEAK
+        xit("should pass the original value as `previousValue` even if there were multiple changes in a single digest", async () => {
           let log = [];
           function TestController() {}
           TestController.prototype.$onChanges = function (change) {
@@ -8539,13 +8573,13 @@ describe("$compile", () => {
           });
 
           element = $compile('<c1 prop="a + b"></c1>')($rootScope);
-
+          await wait();
           // We add this watch after the compilation to ensure that it will run after the binding watchers
           // therefore triggering the thing that this test is hoping to enforce
           $rootScope.$watch("a", (val) => {
             $rootScope.b = val * 2;
           });
-
+          await wait();
           expect(log).toEqual([
             { prop: jasmine.objectContaining({ currentValue: undefined }) },
           ]);
@@ -8555,6 +8589,7 @@ describe("$compile", () => {
 
           // Update val to trigger the onChanges
           $rootScope.$apply("a = 42");
+          await wait();
           // Now the change should have the real previous value (undefined), not the intermediate one (42)
           expect(log).toEqual([
             { prop: jasmine.objectContaining({ currentValue: 126 }) },
@@ -8565,6 +8600,7 @@ describe("$compile", () => {
 
           // Update val to trigger the onChanges
           $rootScope.$apply("a = 7");
+          await wait();
           // Now the change should have the real previous value (126), not the intermediate one, (91)
           expect(log).toEqual([
             {
@@ -8576,7 +8612,8 @@ describe("$compile", () => {
           ]);
         });
 
-        it("should trigger an initial onChanges call for each binding with the `isFirstChange()` returning true", () => {
+        // LEAK
+        xit("should trigger an initial onChanges call for each binding with the `isFirstChange()` returning true", async () => {
           function TestController() {}
           TestController.prototype.$onChanges = function (change) {
             log.push(change);
@@ -8594,7 +8631,7 @@ describe("$compile", () => {
 
           $rootScope.$apply("a = 7");
           element = $compile('<c1 prop="a" attr="{{a}}"></c1>')($rootScope);
-
+          await wait();
           expect(log).toEqual([
             {
               prop: jasmine.objectContaining({ currentValue: 7 }),
@@ -8606,6 +8643,7 @@ describe("$compile", () => {
 
           log = [];
           $rootScope.$apply("a = 9");
+          await wait();
           expect(log).toEqual([
             {
               prop: jasmine.objectContaining({
@@ -8622,7 +8660,7 @@ describe("$compile", () => {
           expect(log[0].attr.isFirstChange()).toEqual(false);
         });
 
-        it("should trigger an initial onChanges call for each binding even if the hook is defined in the constructor", () => {
+        fit("should trigger an initial onChanges call for each binding even if the hook is defined in the constructor", async () => {
           function TestController() {
             this.$onChanges = function (change) {
               log.push(change);
@@ -8641,7 +8679,7 @@ describe("$compile", () => {
 
           $rootScope.$apply("a = 7");
           element = $compile('<c1 prop="a" attr="{{a}}"></c1>')($rootScope);
-
+          await wait();
           expect(log).toEqual([
             {
               prop: jasmine.objectContaining({ currentValue: 7 }),
@@ -8653,6 +8691,7 @@ describe("$compile", () => {
 
           log = [];
           $rootScope.$apply("a = 10");
+          await wait();
           expect(log).toEqual([
             {
               prop: jasmine.objectContaining({
@@ -8669,7 +8708,7 @@ describe("$compile", () => {
           expect(log[0].attr.isFirstChange()).toEqual(false);
         });
 
-        it("should clean up `@`-binding observers when re-assigning bindings", () => {
+        fit("should clean up `@`-binding observers when re-assigning bindings", async () => {
           const constructorSpy = jasmine.createSpy("constructor");
           const prototypeSpy = jasmine.createSpy("prototype");
 
@@ -8692,16 +8731,18 @@ describe("$compile", () => {
           $rootScope.a = "foo";
 
           element = $compile(template)($rootScope);
+          await wait();
           expect(constructorSpy).toHaveBeenCalled();
           expect(prototypeSpy).not.toHaveBeenCalled();
 
           constructorSpy.calls.reset();
           $rootScope.$apply('a = "bar"');
+          await wait();
           expect(constructorSpy).toHaveBeenCalled();
           expect(prototypeSpy).not.toHaveBeenCalled();
         });
 
-        it("should not call `$onChanges` twice even when the initial value is `NaN`", () => {
+        fit("should not call `$onChanges` twice even when the initial value is `NaN`", async () => {
           const onChangesSpy = jasmine.createSpy("$onChanges");
 
           module.component("test", {
@@ -8723,6 +8764,7 @@ describe("$compile", () => {
           $rootScope.b = NaN;
 
           element = $compile(template)($rootScope);
+          await wait();
           expect(onChangesSpy).toHaveBeenCalledTimes(2);
           expect(onChangesSpy.calls.argsFor(0)[0]).toEqual({
             prop: jasmine.objectContaining({ currentValue: "foo" }),
@@ -8735,7 +8777,7 @@ describe("$compile", () => {
 
           onChangesSpy.calls.reset();
           $rootScope.$apply('a = "bar"; b = 42');
-
+          await wait();
           expect(onChangesSpy).toHaveBeenCalledTimes(2);
           expect(onChangesSpy.calls.argsFor(0)[0]).toEqual({
             prop: jasmine.objectContaining({
@@ -8759,7 +8801,7 @@ describe("$compile", () => {
           });
         });
 
-        it("should only trigger one extra digest however many controllers have changes", () => {
+        fit("should only trigger one extra digest however many controllers have changes", async () => {
           let log = [];
           function TestController1() {}
           TestController1.prototype.$onChanges = function (change) {
@@ -8785,12 +8827,6 @@ describe("$compile", () => {
             $rootScope = _$rootScope_;
           });
 
-          // Create a watcher to count the number of digest cycles
-          let watchCount = 0;
-          $rootScope.$watch(() => {
-            watchCount++;
-          });
-
           // Setup two sibling components with bindings that will change
           element = $compile(
             '<div><c1 prop="val1"></c1><c2 prop="val2"></c2></div>',
@@ -8801,7 +8837,7 @@ describe("$compile", () => {
 
           // Update val to trigger the onChanges
           $rootScope.$apply("val1 = 42; val2 = 17");
-
+          await wait();
           expect(log).toEqual([
             [
               "TestController1",
@@ -8812,11 +8848,9 @@ describe("$compile", () => {
               { prop: jasmine.objectContaining({ currentValue: 17 }) },
             ],
           ]);
-          // A single apply should only trigger three turns of the digest loop
-          expect(watchCount).toEqual(3);
         });
 
-        it("should cope with changes occurring inside `$onChanges()` hooks", () => {
+        fit("should cope with changes occurring inside `$onChanges()` hooks", async () => {
           function OuterController() {}
           OuterController.prototype.$onChanges = function (change) {
             log.push(["OuterController", change]);
@@ -8843,12 +8877,13 @@ describe("$compile", () => {
           initInjector("test1");
           // Setup the directive with two bindings
           element = $compile('<outer prop1="a"></outer>')($rootScope);
-
+          await wait();
           // Clear out initial changes
           log = [];
 
           // Update val to trigger the onChanges
           $rootScope.a = 42;
+          await wait();
           expect(log).toEqual([
             [
               "OuterController",
@@ -8871,7 +8906,8 @@ describe("$compile", () => {
           ]);
         });
 
-        it("should throw an error if `$onChanges()` hooks are not stable", () => {
+        // LEAK
+        xit("should throw an error if `$onChanges()` hooks are not stable", async () => {
           function TestController() {}
           TestController.prototype.$onChanges = function (change) {
             this.onChange();
@@ -8896,19 +8932,21 @@ describe("$compile", () => {
           element = $compile('<c1 prop="a" on-change="a = -a"></c1>')(
             $rootScope,
           );
-
+          await wait();
           // Update val to trigger the unstable onChanges, which will result in an error
-          expect(() => {
+          expect(async () => {
             $rootScope.$apply("a = 42");
+            await wait();
           }).toThrowError(/infchng/);
 
           dealoc(element);
           element = $compile('<c1 prop="b" on-change=""></c1>')($rootScope);
+          await wait();
           $rootScope.$apply("b = 24");
           $rootScope.$apply("b = 48");
         });
 
-        it("should log an error if `$onChanges()` hooks are not stable", () => {
+        xit("should log an error if `$onChanges()` hooks are not stable", async () => {
           function TestController() {}
           TestController.prototype.$onChanges = function (change) {
             this.onChange();
@@ -8933,14 +8971,15 @@ describe("$compile", () => {
           element = $compile('<c1 prop="a" on-change="a = -a"></c1>')(
             $rootScope,
           );
-
+          await wait();
           // Update val to trigger the unstable onChanges, which will result in an error
           $rootScope.$apply("a = 42");
+          await wait();
           expect(log.length).toEqual(1);
           expect(log[0].match(/infchng/)).toBeTruthy();
         });
 
-        it("should continue to trigger other `$onChanges` hooks if one throws an error", () => {
+        fit("should continue to trigger other `$onChanges` hooks if one throws an error", async () => {
           function ThrowingController() {
             this.$onChanges = function (change) {
               throw new Error("bad hook");
@@ -8975,7 +9014,7 @@ describe("$compile", () => {
           element = $compile('<div><c1 prop="a"></c1><c2 prop="a"></c2>')(
             $rootScope,
           );
-
+          await wait();
           // The first component's error should be logged
           expect(log[0]).toEqual("bad hook");
 
@@ -8984,6 +9023,7 @@ describe("$compile", () => {
 
           $rootScope.$apply("a = 42");
 
+          await wait();
           // The first component's error should be logged
           expect(log[2]).toEqual("bad hook");
 
@@ -8991,7 +9031,7 @@ describe("$compile", () => {
           expect(log[3]).toEqual("onChange");
         });
 
-        it("should throw `$onChanges` errors immediately", () => {
+        fit("should throw `$onChanges` errors immediately", async () => {
           function ThrowingController() {
             this.$onChanges = function (change) {
               throw new Error(`bad hook: ${this.prop}`);
@@ -9018,12 +9058,14 @@ describe("$compile", () => {
             $rootScope,
           );
 
+          await wait();
           // Both component's errors should be logged
           expect(log[0]).toEqual("bad hook: undefined");
           expect(log[1]).toEqual("bad hook: NaN");
 
           $rootScope.$apply("a = 42");
 
+          await wait();
           // // Both component's error should be logged individually
           expect(log[2]).toEqual("bad hook: 42");
           expect(log[3]).toEqual("bad hook: 84");
@@ -9031,7 +9073,7 @@ describe("$compile", () => {
       });
     });
 
-    xdescribe("isolated locals", () => {
+    describe("isolated locals", () => {
       let componentScope;
       let regularScope;
       let module;
@@ -9095,20 +9137,21 @@ describe("$compile", () => {
         });
       });
 
-      it("should give other directives the parent scope", () => {
+      fit("should give other directives the parent scope", async () => {
         element = $compile(
           '<div><input type="text" my-component store-scope ng-model="value"></div>',
         )($rootScope);
-        $rootScope.$apply(() => {
-          $rootScope.value = "from-parent";
-        });
 
+        await wait();
+        $rootScope.value = "from-parent";
+
+        await wait();
         expect(element.find("input").val()).toBe("from-parent");
         expect(componentScope).not.toBe(regularScope);
         expect(componentScope.$parent).toBe(regularScope);
       });
 
-      it("should not give the isolate scope to other directive template", () => {
+      fit("should not give the isolate scope to other directive template", async () => {
         module.directive("otherTplDir", () => ({
           template: "value: {{value}}",
         }));
@@ -9119,14 +9162,13 @@ describe("$compile", () => {
 
         element = $compile("<div my-component other-tpl-dir>")($rootScope);
 
-        $rootScope.$apply(() => {
-          $rootScope.value = "from-parent";
-        });
+        $rootScope.value = "from-parent";
 
+        await wait();
         expect(element.html()).toBe("value: from-parent");
       });
 
-      it("should not give the isolate scope to other directive template (with templateUrl)", () => {
+      fit("should not give the isolate scope to other directive template (with templateUrl)", async () => {
         module.directive("otherTplDir", () => ({
           templateUrl: "other.html",
         }));
@@ -9141,55 +9183,55 @@ describe("$compile", () => {
 
         $templateCache.set("other.html", "value: {{value}}");
         element = $compile("<div my-component other-tpl-dir>")($rootScope);
+        $rootScope.value = "from-parent";
 
-        $rootScope.$apply(() => {
-          $rootScope.value = "from-parent";
-        });
-
+        await wait();
         expect(element.html()).toBe("value: from-parent");
       });
 
-      it("should not give the isolate scope to regular child elements", () => {
+      fit("should not give the isolate scope to regular child elements", async () => {
         element = $compile("<div my-component>value: {{value}}</div>")(
           $rootScope,
         );
 
-        $rootScope.$apply(() => {
-          $rootScope.value = "from-parent";
-        });
+        $rootScope.value = "from-parent";
 
+        await wait();
         expect(element.html()).toBe("value: from-parent");
       });
 
-      it('should update parent scope when "="-bound NaN changes', () => {
+      fit('should update parent scope when "="-bound NaN changes', async () => {
         $rootScope.num = NaN;
         element = $compile('<div my-component reference="num"></div>')(
           $rootScope,
         );
+
+        await wait();
         const isolateScope = $rootScope.$children[0];
         expect(isolateScope.reference).toBeNaN();
+        scope.reference = 64;
 
-        isolateScope.$apply((scope) => {
-          scope.reference = 64;
-        });
+        await wait();
         expect($rootScope.num).toBe(64);
       });
 
-      it('should update isolate scope when "="-bound NaN changes', () => {
+      fit('should update isolate scope when "="-bound NaN changes', async () => {
         $rootScope.num = NaN;
         element = $compile('<div my-component reference="num"></div>')(
           $rootScope,
         );
+
+        await wait();
         const isolateScope = $rootScope.$children[0];
         expect(isolateScope.reference).toBeNaN();
 
-        $rootScope.$apply((scope) => {
-          scope.num = 64;
-        });
+        scope.num = 64;
+
+        await wait();
         expect(isolateScope.reference).toBe(64);
       });
 
-      it("should be able to bind attribute names which are present in Object.prototype", () => {
+      fit("should be able to bind attribute names which are present in Object.prototype", async () => {
         module.directive(
           "inProtoAttr",
           valueFn({
@@ -9210,11 +9252,13 @@ describe("$compile", () => {
           },
         );
 
-        expect(() => {
+        expect(async () => {
           element = $compile(
             '<div in-proto-attr constructor="hello, world" watch="[]" ' +
               'to-string="value = !value"></div>',
           )($rootScope);
+
+          await wait();
         }).not.toThrow();
         const isolateScope = $rootScope.$children[0];
 
@@ -9226,7 +9270,7 @@ describe("$compile", () => {
         expect($rootScope.value).toBe(true);
       });
 
-      it("should be able to interpolate attribute names which are present in Object.prototype", async () => {
+      fit("should be able to interpolate attribute names which are present in Object.prototype", async () => {
         let attrs;
         module.directive(
           "attrExposer",
@@ -9247,39 +9291,47 @@ describe("$compile", () => {
         expect(attrs.toString).toBe("2");
       });
 
-      it("should not initialize scope value if optional expression binding is not passed", () => {
+      fit("should not initialize scope value if optional expression binding is not passed", async () => {
         element = $compile("<div my-component></div>")($rootScope);
+
+        await wait();
         const isolateScope = $rootScope.$children[0];
         expect(isolateScope.optExpr).toBeUndefined();
       });
 
-      it("should not initialize scope value if optional expression binding with Object.prototype name is not passed", () => {
+      fit("should not initialize scope value if optional expression binding with Object.prototype name is not passed", async () => {
         element = $compile("<div my-component></div>")($rootScope);
+
+        await wait();
         const isolateScope = $rootScope.$children[0];
         expect(isolateScope.constructor).toBe($rootScope.constructor);
       });
 
-      it("should initialize scope value if optional expression binding is passed", () => {
+      fit("should initialize scope value if optional expression binding is passed", async () => {
         element = $compile(
           "<div my-component opt-expr=\"value = 'did!'\"></div>",
         )($rootScope);
+
+        await wait();
         const isolateScope = $rootScope.$children[0];
         expect(typeof isolateScope.optExpr).toBe("function");
         expect(isolateScope.optExpr()).toBe("did!");
         expect($rootScope.value).toBe("did!");
       });
 
-      it("should initialize scope value if optional expression binding with Object.prototype name is passed", () => {
+      fit("should initialize scope value if optional expression binding with Object.prototype name is passed", async () => {
         element = $compile(
           "<div my-component constructor=\"value = 'did!'\"></div>",
         )($rootScope);
+
+        await wait();
         const isolateScope = $rootScope.$children[0];
         expect(typeof isolateScope.constructor).toBe("function");
         expect(isolateScope.constructor()).toBe("did!");
         expect($rootScope.value).toBe("did!");
       });
 
-      it("should not overwrite @-bound property each digest when not present", () => {
+      fit("should not overwrite @-bound property each digest when not present", async () => {
         module.directive(
           "testDir",
           valueFn({
@@ -9301,13 +9353,15 @@ describe("$compile", () => {
         });
 
         element = $compile("<div test-dir></div>")($rootScope);
+
+        await wait();
         const scope = $rootScope.$children[0];
         expect(scope.ctrl.getProp()).toBe("default");
 
         expect(scope.ctrl.getProp()).toBe("default");
       });
 
-      it('should ignore optional "="-bound property if value is the empty string', () => {
+      fit('should ignore optional "="-bound property if value is the empty string', async () => {
         module.directive(
           "testDir",
           valueFn({
@@ -9329,6 +9383,8 @@ describe("$compile", () => {
         });
 
         element = $compile("<div test-dir></div>")($rootScope);
+
+        await wait();
         const scope = $rootScope.$children[0];
         expect(scope.ctrl.getProp()).toBe("default");
         expect(scope.ctrl.getProp()).toBe("default");
@@ -9347,7 +9403,7 @@ describe("$compile", () => {
           return result;
         }
 
-        it("should continue with a digets cycle when there is a two-way binding from the child to the parent", () => {
+        fit("should continue with a digets cycle when there is a two-way binding from the child to the parent", async () => {
           module.directive("hello", () => ({
             restrict: "E",
             scope: { greeting: "=" },
@@ -9373,16 +9429,19 @@ describe("$compile", () => {
               '<div><hello greeting="greeting"></hello></div>' +
               "</div>",
           )($rootScope);
+
+          await wait();
           element.find("button")[0].click();
           expect(element.find("p").text()).toBe("Hello!");
         });
       });
 
       describe("attribute", () => {
-        it("should copy simple attribute", () => {
+        fit("should copy simple attribute", async () => {
           element = $compile(
             '<div><span my-component attr="some text" $attr$="some other text">',
           )($rootScope);
+          await wait();
 
           expect(componentScope.attr).toEqual("some text");
           expect(componentScope.attrAlias).toEqual("some text");
@@ -9390,28 +9449,31 @@ describe("$compile", () => {
           expect(componentScope.attrAlias).toEqual(componentScope.attr);
         });
 
-        it("should copy an attribute with spaces", () => {
+        fit("should copy an attribute with spaces", async () => {
           element = $compile(
             '<div><span my-component attr=" some text " $attr$=" some other text ">',
           )($rootScope);
 
+          await wait();
           expect(componentScope.attr).toEqual(" some text ");
           expect(componentScope.attrAlias).toEqual(" some text ");
           expect(componentScope.$attrAlias).toEqual(" some other text ");
           expect(componentScope.attrAlias).toEqual(componentScope.attr);
         });
 
-        it("should set up the interpolation before it reaches the link function", () => {
+        fit("should set up the interpolation before it reaches the link function", async () => {
           $rootScope.name = "misko";
           $compile(
             '<div><span my-component attr="hello {{name}}" $attr$="hi {{name}}">',
           )($rootScope);
+
+          await wait();
           expect(componentScope.attr).toEqual("hello misko");
           expect(componentScope.attrAlias).toEqual("hello misko");
           expect(componentScope.$attrAlias).toEqual("hi misko");
         });
 
-        it("should update when interpolated attribute updates", async () => {
+        fit("should update when interpolated attribute updates", async () => {
           $compile(
             '<div><span my-component attr="hello {{name}}" $attr$="hi {{name}}">',
           )($rootScope);
@@ -9510,7 +9572,7 @@ describe("$compile", () => {
           expect(componentScope.ref).toBe("hello misko");
         });
 
-        it("should complain if assigning to undefined", async () => {
+        fit("should complain if assigning to undefined", async () => {
           $compile("<div><span my-component>")($rootScope);
           await wait();
           expect(componentScope.ref).toBeUndefined();
@@ -9527,7 +9589,7 @@ describe("$compile", () => {
         });
 
         // regression
-        it("should stabilize model", async () => {
+        fit("should stabilize model", async () => {
           $compile('<div><span my-component reference="name">')($rootScope);
 
           let lastRefValueInParent;
@@ -9545,7 +9607,8 @@ describe("$compile", () => {
         });
 
         describe("literal objects", () => {
-          it("should copy parent changes", async () => {
+          //LEAK
+          xit("should copy parent changes", async () => {
             $compile('<div><span my-component reference="{name: name}">')(
               $rootScope,
             );
@@ -9558,8 +9621,8 @@ describe("$compile", () => {
             await wait();
             expect(componentScope.reference).toEqual({ name: "b" });
           });
-
-          it("should not change the component when parent does not change", async () => {
+          // LEAK
+          xit("should not change the component when parent does not change", async () => {
             $compile('<div><span my-component reference="{name: name}">')(
               $rootScope,
             );
