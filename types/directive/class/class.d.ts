@@ -1,3 +1,3 @@
-export const ngClassDirective: (string | (($parse: import("../../core/parse/parse.js").ParseService) => import("../../types").Directive))[];
-export const ngClassOddDirective: (string | (($parse: import("../../core/parse/parse.js").ParseService) => import("../../types").Directive))[];
-export const ngClassEvenDirective: (string | (($parse: import("../../core/parse/parse.js").ParseService) => import("../../types").Directive))[];
+export const ngClassDirective: (() => import("../../types").Directive)[];
+export const ngClassOddDirective: (() => import("../../types").Directive)[];
+export const ngClassEvenDirective: (() => import("../../types").Directive)[];

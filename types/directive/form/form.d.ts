@@ -1,12 +1,74 @@
-export function FormController($element: any, $attrs: any, $scope: any, $animate: any, $interpolate: any): void;
+export function setupValidity(instance: any): void;
+export function addSetValidityMethod(context: any): void;
+export function isObjectEmpty(obj: any): boolean;
+export namespace nullFormCtrl {
+    function $addControl(): void;
+    function $getControls(): any[];
+    function $$renameControl(control: any, name: any): any;
+    function $removeControl(): void;
+    function $setValidity(): void;
+    function $setDirty(): void;
+    function $setPristine(): void;
+    function $setSubmitted(): void;
+    function $$setSubmitted(): void;
+}
+export const PENDING_CLASS: "ng-pending";
+/**
+ * @property {boolean} $dirty True if user has already interacted with the form.
+ * @property {boolean} $valid True if all of the containing forms and controls are valid.
+ * @property {boolean} $invalid True if at least one containing control or form is invalid.
+ * @property {boolean} $submitted True if user has submitted the form even if its invalid.
+ *
+ * @property {Object} $pending An object hash, containing references to controls or forms with
+ *  pending validators, where:
+ *
+ *  - keys are validations tokens (error names).
+ *  - values are arrays of controls or forms that have a pending validator for the given error name.
+ *
+ * See {@link form.FormController#$error $error} for a list of built-in validation tokens.
+ *
+ * @property {Object} $error An object hash, containing references to controls or forms with failing
+ *  validators, where:
+ *
+ *  - keys are validation tokens (error names),
+ *  - values are arrays of controls or forms that have a failing validator for the given error name.
+ *
+ *  Built-in validation tokens:
+ *  - `email`
+ *  - `max`
+ *  - `maxlength`
+ *  - `min`
+ *  - `minlength`
+ *  - `number`
+ *  - `pattern`
+ *  - `required`
+ *  - `url`
+ *  - `date`
+ *  - `datetimelocal`
+ *  - `time`
+ *  - `week`
+ *  - `month`
+ *
+ * @description
+ * `FormController` keeps track of all its controls and nested forms as well as the state of them,
+ * such as being valid/invalid or dirty/pristine.
+ *
+ * Each {@link ng.directive:form form} directive creates an instance
+ * of `FormController`.
+ *
+ */
 export class FormController {
+    static $inject: string[];
     constructor($element: any, $attrs: any, $scope: any, $animate: any, $interpolate: any);
     $$controls: any[];
-    $error: {};
-    $$success: {};
-    $pending: any;
     $name: any;
+    /**
+     * @property {boolean} $dirty True if user has already interacted with the form.
+     */
     $dirty: boolean;
+    /**
+     * @propertys {boolean} $pristine - True if user has not interacted with the form yet.s
+     */
     $pristine: boolean;
     $valid: boolean;
     $invalid: boolean;
@@ -15,6 +77,9 @@ export class FormController {
     $$parentForm: FormController | any;
     $$element: any;
     $$animate: any;
+    $error: {};
+    $$success: {};
+    $pending: any;
     /**
      * Rollback all form controls pending updates to the `$modelValue`.
      *
@@ -75,7 +140,6 @@ export class FormController {
      * may not mean that the form is still `$dirty`.
      */
     $removeControl(control: any): void;
-    $setValidity: (_a: any, _b: any, _c: any) => void;
     /**
      * Sets the form to a dirty state.
      *
@@ -113,24 +177,6 @@ export class FormController {
     $setSubmitted(): void;
     $$setSubmitted(): void;
 }
-export namespace FormController {
-    let $inject: string[];
-}
-export function setupValidity(instance: any): void;
-export function addSetValidityMethod(context: any): void;
-export function isObjectEmpty(obj: any): boolean;
-export namespace nullFormCtrl {
-    export function $addControl(): void;
-    export function $getControls(): any[];
-    export { nullFormRenameControl as $$renameControl };
-    export function $removeControl(): void;
-    export let $setValidity: (...any: any) => any;
-    export function $setDirty(): void;
-    export function $setPristine(): void;
-    export function $setSubmitted(): void;
-    export function $$setSubmitted(): void;
-}
-export const PENDING_CLASS: "ng-pending";
 export const formDirective: (string | (($parse: any) => {
     name: string;
     restrict: string;
@@ -149,5 +195,3 @@ export const ngFormDirective: (string | (($parse: any) => {
         pre: (scope: any, formElement: any, attr: any, ctrls: any) => void;
     };
 }))[];
-declare function nullFormRenameControl(control: any, name: any): void;
-export {};

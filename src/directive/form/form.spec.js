@@ -25,6 +25,7 @@ describe("form", () => {
         $compileProvider.directive("storeModelCtrl", () => ({
           require: "ngModel",
           link(scope, elm, attr, ctrl) {
+            debugger;
             control = ctrl;
           },
         }));
@@ -53,8 +54,10 @@ describe("form", () => {
         '<input ng-if="inputPresent" name="alias" ng-model="value" store-model-ctrl/>' +
         "</form>",
     )(scope);
+    await wait();
     scope.inputPresent = true;
     const form = scope.myForm;
+    await wait();
     control.$setValidity("required", false);
     await wait();
 

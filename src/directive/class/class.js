@@ -1,17 +1,18 @@
-import { hasAnimate, isObject, isString } from "../../shared/utils";
+import { hasAnimate, isObject, isString } from "../../shared/utils.js";
 
 function classDirective(name, selector) {
   name = `ngClass${name}`;
-  let indexWatchExpression;
+  //let indexWatchExpression;
 
   return [
-    "$parse",
+    // "$parse",
+    //@param {import("../../core/parse/parse.js").ParseService} $parse
     /**
      *
-     * @param {import("../../core/parse/parse.js").ParseService} $parse
+     *
      * @returns {import("../../types").Directive}
      */
-    ($parse) => ({
+    () => ({
       restrict: "EA",
       /**
        * @param {import("../../core/scope/scope").Scope} scope
@@ -36,7 +37,7 @@ function classDirective(name, selector) {
           //     return $index & 1;
           //   });
           // }
-          ngClassIndexWatchAction(scope.$index & 1);
+          ngClassIndexWatchAction(scope["$index"] & 1);
           // scope.$watch("$index", (val) => {
           //   console.log(val)
 

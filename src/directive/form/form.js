@@ -18,24 +18,19 @@ import { isProxy } from "../../core/scope/scope.js";
 export const nullFormCtrl = {
   $addControl: () => {},
   $getControls: () => [],
-  $$renameControl: nullFormRenameControl,
+  $$renameControl: (control, name) => (control.$name = name),
   $removeControl: () => {},
-  /** @type {(...any) => any} */
-  $setValidity: function () {},
+  $setValidity: () => {},
   $setDirty: () => {},
   $setPristine: () => {},
   $setSubmitted: () => {},
   $$setSubmitted: () => {},
 };
+
 export const PENDING_CLASS = "ng-pending";
 const SUBMITTED_CLASS = "ng-submitted";
 
-function nullFormRenameControl(control, name) {
-  control.$name = name;
-}
-
 /**
- * @property {boolean} $pristine True if user has not interacted with the form yet.
  * @property {boolean} $dirty True if user has already interacted with the form.
  * @property {boolean} $valid True if all of the containing forms and controls are valid.
  * @property {boolean} $invalid True if at least one containing control or form is invalid.
@@ -80,41 +75,38 @@ function nullFormRenameControl(control, name) {
  *
  */
 // asks for $scope to fool the BC controller module
-FormController.$inject = [
-  "$element",
-  "$attrs",
-  "$scope",
-  "$animate",
-  "$interpolate",
-];
-export function FormController(
-  $element,
-  $attrs,
-  $scope,
-  $animate,
-  $interpolate,
-) {
-  this.$$controls = [];
 
-  // init state
-  this.$error = {};
-  this.$$success = {};
-  this.$pending = undefined;
-  this.$name = $interpolate($attrs.name || $attrs.ngForm || "")($scope);
-  this.$dirty = false;
-  this.$pristine = true;
-  this.$valid = true;
-  this.$invalid = false;
-  this.$submitted = false;
-  /** @type {FormController|Object} */
-  this.$$parentForm = nullFormCtrl;
+export class FormController {
+  static $inject = ["$element", "$attrs", "$scope", "$animate", "$interpolate"];
 
-  this.$$element = $element;
-  this.$$animate = $animate;
-  setupValidity(this);
-}
+  constructor($element, $attrs, $scope, $animate, $interpolate) {
+    this.$$controls = [];
 
-FormController.prototype = {
+    this.$name = $interpolate($attrs.name || $attrs.ngForm || "")($scope);
+
+    /**
+     * @property {boolean} $dirty True if user has already interacted with the form.
+     */
+    this.$dirty = false;
+
+    /**
+     * @propertys {boolean} $pristine - True if user has not interacted with the form yet.s
+     */
+    this.$pristine = true;
+    this.$valid = true;
+    this.$invalid = false;
+    this.$submitted = false;
+    /** @type {FormController|Object} */
+    this.$$parentForm = nullFormCtrl;
+
+    this.$$element = $element;
+    this.$$animate = $animate;
+    this.$error = {};
+    this.$$success = {};
+    this.$pending = undefined;
+    setupValidity(this);
+  }
+
   /**
    * Rollback all form controls pending updates to the `$modelValue`.
    *
@@ -126,7 +118,7 @@ FormController.prototype = {
     this.$$controls.forEach((control) => {
       control.$rollbackViewValue();
     });
-  },
+  }
 
   /**
    * Commit all form controls pending updates to the `$modelValue`.
@@ -139,7 +131,7 @@ FormController.prototype = {
     this.$$controls.forEach((control) => {
       control.$commitViewValue();
     });
-  },
+  }
 
   /**
    * Register a control with the form. Input elements using ngModelController do this automatically
@@ -166,7 +158,7 @@ FormController.prototype = {
       this[control.$name] = control;
     }
     control.$target.$$parentForm = this;
-  },
+  }
 
   /**
    * This method returns a **shallow copy** of the controls that are currently part of this form.
@@ -185,7 +177,7 @@ FormController.prototype = {
    */
   $getControls() {
     return shallowCopy(this.$$controls);
-  },
+  }
 
   // Private API: rename a form control
   $$renameControl(control, newName) {
@@ -196,7 +188,7 @@ FormController.prototype = {
     }
     this[newName] = control;
     control.$name = newName;
-  },
+  }
 
   /**
    * Deregister a control from the form.
@@ -227,10 +219,7 @@ FormController.prototype = {
 
     arrayRemove(this.$$controls, control);
     control.$$parentForm = nullFormCtrl;
-  },
-
-  // eslint-disable-next-line no-unused-vars
-  $setValidity: function (_a, _b, _c) {},
+  }
 
   /**
    * Sets the form to a dirty state.
@@ -244,7 +233,7 @@ FormController.prototype = {
     this.$dirty = true;
     this.$pristine = false;
     this.$$parentForm.$setDirty();
-  },
+  }
 
   /**
    * Sets the form to its pristine state.
@@ -270,7 +259,7 @@ FormController.prototype = {
     this.$$controls.forEach((control) => {
       control.$setPristine();
     });
-  },
+  }
 
   /**
    * Sets the form to its untouched state.
@@ -285,7 +274,7 @@ FormController.prototype = {
     this.$$controls.forEach((control) => {
       control.$setUntouched();
     });
-  },
+  }
 
   /**
    * Sets the form to its `$submitted` state. This will also set `$submitted` on all child and
@@ -298,7 +287,7 @@ FormController.prototype = {
       rootForm = rootForm.$$parentForm;
     }
     rootForm.$$setSubmitted();
-  },
+  }
 
   $$setSubmitted() {
     this.$$animate.addClass(this.$$element, SUBMITTED_CLASS);
@@ -308,8 +297,8 @@ FormController.prototype = {
         control.$$setSubmitted();
       }
     });
-  },
-};
+  }
+}
 
 /**
  * Change the validity state of the form, and notify the parent form (if any).
@@ -551,9 +540,7 @@ export function setupValidity(instance) {
 }
 
 export function addSetValidityMethod(context) {
-  const { clazz } = context;
-  const { set } = context;
-  const { unset } = context;
+  const { clazz, set, unset } = context;
 
   clazz.prototype.$setValidity = function (
     validationErrorKey,
