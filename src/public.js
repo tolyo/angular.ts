@@ -126,7 +126,6 @@ import {
   $ViewDirectiveFill,
   ngView,
 } from "./router/directives/view-directive.js";
-import { ngObserveDirective } from "./directive/observe/observe.js";
 import { ngChannelDirective } from "./directive/channel/channel.js";
 
 /**
@@ -187,7 +186,6 @@ export function publishExternalAPI(angular) {
               ngSwitch: ngSwitchDirective,
               ngSwitchWhen: ngSwitchWhenDirective,
               ngSwitchDefault: ngSwitchDefaultDirective,
-              ngObserve: ngObserveDirective,
               ngOptions: ngOptionsDirective,
               ngTransclude: ngTranscludeDirective,
               ngModel: ngModelDirective,

@@ -74,11 +74,7 @@
     <test-component greeting="{{ greeting }}"></test-component>
     <div>{{ greeting }}</div>
 
-    <fluent-select
-      ng-observe="current-value"
-      data-update="greeting"
-      title="Select a section"
-    >
+    <fluent-select ng-observe-current-value="greeting" title="Select a section">
       <fluent-option value="Beginning">Beginning</fluent-option>
       <fluent-option value="Middle">Middle</fluent-option>
       <fluent-option value="End">End</fluent-option>
@@ -86,7 +82,7 @@
     <br />
 
     {{ activeid }}
-    <fluent-tabs ng-observe="activeid" activeid="entrees">
+    <fluent-tabs ng-observe-activeid activeid="entrees">
       <fluent-tab id="apps">Appetizers</fluent-tab>
       <fluent-tab id="entrees">Entrees</fluent-tab>
       <fluent-tab id="desserts">Desserts</fluent-tab>
@@ -171,7 +167,7 @@
 
     {{ value }}
 
-    <fluent-radio-group ng-observe="value" orientation="vertical">
+    <fluent-radio-group ng-observe-value orientation="vertical">
       <fluent-radio value="1">18-24</fluent-radio>
       <fluent-radio value="2">25-33</fluent-radio>
       <fluent-radio value="3">34-44</fluent-radio>
@@ -180,7 +176,7 @@
 
     {{ checked }}
 
-    <fluent-switch ng-observe="aria-checked" data-update="checked">
+    <fluent-switch ng-observe-aria-checked="checked">
       <span slot="checked-message">On</span>
       <span slot="unchecked-message">Off</span>
       <label for="cap-switch">Captions:</label>

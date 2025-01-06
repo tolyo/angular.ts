@@ -1,19 +1,21 @@
+import { kebabToCamel } from "../../shared/jqlite/jqlite.js";
+
 /**
- * @returns {import("../../types").Directive}
+ * @param {string} source - the name of the attribute to be observed
+ * @param {string} prop - the scope property to be updated with attribute value
+ * @returns {import("../../types.js").Directive}
  */
-export function ngObserveDirective() {
+export function ngObserveDirective(source, prop) {
   return {
     restrict: "A",
-    link: (scope, element, attrs) => {
+    compile: () => (scope, element) => {
       const targetElement = element[0];
-      const source = attrs["ngObserve"];
-      let prop = targetElement.dataset["update"];
-      if (!prop) {
+      if (prop === "") {
         prop = source;
       }
-
-      if (!scope[prop]) {
-        scope[prop] = targetElement.getAttribute(source);
+      const normalized = kebabToCamel(prop);
+      if (!scope[normalized]) {
+        scope[normalized] = targetElement.getAttribute(source);
       }
 
       const observer = new MutationObserver((mutations) => {
@@ -21,8 +23,8 @@ export function ngObserveDirective() {
         const newValue = /** @type {HTMLElement} */ (
           mutation.target
         ).getAttribute(source);
-        if (scope[prop] !== newValue) {
-          scope[prop] = newValue;
+        if (scope[normalized] !== newValue) {
+          scope[normalized] = newValue;
         }
       });
 

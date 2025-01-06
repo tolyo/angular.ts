@@ -36,6 +36,7 @@ import { PREFIX_REGEXP } from "../../shared/constants.js";
 import { createEventDirective } from "../../directive/events/events.js";
 import { CACHE, EXPANDO } from "../cache/cache.js";
 import { Attributes } from "./attributes.js";
+import { ngObserveDirective } from "../../directive/observe/observe.js";
 
 /**
  * Function that aggregates all linking fns for a compilation root (nodeList)
@@ -44,7 +45,6 @@ import { Attributes } from "./attributes.js";
 
 const $compileMinErr = minErr("$compile");
 
-const UNINITALIZED_VALIED = new Object();
 const EXCLUDED_DIRECTIVES = ["ngIf", "ngRepeat"];
 
 CompileProvider.$inject = ["$provide", "$$sanitizeUriProvider"];
@@ -567,7 +567,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
           ? (x) => x
           : (x) => x.replace(/\{\{/g, startSymbol).replace(/}}/g, endSymbol);
 
-      const NG_PREFIX_BINDING = /^ng(Attr|Prop|On)([A-Z].*)$/;
+      const NG_PREFIX_BINDING = /^ng(Attr|Prop|On|Observe)([A-Z].*)$/;
       const MULTI_ELEMENT_DIR_RE = /^(.+)Start$/;
       return compile;
 
@@ -975,6 +975,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
               let isNgAttr = false;
               let isNgProp = false;
               let isNgEvent = false;
+              let isNgObserve = false;
               let multiElementMatch;
 
               attr = nAttrs[j];
@@ -988,6 +989,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                 isNgAttr = ngPrefixMatch[1] === "Attr";
                 isNgProp = ngPrefixMatch[1] === "Prop";
                 isNgEvent = ngPrefixMatch[1] === "On";
+                isNgObserve = ngPrefixMatch[1] === "Observe";
 
                 // Normalize the non-prefixed name
                 name = name
@@ -1015,6 +1017,8 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                 } else {
                   addEventDirective(directives, nName, name);
                 }
+              } else if (isNgObserve) {
+                addObserveDirective(directives, name, value);
               } else {
                 // Update nName for cases where a prefix was removed
                 // NOTE: the .toLowerCase() is unnecessary and causes https://github.com/angular/angular.js/issues/16624 for ng-attr-*
@@ -2629,14 +2633,12 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
 
       function addEventDirective(directives, attrName, eventName) {
         directives.push(
-          createEventDirective(
-            $parse,
-            $rootScope,
-            $exceptionHandler,
-            attrName,
-            eventName,
-          ),
+          createEventDirective($parse, $exceptionHandler, attrName, eventName),
         );
+      }
+
+      function addObserveDirective(directives, source, prop) {
+        directives.push(ngObserveDirective(source, prop));
       }
 
       function addAttrInterpolateDirective(

@@ -74,6 +74,7 @@ export class Angular {
      * @returns {any} InjectorService - Returns the newly created injector for this app.
      */
     bootstrap(element: string | Element | Document, modules?: Array<string | any>, config?: AngularBootstrapConfig): any;
+    $injector: import("./core/di/internal-injector").InjectorService;
     /**
      *
      * @param {any[]} modules
@@ -86,7 +87,6 @@ export class Angular {
      * @param {Element|Document} element
      */
     init(element: Element | Document): void;
-    $injector: any;
     /**
      *
      * The `angular.module` is a global place for creating, registering and retrieving AngularJS

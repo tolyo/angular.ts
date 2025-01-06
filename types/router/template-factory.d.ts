@@ -9,11 +9,11 @@
 export class TemplateFactoryProvider {
     /** @type {boolean} */
     _useHttp: boolean;
-    $get: (string | (($http: any, $templateCache: import("../core/cache/cache-factory").TemplateCache, $templateRequest: any, $injector: import("../core/di/internal-injector").InjectorService) => this))[];
+    $get: (string | (($http: any, $templateCache: import("../core/cache/cache-factory.js").TemplateCache, $templateRequest: any, $injector: import("../core/di/internal-injector.js").InjectorService) => this))[];
     $templateRequest: any;
     $http: any;
-    $templateCache: import("../core/cache/cache-factory").TemplateCache;
-    $injector: import("../core/di/internal-injector").InjectorService;
+    $templateCache: import("../core/cache/cache-factory.js").TemplateCache;
+    $injector: import("../core/di/internal-injector.js").InjectorService;
     /**
      * Forces the provider to use $http service directly
      * @param {boolean} value
@@ -28,12 +28,12 @@ export class TemplateFactoryProvider {
      *
      * @param {any} config
      * @param {any} params  Parameters to pass to the template function.
-     * @param {import("./resolve/resolve-context").ResolveContext} context The resolve context associated with the template's view
+     * @param {import("./resolve/resolve-context.js").ResolveContext} context The resolve context associated with the template's view
      *
      * @return {string|object}  The template html as a string, or a promise for
      * that string,or `null` if no template is configured.
      */
-    fromConfig(config: any, params: any, context: import("./resolve/resolve-context").ResolveContext): string | object;
+    fromConfig(config: any, params: any, context: import("./resolve/resolve-context.js").ResolveContext): string | object;
     /**
      * Creates a template from a string or a function returning a string.
      *
@@ -57,21 +57,21 @@ export class TemplateFactoryProvider {
     /**
      * Creates a template by invoking an injectable provider function.
      *
-     * @param {import('../types').Injectable<any>} provider Function to invoke via `locals`
+     * @param {import('../types.js').Injectable<any>} provider Function to invoke via `locals`
      * @param {Function} params a function used to invoke the template provider
-     * @param {import("./resolve/resolve-context").ResolveContext} context
+     * @param {import("./resolve/resolve-context.js").ResolveContext} context
      * @return {string|Promise.<string>} The template html as a string, or a promise
      * for that string.
      */
-    fromProvider(provider: import("../types").Injectable<any>, params: Function, context: import("./resolve/resolve-context").ResolveContext): string | Promise<string>;
+    fromProvider(provider: import("../types.js").Injectable<any>, params: Function, context: import("./resolve/resolve-context.js").ResolveContext): string | Promise<string>;
     /**
      * Creates a component's template by invoking an injectable provider function.
      *
-     * @param {import('../types').Injectable<any>} provider Function to invoke via `locals`
+     * @param {import('../types.js').Injectable<any>} provider Function to invoke via `locals`
      * @param {Function} params a function used to invoke the template provider
      * @return {string} The template html as a string: "<component-name input1='::$resolve.foo'></component-name>".
      */
-    fromComponentProvider(provider: import("../types").Injectable<any>, params: Function, context: any): string;
+    fromComponentProvider(provider: import("../types.js").Injectable<any>, params: Function, context: any): string;
     /**
      * Creates a template from a component's name
      *
@@ -81,12 +81,12 @@ export class TemplateFactoryProvider {
      * The template wires input and output bindings to resolves or from the parent component.
      *
      * @param {any} ngView {object} The parent ng-view (for binding outputs to callbacks)
-     * @param {import("./resolve/resolve-context").ResolveContext} context The ResolveContext (for binding outputs to callbacks returned from resolves)
+     * @param {import("./resolve/resolve-context.js").ResolveContext} context The ResolveContext (for binding outputs to callbacks returned from resolves)
      * @param {string} component {string} Component's name in camel case.
      * @param {any} [bindings] An object defining the component's bindings: {foo: '<'}
      * @return {string} The template as a string: "<component-name input1='$resolve.foo'></component-name>".
      */
-    makeComponentTemplate(ngView: any, context: import("./resolve/resolve-context").ResolveContext, component: string, bindings?: any): string;
+    makeComponentTemplate(ngView: any, context: import("./resolve/resolve-context.js").ResolveContext, component: string, bindings?: any): string;
 }
 export type BindingTuple = {
     name: string;
