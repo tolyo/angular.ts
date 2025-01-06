@@ -1,10 +1,10 @@
 import { dealoc } from "../shared/jqlite/jqlite.js";
-import { Angular } from "../loader";
-import { wait } from "../shared/test-utils";
+import { Angular } from "../loader.js";
+import { wait } from "../shared/test-utils.js";
 
 describe("ngView", () => {
   describe("scrollIntoView", () => {
-    let elem, $anchorScroll, $ngViewScroll, $timeout;
+    let elem, $anchorScroll, $ngViewScroll;
 
     beforeEach(() => {
       dealoc(document.getElementById("dummy"));
@@ -15,10 +15,9 @@ describe("ngView", () => {
         ["defaultModule"],
       );
 
-      $injector.invoke((_$ngViewScroll_, _$timeout_, _$anchorScroll_) => {
+      $injector.invoke((_$ngViewScroll_, _$anchorScroll_) => {
         $anchorScroll = _$anchorScroll_;
         $ngViewScroll = _$ngViewScroll_;
-        $timeout = _$timeout_;
       });
       elem = [{ scrollIntoView: jasmine.createSpy("scrollIntoView") }];
     });

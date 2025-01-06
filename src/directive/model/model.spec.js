@@ -12,7 +12,6 @@ describe("ngModel", () => {
   let $compile;
   let injector;
   let $rootScope;
-  let $q;
 
   beforeEach(() => {
     window.angular = new Angular();

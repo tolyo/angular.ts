@@ -10,7 +10,7 @@ export function getLastAjaxRequest() {
 }
 
 describe("$http", function () {
-  let $http, $injector, $httpBackend, requests, response, $rootScope, $q;
+  let $http, $injector, $httpBackend, requests, response, $rootScope;
 
   beforeEach(function () {
     window.angular = new Angular();

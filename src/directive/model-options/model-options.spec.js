@@ -1,6 +1,6 @@
-import { defaultModelOptions } from "./model-options";
+import { defaultModelOptions } from "./model-options.js";
 import { dealoc, JQLite } from "../../shared/jqlite/jqlite.js";
-import { Angular } from "../../loader";
+import { Angular } from "../../loader.js";
 
 function changeGivenInputTo(inputElm, val) {
   inputElm[0].value = val;
@@ -27,8 +27,6 @@ describe("ngModelOptions", () => {
     describe("basic usage", () => {
       let $rootScope;
       let $compile;
-      let $timeout;
-      let $q;
       let inputElm;
       let formElm;
       let injector;

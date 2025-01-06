@@ -104,7 +104,10 @@ export class FormController {
     this.$error = {};
     this.$$success = {};
     this.$pending = undefined;
-    setupValidity(this);
+    this.$$classCache = {};
+    const isValid = this.$$element[0].classList.contains(VALID_CLASS);
+    this.$$classCache[VALID_CLASS] = isValid;
+    this.$$classCache[INVALID_CLASS] = !isValid;
   }
 
   /**

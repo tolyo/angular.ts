@@ -5,7 +5,6 @@ describe("ngSwitch", () => {
   let $scope;
   let $compile;
   let element;
-  let $timeout;
 
   beforeEach(() => {
     window.angular = new Angular();
