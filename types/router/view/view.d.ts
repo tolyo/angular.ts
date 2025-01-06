@@ -30,8 +30,8 @@ export class ViewService {
     $get: (() => this)[];
     _rootViewContext(context: any): any;
     _rootContext: any;
-    _viewConfigFactory(viewType: any, factory: any): void;
-    createViewConfig(path: any, decl: any): any[];
+    _viewConfigFactory(factory: any): void;
+    createViewConfig(path: any, decl: any): (void & any[]) | void[];
     /**
      * Deactivates a ViewConfig.
      *

@@ -73,7 +73,6 @@ export function ng1ViewsBuilder(state) {
       );
     }
     config.resolveAs = config.resolveAs || "$resolve";
-    config.$type = "ng1";
     config.$context = state;
     config.$name = name;
     const normalized = Ng1ViewConfig.normalizeUIViewTarget(

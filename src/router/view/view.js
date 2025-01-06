@@ -39,7 +39,7 @@ export class ViewService {
         return () => removeFrom(this._listeners, listener);
       },
     };
-    this._pluginapi._viewConfigFactory("ng1", getNg1ViewConfigFactory());
+    this._pluginapi._viewConfigFactory(getNg1ViewConfigFactory());
   }
 
   $get = [() => this];
@@ -48,11 +48,11 @@ export class ViewService {
     return (this._rootContext = context || this._rootContext);
   }
 
-  _viewConfigFactory(viewType, factory) {
-    this._viewConfigFactories[viewType] = factory;
+  _viewConfigFactory(factory) {
+    this._viewConfigFactory = factory;
   }
   createViewConfig(path, decl) {
-    const cfgFactory = this._viewConfigFactories[decl.$type];
+    const cfgFactory = this._viewConfigFactory;
     if (!cfgFactory)
       throw new Error(
         "ViewService: No view config factory registered for type " + decl.$type,
@@ -155,8 +155,7 @@ export class ViewService {
   registerUIView(ngView) {
     trace.traceViewServiceUIViewEvent("-> Registering", ngView);
     const ngViews = this._ngViews;
-    const fqnAndTypeMatches = (uiv) =>
-      uiv.fqn === ngView.fqn && uiv.$type === ngView.$type;
+    const fqnAndTypeMatches = (uiv) => uiv.fqn === ngView.fqn;
     if (ngViews.filter(fqnAndTypeMatches).length)
       trace.traceViewServiceUIViewEvent("!!!! duplicate ngView named:", ngView);
     ngViews.push(ngView);

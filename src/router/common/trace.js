@@ -45,7 +45,7 @@ function ngViewString(uiview) {
   const state = uiview.creationContext
     ? uiview.creationContext.name || "(root)"
     : "(none)";
-  return `[ng-view#${uiview.id} ${uiview.$type}:${uiview.fqn} (${uiview.name}@${state})]`;
+  return `[ng-view#${uiview.id}:${uiview.fqn} (${uiview.name}@${state})]`;
 }
 const viewConfigString = (viewConfig) => {
   const view = viewConfig.viewDecl;
