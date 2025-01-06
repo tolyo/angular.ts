@@ -1,7 +1,7 @@
 import { JQLite, dealoc } from "../../shared/jqlite/jqlite.js";
 import { Angular } from "../../loader.js";
 import { NgModelController } from "./model.js";
-import { isDefined, valueFn, isObject } from "../../shared/utils.js";
+import { isDefined, isObject } from "../../shared/utils.js";
 import { browserTrigger, wait } from "../../shared/test-utils.js";
 
 describe("ngModel", () => {
@@ -917,14 +917,14 @@ describe("ngModel", () => {
 
       it("should only validate to true if all validations are true", () => {
         ctrl.$modelValue = undefined;
-        ctrl.$validators.a = valueFn(true);
-        ctrl.$validators.b = valueFn(true);
-        ctrl.$validators.c = valueFn(false);
+        ctrl.$validators.a = () => true;
+        ctrl.$validators.b = () => true;
+        ctrl.$validators.c = () => false;
 
         ctrl.$validate();
         expect(ctrl.$valid).toBe(false);
 
-        ctrl.$validators.c = valueFn(true);
+        ctrl.$validators.c = () => true;
 
         ctrl.$validate();
         expect(ctrl.$valid).toBe(true);
@@ -933,7 +933,7 @@ describe("ngModel", () => {
       it("should treat all responses as boolean for synchronous validators", () => {
         const expectValid = function (value, expected) {
           ctrl.$modelValue = undefined;
-          ctrl.$validators.a = valueFn(value);
+          ctrl.$validators.a = () => value;
 
           ctrl.$validate();
           expect(ctrl.$valid).toBe(expected);
@@ -958,9 +958,9 @@ describe("ngModel", () => {
 
       it("should register invalid validations on the $error object", () => {
         ctrl.$modelValue = undefined;
-        ctrl.$validators.unique = valueFn(false);
-        ctrl.$validators.tooLong = valueFn(false);
-        ctrl.$validators.notNumeric = valueFn(true);
+        ctrl.$validators.unique = () => false;
+        ctrl.$validators.tooLong = () => false;
+        ctrl.$validators.notNumeric = () => true;
 
         ctrl.$validate();
 

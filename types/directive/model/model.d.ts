@@ -85,7 +85,7 @@ export class NgModelController {
     $name: any;
     $$parentForm: {
         $addControl: () => void;
-        $getControls: () => any;
+        $getControls: () => any[];
         $$renameControl: (control: any, name: any) => void;
         $removeControl: () => void;
         $setValidity: (...any: any) => any;

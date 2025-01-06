@@ -1,6 +1,6 @@
 import { Angular } from "../../loader";
 import { createInjector, annotate } from "./injector";
-import { valueFn, extend } from "../../shared/utils";
+import { extend } from "../../shared/utils";
 
 describe("injector.modules", () => {
   beforeEach(() => {
@@ -1434,9 +1434,9 @@ it("should define module", () => {
   createInjector([
     function ($provide) {
       $provide.value("value", "value;");
-      $provide.factory("fn", valueFn("function;"));
+      $provide.factory("fn", () => "function;");
       $provide.provider("service", function Provider() {
-        this.$get = valueFn("service;");
+        this.$get = () => "service;";
       });
     },
     function (valueProvider, fnProvider, serviceProvider) {
@@ -1564,13 +1564,13 @@ describe("module", () => {
       });
     createInjector([
       "b",
-      valueFn(() => {
+      () => () => {
         log += "C";
-      }),
+      },
       [
-        valueFn(() => {
+        () => () => {
           log += "D";
-        }),
+        },
       ],
     ]);
     expect(log).toEqual("abABCD");
@@ -1673,7 +1673,7 @@ describe("factory", () => {
     expect(
       createInjector([
         function ($provide) {
-          $provide.factory("value", valueFn("abc"));
+          $provide.factory("value", () => "abc");
         },
       ]).get("value"),
     ).toEqual("abc");
@@ -1730,7 +1730,7 @@ describe("provider", () => {
       createInjector([
         function ($provide) {
           $provide.provider("value", {
-            $get: valueFn("abc"),
+            $get: () => "abc",
           });
         },
       ]).get("value"),
@@ -1773,7 +1773,7 @@ describe("provider", () => {
     expect(
       createInjector([
         function ($provide) {
-          $provide.provider({ value: valueFn({ $get: Array }) });
+          $provide.provider({ value: () => ({ $get: Array }) });
         },
       ]).get("value"),
     ).toEqual([]);

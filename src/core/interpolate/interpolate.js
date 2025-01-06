@@ -3,7 +3,6 @@ import {
   isDefined,
   isUndefined,
   stringify,
-  valueFn,
   extend,
 } from "../../shared/utils";
 import { constantWatchDelegate } from "../parse/parse.js";
@@ -240,7 +239,7 @@ export class InterpolateProvider {
           /**
            * @type {any}
            */
-          const constantInterp = valueFn(unescapedText);
+          const constantInterp = () => unescapedText;
           constantInterp.exp = text;
           constantInterp.expressions = [];
           constantInterp.$$watchDelegate = constantWatchDelegate;

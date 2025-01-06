@@ -1,7 +1,6 @@
 import { dealoc, JQLite } from "../../shared/jqlite/jqlite.js";
-import { Angular } from "../../loader";
-import { valueFn } from "../../shared/utils";
-import { wait } from "../../shared/test-utils";
+import { Angular } from "../../loader.js";
+import { wait } from "../../shared/test-utils.js";
 
 describe("ngClass", () => {
   let element;
@@ -565,10 +564,7 @@ describe("ngClass", () => {
     injector = window.angular.bootstrap(document.getElementById("dummy"), [
       "test",
       ($filterProvider) => {
-        $filterProvider.register(
-          "foo",
-          valueFn((o) => o.a || o.b),
-        );
+        $filterProvider.register("foo", () => (o) => o.a || o.b);
       },
     ]);
 

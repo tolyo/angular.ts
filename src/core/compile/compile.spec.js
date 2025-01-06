@@ -7,7 +7,6 @@ import {
 } from "../../shared/jqlite/jqlite.js";
 import {
   isFunction,
-  valueFn,
   isElement,
   getNodeName,
   extend,
@@ -89,47 +88,47 @@ describe("$compile", () => {
       log: () => ({
         restrict: "A",
         priority: 0,
-        compile: valueFn((scope, element, attrs) => {
+        compile: () => (scope, element, attrs) => {
           log.push(attrs.log || "LOG");
-        }),
+        },
       }),
 
       highLog: () => ({
         restrict: "A",
         priority: 3,
-        compile: valueFn((scope, element, attrs) => {
+        compile: () => (scope, element, attrs) => {
           log.push(attrs.highLog || "HIGH");
-        }),
+        },
       }),
 
       mediumLog: () => ({
         restrict: "A",
         priority: 2,
-        compile: valueFn((scope, element, attrs) => {
+        compile: () => (scope, element, attrs) => {
           log.push(attrs.mediumLog || "MEDIUM");
-        }),
+        },
       }),
 
       greet: () => ({
         restrict: "A",
         priority: 10,
-        compile: valueFn((scope, element, attrs) => {
+        compile: () => (scope, element, attrs) => {
           element.text(`Hello ${attrs.greet}`);
-        }),
+        },
       }),
 
       set: () => (scope, element, attrs) => element.text(attrs.set),
 
-      mediumStop: valueFn({
+      mediumStop: () => ({
         priority: 2,
         terminal: true,
       }),
 
-      stop: valueFn({
+      stop: () => ({
         terminal: true,
       }),
 
-      negativeStop: valueFn({
+      negativeStop: () => ({
         priority: -100, // even with negative priority we still should be able to stop descend
         terminal: true,
       }),
@@ -4855,14 +4854,11 @@ describe("$compile", () => {
     });
 
     fit("should support directives with SVG templates and a slow url that are stamped out later by a transcluding directive", async () => {
-      window.angular.module("test", []).directive(
-        "svgCircleUrl",
-        valueFn({
-          replace: true,
-          templateUrl: "/mock/circle-svg",
-          templateNamespace: "SVG",
-        }),
-      );
+      window.angular.module("test", []).directive("svgCircleUrl", () => ({
+        replace: true,
+        templateUrl: "/mock/circle-svg",
+        templateNamespace: "SVG",
+      }));
 
       injector.loadNewModules(["test"]);
       element = $compile(
@@ -4986,14 +4982,11 @@ describe("$compile", () => {
     });
 
     fit("should allow changing the template structure after the current node", () => {
-      myModule.directive(
-        "after",
-        valueFn({
-          compile(element) {
-            element.after("<span log>B</span>");
-          },
-        }),
-      );
+      myModule.directive("after", () => ({
+        compile(element) {
+          element.after("<span log>B</span>");
+        },
+      }));
       reloadModules();
       element = JQLite("<div><div after>A</div></div>");
       $compile(element)($rootScope);
@@ -5001,14 +4994,11 @@ describe("$compile", () => {
     });
 
     fit("should allow changing the template structure after the current node inside ngRepeat", async () => {
-      myModule.directive(
-        "after",
-        valueFn({
-          compile(element) {
-            element.after("<span log>B</span>");
-          },
-        }),
-      );
+      myModule.directive("after", () => ({
+        compile(element) {
+          element.after("<span log>B</span>");
+        },
+      }));
 
       reloadModules();
       element = JQLite(
@@ -5020,14 +5010,11 @@ describe("$compile", () => {
     });
 
     fit("should allow modifying the DOM structure in post link fn", async () => {
-      myModule.directive(
-        "removeNode",
-        valueFn({
-          link($scope, $element) {
-            $element.remove();
-          },
-        }),
-      );
+      myModule.directive("removeNode", () => ({
+        link($scope, $element) {
+          $element.remove();
+        },
+      }));
       reloadModules();
       element = JQLite("<div><div remove-node></div><div>{{test}}</div></div>");
       $rootScope.test = "Hello";
@@ -5049,20 +5036,14 @@ describe("$compile", () => {
         .directive("factoryError", () => {
           throw "FactoryError";
         })
-        .directive(
-          "templateError",
-          valueFn({
-            compile() {
-              throw "TemplateError";
-            },
-          }),
-        )
-        .directive(
-          "linkingError",
-          valueFn(() => {
-            throw "LinkingError";
-          }),
-        );
+        .directive("templateError", () => ({
+          compile() {
+            throw "TemplateError";
+          },
+        }))
+        .directive("linkingError", () => () => {
+          throw "LinkingError";
+        });
       // we have to create the injector here because the decorate is not able to override
       // exception handler on the defaultModule
       createInjector(["myModule"]).invoke(($compile, $rootScope) => {
@@ -5119,9 +5100,9 @@ describe("$compile", () => {
           ([name, restrict]) => {
             myModule.directive(name, () => ({
               restrict,
-              compile: valueFn((scope, element, attr) => {
+              compile: () => (scope, element, attr) => {
                 log.push(name);
-              }),
+              },
             }));
           },
         );
@@ -5167,123 +5148,84 @@ describe("$compile", () => {
       let attrs;
       beforeEach(() => {
         myModule
-          .directive(
-            "replace",
-            valueFn({
-              restrict: "A",
-              replace: true,
-              template:
-                '<div class="log" style="width: 10px" high-log>Replace!</div>',
-              compile(element, attr) {
-                attr.$set("compiled", "COMPILED");
-                expect(element).toBe(attr.$$element);
-              },
-            }),
-          )
-          .directive(
-            "nomerge",
-            valueFn({
-              restrict: "A",
-              replace: true,
-              template: '<div class="log" id="myid" high-log>No Merge!</div>',
-              compile(element, attr) {
-                attr.$set("compiled", "COMPILED");
-                expect(element).toBe(attr.$$element);
-              },
-            }),
-          )
-          .directive(
-            "append",
-            valueFn({
-              restrict: "A",
-              template:
-                '<div class="log" style="width: 10px" high-log>Append!</div>',
-              compile(element, attr) {
-                attr.$set("compiled", "COMPILED");
-                expect(element).toBe(attr.$$element);
-              },
-            }),
-          )
-          .directive(
-            "replaceWithInterpolatedClass",
-            valueFn({
-              replace: true,
-              template:
-                '<div class="class_{{1+1}}">Replace with interpolated class!</div>',
-              compile(element, attr) {
-                attr.$set("compiled", "COMPILED");
-                expect(element).toBe(attr.$$element);
-              },
-            }),
-          )
-          .directive(
-            "replaceWithInterpolatedStyle",
-            valueFn({
-              replace: true,
-              template:
-                '<div style="width:{{1+1}}px">Replace with interpolated style!</div>',
-              compile(element, attr) {
-                attr.$set("compiled", "COMPILED");
-                expect(element).toBe(attr.$$element);
-              },
-            }),
-          )
-          .directive(
-            "replaceWithTr",
-            valueFn({
-              replace: true,
-              template: "<tr><td>TR</td></tr>",
-            }),
-          )
-          .directive(
-            "replaceWithTd",
-            valueFn({
-              replace: true,
-              template: "<td>TD</td>",
-            }),
-          )
-          .directive(
-            "replaceWithTh",
-            valueFn({
-              replace: true,
-              template: "<th>TH</th>",
-            }),
-          )
-          .directive(
-            "replaceWithThead",
-            valueFn({
-              replace: true,
-              template: "<thead><tr><td>TD</td></tr></thead>",
-            }),
-          )
-          .directive(
-            "replaceWithTbody",
-            valueFn({
-              replace: true,
-              template: "<tbody><tr><td>TD</td></tr></tbody>",
-            }),
-          )
-          .directive(
-            "replaceWithTfoot",
-            valueFn({
-              replace: true,
-              template: "<tfoot><tr><td>TD</td></tr></tfoot>",
-            }),
-          )
-          .directive(
-            "replaceWithOption",
-            valueFn({
-              replace: true,
-              template: "<option>OPTION</option>",
-            }),
-          )
-          .directive(
-            "replaceWithOptgroup",
-            valueFn({
-              replace: true,
-              template: "<optgroup>OPTGROUP</optgroup>",
-            }),
-          )
+          .directive("replace", () => ({
+            restrict: "A",
+            replace: true,
+            template:
+              '<div class="log" style="width: 10px" high-log>Replace!</div>',
+            compile(element, attr) {
+              attr.$set("compiled", "COMPILED");
+              expect(element).toBe(attr.$$element);
+            },
+          }))
+          .directive("nomerge", () => ({
+            restrict: "A",
+            replace: true,
+            template: '<div class="log" id="myid" high-log>No Merge!</div>',
+            compile(element, attr) {
+              attr.$set("compiled", "COMPILED");
+              expect(element).toBe(attr.$$element);
+            },
+          }))
+          .directive("append", () => ({
+            restrict: "A",
+            template:
+              '<div class="log" style="width: 10px" high-log>Append!</div>',
+            compile(element, attr) {
+              attr.$set("compiled", "COMPILED");
+              expect(element).toBe(attr.$$element);
+            },
+          }))
+          .directive("replaceWithInterpolatedClass", () => ({
+            replace: true,
+            template:
+              '<div class="class_{{1+1}}">Replace with interpolated class!</div>',
+            compile(element, attr) {
+              attr.$set("compiled", "COMPILED");
+              expect(element).toBe(attr.$$element);
+            },
+          }))
+          .directive("replaceWithInterpolatedStyle", () => ({
+            replace: true,
+            template:
+              '<div style="width:{{1+1}}px">Replace with interpolated style!</div>',
+            compile(element, attr) {
+              attr.$set("compiled", "COMPILED");
+              expect(element).toBe(attr.$$element);
+            },
+          }))
+          .directive("replaceWithTr", () => ({
+            replace: true,
+            template: "<tr><td>TR</td></tr>",
+          }))
+          .directive("replaceWithTd", () => ({
+            replace: true,
+            template: "<td>TD</td>",
+          }))
+          .directive("replaceWithTh", () => ({
+            replace: true,
+            template: "<th>TH</th>",
+          }))
+          .directive("replaceWithThead", () => ({
+            replace: true,
+            template: "<thead><tr><td>TD</td></tr></thead>",
+          }))
+          .directive("replaceWithTbody", () => ({
+            replace: true,
+            template: "<tbody><tr><td>TD</td></tr></tbody>",
+          }))
+          .directive("replaceWithTfoot", () => ({
+            replace: true,
+            template: "<tfoot><tr><td>TD</td></tr></tfoot>",
+          }))
+          .directive("replaceWithOption", () => ({
+            replace: true,
+            template: "<option>OPTION</option>",
+          }))
+          .directive("replaceWithOptgroup", () => ({
+            replace: true,
+            template: "<optgroup>OPTGROUP</optgroup>",
+          }))
           .directive("logAttrs", () => ({
             link($scope, $element, $attrs) {
               attrs = $attrs;
@@ -5568,18 +5510,15 @@ describe("$compile", () => {
       });
 
       fit("should support SVG templates using directive.templateNamespace=svg", async () => {
-        myModule.directive(
-          "svgAnchor",
-          valueFn({
-            replace: true,
-            template: '<a xlink:href="{{linkurl}}">{{text}}</a>',
-            templateNamespace: "SVG",
-            scope: {
-              linkurl: "@svgAnchor",
-              text: "@?",
-            },
-          }),
-        );
+        myModule.directive("svgAnchor", () => ({
+          replace: true,
+          template: '<a xlink:href="{{linkurl}}">{{text}}</a>',
+          templateNamespace: "SVG",
+          scope: {
+            linkurl: "@svgAnchor",
+            text: "@?",
+          },
+        }));
         reloadModules();
         element = $compile(
           '<svg><g svg-anchor="/foo/bar" text="foo/bar!"></g></svg>',
@@ -5592,23 +5531,20 @@ describe("$compile", () => {
       });
 
       fit("should support MathML templates using directive.templateNamespace=math", async () => {
-        myModule.directive(
-          "pow",
-          valueFn({
-            replace: true,
-            transclude: true,
-            template: "<msup><mn>{{pow}}</mn></msup>",
-            templateNamespace: "MATH",
-            scope: {
-              pow: "@pow",
-            },
-            link(scope, elm, attr, ctrl, transclude) {
-              transclude((node) => {
-                elm.prepend(node[0]);
-              });
-            },
-          }),
-        );
+        myModule.directive("pow", () => ({
+          replace: true,
+          transclude: true,
+          template: "<msup><mn>{{pow}}</mn></msup>",
+          templateNamespace: "MATH",
+          scope: {
+            pow: "@pow",
+          },
+          link(scope, elm, attr, ctrl, transclude) {
+            transclude((node) => {
+              elm.prepend(node[0]);
+            });
+          },
+        }));
         reloadModules();
         element = $compile('<math><mn pow="2"><mn>8</mn></mn></math>')(
           $rootScope,
@@ -5634,7 +5570,7 @@ describe("$compile", () => {
 
         myModule.directive(
           "templateUrlWithPrototype",
-          valueFn(new DirectiveClass()),
+          () => new DirectiveClass(),
         );
         reloadModules();
         element = $compile(
@@ -5647,21 +5583,18 @@ describe("$compile", () => {
 
     describe("template as function", () => {
       beforeEach(() => {
-        myModule.directive(
-          "myDirective",
-          valueFn({
-            replace: true,
-            template($element, $attrs) {
-              expect($element.text()).toBe("original content");
-              expect($attrs.myDirective).toBe("some value");
-              return '<div id="templateContent">template content</div>';
-            },
-            compile($element, $attrs) {
-              expect($element.text()).toBe("template content");
-              expect($attrs.id).toBe("templateContent");
-            },
-          }),
-        );
+        myModule.directive("myDirective", () => ({
+          replace: true,
+          template($element, $attrs) {
+            expect($element.text()).toBe("original content");
+            expect($attrs.myDirective).toBe("some value");
+            return '<div id="templateContent">template content</div>';
+          },
+          compile($element, $attrs) {
+            expect($element.text()).toBe("template content");
+            expect($attrs.id).toBe("templateContent");
+          },
+        }));
       });
 
       fit("should evaluate `template` when defined as fn and use returned string as template", () => {
@@ -5691,163 +5624,106 @@ describe("$compile", () => {
               errors.push(exception.message);
             };
           })
-          .directive(
-            "hello",
-            valueFn({
-              restrict: "A",
-              templateUrl: "/mock/hello",
-              transclude: true,
-            }),
-          )
-          .directive(
-            "401",
-            valueFn({
-              restrict: "A",
-              templateUrl: "/mock/401",
-              transclude: true,
-            }),
-          )
-          .directive(
-            "cau",
-            valueFn({
-              restrict: "A",
-              templateUrl: "/mock/divexpr",
-            }),
-          )
-          .directive(
-            "crossDomainTemplate",
-            valueFn({
-              restrict: "A",
-              templateUrl: "http://example.com/should-not-load.html",
-            }),
-          )
+          .directive("hello", () => ({
+            restrict: "A",
+            templateUrl: "/mock/hello",
+            transclude: true,
+          }))
+          .directive("401", () => ({
+            restrict: "A",
+            templateUrl: "/mock/401",
+            transclude: true,
+          }))
+          .directive("cau", () => ({
+            restrict: "A",
+            templateUrl: "/mock/divexpr",
+          }))
+          .directive("crossDomainTemplate", () => ({
+            restrict: "A",
+            templateUrl: "http://example.com/should-not-load.html",
+          }))
           .directive("trustedTemplate", () => ({
             restrict: "A",
             templateUrl() {
               return $sce.trustAsResourceUrl("http://localhost:3000/hello");
             },
           }))
-          .directive(
-            "cError",
-            valueFn({
-              restrict: "A",
-              templateUrl: "/mock/empty",
-              compile() {
-                throw new Error("cError");
-              },
-            }),
-          )
-          .directive(
-            "lError",
-            valueFn({
-              restrict: "A",
-              templateUrl: "/mock/empty",
-              compile() {
-                throw new Error("lError");
-              },
-            }),
-          )
-          .directive(
-            "iHello",
-            valueFn({
-              restrict: "A",
-              replace: true,
-              templateUrl: "/mock/div",
-            }),
-          )
-          .directive(
-            "iCau",
-            valueFn({
-              restrict: "A",
-              replace: true,
-              templateUrl: "/mock/divexpr",
-            }),
-          )
-          .directive(
-            "iCError",
-            valueFn({
-              restrict: "A",
-              replace: true,
-              templateUrl: "error.html",
-              compile() {
-                throw new Error("cError");
-              },
-            }),
-          )
-          .directive(
-            "iLError",
-            valueFn({
-              restrict: "A",
-              replace: true,
-              templateUrl: "error.html",
-              compile() {
-                throw new Error("lError");
-              },
-            }),
-          )
-          .directive(
-            "replace",
-            valueFn({
-              replace: true,
-              template: "<span>Hello, {{name}}!</span>",
-            }),
-          )
-          .directive(
-            "replaceWithTr",
-            valueFn({
-              replace: true,
-              templateUrl: "tr.html",
-            }),
-          )
-          .directive(
-            "replaceWithTd",
-            valueFn({
-              replace: true,
-              templateUrl: "td.html",
-            }),
-          )
-          .directive(
-            "replaceWithTh",
-            valueFn({
-              replace: true,
-              templateUrl: "th.html",
-            }),
-          )
-          .directive(
-            "replaceWithThead",
-            valueFn({
-              replace: true,
-              templateUrl: "thead.html",
-            }),
-          )
-          .directive(
-            "replaceWithTbody",
-            valueFn({
-              replace: true,
-              templateUrl: "tbody.html",
-            }),
-          )
-          .directive(
-            "replaceWithTfoot",
-            valueFn({
-              replace: true,
-              templateUrl: "tfoot.html",
-            }),
-          )
-          .directive(
-            "replaceWithOption",
-            valueFn({
-              replace: true,
-              templateUrl: "option.html",
-            }),
-          )
-          .directive(
-            "replaceWithOptgroup",
-            valueFn({
-              replace: true,
-              templateUrl: "optgroup.html",
-            }),
-          );
+          .directive("cError", () => ({
+            restrict: "A",
+            templateUrl: "/mock/empty",
+            compile() {
+              throw new Error("cError");
+            },
+          }))
+          .directive("lError", () => ({
+            restrict: "A",
+            templateUrl: "/mock/empty",
+            compile() {
+              throw new Error("lError");
+            },
+          }))
+          .directive("iHello", () => ({
+            restrict: "A",
+            replace: true,
+            templateUrl: "/mock/div",
+          }))
+          .directive("iCau", () => ({
+            restrict: "A",
+            replace: true,
+            templateUrl: "/mock/divexpr",
+          }))
+          .directive("iCError", () => ({
+            restrict: "A",
+            replace: true,
+            templateUrl: "error.html",
+            compile() {
+              throw new Error("cError");
+            },
+          }))
+          .directive("iLError", () => ({
+            restrict: "A",
+            replace: true,
+            templateUrl: "error.html",
+            compile() {
+              throw new Error("lError");
+            },
+          }))
+          .directive("replace", () => ({
+            replace: true,
+            template: "<span>Hello, {{name}}!</span>",
+          }))
+          .directive("replaceWithTr", () => ({
+            replace: true,
+            templateUrl: "tr.html",
+          }))
+          .directive("replaceWithTd", () => ({
+            replace: true,
+            templateUrl: "td.html",
+          }))
+          .directive("replaceWithTh", () => ({
+            replace: true,
+            templateUrl: "th.html",
+          }))
+          .directive("replaceWithThead", () => ({
+            replace: true,
+            templateUrl: "thead.html",
+          }))
+          .directive("replaceWithTbody", () => ({
+            replace: true,
+            templateUrl: "tbody.html",
+          }))
+          .directive("replaceWithTfoot", () => ({
+            replace: true,
+            templateUrl: "tfoot.html",
+          }))
+          .directive("replaceWithOption", () => ({
+            replace: true,
+            templateUrl: "option.html",
+          }))
+          .directive("replaceWithOptgroup", () => ({
+            replace: true,
+            templateUrl: "optgroup.html",
+          }));
 
         createInjector(["myModule"]).invoke(
           (_$compile_, _$rootScope_, _$templateCache_, _$sce_) => {
@@ -6094,13 +5970,10 @@ describe("$compile", () => {
       });
 
       fit("should copy classes from pre-template node into linked element", async () => {
-        window.angular.module("test1", ["ng"]).directive(
-          "test",
-          valueFn({
-            templateUrl: "test.html",
-            replace: true,
-          }),
-        );
+        window.angular.module("test1", ["ng"]).directive("test", () => ({
+          templateUrl: "test.html",
+          replace: true,
+        }));
         createInjector(["test1"]).invoke(
           (_$compile_, _$rootScope_, _$templateCache_) => {
             $compile = _$compile_;
@@ -6122,14 +5995,11 @@ describe("$compile", () => {
         let template, module;
         beforeEach(() => {
           log = [];
-          module = angular.module("test1", ["ng"]).directive(
-            "hello",
-            valueFn({
-              restrict: "A",
-              templateUrl: "/mock/hello",
-              transclude: true,
-            }),
-          );
+          module = angular.module("test1", ["ng"]).directive("hello", () => ({
+            restrict: "A",
+            templateUrl: "/mock/hello",
+            transclude: true,
+          }));
 
           function logDirective(name, priority, options) {
             module.directive(name, () =>
@@ -6373,16 +6243,13 @@ describe("$compile", () => {
 
           const controllerSpy = jasmine.createSpy("controller");
 
-          module.directive(
-            "delayed",
-            valueFn({
-              controller: controllerSpy,
-              templateUrl: "delayed.html",
-              scope: {
-                title: "@",
-              },
-            }),
-          );
+          module.directive("delayed", () => ({
+            controller: controllerSpy,
+            templateUrl: "delayed.html",
+            scope: {
+              title: "@",
+            },
+          }));
 
           createInjector(["test1"]).invoke(
             (_$compile_, _$rootScope_, _$templateCache_) => {
@@ -6505,18 +6372,15 @@ describe("$compile", () => {
       });
 
       fit("should support SVG templates using directive.templateNamespace=svg", () => {
-        myModule.directive(
-          "svgAnchor",
-          valueFn({
-            replace: true,
-            templateUrl: "template.html",
-            templateNamespace: "SVG",
-            scope: {
-              linkurl: "@svgAnchor",
-              text: "@?",
-            },
-          }),
-        );
+        myModule.directive("svgAnchor", () => ({
+          replace: true,
+          templateUrl: "template.html",
+          templateNamespace: "SVG",
+          scope: {
+            linkurl: "@svgAnchor",
+            text: "@?",
+          },
+        }));
         createInjector(["myModule"]).invoke(
           async ($templateCache, $rootScope, $compile) => {
             $templateCache.set(
@@ -6536,23 +6400,20 @@ describe("$compile", () => {
       });
 
       fit("should support MathML templates using directive.templateNamespace=math", () => {
-        myModule.directive(
-          "pow",
-          valueFn({
-            replace: true,
-            transclude: true,
-            templateUrl: "template.html",
-            templateNamespace: "math",
-            scope: {
-              pow: "@pow",
-            },
-            link(scope, elm, attr, ctrl, transclude) {
-              transclude((node) => {
-                elm.prepend(node[0]);
-              });
-            },
-          }),
-        );
+        myModule.directive("pow", () => ({
+          replace: true,
+          transclude: true,
+          templateUrl: "template.html",
+          templateNamespace: "math",
+          scope: {
+            pow: "@pow",
+          },
+          link(scope, elm, attr, ctrl, transclude) {
+            transclude((node) => {
+              elm.prepend(node[0]);
+            });
+          },
+        }));
         createInjector(["myModule"]).invoke(
           async ($templateCache, $rootScope, $compile) => {
             $templateCache.set(
@@ -6586,7 +6447,7 @@ describe("$compile", () => {
 
         myModule.directive(
           "templateUrlWithPrototype",
-          valueFn(new DirectiveClass()),
+          () => new DirectiveClass(),
         );
 
         createInjector(["myModule"]).invoke(
@@ -6604,21 +6465,18 @@ describe("$compile", () => {
 
     describe("templateUrl as function", () => {
       fit("should evaluate `templateUrl` when defined as fn and use returned value as url", async () => {
-        window.angular.module("test1", ["ng"]).directive(
-          "myDirective",
-          valueFn({
-            replace: true,
-            templateUrl($element, $attrs) {
-              expect($element.text()).toBe("original content");
-              expect($attrs.myDirective).toBe("some value");
-              return "my-directive.html";
-            },
-            compile($element, $attrs) {
-              expect($element.text()).toBe("template content");
-              expect($attrs.id).toBe("templateContent");
-            },
-          }),
-        );
+        window.angular.module("test1", ["ng"]).directive("myDirective", () => ({
+          replace: true,
+          templateUrl($element, $attrs) {
+            expect($element.text()).toBe("original content");
+            expect($attrs.myDirective).toBe("some value");
+            return "my-directive.html";
+          },
+          compile($element, $attrs) {
+            expect($element.text()).toBe("template content");
+            expect($attrs.id).toBe("templateContent");
+          },
+        }));
 
         createInjector(["test1"]).invoke(
           async ($templateCache, $rootScope, $compile) => {
@@ -7165,15 +7023,12 @@ describe("$compile", () => {
                 deregisterObserver = attr.$observe("someAttr", observeSpy);
               },
           )
-          .directive(
-            "replaceSomeAttr",
-            valueFn({
-              compile(element, attr) {
-                attr.$set("someAttr", "bar-{{1+1}}");
-                expect(element).toBe(attr.$$element);
-              },
-            }),
-          );
+          .directive("replaceSomeAttr", () => ({
+            compile(element, attr) {
+              attr.$set("someAttr", "bar-{{1+1}}");
+              expect(element).toBe(attr.$$element);
+            },
+          }));
         dealoc(document.getElementById("dummy"));
         window.angular
           .bootstrap(document.getElementById("dummy"), ["test1"])
@@ -7606,14 +7461,11 @@ describe("$compile", () => {
       });
 
       fit("should support link function on directive object", async () => {
-        module.directive(
-          "abc",
-          valueFn({
-            link(scope, element, attrs) {
-              element.text(attrs.abc);
-            },
-          }),
-        );
+        module.directive("abc", () => ({
+          link(scope, element, attrs) {
+            element.text(attrs.abc);
+          },
+        }));
 
         createInjector(["test1"]).invoke((_$compile_, _$rootScope_) => {
           $compile = _$compile_;
@@ -7625,17 +7477,14 @@ describe("$compile", () => {
       });
 
       fit("should support $observe inside link function on directive object", async () => {
-        module.directive(
-          "testLink",
-          valueFn({
-            templateUrl: "test-link.html",
-            link(scope, element, attrs) {
-              attrs.$observe("testLink", (val) => {
-                scope.testAttr = val;
-              });
-            },
-          }),
-        );
+        module.directive("testLink", () => ({
+          templateUrl: "test-link.html",
+          link(scope, element, attrs) {
+            attrs.$observe("testLink", (val) => {
+              scope.testAttr = val;
+            });
+          },
+        }));
 
         createInjector(["test1"]).invoke(
           (_$compile_, _$rootScope_, _$templateCache_) => {
@@ -7663,12 +7512,12 @@ describe("$compile", () => {
       describe("attrs", () => {
         fit("should allow setting of attributes", async () => {
           module.directive({
-            setter: valueFn((scope, element, attr) => {
+            setter: () => (scope, element, attr) => {
               attr.$set("name", "abc");
               attr.$set("disabled", true);
               expect(attr.name).toBe("abc");
               expect(attr.disabled).toBe(true);
-            }),
+            },
           });
 
           createInjector(["test1"]).invoke((_$compile_, _$rootScope_) => {
@@ -7685,7 +7534,7 @@ describe("$compile", () => {
         fit("should read boolean attributes as boolean only on control elements", async () => {
           let value;
           module.directive({
-            input: valueFn({
+            input: () => ({
               restrict: "EA",
               link(scope, element, attr) {
                 value = attr.required;
@@ -7706,7 +7555,7 @@ describe("$compile", () => {
         fit("should read boolean attributes as text on non-controll elements", async () => {
           let value;
           module.directive({
-            div: valueFn({
+            div: () => ({
               restrict: "EA",
               link(scope, element, attr) {
                 value = attr.required;
@@ -7728,40 +7577,34 @@ describe("$compile", () => {
           const state = { first: [], second: [] };
           module
             .value("state", state)
-            .directive(
-              "first",
-              valueFn({
-                priority: 1,
-                compile(templateElement, templateAttr) {
-                  return function (scope, element, attr) {
-                    state.first.push({
-                      template: {
-                        element: templateElement,
-                        attr: templateAttr,
-                      },
-                      link: { element, attr },
-                    });
-                  };
-                },
-              }),
-            )
-            .directive(
-              "second",
-              valueFn({
-                priority: 2,
-                compile(templateElement, templateAttr) {
-                  return function (scope, element, attr) {
-                    state.second.push({
-                      template: {
-                        element: templateElement,
-                        attr: templateAttr,
-                      },
-                      link: { element, attr },
-                    });
-                  };
-                },
-              }),
-            );
+            .directive("first", () => ({
+              priority: 1,
+              compile(templateElement, templateAttr) {
+                return function (scope, element, attr) {
+                  state.first.push({
+                    template: {
+                      element: templateElement,
+                      attr: templateAttr,
+                    },
+                    link: { element, attr },
+                  });
+                };
+              },
+            }))
+            .directive("second", () => ({
+              priority: 2,
+              compile(templateElement, templateAttr) {
+                return function (scope, element, attr) {
+                  state.second.push({
+                    template: {
+                      element: templateElement,
+                      attr: templateAttr,
+                    },
+                    link: { element, attr },
+                  });
+                };
+              },
+            }));
 
           createInjector(["test1"]).invoke(($rootScope, $compile, state) => {
             const template = $compile("<div first second>");
@@ -7840,15 +7683,12 @@ describe("$compile", () => {
           let attr, $sce;
           beforeEach(async () => {
             ["input", "a", "img"].forEach((tag) => {
-              module.directive(
-                tag,
-                valueFn({
-                  restrict: "EA",
-                  link(scope, element, attr) {
-                    scope.attr = attr;
-                  },
-                }),
-              );
+              module.directive(tag, () => ({
+                restrict: "EA",
+                link(scope, element, attr) {
+                  scope.attr = attr;
+                },
+              }));
             });
 
             createInjector(["test1"]).invoke(
@@ -7999,8 +7839,8 @@ describe("$compile", () => {
             .and.callFake(check);
 
           module
-            .directive("d1", valueFn({ controller: Controller1 }))
-            .directive("d2", valueFn({ controller: Controller2 }));
+            .directive("d1", () => ({ controller: Controller1 }))
+            .directive("d2", () => ({ controller: Controller2 }));
 
           createInjector(["test1"]).invoke((_$compile_, _$rootScope_) => {
             $compile = _$compile_;
@@ -8061,12 +7901,12 @@ describe("$compile", () => {
           };
 
           module
-            .directive(
-              "d1",
-              valueFn({ scope: true, controller: TestController }),
-            )
-            .directive("d2", valueFn({ scope: {}, controller: TestController }))
-            .directive("d3", valueFn({ controller: TestController }));
+            .directive("d1", () => ({
+              scope: true,
+              controller: TestController,
+            }))
+            .directive("d2", () => ({ scope: {}, controller: TestController }))
+            .directive("d3", () => ({ controller: TestController }));
 
           createInjector(["test1"]).invoke((_$compile_, _$rootScope_) => {
             $compile = _$compile_;
@@ -8133,18 +7973,18 @@ describe("$compile", () => {
           };
 
           module
-            .directive(
-              "parent",
-              valueFn({ scope: true, controller: ParentController }),
-            )
-            .directive(
-              "child",
-              valueFn({ scope: true, controller: ChildController }),
-            )
-            .directive(
-              "grandChild",
-              valueFn({ scope: true, controller: GrandChildController }),
-            );
+            .directive("parent", () => ({
+              scope: true,
+              controller: ParentController,
+            }))
+            .directive("child", () => ({
+              scope: true,
+              controller: ChildController,
+            }))
+            .directive("grandChild", () => ({
+              scope: true,
+              controller: GrandChildController,
+            }));
 
           createInjector(["test1"]).invoke((_$compile_, _$rootScope_) => {
             $compile = _$compile_;
@@ -8188,36 +8028,30 @@ describe("$compile", () => {
           };
 
           module
-            .directive(
-              "d1",
-              valueFn({
-                controller: Controller1,
-                link: {
-                  pre(s, e) {
-                    log.push(`d1 pre: ${e.text()}`);
-                  },
-                  post(s, e) {
-                    log.push(`d1 post: ${e.text()}`);
-                  },
+            .directive("d1", () => ({
+              controller: Controller1,
+              link: {
+                pre(s, e) {
+                  log.push(`d1 pre: ${e.text()}`);
                 },
-                template: "<d2></d2>",
-              }),
-            )
-            .directive(
-              "d2",
-              valueFn({
-                controller: Controller2,
-                link: {
-                  pre(s, e) {
-                    log.push(`d2 pre: ${e.text()}`);
-                  },
-                  post(s, e) {
-                    log.push(`d2 post: ${e.text()}`);
-                  },
+                post(s, e) {
+                  log.push(`d1 post: ${e.text()}`);
                 },
-                template: "loaded",
-              }),
-            );
+              },
+              template: "<d2></d2>",
+            }))
+            .directive("d2", () => ({
+              controller: Controller2,
+              link: {
+                pre(s, e) {
+                  log.push(`d2 pre: ${e.text()}`);
+                },
+                post(s, e) {
+                  log.push(`d2 post: ${e.text()}`);
+                },
+              },
+              template: "loaded",
+            }));
 
           createInjector(["test1"]).invoke((_$compile_, _$rootScope_) => {
             $compile = _$compile_;
@@ -9232,18 +9066,15 @@ describe("$compile", () => {
       });
 
       fit("should be able to bind attribute names which are present in Object.prototype", async () => {
-        module.directive(
-          "inProtoAttr",
-          valueFn({
-            scope: {
-              constructor: "@",
-              toString: "&",
+        module.directive("inProtoAttr", () => ({
+          scope: {
+            constructor: "@",
+            toString: "&",
 
-              // Spidermonkey extension, may be obsolete in the future
-              watch: "=",
-            },
-          }),
-        );
+            // Spidermonkey extension, may be obsolete in the future
+            watch: "=",
+          },
+        }));
         createInjector(["test1"]).invoke(
           (_$compile_, _$rootScope_, _$templateCache_) => {
             $compile = _$compile_;
@@ -9272,14 +9103,11 @@ describe("$compile", () => {
 
       fit("should be able to interpolate attribute names which are present in Object.prototype", async () => {
         let attrs;
-        module.directive(
-          "attrExposer",
-          valueFn({
-            link($scope, $element, $attrs) {
-              attrs = $attrs;
-            },
-          }),
-        );
+        module.directive("attrExposer", () => ({
+          link($scope, $element, $attrs) {
+            attrs = $attrs;
+          },
+        }));
 
         createInjector(["test1"]).invoke((_$compile_, _$rootScope_) => {
           $compile = _$compile_;
@@ -9332,20 +9160,17 @@ describe("$compile", () => {
       });
 
       fit("should not overwrite @-bound property each digest when not present", async () => {
-        module.directive(
-          "testDir",
-          valueFn({
-            scope: { prop: "@" },
-            controller($scope) {
-              $scope.prop = $scope.prop || "default";
-              this.getProp = () => {
-                return $scope.prop;
-              };
-            },
-            controllerAs: "ctrl",
-            template: "<p></p>",
-          }),
-        );
+        module.directive("testDir", () => ({
+          scope: { prop: "@" },
+          controller($scope) {
+            $scope.prop = $scope.prop || "default";
+            this.getProp = () => {
+              return $scope.prop;
+            };
+          },
+          controllerAs: "ctrl",
+          template: "<p></p>",
+        }));
 
         createInjector(["test1"]).invoke((_$compile_, _$rootScope_) => {
           $compile = _$compile_;
@@ -9362,20 +9187,17 @@ describe("$compile", () => {
       });
 
       fit('should ignore optional "="-bound property if value is the empty string', async () => {
-        module.directive(
-          "testDir",
-          valueFn({
-            scope: { prop: "=?" },
-            controller($scope) {
-              $scope.prop = $scope.prop || "default";
-              this.getProp = () => {
-                return $scope.prop;
-              };
-            },
-            controllerAs: "ctrl",
-            template: "<p></p>",
-          }),
-        );
+        module.directive("testDir", () => ({
+          scope: { prop: "=?" },
+          controller($scope) {
+            $scope.prop = $scope.prop || "default";
+            this.getProp = () => {
+              return $scope.prop;
+            };
+          },
+          controllerAs: "ctrl",
+          template: "<p></p>",
+        }));
 
         createInjector(["test1"]).invoke((_$compile_, _$rootScope_) => {
           $compile = _$compile_;
@@ -10516,39 +10338,36 @@ describe("$compile", () => {
       it("should expose isolate scope variables on controller with controllerAs when bindToController is true (template)", () => {
         let controllerCalled = false;
 
-        module.directive(
-          "fooDir",
-          valueFn({
-            template: "<p>isolate</p>",
-            scope: {
-              data: "=dirData",
-              oneway: "<dirData",
-              str: "@dirStr",
-              fn: "&dirFn",
-            },
-            controller($scope) {
-              this.$onInit = () => {
-                expect(this.data).toEqual({
-                  foo: "bar",
-                  baz: "biz",
-                });
-                expect(this.oneway).toEqual({
-                  foo: "bar",
-                  baz: "biz",
-                });
-                expect(this.str).toBe("Hello, world!");
-                expect(this.fn()).toBe("called!");
-              };
-              controllerCalled = true;
-            },
-            controllerAs: "test",
-            bindToController: true,
-          }),
-        );
+        module.directive("fooDir", () => ({
+          template: "<p>isolate</p>",
+          scope: {
+            data: "=dirData",
+            oneway: "<dirData",
+            str: "@dirStr",
+            fn: "&dirFn",
+          },
+          controller($scope) {
+            this.$onInit = () => {
+              expect(this.data).toEqual({
+                foo: "bar",
+                baz: "biz",
+              });
+              expect(this.oneway).toEqual({
+                foo: "bar",
+                baz: "biz",
+              });
+              expect(this.str).toBe("Hello, world!");
+              expect(this.fn()).toBe("called!");
+            };
+            controllerCalled = true;
+          },
+          controllerAs: "test",
+          bindToController: true,
+        }));
 
         initInjector("test1");
 
-        $rootScope.fn = valueFn("called!");
+        $rootScope.fn = () => "called!";
         $rootScope.whom = "world";
         $rootScope.remoteData = {
           foo: "bar",
@@ -10565,44 +10384,41 @@ describe("$compile", () => {
       it("should not pre-assign bound properties to the controller", () => {
         let controllerCalled = false;
         let onInitCalled = false;
-        module.directive(
-          "fooDir",
-          valueFn({
-            template: "<p>isolate</p>",
-            scope: {
-              data: "=dirData",
-              oneway: "<dirData",
-              str: "@dirStr",
-              fn: "&dirFn",
-            },
-            controller($scope) {
-              expect(this.data).toBeUndefined();
-              expect(this.oneway).toBeUndefined();
-              expect(this.str).toBeUndefined();
-              expect(this.fn).toBeUndefined();
-              controllerCalled = true;
-              this.$onInit = () => {
-                expect(this.data).toEqual({
-                  foo: "bar",
-                  baz: "biz",
-                });
-                expect(this.oneway).toEqual({
-                  foo: "bar",
-                  baz: "biz",
-                });
-                expect(this.str).toBe("Hello, world!");
-                expect(this.fn()).toBe("called!");
-                onInitCalled = true;
-              };
-            },
-            controllerAs: "test",
-            bindToController: true,
-          }),
-        );
+        module.directive("fooDir", () => ({
+          template: "<p>isolate</p>",
+          scope: {
+            data: "=dirData",
+            oneway: "<dirData",
+            str: "@dirStr",
+            fn: "&dirFn",
+          },
+          controller($scope) {
+            expect(this.data).toBeUndefined();
+            expect(this.oneway).toBeUndefined();
+            expect(this.str).toBeUndefined();
+            expect(this.fn).toBeUndefined();
+            controllerCalled = true;
+            this.$onInit = () => {
+              expect(this.data).toEqual({
+                foo: "bar",
+                baz: "biz",
+              });
+              expect(this.oneway).toEqual({
+                foo: "bar",
+                baz: "biz",
+              });
+              expect(this.str).toBe("Hello, world!");
+              expect(this.fn()).toBe("called!");
+              onInitCalled = true;
+            };
+          },
+          controllerAs: "test",
+          bindToController: true,
+        }));
 
         initInjector("test1");
 
-        $rootScope.fn = valueFn("called!");
+        $rootScope.fn = () => "called!";
         $rootScope.whom = "world";
         $rootScope.remoteData = {
           foo: "bar",
@@ -10641,23 +10457,20 @@ describe("$compile", () => {
         );
         spyOn(Controller.prototype, "$onInit").and.callThrough();
 
-        module.directive(
-          "fooDir",
-          valueFn({
-            template: "<p>isolate</p>",
-            scope: {
-              data: "=dirData",
-              oneway: "<dirData",
-              str: "@dirStr",
-              fn: "&dirFn",
-            },
-            controller: Controller,
-            controllerAs: "test",
-            bindToController: true,
-          }),
-        );
+        module.directive("fooDir", () => ({
+          template: "<p>isolate</p>",
+          scope: {
+            data: "=dirData",
+            oneway: "<dirData",
+            str: "@dirStr",
+            fn: "&dirFn",
+          },
+          controller: Controller,
+          controllerAs: "test",
+          bindToController: true,
+        }));
         initInjector("test1");
-        $rootScope.fn = valueFn("called!");
+        $rootScope.fn = () => "called!";
         $rootScope.whom = "world";
         $rootScope.remoteData = {
           foo: "bar",
@@ -10673,18 +10486,15 @@ describe("$compile", () => {
       });
 
       it("should update @-bindings on controller when bindToController and attribute change observed", () => {
-        module.directive(
-          "atBinding",
-          valueFn({
-            template: "<p>{{At.text}}</p>",
-            scope: {
-              text: "@atBinding",
-            },
-            controller($scope) {},
-            bindToController: true,
-            controllerAs: "At",
-          }),
-        );
+        module.directive("atBinding", () => ({
+          template: "<p>{{At.text}}</p>",
+          scope: {
+            text: "@atBinding",
+          },
+          controller($scope) {},
+          bindToController: true,
+          controllerAs: "At",
+        }));
         initInjector("test1");
         element = $compile('<div at-binding="Test: {{text}}"></div>')(
           $rootScope,
@@ -10698,39 +10508,36 @@ describe("$compile", () => {
 
       it("should expose isolate scope variables on controller with controllerAs when bindToController is true (templateUrl)", () => {
         let controllerCalled = false;
-        module.directive(
-          "fooDir",
-          valueFn({
-            templateUrl: "test.html",
-            scope: {
-              data: "=dirData",
-              oneway: "<dirData",
-              str: "@dirStr",
-              fn: "&dirFn",
-            },
-            controller($scope) {
-              this.$onInit = () => {
-                expect(this.data).toEqual({
-                  foo: "bar",
-                  baz: "biz",
-                });
-                expect(this.oneway).toEqual({
-                  foo: "bar",
-                  baz: "biz",
-                });
-                expect(this.str).toBe("Hello, world!");
-                expect(this.fn()).toBe("called!");
-              };
-              controllerCalled = true;
-            },
-            controllerAs: "test",
-            bindToController: true,
-          }),
-        );
+        module.directive("fooDir", () => ({
+          templateUrl: "test.html",
+          scope: {
+            data: "=dirData",
+            oneway: "<dirData",
+            str: "@dirStr",
+            fn: "&dirFn",
+          },
+          controller($scope) {
+            this.$onInit = () => {
+              expect(this.data).toEqual({
+                foo: "bar",
+                baz: "biz",
+              });
+              expect(this.oneway).toEqual({
+                foo: "bar",
+                baz: "biz",
+              });
+              expect(this.str).toBe("Hello, world!");
+              expect(this.fn()).toBe("called!");
+            };
+            controllerCalled = true;
+          },
+          controllerAs: "test",
+          bindToController: true,
+        }));
         initInjector("test1");
 
         $templateCache.set("test.html", "<p>isolate</p>");
-        $rootScope.fn = valueFn("called!");
+        $rootScope.fn = () => "called!";
         $rootScope.whom = "world";
         $rootScope.remoteData = {
           foo: "bar",
@@ -10745,20 +10552,17 @@ describe("$compile", () => {
       });
 
       it("should throw noctrl when missing controller", () => {
-        module.directive(
-          "noCtrl",
-          valueFn({
-            templateUrl: "test.html",
-            scope: {
-              data: "=dirData",
-              oneway: "<dirData",
-              str: "@dirStr",
-              fn: "&dirFn",
-            },
-            controllerAs: "test",
-            bindToController: true,
-          }),
-        );
+        module.directive("noCtrl", () => ({
+          templateUrl: "test.html",
+          scope: {
+            data: "=dirData",
+            oneway: "<dirData",
+            str: "@dirStr",
+            fn: "&dirFn",
+          },
+          controllerAs: "test",
+          bindToController: true,
+        }));
         initInjector("test1");
         expect(() => {
           $compile("<div no-ctrl>")($rootScope);
@@ -10767,10 +10571,10 @@ describe("$compile", () => {
 
       it("should throw badrestrict on first compilation when restrict is invalid", () => {
         module
-          .directive("invalidRestrictBadString", valueFn({ restrict: '"' }))
-          .directive("invalidRestrictTrue", valueFn({ restrict: true }))
-          .directive("invalidRestrictObject", valueFn({ restrict: {} }))
-          .directive("invalidRestrictNumber", valueFn({ restrict: 42 }))
+          .directive("invalidRestrictBadString", () => ({ restrict: '"' }))
+          .directive("invalidRestrictTrue", () => ({ restrict: true }))
+          .directive("invalidRestrictObject", () => ({ restrict: {} }))
+          .directive("invalidRestrictNumber", () => ({ restrict: 42 }))
           .decorator("$exceptionHandler", () => {
             return (exception, cause) => {
               log.push(exception.message);
@@ -10885,12 +10689,12 @@ describe("$compile", () => {
                     };
                     controllerCalled = true;
                   })
-                  .directive("fooDir", valueFn(ddo));
+                  .directive("fooDir", () => ddo);
 
                 initInjector("myModule");
 
                 $templateCache.set("test.html", "<p>template</p>");
-                $rootScope.fn = valueFn("called!");
+                $rootScope.fn = () => "called!";
                 $rootScope.whom = "world";
                 $rootScope.remoteData = {
                   foo: "bar",
@@ -10920,53 +10724,47 @@ describe("$compile", () => {
         let controller1Called = false;
         let controller2Called = false;
         module
-          .directive(
-            "foo",
-            valueFn({
-              bindToController: {
-                data: "=fooData",
-                oneway: "<fooData",
-                str: "@fooStr",
-                fn: "&fooFn",
-              },
-              controllerAs: "fooCtrl",
-              controller() {
-                this.$onInit = () => {
-                  expect(this.data).toEqual({ foo: "bar", baz: "biz" });
-                  expect(this.oneway).toEqual({ foo: "bar", baz: "biz" });
-                  expect(this.str).toBe("Hello, world!");
-                  expect(this.fn()).toBe("called!");
-                };
-                controller1Called = true;
-              },
-            }),
-          )
-          .directive(
-            "bar",
-            valueFn({
-              bindToController: {
-                data: "=barData",
-                oneway: "<barData",
-                str: "@barStr",
-                fn: "&barFn",
-              },
-              controllerAs: "barCtrl",
-              controller() {
-                this.$onInit = () => {
-                  expect(this.data).toEqual({ foo2: "bar2", baz2: "biz2" });
-                  expect(this.oneway).toEqual({ foo2: "bar2", baz2: "biz2" });
-                  expect(this.str).toBe("Hello, second world!");
-                  expect(this.fn()).toBe("second called!");
-                };
-                controller2Called = true;
-              },
-            }),
-          );
+          .directive("foo", () => ({
+            bindToController: {
+              data: "=fooData",
+              oneway: "<fooData",
+              str: "@fooStr",
+              fn: "&fooFn",
+            },
+            controllerAs: "fooCtrl",
+            controller() {
+              this.$onInit = () => {
+                expect(this.data).toEqual({ foo: "bar", baz: "biz" });
+                expect(this.oneway).toEqual({ foo: "bar", baz: "biz" });
+                expect(this.str).toBe("Hello, world!");
+                expect(this.fn()).toBe("called!");
+              };
+              controller1Called = true;
+            },
+          }))
+          .directive("bar", () => ({
+            bindToController: {
+              data: "=barData",
+              oneway: "<barData",
+              str: "@barStr",
+              fn: "&barFn",
+            },
+            controllerAs: "barCtrl",
+            controller() {
+              this.$onInit = () => {
+                expect(this.data).toEqual({ foo2: "bar2", baz2: "biz2" });
+                expect(this.oneway).toEqual({ foo2: "bar2", baz2: "biz2" });
+                expect(this.str).toBe("Hello, second world!");
+                expect(this.fn()).toBe("second called!");
+              };
+              controller2Called = true;
+            },
+          }));
         initInjector("test1");
-        $rootScope.fn = valueFn("called!");
+        $rootScope.fn = () => "called!";
         $rootScope.string = "world";
         $rootScope.data = { foo: "bar", baz: "biz" };
-        $rootScope.fn2 = valueFn("second called!");
+        $rootScope.fn2 = () => "second called!";
         $rootScope.string2 = "second world";
         $rootScope.data2 = { foo2: "bar2", baz2: "biz2" };
         element = $compile(
@@ -10989,54 +10787,48 @@ describe("$compile", () => {
         let controller1Called = false;
         let controller2Called = false;
         module
-          .directive(
-            "foo",
-            valueFn({
-              bindToController: {
-                data: "=fooData",
-                oneway: "<fooData",
-                str: "@fooStr",
-                fn: "&fooFn",
-              },
-              scope: {},
-              controllerAs: "fooCtrl",
-              controller() {
-                this.$onInit = () => {
-                  expect(this.data).toEqual({ foo: "bar", baz: "biz" });
-                  expect(this.oneway).toEqual({ foo: "bar", baz: "biz" });
-                  expect(this.str).toBe("Hello, world!");
-                  expect(this.fn()).toBe("called!");
-                };
-                controller1Called = true;
-              },
-            }),
-          )
-          .directive(
-            "bar",
-            valueFn({
-              bindToController: {
-                data: "=barData",
-                oneway: "<barData",
-                str: "@barStr",
-                fn: "&barFn",
-              },
-              controllerAs: "barCtrl",
-              controller() {
-                this.$onInit = () => {
-                  expect(this.data).toEqual({ foo2: "bar2", baz2: "biz2" });
-                  expect(this.oneway).toEqual({ foo2: "bar2", baz2: "biz2" });
-                  expect(this.str).toBe("Hello, second world!");
-                  expect(this.fn()).toBe("second called!");
-                };
-                controller2Called = true;
-              },
-            }),
-          );
+          .directive("foo", () => ({
+            bindToController: {
+              data: "=fooData",
+              oneway: "<fooData",
+              str: "@fooStr",
+              fn: "&fooFn",
+            },
+            scope: {},
+            controllerAs: "fooCtrl",
+            controller() {
+              this.$onInit = () => {
+                expect(this.data).toEqual({ foo: "bar", baz: "biz" });
+                expect(this.oneway).toEqual({ foo: "bar", baz: "biz" });
+                expect(this.str).toBe("Hello, world!");
+                expect(this.fn()).toBe("called!");
+              };
+              controller1Called = true;
+            },
+          }))
+          .directive("bar", () => ({
+            bindToController: {
+              data: "=barData",
+              oneway: "<barData",
+              str: "@barStr",
+              fn: "&barFn",
+            },
+            controllerAs: "barCtrl",
+            controller() {
+              this.$onInit = () => {
+                expect(this.data).toEqual({ foo2: "bar2", baz2: "biz2" });
+                expect(this.oneway).toEqual({ foo2: "bar2", baz2: "biz2" });
+                expect(this.str).toBe("Hello, second world!");
+                expect(this.fn()).toBe("second called!");
+              };
+              controller2Called = true;
+            },
+          }));
         initInjector("test1");
-        $rootScope.fn = valueFn("called!");
+        $rootScope.fn = () => "called!";
         $rootScope.string = "world";
         $rootScope.data = { foo: "bar", baz: "biz" };
-        $rootScope.fn2 = valueFn("second called!");
+        $rootScope.fn2 = () => "second called!";
         $rootScope.string2 = "second world";
         $rootScope.data2 = { foo2: "bar2", baz2: "biz2" };
         element = $compile(
@@ -11059,55 +10851,49 @@ describe("$compile", () => {
         let controller1Called = false;
         let controller2Called = false;
         module
-          .directive(
-            "foo",
-            valueFn({
-              bindToController: {
-                data: "=fooData",
-                oneway: "<fooData",
-                str: "@fooStr",
-                fn: "&fooFn",
-              },
-              scope: true,
-              controllerAs: "fooCtrl",
-              controller() {
-                this.$onInit = () => {
-                  expect(this.data).toEqual({ foo: "bar", baz: "biz" });
-                  expect(this.oneway).toEqual({ foo: "bar", baz: "biz" });
-                  expect(this.str).toBe("Hello, world!");
-                  expect(this.fn()).toBe("called!");
-                };
-                controller1Called = true;
-              },
-            }),
-          )
-          .directive(
-            "bar",
-            valueFn({
-              bindToController: {
-                data: "=barData",
-                oneway: "<barData",
-                str: "@barStr",
-                fn: "&barFn",
-              },
-              scope: true,
-              controllerAs: "barCtrl",
-              controller() {
-                this.$onInit = () => {
-                  expect(this.data).toEqual({ foo2: "bar2", baz2: "biz2" });
-                  expect(this.oneway).toEqual({ foo2: "bar2", baz2: "biz2" });
-                  expect(this.str).toBe("Hello, second world!");
-                  expect(this.fn()).toBe("second called!");
-                };
-                controller2Called = true;
-              },
-            }),
-          );
+          .directive("foo", () => ({
+            bindToController: {
+              data: "=fooData",
+              oneway: "<fooData",
+              str: "@fooStr",
+              fn: "&fooFn",
+            },
+            scope: true,
+            controllerAs: "fooCtrl",
+            controller() {
+              this.$onInit = () => {
+                expect(this.data).toEqual({ foo: "bar", baz: "biz" });
+                expect(this.oneway).toEqual({ foo: "bar", baz: "biz" });
+                expect(this.str).toBe("Hello, world!");
+                expect(this.fn()).toBe("called!");
+              };
+              controller1Called = true;
+            },
+          }))
+          .directive("bar", () => ({
+            bindToController: {
+              data: "=barData",
+              oneway: "<barData",
+              str: "@barStr",
+              fn: "&barFn",
+            },
+            scope: true,
+            controllerAs: "barCtrl",
+            controller() {
+              this.$onInit = () => {
+                expect(this.data).toEqual({ foo2: "bar2", baz2: "biz2" });
+                expect(this.oneway).toEqual({ foo2: "bar2", baz2: "biz2" });
+                expect(this.str).toBe("Hello, second world!");
+                expect(this.fn()).toBe("second called!");
+              };
+              controller2Called = true;
+            },
+          }));
         initInjector("test1");
-        $rootScope.fn = valueFn("called!");
+        $rootScope.fn = () => "called!";
         $rootScope.string = "world";
         $rootScope.data = { foo: "bar", baz: "biz" };
-        $rootScope.fn2 = valueFn("second called!");
+        $rootScope.fn2 = () => "second called!";
         $rootScope.string2 = "second world";
         $rootScope.data2 = { foo2: "bar2", baz2: "biz2" };
         element = $compile(
@@ -11144,20 +10930,17 @@ describe("$compile", () => {
             };
             this.value4 = "child4";
           })
-          .directive(
-            "child",
-            valueFn({
-              scope: true,
-              controller: "ChildCtrl as ctrl",
-              bindToController: {
-                fromParent1: "@",
-                fromParent2: "=",
-                fromParent3: "&",
-                fromParent4: "<",
-              },
-              template: "",
-            }),
-          );
+          .directive("child", () => ({
+            scope: true,
+            controller: "ChildCtrl as ctrl",
+            bindToController: {
+              fromParent1: "@",
+              fromParent2: "=",
+              fromParent3: "&",
+              fromParent4: "<",
+            },
+            template: "",
+          }));
         initInjector("test1");
         element = $compile(
           '<div ng-controller="ParentCtrl as ctrl">' +
@@ -11204,20 +10987,17 @@ describe("$compile", () => {
             };
             this.value4 = "child4";
           })
-          .directive(
-            "child",
-            valueFn({
-              scope: {},
-              controller: "ChildCtrl as ctrl",
-              bindToController: {
-                fromParent1: "@",
-                fromParent2: "=",
-                fromParent3: "&",
-                fromParent4: "<",
-              },
-              template: "",
-            }),
-          );
+          .directive("child", () => ({
+            scope: {},
+            controller: "ChildCtrl as ctrl",
+            bindToController: {
+              fromParent1: "@",
+              fromParent2: "=",
+              fromParent3: "&",
+              fromParent4: "<",
+            },
+            template: "",
+          }));
 
         initInjector("test1");
         element = $compile(
@@ -11255,15 +11035,12 @@ describe("$compile", () => {
             controllerCalled = true;
             myCtrl = this;
           })
-          .directive(
-            "fooDir",
-            valueFn({
-              templateUrl: "test.html",
-              bindToController: {},
-              scope: true,
-              controller: "myCtrl as theCtrl",
-            }),
-          );
+          .directive("fooDir", () => ({
+            templateUrl: "test.html",
+            bindToController: {},
+            scope: true,
+            controller: "myCtrl as theCtrl",
+          }));
         initInjector("test1");
         $templateCache.set("test.html", "<p>isolate</p>");
         element = $compile("<div foo-dir>")($rootScope);
@@ -11297,23 +11074,20 @@ describe("$compile", () => {
             myCtrl = this;
             return new MyCtrl();
           })
-          .directive(
-            "fooDir",
-            valueFn({
-              templateUrl: "test.html",
-              bindToController: {
-                data: "=dirData",
-                oneway: "<dirData",
-                str: "@dirStr",
-                fn: "&dirFn",
-              },
-              scope: true,
-              controller: "myCtrl as theCtrl",
-            }),
-          );
+          .directive("fooDir", () => ({
+            templateUrl: "test.html",
+            bindToController: {
+              data: "=dirData",
+              oneway: "<dirData",
+              str: "@dirStr",
+              fn: "&dirFn",
+            },
+            scope: true,
+            controller: "myCtrl as theCtrl",
+          }));
         initInjector("test1");
         $templateCache.set("test.html", "<p>isolate</p>");
-        $rootScope.fn = valueFn("called!");
+        $rootScope.fn = () => "called!";
         $rootScope.whom = "world";
         $rootScope.remoteData = {
           foo: "bar",
@@ -11356,23 +11130,20 @@ describe("$compile", () => {
             myCtrl = this;
             return new MyCtrl();
           })
-          .directive(
-            "fooDir",
-            valueFn({
-              templateUrl: "test.html",
-              bindToController: true,
-              scope: {
-                data: "=dirData",
-                oneway: "<dirData",
-                str: "@dirStr",
-                fn: "&dirFn",
-              },
-              controller: "myCtrl as theCtrl",
-            }),
-          );
+          .directive("fooDir", () => ({
+            templateUrl: "test.html",
+            bindToController: true,
+            scope: {
+              data: "=dirData",
+              oneway: "<dirData",
+              str: "@dirStr",
+              fn: "&dirFn",
+            },
+            controller: "myCtrl as theCtrl",
+          }));
         initInjector("test1");
         $templateCache.set("test.html", "<p>isolate</p>");
-        $rootScope.fn = valueFn("called!");
+        $rootScope.fn = () => "called!";
         $rootScope.whom = "world";
         $rootScope.remoteData = {
           foo: "bar",
@@ -11393,26 +11164,23 @@ describe("$compile", () => {
 
       describe("should not overwrite @-bound property each digest when not present", () => {
         it("when creating new scope", () => {
-          module.directive(
-            "testDir",
-            valueFn({
-              scope: true,
-              bindToController: {
-                prop: "@",
-              },
-              controller() {
-                const self = this;
-                this.$onInit = () => {
-                  this.prop = this.prop || "default";
-                };
-                this.getProp = () => {
-                  return self.prop;
-                };
-              },
-              controllerAs: "ctrl",
-              template: "<p></p>",
-            }),
-          );
+          module.directive("testDir", () => ({
+            scope: true,
+            bindToController: {
+              prop: "@",
+            },
+            controller() {
+              const self = this;
+              this.$onInit = () => {
+                this.prop = this.prop || "default";
+              };
+              this.getProp = () => {
+                return self.prop;
+              };
+            },
+            controllerAs: "ctrl",
+            template: "<p></p>",
+          }));
           initInjector("test1");
           element = $compile("<div test-dir></div>")($rootScope);
           const scope = $rootScope.$children[0];
@@ -11422,26 +11190,23 @@ describe("$compile", () => {
         });
 
         it("when creating isolate scope", () => {
-          module.directive(
-            "testDir",
-            valueFn({
-              scope: {},
-              bindToController: {
-                prop: "@",
-              },
-              controller() {
-                const self = this;
-                this.$onInit = () => {
-                  this.prop = this.prop || "default";
-                };
-                this.getProp = () => {
-                  return self.prop;
-                };
-              },
-              controllerAs: "ctrl",
-              template: "<p></p>",
-            }),
-          );
+          module.directive("testDir", () => ({
+            scope: {},
+            bindToController: {
+              prop: "@",
+            },
+            controller() {
+              const self = this;
+              this.$onInit = () => {
+                this.prop = this.prop || "default";
+              };
+              this.getProp = () => {
+                return self.prop;
+              };
+            },
+            controllerAs: "ctrl",
+            template: "<p></p>",
+          }));
           initInjector("test1");
           element = $compile("<div test-dir></div>")($rootScope);
           const scope = $rootScope.$children[0];
@@ -11558,23 +11323,20 @@ describe("$compile", () => {
       it("transcluded children should receive explicit return value of parent controller", async () => {
         let expectedController;
         module
-          .directive(
-            "nester",
-            valueFn({
-              transclude: true,
-              controller($transclude) {
-                this.foo = "baz";
-                expectedController = { transclude: $transclude, foo: "bar" };
-                return expectedController;
-              },
-              link(scope, el, attr, ctrl) {
-                ctrl.transclude(cloneAttach);
-                function cloneAttach(clone) {
-                  el.append(clone);
-                }
-              },
-            }),
-          )
+          .directive("nester", () => ({
+            transclude: true,
+            controller($transclude) {
+              this.foo = "baz";
+              expectedController = { transclude: $transclude, foo: "bar" };
+              return expectedController;
+            },
+            link(scope, el, attr, ctrl) {
+              ctrl.transclude(cloneAttach);
+              function cloneAttach(clone) {
+                el.append(clone);
+              }
+            },
+          }))
           .directive("nested", () => ({
             require: "^^nester",
             link(scope, element, attrs, controller) {
@@ -12265,22 +12027,16 @@ describe("$compile", () => {
 
       it("should support multiple controllers", () => {
         module
-          .directive(
-            "c1",
-            valueFn({
-              controller() {
-                this.name = "c1";
-              },
-            }),
-          )
-          .directive(
-            "c2",
-            valueFn({
-              controller() {
-                this.name = "c2";
-              },
-            }),
-          )
+          .directive("c1", () => ({
+            controller() {
+              this.name = "c1";
+            },
+          }))
+          .directive("c2", () => ({
+            controller() {
+              this.name = "c2";
+            },
+          }))
           .directive("dep", () => ({
             require: ["^c1", "^c2"],
             link(scope, element, attrs, controller) {
@@ -12294,22 +12050,16 @@ describe("$compile", () => {
 
       it("should support multiple controllers as an object hash", () => {
         module
-          .directive(
-            "c1",
-            valueFn({
-              controller() {
-                this.name = "c1";
-              },
-            }),
-          )
-          .directive(
-            "c2",
-            valueFn({
-              controller() {
-                this.name = "c2";
-              },
-            }),
-          )
+          .directive("c1", () => ({
+            controller() {
+              this.name = "c1";
+            },
+          }))
+          .directive("c2", () => ({
+            controller() {
+              this.name = "c2";
+            },
+          }))
           .directive("dep", () => ({
             require: { myC1: "^c1", myC2: "^c2" },
             link(scope, element, attrs, controllers) {
@@ -12323,22 +12073,16 @@ describe("$compile", () => {
 
       it("should support omitting the name of the required controller if it is the same as the key", () => {
         module
-          .directive(
-            "myC1",
-            valueFn({
-              controller() {
-                this.name = "c1";
-              },
-            }),
-          )
-          .directive(
-            "myC2",
-            valueFn({
-              controller() {
-                this.name = "c2";
-              },
-            }),
-          )
+          .directive("myC1", () => ({
+            controller() {
+              this.name = "c1";
+            },
+          }))
+          .directive("myC2", () => ({
+            controller() {
+              this.name = "c2";
+            },
+          }))
           .directive("dep", () => ({
             require: { myC1: "^", myC2: "^" },
             link(scope, element, attrs, controllers) {
@@ -12357,23 +12101,17 @@ describe("$compile", () => {
         const asyncCtrlSpy = jasmine.createSpy("async controller");
 
         module
-          .directive(
-            "myDirectiveSync",
-            valueFn({
-              template: "<div>Hello!</div>",
-              controller: syncCtrlSpy,
-            }),
-          )
-          .directive(
-            "myDirectiveAsync",
-            valueFn({
-              templateUrl: "myDirectiveAsync.html",
-              controller: asyncCtrlSpy,
-              compile() {
-                return () => {};
-              },
-            }),
-          );
+          .directive("myDirectiveSync", () => ({
+            template: "<div>Hello!</div>",
+            controller: syncCtrlSpy,
+          }))
+          .directive("myDirectiveAsync", () => ({
+            templateUrl: "myDirectiveAsync.html",
+            controller: asyncCtrlSpy,
+            compile() {
+              return () => {};
+            },
+          }));
         initInjector("test1");
         expect(syncCtrlSpy).not.toHaveBeenCalled();
         expect(asyncCtrlSpy).not.toHaveBeenCalled();
@@ -12585,14 +12323,11 @@ describe("$compile", () => {
       });
 
       it("should throw ctreq with correct directive name, regardless of order", () => {
-        module.directive(
-          "aDir",
-          valueFn({
-            restrict: "E",
-            require: "ngModel",
-            link: () => {},
-          }),
-        );
+        module.directive("aDir", () => ({
+          restrict: "E",
+          require: "ngModel",
+          link: () => {},
+        }));
         initInjector("test1");
         expect(() => {
           // a-dir will cause a ctreq error to be thrown. Previously, the error would reference
@@ -12652,29 +12387,19 @@ describe("$compile", () => {
 
         it("should transclude transcluded content", async () => {
           module
-            .directive(
-              "book",
-              valueFn({
-                transclude: "content",
-                template:
-                  "<div>book-<div chapter>(<div ng-transclude></div>)</div></div>",
-              }),
-            )
-            .directive(
-              "chapter",
-              valueFn({
-                transclude: "content",
-                templateUrl: "chapter.html",
-              }),
-            )
-            .directive(
-              "section",
-              valueFn({
-                transclude: "content",
-                template:
-                  "<div>section-!<div ng-transclude></div>!</div></div>",
-              }),
-            );
+            .directive("book", () => ({
+              transclude: "content",
+              template:
+                "<div>book-<div chapter>(<div ng-transclude></div>)</div></div>",
+            }))
+            .directive("chapter", () => ({
+              transclude: "content",
+              templateUrl: "chapter.html",
+            }))
+            .directive("section", () => ({
+              transclude: "content",
+              template: "<div>section-!<div ng-transclude></div>!</div></div>",
+            }));
           initInjector("test1");
           // return function ($httpBackend) {
           $templateCache.set(
@@ -12730,20 +12455,17 @@ describe("$compile", () => {
         });
 
         it("should not merge text elements from transcluded content", async () => {
-          module.directive(
-            "foo",
-            valueFn({
-              transclude: "content",
-              template: "<div>This is before {{before}}. </div>",
-              link(scope, element, attr, ctrls, $transclude) {
-                const futureParent = element.children().eq(0);
-                $transclude((clone) => {
-                  futureParent.append(clone);
-                }, futureParent);
-              },
-              scope: true,
-            }),
-          );
+          module.directive("foo", () => ({
+            transclude: "content",
+            template: "<div>This is before {{before}}. </div>",
+            link(scope, element, attr, ctrls, $transclude) {
+              const futureParent = element.children().eq(0);
+              $transclude((clone) => {
+                futureParent.append(clone);
+              }, futureParent);
+            },
+            scope: true,
+          }));
           initInjector("test1");
           element = $compile(
             "<div><div foo>This is after {{after}}</div></div>",
@@ -12767,18 +12489,12 @@ describe("$compile", () => {
 
         it("should only allow one content transclusion per element", () => {
           module
-            .directive(
-              "first",
-              valueFn({
-                transclude: true,
-              }),
-            )
-            .directive(
-              "second",
-              valueFn({
-                transclude: true,
-              }),
-            );
+            .directive("first", () => ({
+              transclude: true,
+            }))
+            .directive("second", () => ({
+              transclude: true,
+            }));
           initInjector("test1");
           expect(() => {
             $compile('<div first="" second=""></div>');
@@ -12787,24 +12503,18 @@ describe("$compile", () => {
 
         it("should correctly handle multi-element directives", () => {
           module
-            .directive(
-              "foo",
-              valueFn({
-                template: "[<div ng-transclude></div>]",
-                transclude: true,
-              }),
-            )
-            .directive(
-              "bar",
-              valueFn({
-                template:
-                  '[<div ng-transclude="header"></div>|<div ng-transclude="footer"></div>]',
-                transclude: {
-                  header: "header",
-                  footer: "footer",
-                },
-              }),
-            );
+            .directive("foo", () => ({
+              template: "[<div ng-transclude></div>]",
+              transclude: true,
+            }))
+            .directive("bar", () => ({
+              template:
+                '[<div ng-transclude="header"></div>|<div ng-transclude="footer"></div>]',
+              transclude: {
+                header: "header",
+                footer: "footer",
+              },
+            }));
           initInjector("test1");
           const tmplWithFoo =
             "<foo>" +
@@ -12832,28 +12542,22 @@ describe("$compile", () => {
         // see issue https://github.com/angular/angular.js/issues/12936
         it("should use the proper scope when it is on the root element of a replaced directive template", async () => {
           module
-            .directive(
-              "isolate",
-              valueFn({
-                scope: {},
-                replace: true,
-                template: "<div trans>{{x}}</div>",
-                link(scope, element, attr, ctrl) {
-                  scope.x = "iso";
-                },
-              }),
-            )
-            .directive(
-              "trans",
-              valueFn({
-                transclude: "content",
-                link(scope, element, attr, ctrl, $transclude) {
-                  $transclude((clone) => {
-                    element.append(clone);
-                  });
-                },
-              }),
-            );
+            .directive("isolate", () => ({
+              scope: {},
+              replace: true,
+              template: "<div trans>{{x}}</div>",
+              link(scope, element, attr, ctrl) {
+                scope.x = "iso";
+              },
+            }))
+            .directive("trans", () => ({
+              transclude: "content",
+              link(scope, element, attr, ctrl, $transclude) {
+                $transclude((clone) => {
+                  element.append(clone);
+                });
+              },
+            }));
           initInjector("test1");
           element = $compile("<isolate></isolate>")($rootScope);
           $rootScope.x = "root";
@@ -12864,28 +12568,22 @@ describe("$compile", () => {
         // see issue https://github.com/angular/angular.js/issues/12936
         it("should use the proper scope when it is on the root element of a replaced directive template with child scope", async () => {
           module
-            .directive(
-              "child",
-              valueFn({
-                scope: true,
-                replace: true,
-                template: "<div trans>{{x}}</div>",
-                link(scope, element, attr, ctrl) {
-                  scope.x = "child";
-                },
-              }),
-            )
-            .directive(
-              "trans",
-              valueFn({
-                transclude: "content",
-                link(scope, element, attr, ctrl, $transclude) {
-                  $transclude((clone) => {
-                    element.append(clone);
-                  });
-                },
-              }),
-            );
+            .directive("child", () => ({
+              scope: true,
+              replace: true,
+              template: "<div trans>{{x}}</div>",
+              link(scope, element, attr, ctrl) {
+                scope.x = "child";
+              },
+            }))
+            .directive("trans", () => ({
+              transclude: "content",
+              link(scope, element, attr, ctrl, $transclude) {
+                $transclude((clone) => {
+                  element.append(clone);
+                });
+              },
+            }));
           initInjector("test1");
           element = $compile("<child></child>")($rootScope);
           $rootScope.x = "root";
@@ -12895,16 +12593,13 @@ describe("$compile", () => {
 
         it("should throw if a transcluded node is transcluded again", () => {
           module
-            .directive(
-              "trans",
-              valueFn({
-                transclude: true,
-                link(scope, element, attr, ctrl, $transclude) {
-                  $transclude();
-                  $transclude();
-                },
-              }),
-            )
+            .directive("trans", () => ({
+              transclude: true,
+              link(scope, element, attr, ctrl, $transclude) {
+                $transclude();
+                $transclude();
+              },
+            }))
             .decorator("$exceptionHandler", () => {
               return (exception, cause) => {
                 throw new Error(exception.message);
@@ -13276,29 +12971,23 @@ describe("$compile", () => {
                 throw new Error(exception.message);
               };
             })
-            .directive(
-              "transFoo",
-              valueFn({
-                template:
-                  "<div>" +
-                  "<div no-trans-bar></div>" +
-                  "<div ng-transclude>this one should get replaced with content</div>" +
-                  '<div class="foo" ng-transclude></div>' +
-                  "</div>",
-                transclude: true,
-              }),
-            )
-            .directive(
-              "noTransBar",
-              valueFn({
-                template:
-                  "<div>" +
-                  // This ng-transclude is invalid. It should throw an error.
-                  '<div class="bar" ng-transclude></div>' +
-                  "</div>",
-                transclude: false,
-              }),
-            );
+            .directive("transFoo", () => ({
+              template:
+                "<div>" +
+                "<div no-trans-bar></div>" +
+                "<div ng-transclude>this one should get replaced with content</div>" +
+                '<div class="foo" ng-transclude></div>' +
+                "</div>",
+              transclude: true,
+            }))
+            .directive("noTransBar", () => ({
+              template:
+                "<div>" +
+                // This ng-transclude is invalid. It should throw an error.
+                '<div class="bar" ng-transclude></div>' +
+                "</div>",
+              transclude: false,
+            }));
           initInjector("test1");
           expect(() => {
             $compile("<div trans-foo>content</div>")($rootScope);
@@ -13313,25 +13002,19 @@ describe("$compile", () => {
                 done();
               };
             })
-            .directive(
-              "transFoo",
-              valueFn({
-                template:
-                  "<div>" +
-                  "<div no-trans-bar></div>" +
-                  "<div ng-transclude>this one should get replaced with content</div>" +
-                  '<div class="foo" ng-transclude></div>' +
-                  "</div>",
-                transclude: true,
-              }),
-            )
-            .directive(
-              "noTransBar",
-              valueFn({
-                templateUrl: "noTransBar.html",
-                transclude: false,
-              }),
-            );
+            .directive("transFoo", () => ({
+              template:
+                "<div>" +
+                "<div no-trans-bar></div>" +
+                "<div ng-transclude>this one should get replaced with content</div>" +
+                '<div class="foo" ng-transclude></div>' +
+                "</div>",
+              transclude: true,
+            }))
+            .directive("noTransBar", () => ({
+              templateUrl: "noTransBar.html",
+              transclude: false,
+            }));
           initInjector("test1");
           $templateCache.set(
             "noTransBar.html",
@@ -13345,22 +13028,19 @@ describe("$compile", () => {
         });
 
         it("should expose transcludeFn in compile fn even for templateUrl", async () => {
-          module.directive(
-            "transInCompile",
-            valueFn({
-              transclude: true,
-              // template: '<div class="foo">whatever</div>',
-              templateUrl: "foo.html",
-              compile(_, __, transclude) {
-                return function (scope, element) {
-                  transclude(scope, (clone, scope) => {
-                    element.html("");
-                    element.append(clone);
-                  });
-                };
-              },
-            }),
-          );
+          module.directive("transInCompile", () => ({
+            transclude: true,
+            // template: '<div class="foo">whatever</div>',
+            templateUrl: "foo.html",
+            compile(_, __, transclude) {
+              return function (scope, element) {
+                transclude(scope, (clone, scope) => {
+                  element.html("");
+                  element.append(clone);
+                });
+              };
+            },
+          }));
           initInjector("test1");
           $templateCache.set("foo.html", '<div class="foo">whatever</div>');
 
@@ -13468,25 +13148,22 @@ describe("$compile", () => {
         it("should copy the directive controller to all clones", () => {
           let transcludeCtrl;
           const cloneCount = 2;
-          module.directive(
-            "transclude",
-            valueFn({
-              transclude: "content",
-              controller($transclude) {
-                transcludeCtrl = this;
-              },
-              link(scope, el, attr, ctrl, $transclude) {
-                let i;
-                for (i = 0; i < cloneCount; i++) {
-                  $transclude(cloneAttach);
-                }
+          module.directive("transclude", () => ({
+            transclude: "content",
+            controller($transclude) {
+              transcludeCtrl = this;
+            },
+            link(scope, el, attr, ctrl, $transclude) {
+              let i;
+              for (i = 0; i < cloneCount; i++) {
+                $transclude(cloneAttach);
+              }
 
-                function cloneAttach(clone) {
-                  el.append(clone);
-                }
-              },
-            }),
-          );
+              function cloneAttach(clone) {
+                el.append(clone);
+              }
+            },
+          }));
           initInjector("test1");
           element = $compile("<div transclude><span></span></div>")($rootScope);
           const children = element.children();
@@ -13505,25 +13182,22 @@ describe("$compile", () => {
           let ctrlTransclude;
           let preLinkTransclude;
           let postLinkTransclude;
-          module.directive(
-            "transclude",
-            valueFn({
-              transclude: "content",
-              controller($transclude) {
-                ctrlTransclude = $transclude;
-              },
-              compile() {
-                return {
-                  pre(scope, el, attr, ctrl, $transclude) {
-                    preLinkTransclude = $transclude;
-                  },
-                  post(scope, el, attr, ctrl, $transclude) {
-                    postLinkTransclude = $transclude;
-                  },
-                };
-              },
-            }),
-          );
+          module.directive("transclude", () => ({
+            transclude: "content",
+            controller($transclude) {
+              ctrlTransclude = $transclude;
+            },
+            compile() {
+              return {
+                pre(scope, el, attr, ctrl, $transclude) {
+                  preLinkTransclude = $transclude;
+                },
+                post(scope, el, attr, ctrl, $transclude) {
+                  postLinkTransclude = $transclude;
+                },
+              };
+            },
+          }));
           initInjector("test1");
           element = $compile("<div transclude></div>")($rootScope);
           expect(ctrlTransclude).toBeDefined();
@@ -13533,17 +13207,14 @@ describe("$compile", () => {
 
         it("should allow an optional scope argument in $transclude", async () => {
           let capturedChildCtrl;
-          module.directive(
-            "transclude",
-            valueFn({
-              transclude: "content",
-              link(scope, element, attr, ctrl, $transclude) {
-                $transclude(scope, (clone) => {
-                  element.append(clone);
-                });
-              },
-            }),
-          );
+          module.directive("transclude", () => ({
+            transclude: "content",
+            link(scope, element, attr, ctrl, $transclude) {
+              $transclude(scope, (clone) => {
+                element.append(clone);
+              });
+            },
+          }));
           initInjector("test1");
           element = $compile("<div transclude>{{$id}}</div>")($rootScope);
           await wait();
@@ -13553,27 +13224,21 @@ describe("$compile", () => {
         it("should expose the directive controller to transcluded children", () => {
           let capturedChildCtrl;
           module
-            .directive(
-              "transclude",
-              valueFn({
-                transclude: "content",
-                controller() {},
-                link(scope, element, attr, ctrl, $transclude) {
-                  $transclude((clone) => {
-                    element.append(clone);
-                  });
-                },
-              }),
-            )
-            .directive(
-              "child",
-              valueFn({
-                require: "^transclude",
-                link(scope, element, attr, ctrl) {
-                  capturedChildCtrl = ctrl;
-                },
-              }),
-            );
+            .directive("transclude", () => ({
+              transclude: "content",
+              controller() {},
+              link(scope, element, attr, ctrl, $transclude) {
+                $transclude((clone) => {
+                  element.append(clone);
+                });
+              },
+            }))
+            .directive("child", () => ({
+              require: "^transclude",
+              link(scope, element, attr, ctrl) {
+                capturedChildCtrl = ctrl;
+              },
+            }));
           initInjector("test1");
           element = $compile("<div transclude><div child></div></div>")(
             $rootScope,
@@ -13583,14 +13248,11 @@ describe("$compile", () => {
 
         // See issue https://github.com/angular/angular.js/issues/14924
         it("should not process top-level transcluded text nodes merged into their sibling", () => {
-          module.directive(
-            "transclude",
-            valueFn({
-              template: "<ng-transclude></ng-transclude>",
-              transclude: true,
-              scope: {},
-            }),
-          );
+          module.directive("transclude", () => ({
+            template: "<ng-transclude></ng-transclude>",
+            transclude: true,
+            scope: {},
+          }));
           initInjector("test1");
           element = JQLite("<div transclude></div>");
           element[0].appendChild(document.createTextNode("1{{ value }}"));
@@ -13623,15 +13285,12 @@ describe("$compile", () => {
                   };
                 },
               }))
-              .directive(
-                "toggle",
-                valueFn({
-                  scope: { t: "=toggle" },
-                  transclude: true,
-                  template:
-                    '<div ng-if="t"><lazy-compile><div ng-transclude></div></lazy-compile></div>',
-                }),
-              );
+              .directive("toggle", () => ({
+                scope: { t: "=toggle" },
+                transclude: true,
+                template:
+                  '<div ng-if="t"><lazy-compile><div ng-transclude></div></lazy-compile></div>',
+              }));
             initInjector("test1");
           });
 
@@ -13663,14 +13322,11 @@ describe("$compile", () => {
           });
 
           it("should preserve the bound scope when using recursive transclusion", () => {
-            module.directive(
-              "recursiveTransclude",
-              valueFn({
-                transclude: true,
-                template:
-                  "<div><lazy-compile><div ng-transclude></div></lazy-compile></div>",
-              }),
-            );
+            module.directive("recursiveTransclude", () => ({
+              transclude: true,
+              template:
+                "<div><lazy-compile><div ng-transclude></div></lazy-compile></div>",
+            }));
             initInjector("test1");
             element = $compile(
               "<div>" +
@@ -13838,51 +13494,33 @@ describe("$compile", () => {
         describe("nested transcludes", () => {
           beforeEach(() => {
             module
-              .directive("noop", valueFn({}))
-              .directive(
-                "sync",
-                valueFn({
-                  template: "<div ng-transclude></div>",
-                  transclude: true,
-                }),
-              )
-              .directive(
-                "async",
-                valueFn({
-                  templateUrl: "async",
-                  transclude: true,
-                }),
-              )
-              .directive(
-                "syncSync",
-                valueFn({
-                  template:
-                    "<div noop><div sync><div ng-transclude></div></div></div>",
-                  transclude: true,
-                }),
-              )
-              .directive(
-                "syncAsync",
-                valueFn({
-                  template:
-                    "<div noop><div async><div ng-transclude></div></div></div>",
-                  transclude: true,
-                }),
-              )
-              .directive(
-                "asyncSync",
-                valueFn({
-                  templateUrl: "asyncSync",
-                  transclude: true,
-                }),
-              )
-              .directive(
-                "asyncAsync",
-                valueFn({
-                  templateUrl: "asyncAsync",
-                  transclude: true,
-                }),
-              );
+              .directive("noop", () => ({}))
+              .directive("sync", () => ({
+                template: "<div ng-transclude></div>",
+                transclude: true,
+              }))
+              .directive("async", () => ({
+                templateUrl: "async",
+                transclude: true,
+              }))
+              .directive("syncSync", () => ({
+                template:
+                  "<div noop><div sync><div ng-transclude></div></div></div>",
+                transclude: true,
+              }))
+              .directive("syncAsync", () => ({
+                template:
+                  "<div noop><div async><div ng-transclude></div></div></div>",
+                transclude: true,
+              }))
+              .directive("asyncSync", () => ({
+                templateUrl: "asyncSync",
+                transclude: true,
+              }))
+              .directive("asyncAsync", () => ({
+                templateUrl: "asyncAsync",
+                transclude: true,
+              }));
 
             initInjector("test1");
             $templateCache.set("async", "<div ng-transclude></div>");
@@ -13949,50 +13587,35 @@ describe("$compile", () => {
         describe("nested isolated scope transcludes", () => {
           beforeEach(() => {
             module
-              .directive(
-                "trans",
-                valueFn({
-                  restrict: "E",
-                  template: "<div ng-transclude></div>",
-                  transclude: true,
-                }),
-              )
-              .directive(
-                "transAsync",
-                valueFn({
-                  restrict: "E",
-                  templateUrl: "transAsync",
-                  transclude: true,
-                }),
-              )
-              .directive(
-                "iso",
-                valueFn({
-                  restrict: "E",
-                  transclude: true,
-                  template: "<trans><span ng-transclude></span></trans>",
-                  scope: {},
-                }),
-              )
-              .directive(
-                "isoAsync1",
-                valueFn({
-                  restrict: "E",
-                  transclude: true,
-                  template:
-                    "<trans-async><span ng-transclude></span></trans-async>",
-                  scope: {},
-                }),
-              )
-              .directive(
-                "isoAsync2",
-                valueFn({
-                  restrict: "E",
-                  transclude: true,
-                  templateUrl: "isoAsync",
-                  scope: {},
-                }),
-              );
+              .directive("trans", () => ({
+                restrict: "E",
+                template: "<div ng-transclude></div>",
+                transclude: true,
+              }))
+              .directive("transAsync", () => ({
+                restrict: "E",
+                templateUrl: "transAsync",
+                transclude: true,
+              }))
+              .directive("iso", () => ({
+                restrict: "E",
+                transclude: true,
+                template: "<trans><span ng-transclude></span></trans>",
+                scope: {},
+              }))
+              .directive("isoAsync1", () => ({
+                restrict: "E",
+                transclude: true,
+                template:
+                  "<trans-async><span ng-transclude></span></trans-async>",
+                scope: {},
+              }))
+              .directive("isoAsync2", () => ({
+                restrict: "E",
+                transclude: true,
+                templateUrl: "isoAsync",
+                scope: {},
+              }));
 
             $templateCache.set("transAsync", "<div ng-transclude></div>");
             $templateCache.set(
@@ -14028,23 +13651,20 @@ describe("$compile", () => {
 
         describe("multiple siblings receiving transclusion", () => {
           it("should only receive transclude from parent", () => {
-            module.directive(
-              "myExample",
-              valueFn({
-                scope: {},
-                link: function link(scope, element, attrs) {
-                  const foo = element[0].querySelector(".foo");
-                  scope.children = JQLite(foo).children().length;
-                },
-                template:
-                  "<div>" +
-                  "<div>myExample {{children}}!</div>" +
-                  '<div ng-if="children">has children</div>' +
-                  '<div class="foo" ng-transclude></div>' +
-                  "</div>",
-                transclude: true,
-              }),
-            );
+            module.directive("myExample", () => ({
+              scope: {},
+              link: function link(scope, element, attrs) {
+                const foo = element[0].querySelector(".foo");
+                scope.children = JQLite(foo).children().length;
+              },
+              template:
+                "<div>" +
+                "<div>myExample {{children}}!</div>" +
+                '<div ng-if="children">has children</div>' +
+                '<div class="foo" ng-transclude></div>' +
+                "</div>",
+              transclude: true,
+            }));
 
             initInjector("test1");
             let element = $compile("<div my-example></div>")($rootScope);
@@ -14094,20 +13714,14 @@ describe("$compile", () => {
 
       it("should only allow one element transclusion per element", () => {
         module
-          .directive(
-            "first",
-            valueFn({
-              transclude: "element",
-              template: "<div ng-transclude></div>",
-            }),
-          )
-          .directive(
-            "second",
-            valueFn({
-              transclude: "element",
-              template: "<div ng-transclude></div>",
-            }),
-          )
+          .directive("first", () => ({
+            transclude: "element",
+            template: "<div ng-transclude></div>",
+          }))
+          .directive("second", () => ({
+            transclude: "element",
+            template: "<div ng-transclude></div>",
+          }))
           .decorator("$exceptionHandler", () => {
             return (exception, cause) => {
               throw new Error(exception.message);
@@ -14123,21 +13737,15 @@ describe("$compile", () => {
         // we restart compilation in this case and we need to remember the duplicates during the second compile
         // regression #3893
         module
-          .directive(
-            "first",
-            valueFn({
-              transclude: "element",
-              template: "<div ng-transclude></div>",
-              priority: 100,
-            }),
-          )
-          .directive(
-            "second",
-            valueFn({
-              transclude: "element",
-              template: "<div ng-transclude></div>",
-            }),
-          )
+          .directive("first", () => ({
+            transclude: "element",
+            template: "<div ng-transclude></div>",
+            priority: 100,
+          }))
+          .directive("second", () => ({
+            transclude: "element",
+            template: "<div ng-transclude></div>",
+          }))
           .decorator("$exceptionHandler", () => {
             return (exception, cause) => {
               throw new Error(exception.message);
@@ -14151,28 +13759,19 @@ describe("$compile", () => {
 
       it("should only allow one element transclusion per element when async replace directive is in the mix", () => {
         module
-          .directive(
-            "template",
-            valueFn({
-              templateUrl: "template.html",
-              replace: true,
-            }),
-          )
-          .directive(
-            "first",
-            valueFn({
-              transclude: true,
-              template: "<div ng-transclude></div>",
-              priority: 100,
-            }),
-          )
-          .directive(
-            "second",
-            valueFn({
-              transclude: true,
-              template: "<div ng-transclude></div>",
-            }),
-          );
+          .directive("template", () => ({
+            templateUrl: "template.html",
+            replace: true,
+          }))
+          .directive("first", () => ({
+            transclude: true,
+            template: "<div ng-transclude></div>",
+            priority: 100,
+          }))
+          .directive("second", () => ({
+            transclude: true,
+            template: "<div ng-transclude></div>",
+          }));
 
         initInjector("test1");
         $templateCache.set("template.html", "<p second>template.html</p>");
@@ -14183,28 +13782,19 @@ describe("$compile", () => {
 
       it("should only allow one element transclusion per element when replace directive is in the mix", () => {
         module
-          .directive(
-            "template",
-            valueFn({
-              template: "<p second></p>",
-              replace: true,
-            }),
-          )
-          .directive(
-            "first",
-            valueFn({
-              transclude: true,
-              template: "<div ng-transclude></div>",
-              priority: 100,
-            }),
-          )
-          .directive(
-            "second",
-            valueFn({
-              transclude: true,
-              template: "<div ng-transclude></div>",
-            }),
-          );
+          .directive("template", () => ({
+            template: "<p second></p>",
+            replace: true,
+          }))
+          .directive("first", () => ({
+            transclude: true,
+            template: "<div ng-transclude></div>",
+            priority: 100,
+          }))
+          .directive("second", () => ({
+            transclude: true,
+            template: "<div ng-transclude></div>",
+          }));
         initInjector("test1");
         expect(() => {
           $compile("<div template first></div>");
@@ -14213,17 +13803,14 @@ describe("$compile", () => {
 
       it("should support transcluded element on root content", () => {
         let comment;
-        module.directive(
-          "transclude",
-          valueFn({
-            transclude: "element",
-            compile(element, attr, linker) {
-              return function (scope, element, attr) {
-                comment = element;
-              };
-            },
-          }),
-        );
+        module.directive("transclude", () => ({
+          transclude: "element",
+          compile(element, attr, linker) {
+            return function (scope, element, attr) {
+              comment = element;
+            };
+          },
+        }));
         initInjector("test1");
         const element = JQLite(
           JQLite("<div>before<div transclude></div>after</div>")[0].childNodes,
@@ -14240,9 +13827,9 @@ describe("$compile", () => {
           .directive("log", () => ({
             restrict: "A",
             priority: 0,
-            compile: valueFn((scope, element, attrs) => {
+            compile: () => (scope, element, attrs) => {
               log.push(attrs.log || "LOG");
-            }),
+            },
           }))
           .directive("elementTrans", () => ({
             transclude: "element",
@@ -14301,15 +13888,12 @@ describe("$compile", () => {
 
       it("should allow to access $transclude in the same directive", () => {
         let _$transclude;
-        module.directive(
-          "transclude",
-          valueFn({
-            transclude: "element",
-            controller($transclude) {
-              _$transclude = $transclude;
-            },
-          }),
-        );
+        module.directive("transclude", () => ({
+          transclude: "element",
+          controller($transclude) {
+            _$transclude = $transclude;
+          },
+        }));
         initInjector("test1");
         element = $compile("<div transclude></div>")($rootScope);
         expect(_$transclude).toBeDefined();
@@ -14318,25 +13902,22 @@ describe("$compile", () => {
       it("should copy the directive controller to all clones", () => {
         let transcludeCtrl;
         const cloneCount = 2;
-        module.directive(
-          "transclude",
-          valueFn({
-            transclude: "element",
-            controller() {
-              transcludeCtrl = this;
-            },
-            link(scope, el, attr, ctrl, $transclude) {
-              let i;
-              for (i = 0; i < cloneCount; i++) {
-                $transclude(cloneAttach);
-              }
+        module.directive("transclude", () => ({
+          transclude: "element",
+          controller() {
+            transcludeCtrl = this;
+          },
+          link(scope, el, attr, ctrl, $transclude) {
+            let i;
+            for (i = 0; i < cloneCount; i++) {
+              $transclude(cloneAttach);
+            }
 
-              function cloneAttach(clone) {
-                el.after(clone);
-              }
-            },
-          }),
-        );
+            function cloneAttach(clone) {
+              el.after(clone);
+            }
+          },
+        }));
         initInjector("test1");
         element = $compile("<div><div transclude></div></div>")($rootScope);
         const children = element.children();
@@ -14351,27 +13932,21 @@ describe("$compile", () => {
       it("should expose the directive controller to transcluded children", () => {
         let capturedTranscludeCtrl;
         module
-          .directive(
-            "transclude",
-            valueFn({
-              transclude: "element",
-              controller() {},
-              link(scope, element, attr, ctrl, $transclude) {
-                $transclude(scope, (clone) => {
-                  element.after(clone);
-                });
-              },
-            }),
-          )
-          .directive(
-            "child",
-            valueFn({
-              require: "^transclude",
-              link(scope, element, attr, ctrl) {
-                capturedTranscludeCtrl = ctrl;
-              },
-            }),
-          );
+          .directive("transclude", () => ({
+            transclude: "element",
+            controller() {},
+            link(scope, element, attr, ctrl, $transclude) {
+              $transclude(scope, (clone) => {
+                element.after(clone);
+              });
+            },
+          }))
+          .directive("child", () => ({
+            require: "^transclude",
+            link(scope, element, attr, ctrl) {
+              capturedTranscludeCtrl = ctrl;
+            },
+          }));
         initInjector("test1");
         // We need to wrap the transclude directive's element in a parent element so that the
         // cloned element gets deallocated/cleaned up correctly
@@ -14384,22 +13959,16 @@ describe("$compile", () => {
       it("should allow access to $transclude in a templateUrl directive", () => {
         let transclude;
         module
-          .directive(
-            "template",
-            valueFn({
-              templateUrl: "template.html",
-              replace: true,
-            }),
-          )
-          .directive(
-            "transclude",
-            valueFn({
-              transclude: "content",
-              controller($transclude) {
-                transclude = $transclude;
-              },
-            }),
-          );
+          .directive("template", () => ({
+            templateUrl: "template.html",
+            replace: true,
+          }))
+          .directive("transclude", () => ({
+            transclude: "content",
+            controller($transclude) {
+              transclude = $transclude;
+            },
+          }));
         initInjector("test1");
         $templateCache.set("template.html", "<div transclude></div>");
         element = $compile("<div template></div>")($rootScope);
@@ -14549,24 +14118,18 @@ describe("$compile", () => {
         let transclude;
 
         module
-          .directive(
-            "trans",
-            valueFn({
-              transclude: true,
-              controller($transclude) {
-                transclude = $transclude;
-              },
-            }),
-          )
-          .directive(
-            "inner",
-            valueFn({
-              template: "<span>FooBar</span>",
-              compile() {
-                innerCompilationCount += 1;
-              },
-            }),
-          );
+          .directive("trans", () => ({
+            transclude: true,
+            controller($transclude) {
+              transclude = $transclude;
+            },
+          }))
+          .directive("inner", () => ({
+            template: "<span>FooBar</span>",
+            compile() {
+              innerCompilationCount += 1;
+            },
+          }));
         initInjector("test1");
         element = $compile("<trans><inner></inner></trans>")($rootScope);
         expect(innerCompilationCount).toBe(0);
@@ -14582,25 +14145,19 @@ describe("$compile", () => {
         let transclude;
 
         module
-          .directive(
-            "trans",
-            valueFn({
-              transclude: true,
-              template: "<div>Baz</div>",
-              controller($transclude) {
-                transclude = $transclude;
-              },
-            }),
-          )
-          .directive(
-            "inner",
-            valueFn({
-              template: "<span>FooBar</span>",
-              compile() {
-                innerCompilationCount += 1;
-              },
-            }),
-          );
+          .directive("trans", () => ({
+            transclude: true,
+            template: "<div>Baz</div>",
+            controller($transclude) {
+              transclude = $transclude;
+            },
+          }))
+          .directive("inner", () => ({
+            template: "<span>FooBar</span>",
+            compile() {
+              innerCompilationCount += 1;
+            },
+          }));
         initInjector("test1");
         element = $compile("<trans><inner></inner></trans>")($rootScope);
         expect(innerCompilationCount).toBe(0);
@@ -14616,25 +14173,19 @@ describe("$compile", () => {
         let transclude;
 
         module
-          .directive(
-            "trans",
-            valueFn({
-              transclude: true,
-              templateUrl: "baz.html",
-              controller($transclude) {
-                transclude = $transclude;
-              },
-            }),
-          )
-          .directive(
-            "inner",
-            valueFn({
-              template: "<span>FooBar</span>",
-              compile() {
-                innerCompilationCount += 1;
-              },
-            }),
-          );
+          .directive("trans", () => ({
+            transclude: true,
+            templateUrl: "baz.html",
+            controller($transclude) {
+              transclude = $transclude;
+            },
+          }))
+          .directive("inner", () => ({
+            template: "<span>FooBar</span>",
+            compile() {
+              innerCompilationCount += 1;
+            },
+          }));
         initInjector("test1");
         $templateCache.set("baz.html", "<div>Baz</div>");
         element = $compile("<trans><inner></inner></trans>")($rootScope);
@@ -14651,24 +14202,18 @@ describe("$compile", () => {
         let transclude;
 
         module
-          .directive(
-            "trans",
-            valueFn({
-              transclude: "element",
-              controller($transclude) {
-                transclude = $transclude;
-              },
-            }),
-          )
-          .directive(
-            "inner",
-            valueFn({
-              template: "<span>FooBar</span>",
-              compile() {
-                innerCompilationCount += 1;
-              },
-            }),
-          );
+          .directive("trans", () => ({
+            transclude: "element",
+            controller($transclude) {
+              transclude = $transclude;
+            },
+          }))
+          .directive("inner", () => ({
+            template: "<span>FooBar</span>",
+            compile() {
+              innerCompilationCount += 1;
+            },
+          }));
         initInjector("test1");
         element = $compile("<div><trans><inner></inner></trans></div>")(
           $rootScope,
@@ -14687,27 +14232,21 @@ describe("$compile", () => {
         let transclude;
 
         module
-          .directive(
-            "outer",
-            valueFn({
-              transclude: true,
-              compile() {
-                outerCompilationCount += 1;
-              },
-              controller($transclude) {
-                transclude = $transclude;
-              },
-            }),
-          )
-          .directive(
-            "inner",
-            valueFn({
-              template: "<span>FooBar</span>",
-              compile() {
-                innerCompilationCount += 1;
-              },
-            }),
-          );
+          .directive("outer", () => ({
+            transclude: true,
+            compile() {
+              outerCompilationCount += 1;
+            },
+            controller($transclude) {
+              transclude = $transclude;
+            },
+          }))
+          .directive("inner", () => ({
+            template: "<span>FooBar</span>",
+            compile() {
+              innerCompilationCount += 1;
+            },
+          }));
         initInjector("test1");
         $rootScope.shouldCompile = false;
 
@@ -14733,27 +14272,18 @@ describe("$compile", () => {
         let innerCompilationCount = 0;
 
         module
-          .directive(
-            "outer",
-            valueFn({
-              transclude: true,
-            }),
-          )
-          .directive(
-            "outer",
-            valueFn({
-              templateUrl: "inner.html",
-              replace: true,
-            }),
-          )
-          .directive(
-            "inner",
-            valueFn({
-              compile() {
-                innerCompilationCount += 1;
-              },
-            }),
-          );
+          .directive("outer", () => ({
+            transclude: true,
+          }))
+          .directive("outer", () => ({
+            templateUrl: "inner.html",
+            replace: true,
+          }))
+          .directive("inner", () => ({
+            compile() {
+              innerCompilationCount += 1;
+            },
+          }));
         initInjector("test1");
         $templateCache.set("inner.html", "<inner></inner>");
         element = $compile("<outer></outer>")($rootScope);
@@ -15077,14 +14607,11 @@ describe("$compile", () => {
 
     // See issue https://github.com/angular/angular.js/issues/14924
     it("should not process top-level transcluded text nodes merged into their sibling", () => {
-      module.directive(
-        "transclude",
-        valueFn({
-          template: "<ng-transclude></ng-transclude>",
-          transclude: {},
-          scope: {},
-        }),
-      );
+      module.directive("transclude", () => ({
+        template: "<ng-transclude></ng-transclude>",
+        transclude: {},
+        scope: {},
+      }));
       initInjector("test1");
       element = JQLite("<div transclude></div>");
       element[0].appendChild(document.createTextNode("1{{ value }}"));
@@ -15250,18 +14777,15 @@ describe("$compile", () => {
   describe("img[srcset] sanitization", () => {
     it("should not error if srcset is undefined", () => {
       let linked = false;
-      module.directive(
-        "setter",
-        valueFn((scope, elem, attrs) => {
-          // Set srcset to a value
-          attrs.$set("srcset", "http://example.com/");
-          expect(attrs.srcset).toBe("http://example.com/");
-          // Now set it to undefined
-          attrs.$set("srcset", undefined);
-          expect(attrs.srcset).toBeUndefined();
-          linked = true;
-        }),
-      );
+      module.directive("setter", () => (scope, elem, attrs) => {
+        // Set srcset to a value
+        attrs.$set("srcset", "http://example.com/");
+        expect(attrs.srcset).toBe("http://example.com/");
+        // Now set it to undefined
+        attrs.$set("srcset", undefined);
+        expect(attrs.srcset).toBeUndefined();
+        linked = true;
+      });
       initInjector("test1");
       element = $compile("<img setter></img>")($rootScope);
       expect(linked).toBe(true);
@@ -15872,14 +15396,11 @@ describe("$compile", () => {
 
     it("should use the non-prefixed name in $attr mappings", async () => {
       let attrs;
-      module.directive(
-        "attrExposer",
-        valueFn({
-          link($scope, $element, $attrs) {
-            attrs = $attrs;
-          },
-        }),
-      );
+      module.directive("attrExposer", () => ({
+        link($scope, $element, $attrs) {
+          attrs = $attrs;
+        },
+      }));
       initInjector("test1");
 
       $compile(
@@ -16268,15 +15789,12 @@ describe("$compile", () => {
     });
 
     it("should group on nested groups", () => {
-      module.directive(
-        "ngMultiBind",
-        valueFn({
-          multiElement: true,
-          link(scope, element, attr) {
-            element.text(scope.$eval(attr.ngMultiBind));
-          },
-        }),
-      );
+      module.directive("ngMultiBind", () => ({
+        multiElement: true,
+        link(scope, element, attr) {
+          element.text(scope.$eval(attr.ngMultiBind));
+        },
+      }));
       initInjector("test1");
 
       $rootScope.show = false;

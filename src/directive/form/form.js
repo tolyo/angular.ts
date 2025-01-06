@@ -1,5 +1,4 @@
 import {
-  valueFn,
   assertNotHasOwnProperty,
   shallowCopy,
   arrayRemove,
@@ -18,7 +17,7 @@ import { isProxy } from "../../core/scope/scope.js";
 
 export const nullFormCtrl = {
   $addControl: () => {},
-  $getControls: valueFn([]),
+  $getControls: () => [],
   $$renameControl: nullFormRenameControl,
   $removeControl: () => {},
   /** @type {(...any) => any} */

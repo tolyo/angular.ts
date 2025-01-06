@@ -409,16 +409,6 @@ export function inherit(parent, extra) {
   return extend(Object.create(parent), extra);
 }
 
-/**
- * @param {*} value
- * @returns {() => *}
- */
-export function valueFn(value) {
-  return function valueRef() {
-    return value;
-  };
-}
-
 export function hasCustomToString(obj) {
   return isFunction(obj.toString) && obj.toString !== toString;
 }

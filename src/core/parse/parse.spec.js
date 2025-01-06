@@ -218,7 +218,7 @@ describe("parser", () => {
       it("should parse filters", () => {
         filterProvider.register(
           "substring",
-          valueFn((input, start, end) => input.substring(start, end)),
+          () => (input, start, end) => input.substring(start, end),
         );
 
         expect(() => {
@@ -997,13 +997,10 @@ describe("parser", () => {
 
     it("should be invoked when the input/arguments change", async () => {
       let filterCalled = false;
-      filterProvider.register(
-        "foo",
-        valueFn((input) => {
-          filterCalled = true;
-          return input;
-        }),
-      );
+      filterProvider.register("foo", () => (input) => {
+        filterCalled = true;
+        return input;
+      });
 
       scope.$watch("a | foo:b:1", () => {});
       await wait();
@@ -1024,13 +1021,10 @@ describe("parser", () => {
 
     it("should not be invoked unless the input/arguments change within literals", async () => {
       const filterCalls = [];
-      filterProvider.register(
-        "foo",
-        valueFn((input) => {
-          filterCalls.push(input);
-          return input;
-        }),
-      );
+      filterProvider.register("foo", () => (input) => {
+        filterCalls.push(input);
+        return input;
+      });
 
       scope.$watch("[(a | foo:b:1), undefined]", () => {});
 
@@ -1045,13 +1039,10 @@ describe("parser", () => {
 
     it("should be treated as constant when input are constant", async () => {
       let filterCalls = 0;
-      filterProvider.register(
-        "foo",
-        valueFn((input) => {
-          filterCalls++;
-          return input;
-        }),
-      );
+      filterProvider.register("foo", () => (input) => {
+        filterCalls++;
+        return input;
+      });
 
       const parsed = $parse("{x: 1} | foo:1");
       expect(parsed.constant).toBe(true);
@@ -1111,13 +1102,10 @@ describe("parser", () => {
     describe("that does NOT support valueOf()", () => {
       it("should always be reevaluated", async () => {
         let filterCalls = 0;
-        filterProvider.register(
-          "foo",
-          valueFn((input) => {
-            filterCalls++;
-            return input;
-          }),
-        );
+        filterProvider.register("foo", () => (input) => {
+          filterCalls++;
+          return input;
+        });
 
         scope.obj = {};
 
@@ -1132,10 +1120,7 @@ describe("parser", () => {
       });
 
       it("should always be reevaluated in literals", async () => {
-        filterProvider.register(
-          "foo",
-          valueFn((input) => input.b > 0),
-        );
+        filterProvider.register("foo", () => (input) => input.b > 0);
 
         scope.$watch("[(a | foo)]", () => {});
         scope.$apply("a = {b: 1}");
@@ -1163,14 +1148,11 @@ describe("parser", () => {
     describe("that does support valueOf()", () => {
       it("should not be reevaluated", async () => {
         let filterCalls = 0;
-        filterProvider.register(
-          "foo",
-          valueFn((input) => {
-            filterCalls++;
-            expect(input instanceof Date).toBe(true);
-            return input;
-          }),
-        );
+        filterProvider.register("foo", () => (input) => {
+          filterCalls++;
+          expect(input instanceof Date).toBe(true);
+          return input;
+        });
 
         const date = (scope.date = new Date());
 
@@ -1186,13 +1168,10 @@ describe("parser", () => {
 
       it("should not be reevaluated in literals", async () => {
         let filterCalls = 0;
-        filterProvider.register(
-          "foo",
-          valueFn((input) => {
-            filterCalls++;
-            return input;
-          }),
-        );
+        filterProvider.register("foo", () => (input) => {
+          filterCalls++;
+          return input;
+        });
 
         let watcherCalls = 0;
         scope.$watch("[(date | foo)]", (input) => {
@@ -1215,13 +1194,10 @@ describe("parser", () => {
 
       it("should be reevaluated when valueOf() changes", async () => {
         let filterCalls = 0;
-        filterProvider.register(
-          "foo",
-          valueFn((input) => {
-            filterCalls++;
-            return input;
-          }),
-        );
+        filterProvider.register("foo", () => (input) => {
+          filterCalls++;
+          return input;
+        });
 
         let watcherCalls = 0;
 
@@ -1243,13 +1219,10 @@ describe("parser", () => {
 
       it("should be reevaluated in literals when valueOf() changes", async () => {
         let filterCalls = 0;
-        filterProvider.register(
-          "foo",
-          valueFn((input) => {
-            filterCalls++;
-            return input;
-          }),
-        );
+        filterProvider.register("foo", () => (input) => {
+          filterCalls++;
+          return input;
+        });
 
         scope.date = new Date(1234567890123);
 
@@ -1271,13 +1244,10 @@ describe("parser", () => {
 
       it("should not be reevaluated when the instance changes but valueOf() does not", async () => {
         let filterCalls = 0;
-        filterProvider.register(
-          "foo",
-          valueFn((input) => {
-            filterCalls++;
-            return input;
-          }),
-        );
+        filterProvider.register("foo", () => (input) => {
+          filterCalls++;
+          return input;
+        });
 
         scope.date = new Date(1234567890123);
 
@@ -1299,13 +1269,10 @@ describe("parser", () => {
 
     it("should not be reevaluated when input is simplified via unary operators", async () => {
       let filterCalls = 0;
-      filterProvider.register(
-        "foo",
-        valueFn((input) => {
-          filterCalls++;
-          return input;
-        }),
-      );
+      filterProvider.register("foo", () => (input) => {
+        filterCalls++;
+        return input;
+      });
 
       scope.obj = {};
 
@@ -1325,13 +1292,10 @@ describe("parser", () => {
 
     it("should not be reevaluated when input is simplified via non-plus/concat binary operators", async () => {
       let filterCalls = 0;
-      filterProvider.register(
-        "foo",
-        valueFn((input) => {
-          filterCalls++;
-          return input;
-        }),
-      );
+      filterProvider.register("foo", () => (input) => {
+        filterCalls++;
+        return input;
+      });
 
       scope.obj = {};
 
@@ -1351,13 +1315,10 @@ describe("parser", () => {
 
     it("should be reevaluated when input is simplified via plus/concat", async () => {
       let filterCalls = 0;
-      filterProvider.register(
-        "foo",
-        valueFn((input) => {
-          filterCalls++;
-          return input;
-        }),
-      );
+      filterProvider.register("foo", () => (input) => {
+        filterCalls++;
+        return input;
+      });
 
       scope.obj = {};
 
@@ -1392,13 +1353,10 @@ describe("parser", () => {
 
     it("should not be reevaluated when passed literals", async () => {
       let filterCalls = 0;
-      filterProvider.register(
-        "foo",
-        valueFn((input) => {
-          filterCalls++;
-          return input;
-        }),
-      );
+      filterProvider.register("foo", () => (input) => {
+        filterCalls++;
+        return input;
+      });
 
       let watcherCalls = 0;
       scope.$watch("[a] | foo", (input) => {
@@ -1418,13 +1376,10 @@ describe("parser", () => {
 
     it("should not be reevaluated in literals", async () => {
       let filterCalls = 0;
-      filterProvider.register(
-        "foo",
-        valueFn((input) => {
-          filterCalls++;
-          return input;
-        }),
-      );
+      filterProvider.register("foo", () => (input) => {
+        filterCalls++;
+        return input;
+      });
 
       scope.prim = 1234567890123;
 

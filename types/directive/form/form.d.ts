@@ -121,7 +121,7 @@ export function addSetValidityMethod(context: any): void;
 export function isObjectEmpty(obj: any): boolean;
 export namespace nullFormCtrl {
     export function $addControl(): void;
-    export let $getControls: () => any;
+    export function $getControls(): any[];
     export { nullFormRenameControl as $$renameControl };
     export function $removeControl(): void;
     export let $setValidity: (...any: any) => any;

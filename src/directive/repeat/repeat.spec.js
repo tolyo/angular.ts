@@ -1,7 +1,6 @@
-import { Angular } from "../../loader";
+import { Angular } from "../../loader.js";
 import { dealoc, JQLite } from "../../shared/jqlite/jqlite.js";
-import { valueFn } from "../../shared/utils";
-import { wait } from "../../shared/test-utils";
+import { wait } from "../../shared/test-utils.js";
 
 describe("ngRepeat", () => {
   let element;
@@ -1185,17 +1184,14 @@ describe("ngRepeat", () => {
 
   describe("compatibility", () => {
     it("should allow mixing ngRepeat and another element transclusion directive", async () => {
-      $compileProvider.directive(
-        "elmTrans",
-        valueFn({
-          transclude: "element",
-          controller($transclude, $scope, $element) {
-            $transclude((transcludedNodes) => {
-              $element.after("]]").after(transcludedNodes).after("[[");
-            });
-          },
-        }),
-      );
+      $compileProvider.directive("elmTrans", () => ({
+        transclude: "element",
+        controller($transclude, $scope, $element) {
+          $transclude((transcludedNodes) => {
+            $element.after("]]").after(transcludedNodes).after("[[");
+          });
+        },
+      }));
 
       $compile = injector.get("$compile");
 
@@ -1275,25 +1271,19 @@ describe("ngRepeat", () => {
     it("should allow access to directive controller from children when used in a replace template", () => {
       let controller;
       $compileProvider
-        .directive(
-          "template",
-          valueFn({
-            template: '<div ng-repeat="l in [1]"><span test></span></div>',
-            replace: true,
-            controller() {
-              this.flag = true;
-            },
-          }),
-        )
-        .directive(
-          "test",
-          valueFn({
-            require: "^template",
-            link(_scope, _el, _attr, ctrl) {
-              controller = ctrl;
-            },
-          }),
-        );
+        .directive("template", () => ({
+          template: '<div ng-repeat="l in [1]"><span test></span></div>',
+          replace: true,
+          controller() {
+            this.flag = true;
+          },
+        }))
+        .directive("test", () => ({
+          require: "^template",
+          link(_scope, _el, _attr, ctrl) {
+            controller = ctrl;
+          },
+        }));
 
       injector.invoke(async ($compile, $rootScope) => {
         const element = $compile("<div><div template></div></div>")($rootScope);
@@ -1305,15 +1295,12 @@ describe("ngRepeat", () => {
     });
 
     it("should use the correct transcluded scope", async () => {
-      $compileProvider.directive(
-        "iso",
-        valueFn({
-          restrict: "E",
-          transclude: true,
-          template: '<div ng-repeat="a in [1]"><div ng-transclude></div></div>',
-          scope: {},
-        }),
-      );
+      $compileProvider.directive("iso", () => ({
+        restrict: "E",
+        transclude: true,
+        template: '<div ng-repeat="a in [1]"><div ng-transclude></div></div>',
+        scope: {},
+      }));
       injector.invoke(async (_$compile_, _$rootScope_) => {
         $compile = _$compile_;
         $rootScope = _$rootScope_;
@@ -1329,14 +1316,11 @@ describe("ngRepeat", () => {
     });
 
     it("should set the state before linking", async () => {
-      $compileProvider.directive(
-        "assertA",
-        valueFn((scope) => {
-          // This linking function asserts that a is set.
-          // If we only test this by asserting binding, it will work even if the value is set later.
-          expect(scope.a).toBeDefined();
-        }),
-      );
+      $compileProvider.directive("assertA", () => (scope) => {
+        // This linking function asserts that a is set.
+        // If we only test this by asserting binding, it will work even if the value is set later.
+        expect(scope.a).toBeDefined();
+      });
 
       injector.invoke(async (_$compile_, _$rootScope_) => {
         $compile = _$compile_;

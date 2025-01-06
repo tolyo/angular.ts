@@ -3393,7 +3393,7 @@ describe("$http", function () {
 //                 .finally(() => {
 //                   reqInterceptorFulfilled = true;
 //                 })
-//                 .then(valueFn(config));
+//                 .then(() => (config));
 //             },
 //             response() {
 //               return (resInterceptorDeferred = Promise.withResolvers().promise.finally(
@@ -3877,11 +3877,11 @@ describe("$http", function () {
 //     });
 
 //     it("should serialize arrays with functions", () => {
-//       expect(jqrSer({ foo: [valueFn("bar")] })).toEqual("foo%5B%5D=bar"); // foo[]=bar
+//       expect(jqrSer({ foo: [() => ("bar")] })).toEqual("foo%5B%5D=bar"); // foo[]=bar
 //     });
 
 //     it("should serialize arrays with functions inside objects", () => {
-//       expect(jqrSer({ foo: { bar: [valueFn("baz")] } })).toEqual(
+//       expect(jqrSer({ foo: { bar: [() => ("baz")] } })).toEqual(
 //         "foo%5Bbar%5D%5B%5D=baz",
 //       ); // foo[bar][]=baz
 //     });
@@ -3894,11 +3894,11 @@ describe("$http", function () {
 //     });
 
 //     it("should serialize objects with function properties", () => {
-//       expect(jqrSer({ a: valueFn("b") })).toEqual("a=b");
+//       expect(jqrSer({ a: () => ("b") })).toEqual("a=b");
 //     });
 
 //     it("should serialize objects with function properties returning an object", () => {
-//       expect(jqrSer({ a: valueFn({ b: "c" }) })).toEqual(
+//       expect(jqrSer({ a: () => ({ b: "c" }) })).toEqual(
 //         "a=%7B%22b%22:%22c%22%7D",
 //       ); // a={"b":"c"}
 //     });
@@ -3913,13 +3913,13 @@ describe("$http", function () {
 //     });
 
 //     it("should serialize nested objects with function properties", () => {
-//       expect(jqrSer({ foo: { bar: valueFn("barv") } })).toEqual(
+//       expect(jqrSer({ foo: { bar: () => ("barv") } })).toEqual(
 //         "foo%5Bbar%5D=barv",
 //       ); // foo[bar]=barv
 //     });
 
 //     it("should serialize nested objects with function properties returning an object", () => {
-//       expect(jqrSer({ foo: { bar: valueFn({ bav: "barv" }) } })).toEqual(
+//       expect(jqrSer({ foo: { bar: () => ({ bav: "barv" }) } })).toEqual(
 //         "foo%5Bbar%5D=%7B%22bav%22:%22barv%22%7D",
 //       ); // foo[bar]={"bav":"barv"}
 //     });

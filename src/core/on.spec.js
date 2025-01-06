@@ -1,6 +1,5 @@
 import { Angular } from "../loader";
 import { createInjector } from "./di/injector";
-import { valueFn } from "../shared/utils";
 
 describe("ngOn* event binding", () => {
   let $rootScope, module, injector, $compile;
@@ -131,14 +130,11 @@ describe("ngOn* event binding", () => {
     window.angular.module("test", [
       "ng",
       ($compileProvider) => {
-        $compileProvider.directive(
-          "attrExposer",
-          valueFn({
-            link($scope, $element, $attrs) {
-              attrs = $attrs;
-            },
-          }),
-        );
+        $compileProvider.directive("attrExposer", () => ({
+          link($scope, $element, $attrs) {
+            attrs = $attrs;
+          },
+        }));
       },
     ]);
     injector = createInjector(["ng", "test"]);
@@ -169,14 +165,11 @@ describe("ngOn* event binding", () => {
     window.angular.module("test", [
       "ng",
       ($compileProvider) => {
-        $compileProvider.directive(
-          "attrExposer",
-          valueFn({
-            link($scope, $element, $attrs) {
-              attrs = $attrs;
-            },
-          }),
-        );
+        $compileProvider.directive("attrExposer", () => ({
+          link($scope, $element, $attrs) {
+            attrs = $attrs;
+          },
+        }));
       },
     ]);
     injector = createInjector(["ng", "test"]);

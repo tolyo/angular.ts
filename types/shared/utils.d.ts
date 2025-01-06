@@ -228,11 +228,6 @@ export function isNumberNaN(num: any): boolean;
  * @returns {Object}
  */
 export function inherit(parent: any, extra: any): any;
-/**
- * @param {*} value
- * @returns {() => *}
- */
-export function valueFn(value: any): () => any;
 export function hasCustomToString(obj: any): boolean;
 /**
  * @module angular

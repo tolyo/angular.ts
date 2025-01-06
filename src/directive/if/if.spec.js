@@ -1,7 +1,6 @@
 import { dealoc, JQLite } from "../../shared/jqlite/jqlite.js";
-import { valueFn } from "../../shared/utils";
-import { Angular } from "../../loader";
-import { wait } from "../../shared/test-utils";
+import { Angular } from "../../loader.js";
+import { wait } from "../../shared/test-utils.js";
 
 describe("ngIf", () => {
   describe("basic", () => {
@@ -277,25 +276,19 @@ describe("ngIf", () => {
       it("should allow access to directive controller from children when used in a replace template", async () => {
         let controller;
         const { directive } = $compileProvider;
-        directive(
-          "template",
-          valueFn({
-            template: '<div ng-if="true"><span test></span></div>',
-            replace: true,
-            controller() {
-              this.flag = true;
-            },
-          }),
-        );
-        directive(
-          "test",
-          valueFn({
-            require: "^template",
-            link(scope, el, attr, ctrl) {
-              controller = ctrl;
-            },
-          }),
-        );
+        directive("template", () => ({
+          template: '<div ng-if="true"><span test></span></div>',
+          replace: true,
+          controller() {
+            this.flag = true;
+          },
+        }));
+        directive("test", () => ({
+          require: "^template",
+          link(scope, el, attr, ctrl) {
+            controller = ctrl;
+          },
+        }));
         $compile("<div><div template></div></div>")($rootScope);
         await wait();
         await wait();
@@ -303,19 +296,16 @@ describe("ngIf", () => {
       });
 
       it("should use the correct transcluded scope", async () => {
-        $compileProvider.directive(
-          "iso",
-          valueFn({
-            link(scope) {
-              scope.val = "value in iso scope";
-            },
-            restrict: "E",
-            transclude: true,
-            template:
-              '<div ng-if="true">val={{val}}-<div ng-transclude></div></div>',
-            scope: {},
-          }),
-        );
+        $compileProvider.directive("iso", () => ({
+          link(scope) {
+            scope.val = "value in iso scope";
+          },
+          restrict: "E",
+          transclude: true,
+          template:
+            '<div ng-if="true">val={{val}}-<div ng-transclude></div></div>',
+          scope: {},
+        }));
         $rootScope.val = "transcluded content";
         const element = $compile('<iso><span ng-bind="val"></span></iso>')(
           $rootScope,

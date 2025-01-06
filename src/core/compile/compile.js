@@ -18,7 +18,6 @@ import {
   lowercase,
   extend,
   isScope,
-  valueFn,
   inherit,
   isUndefined,
   getNodeName,
@@ -207,9 +206,9 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
               try {
                 let directive = $injector.invoke(directiveFactory);
                 if (isFunction(directive)) {
-                  directive = { compile: valueFn(directive) };
+                  directive = { compile: () => directive };
                 } else if (!directive.compile && directive.link) {
-                  directive.compile = valueFn(directive.link);
+                  directive.compile = () => directive.link;
                 }
                 directive.priority = directive.priority || 0;
                 directive.index = index;

@@ -1,8 +1,6 @@
 import { defaultModelOptions } from "./model-options";
 import { dealoc, JQLite } from "../../shared/jqlite/jqlite.js";
 import { Angular } from "../../loader";
-import { createInjector } from "../../core/di/injector";
-import { valueFn } from "../../shared/utils";
 
 function changeGivenInputTo(inputElm, val) {
   inputElm[0].value = val;
@@ -985,7 +983,7 @@ describe("ngModelOptions", () => {
         window.angular = new Angular();
         module = window.angular.module("myModule", []).directive(
           "foo",
-          valueFn({
+          () => ({
             replace: true,
             template:
               '<input type="text" ng-model-options="{debounce: 1000}" />',

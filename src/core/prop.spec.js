@@ -1,6 +1,5 @@
-import { Angular } from "../loader";
-import { createInjector } from "./di/injector";
-import { valueFn } from "../shared/utils";
+import { Angular } from "../loader.js";
+import { createInjector } from "./di/injector.js";
 import { dealoc } from "../shared/jqlite/jqlite.js";
 
 describe("ngProp*", () => {
@@ -154,14 +153,11 @@ describe("ngProp*", () => {
 
   it("should use the full ng-prop-* attribute name in $attr mappings", () => {
     let attrs;
-    compileProvider.directive(
-      "attrExposer",
-      valueFn({
-        link($scope, $element, $attrs) {
-          attrs = $attrs;
-        },
-      }),
-    );
+    compileProvider.directive("attrExposer", () => ({
+      link($scope, $element, $attrs) {
+        attrs = $attrs;
+      },
+    }));
     $compile(
       '<div attr-exposer ng-prop-title="12" ng-prop-super-title="34" ng-prop-my-camel-title="56">',
     )($rootScope);
@@ -184,14 +180,11 @@ describe("ngProp*", () => {
 
   it("should not conflict with (ng-attr-)attribute mappings of the same name", () => {
     let attrs;
-    compileProvider.directive(
-      "attrExposer",
-      valueFn({
-        link($scope, $element, $attrs) {
-          attrs = $attrs;
-        },
-      }),
-    );
+    compileProvider.directive("attrExposer", () => ({
+      link($scope, $element, $attrs) {
+        attrs = $attrs;
+      },
+    }));
 
     $compile(
       '<div attr-exposer ng-prop-title="42" ng-attr-title="foo" title="bar">',

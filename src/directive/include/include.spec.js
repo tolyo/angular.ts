@@ -1,8 +1,7 @@
 import { dealoc, JQLite } from "../../shared/jqlite/jqlite.js";
-import { Angular } from "../../loader";
-import { createInjector } from "../../core/di/injector";
-import { valueFn } from "../../shared/utils";
-import { wait } from "../../shared/test-utils";
+import { Angular } from "../../loader.js";
+import { createInjector } from "../../core/di/injector.js";
+import { wait } from "../../shared/test-utils.js";
 
 describe("ngInclude", () => {
   describe("basic", () => {
@@ -315,14 +314,11 @@ describe("ngInclude", () => {
     });
 
     it("should construct SVG template elements with correct namespace", async () => {
-      window.angular.module("myModule", []).directive(
-        "test",
-        valueFn({
-          templateNamespace: "svg",
-          templateUrl: "/mock/my-rect.html",
-          replace: true,
-        }),
-      );
+      window.angular.module("myModule", []).directive("test", () => ({
+        templateNamespace: "svg",
+        templateUrl: "/mock/my-rect.html",
+        replace: true,
+      }));
       element = JQLite("<svg><test></test></svg>");
       const injector = angular.bootstrap(element, ["myModule"]);
       $rootScope = injector.get("$rootScope");
@@ -333,14 +329,11 @@ describe("ngInclude", () => {
     });
 
     it("should compile only the template content of an SVG template", async () => {
-      window.angular.module("myModule", []).directive(
-        "test",
-        valueFn({
-          templateNamespace: "svg",
-          templateUrl: "/mock/my-rect2.html",
-          replace: true,
-        }),
-      );
+      window.angular.module("myModule", []).directive("test", () => ({
+        templateNamespace: "svg",
+        templateUrl: "/mock/my-rect2.html",
+        replace: true,
+      }));
       element = JQLite("<svg><test></test></svg>");
       const injector = angular.bootstrap(element, ["myModule"]);
       $rootScope = injector.get("$rootScope");
@@ -525,25 +518,19 @@ describe("ngInclude", () => {
         let controller;
         window.angular
           .module("myModule", [])
-          .directive(
-            "template",
-            valueFn({
-              template: "<div ng-include=\"'/mock/directive'\"></div>",
-              replace: true,
-              controller() {
-                this.flag = true;
-              },
-            }),
-          )
-          .directive(
-            "test",
-            valueFn({
-              require: "^template",
-              link(scope, el, attr, ctrl) {
-                controller = ctrl;
-              },
-            }),
-          );
+          .directive("template", () => ({
+            template: "<div ng-include=\"'/mock/directive'\"></div>",
+            replace: true,
+            controller() {
+              this.flag = true;
+            },
+          }))
+          .directive("test", () => ({
+            require: "^template",
+            link(scope, el, attr, ctrl) {
+              controller = ctrl;
+            },
+          }));
         element = JQLite("<div><div template></div></div>");
         const injector = angular.bootstrap(element, ["myModule"]);
         $rootScope = injector.get("$rootScope");
