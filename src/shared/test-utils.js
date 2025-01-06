@@ -1,4 +1,4 @@
-import { JQLite } from "./jqlite/jqlite";
+import { JQLite } from "./jqlite/jqlite.js";
 
 /**
  * @param {HTMLElement|JQLite} element

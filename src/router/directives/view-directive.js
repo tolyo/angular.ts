@@ -172,7 +172,6 @@ export let ngView = [
               "$default";
           let previousEl, currentEl, currentScope, viewConfig;
           const activeUIView = {
-            $type: "ng1",
             id: directive.count++, // Global sequential ID for ng-view tags added to DOM
             name: name, // ng-view name (<div ng-view="name"></div>
             fqn: inherited.$ngView.fqn

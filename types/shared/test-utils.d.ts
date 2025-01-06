@@ -9,4 +9,4 @@ export function browserTrigger(element: HTMLElement | JQLite, event: string): vo
  * @returns
  */
 export function wait(t: number): Promise<any>;
-import { JQLite } from "./jqlite/jqlite";
+import { JQLite } from "./jqlite/jqlite.js";

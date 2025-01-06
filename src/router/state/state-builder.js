@@ -158,7 +158,7 @@ export function resolvablesBuilder(state) {
     }));
   /** fetch DI annotations from a function or ng1-style array */
   const annotateFn = (fn) => {
-    const $injector = services.$injector;
+    const $injector = window.angular.$injector;
     // ng1 doesn't have an $injector until runtime.
     // If the $injector doesn't exist, use "deferred" literal as a
     // marker indicating they should be annotated when runtime starts

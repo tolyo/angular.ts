@@ -91,7 +91,7 @@ export class TemplateFactoryProvider {
         return asComponent(config.component);
       case "componentProvider":
         return asComponent(
-          this.fromComponentProvider(config.componentProvider, params, context),
+          this.fromComponentProvider(config.componentProvider, context),
         );
       default:
         return asTemplate(defaultTemplate);
@@ -154,14 +154,13 @@ export class TemplateFactoryProvider {
    * Creates a component's template by invoking an injectable provider function.
    *
    * @param {import('../types.js').Injectable<any>} provider Function to invoke via `locals`
-   * @param {Function} params a function used to invoke the template provider
    * @return {string} The template html as a string: "<component-name input1='::$resolve.foo'></component-name>".
    */
-  fromComponentProvider(provider, params, context) {
+  fromComponentProvider(provider, context) {
     const deps = annotate(provider);
     const providerFn = Array.isArray(provider) ? tail(provider) : provider;
     const resolvable = new Resolvable("", providerFn, deps);
-    return resolvable.get(context);
+    return resolvable.get(context); // https://github.com/angular-ui/ui-router/pull/3165/files
   }
   /**
    * Creates a template from a component's name

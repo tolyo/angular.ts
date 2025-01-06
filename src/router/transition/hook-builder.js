@@ -1,6 +1,6 @@
-import { assertPredicate, unnestR } from "../../shared/common";
-import { TransitionHookPhase, TransitionHookScope } from "./interface";
-import { TransitionHook } from "./transition-hook";
+import { assertPredicate, unnestR } from "../../shared/common.js";
+import { TransitionHookPhase, TransitionHookScope } from "./interface.js";
+import { TransitionHook } from "./transition-hook.js";
 /**
  * This class returns applicable TransitionHooks for a specific Transition instance.
  *

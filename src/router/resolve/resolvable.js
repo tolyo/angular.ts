@@ -89,11 +89,12 @@ export class Resolvable {
       return this.data;
     };
     // Sets the promise property first, then getsResolvableDependencies in the context of the promise chain. Always waits one tick.
-    return (this.promise = Promise.resolve()
+    this.promise = Promise.resolve()
       .then(getResolvableDependencies)
       .then(invokeResolveFn)
       .then(customAsyncPolicy)
-      .then(applyResolvedValue));
+      .then(applyResolvedValue);
+    return this.promise;
   }
   /**
    * Gets a promise for this Resolvable's data.

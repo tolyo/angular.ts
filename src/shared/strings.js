@@ -1,9 +1,6 @@
 /**
  * Functions that manipulate strings
  *
- * Although these functions are exported, they are subject to change without notice.
- *
- * @packageDocumentation
  */
 import { isInjectable, isNull, isPromise } from "./predicates";
 import { isUndefined, isFunction, isString, isObject } from "./utils";

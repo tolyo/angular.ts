@@ -1,10 +1,10 @@
-import { pick, tail } from "../../shared/common";
-import { isDefined, isString } from "../../shared/utils";
-import { isInjectable } from "../../shared/predicates";
-import { trace } from "../common/trace";
-import { ResolveContext } from "../resolve/resolve-context";
-import { Resolvable } from "../resolve/resolvable";
-import { annotate } from "../../core/di/injector";
+import { pick, tail } from "../../shared/common.js";
+import { isDefined, isString } from "../../shared/utils.js";
+import { isInjectable } from "../../shared/predicates.js";
+import { trace } from "../common/trace.js";
+import { ResolveContext } from "../resolve/resolve-context.js";
+import { Resolvable } from "../resolve/resolvable.js";
+import { annotate } from "../../core/di/injector.js";
 
 export function getNg1ViewConfigFactory() {
   let templateFactory = null;
