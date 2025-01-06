@@ -80,6 +80,7 @@ export class FormController {
     $error: {};
     $$success: {};
     $pending: any;
+    $$classCache: {};
     /**
      * Rollback all form controls pending updates to the `$modelValue`.
      *

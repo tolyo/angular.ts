@@ -303,7 +303,7 @@ export function $ViewDirectiveFill($compile, $controller, $transitions, $view) {
       const initial = tElement.html();
       tElement.empty();
       return function (scope, $element) {
-        debugger
+        debugger;
         const data = $element.data("$ngView");
         if (!data) {
           $element.html(initial);

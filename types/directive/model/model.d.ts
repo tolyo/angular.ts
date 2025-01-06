@@ -124,6 +124,7 @@ export class NgModelController {
     $$parse: import("../../core/parse/parse.js").ParseService;
     $$exceptionHandler: import("../../core/exception-handler.js").ErrorHandler;
     $$hasNativeValidators: boolean;
+    $$classCache: {};
     set(object: any, property: any): void;
     unset(object: any, property: any): void;
     $setValidity(validationErrorKey: any, state: any): void;

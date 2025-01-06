@@ -1,5 +1,5 @@
-import { find, tail, uniqR, unnestR } from "../../shared/common";
-import { propEq } from "../../shared/hof";
+import { find, tail, uniqR, unnestR } from "../../shared/common.js";
+import { propEq } from "../../shared/hof.js";
 import { trace } from "../common/trace";
 import { Resolvable } from "./resolvable";
 import { PathUtils } from "../path/path-utils";
@@ -195,15 +195,15 @@ export class ResolveContext {
 
 class UIInjectorImpl {
   constructor() {
-    this.native = services.$injector;
+    this.native = window.angular.$injector;
   }
   get(token) {
-    return services.$injector.get(token);
+    return window.angular.$injector.get(token);
   }
   getAsync(token) {
-    return Promise.resolve(services.$injector.get(token));
+    return Promise.resolve(window.angular.$injector.get(token));
   }
   getNative(token) {
-    return services.$injector.get(token);
+    return window.angular.$injector.get(token);
   }
 }
