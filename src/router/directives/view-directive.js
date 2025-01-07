@@ -286,13 +286,9 @@ export let ngView = [
     return directive;
   },
 ];
-$ViewDirectiveFill.$inject = [
-  "$compile",
-  "$controller",
-  "$transitions",
-  "$view",
-];
-export function $ViewDirectiveFill($compile, $controller, $transitions, $view) {
+
+$ViewDirectiveFill.$inject = ["$compile", "$controller", "$transitions"];
+export function $ViewDirectiveFill($compile, $controller, $transitions) {
   const getControllerAs = parse("viewDecl.controllerAs");
   const getResolveAs = parse("viewDecl.resolveAs");
   return {
@@ -302,7 +298,6 @@ export function $ViewDirectiveFill($compile, $controller, $transitions, $view) {
       const initial = tElement.html();
       tElement.empty();
       return function (scope, $element) {
-        debugger;
         const data = $element.data("$ngView");
         if (!data) {
           $element.html(initial);

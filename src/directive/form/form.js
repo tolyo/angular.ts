@@ -6,6 +6,7 @@ import {
   snakeCase,
   extend,
   isUndefined,
+  isObjectEmpty,
 } from "../../shared/utils.js";
 import {
   PRISTINE_CLASS,
@@ -221,7 +222,8 @@ export class FormController {
       });
 
     arrayRemove(this.$$controls, control);
-    control.$$parentForm = nullFormCtrl;
+
+    control.$target["$$parentForm"] = nullFormCtrl;
   }
 
   /**
@@ -301,30 +303,7 @@ export class FormController {
       }
     });
   }
-}
 
-/**
- * Change the validity state of the form, and notify the parent form (if any).
- *
- * Application developers will rarely need to call this method directly. It is used internally, by
- * {@link ngModel.NgModelController#$setValidity NgModelController.$setValidity()}, to propagate a
- * control's validity state to the parent `FormController`.
- *
- * @param {string} validationErrorKey Name of the validator. The `validationErrorKey` will be
- *        assigned to either `$error[validationErrorKey]` or `$pending[validationErrorKey]` (for
- *        unfulfilled `$asyncValidators`), so that it is available for data-binding. The
- *        `validationErrorKey` should be in camelCase and will get converted into dash-case for
- *        class name. Example: `myError` will result in `ng-valid-my-error` and
- *        `ng-invalid-my-error` classes and can be bound to as `{{ someForm.$error.myError }}`.
- * @param {boolean} isValid Whether the current state is valid (true), invalid (false), pending
- *        (undefined),  or skipped (null). Pending is used for unfulfilled `$asyncValidators`.
- *        Skipped is used by AngularJS when validators do not run because of parse errors and when
- *        `$asyncValidators` do not run because any of the `$validators` failed.
- * @param {import("../model/model").NgModelController | FormController} controller - The controller whose validity state is
- *        triggering the change.
- */
-addSetValidityMethod({
-  clazz: FormController,
   set(object, property, controller) {
     const list = object[property];
     if (!list) {
@@ -338,7 +317,8 @@ addSetValidityMethod({
         list.push(controller);
       }
     }
-  },
+  }
+
   unset(object, property, controller) {
     const list = object[property];
     if (!list) {
@@ -348,8 +328,117 @@ addSetValidityMethod({
     if (list.length === 0) {
       delete object[property];
     }
-  },
-});
+  }
+
+  /**
+   * Change the validity state of the form, and notify the parent form (if any).
+   *
+   * Application developers will rarely need to call this method directly. It is used internally, by
+   * {@link ngModel.NgModelController#$setValidity NgModelController.$setValidity()}, to propagate a
+   * control's validity state to the parent `FormController`.
+   *
+   * @param {string} validationErrorKey Name of the validator. The `validationErrorKey` will be
+   *        assigned to either `$error[validationErrorKey]` or `$pending[validationErrorKey]` (for
+   *        unfulfilled `$asyncValidators`), so that it is available for data-binding. The
+   *        `validationErrorKey` should be in camelCase and will get converted into dash-case for
+   *        class name. Example: `myError` will result in `ng-valid-my-error` and
+   *        `ng-invalid-my-error` classes and can be bound to as `{{ someForm.$error.myError }}`.
+   * @param {boolean} state Whether the current state is valid (true), invalid (false), pending
+   *        (undefined),  or skipped (null). Pending is used for unfulfilled `$asyncValidators`.
+   *        Skipped is used by AngularJS when validators do not run because of parse errors and when
+   *        `$asyncValidators` do not run because any of the `$validators` failed.
+   * @param {import("../model/model.js").NgModelController | FormController} controller - The controller whose validity state is
+   *        triggering the change.
+   */
+  $setValidity(validationErrorKey, state, controller) {
+    let that = this;
+    if (isUndefined(state)) {
+      createAndSet(this, "$pending", validationErrorKey, controller);
+    } else {
+      unsetAndCleanup(this, "$pending", validationErrorKey, controller);
+    }
+    if (!isBoolean(state)) {
+      this.unset(this.$error, validationErrorKey, controller);
+      this.unset(this.$$success, validationErrorKey, controller);
+    } else if (state) {
+      this.unset(this.$error, validationErrorKey, controller);
+      this.set(this.$$success, validationErrorKey, controller);
+    } else {
+      this.set(this.$error, validationErrorKey, controller);
+      this.unset(this.$$success, validationErrorKey, controller);
+    }
+    if (this.$pending) {
+      cachedToggleClass(this, PENDING_CLASS, true);
+      this.$valid = this.$invalid = undefined;
+      toggleValidationCss(this, "", null);
+    } else {
+      cachedToggleClass(this, PENDING_CLASS, false);
+      this.$valid = isObjectEmpty(this.$error);
+      this.$invalid = !this.$valid;
+      toggleValidationCss(this, "", this.$valid);
+    }
+
+    // re-read the state as the set/unset methods could have
+    // combined state in this.$error[validationError] (used for forms),
+    // where setting/unsetting only increments/decrements the value,
+    // and does not replace it.
+    let combinedState;
+    if (this.$pending && this.$pending[validationErrorKey]) {
+      combinedState = undefined;
+    } else if (this.$error[validationErrorKey]) {
+      combinedState = false;
+    } else if (this.$$success[validationErrorKey]) {
+      combinedState = true;
+    } else {
+      combinedState = null;
+    }
+
+    toggleValidationCss(this, validationErrorKey, combinedState);
+    this.$$parentForm.$setValidity(validationErrorKey, combinedState, this);
+    function createAndSet(ctrl, name, value, controller) {
+      if (!ctrl[name]) {
+        ctrl[name] = {};
+      }
+      that.set(ctrl[name], value, controller);
+    }
+
+    function unsetAndCleanup(ctrl, name, value, controller) {
+      if (ctrl[name]) {
+        that.unset(ctrl[name], value, controller);
+      }
+      if (isObjectEmpty(ctrl[name])) {
+        ctrl[name] = undefined;
+      }
+    }
+
+    function cachedToggleClass(ctrl, className, switchValue) {
+      if (switchValue && !ctrl.$$classCache[className]) {
+        ctrl.$$animate.addClass(ctrl.$$element, className);
+        ctrl.$$classCache[className] = true;
+      } else if (!switchValue && ctrl.$$classCache[className]) {
+        ctrl.$$animate.removeClass(ctrl.$$element, className);
+        ctrl.$$classCache[className] = false;
+      }
+    }
+
+    function toggleValidationCss(ctrl, validationErrorKey, isValid) {
+      validationErrorKey = validationErrorKey
+        ? `-${snakeCase(validationErrorKey, "-")}`
+        : "";
+
+      cachedToggleClass(
+        ctrl,
+        VALID_CLASS + validationErrorKey,
+        isValid === true,
+      );
+      cachedToggleClass(
+        ctrl,
+        INVALID_CLASS + validationErrorKey,
+        isValid === false,
+      );
+    }
+  }
+}
 
 /**
  * Helper directive that makes it possible to create control groups inside a
@@ -540,108 +629,4 @@ export function setupValidity(instance) {
   instance.$$classCache = {};
   instance.$$classCache[INVALID_CLASS] = !(instance.$$classCache[VALID_CLASS] =
     instance.$$element[0].classList.contains(VALID_CLASS));
-}
-
-export function addSetValidityMethod(context) {
-  const { clazz, set, unset } = context;
-
-  clazz.prototype.$setValidity = function (
-    validationErrorKey,
-    state,
-    controller,
-  ) {
-    if (isUndefined(state)) {
-      createAndSet(this, "$pending", validationErrorKey, controller);
-    } else {
-      unsetAndCleanup(this, "$pending", validationErrorKey, controller);
-    }
-    if (!isBoolean(state)) {
-      unset(this.$error, validationErrorKey, controller);
-      unset(this.$$success, validationErrorKey, controller);
-    } else if (state) {
-      unset(this.$error, validationErrorKey, controller);
-      set(this.$$success, validationErrorKey, controller);
-    } else {
-      set(this.$error, validationErrorKey, controller);
-      unset(this.$$success, validationErrorKey, controller);
-    }
-    if (this.$pending) {
-      cachedToggleClass(this, PENDING_CLASS, true);
-      this.$valid = this.$invalid = undefined;
-      toggleValidationCss(this, "", null);
-    } else {
-      cachedToggleClass(this, PENDING_CLASS, false);
-      this.$valid = isObjectEmpty(this.$error);
-      this.$invalid = !this.$valid;
-      toggleValidationCss(this, "", this.$valid);
-    }
-
-    // re-read the state as the set/unset methods could have
-    // combined state in this.$error[validationError] (used for forms),
-    // where setting/unsetting only increments/decrements the value,
-    // and does not replace it.
-    let combinedState;
-    if (this.$pending && this.$pending[validationErrorKey]) {
-      combinedState = undefined;
-    } else if (this.$error[validationErrorKey]) {
-      combinedState = false;
-    } else if (this.$$success[validationErrorKey]) {
-      combinedState = true;
-    } else {
-      combinedState = null;
-    }
-
-    toggleValidationCss(this, validationErrorKey, combinedState);
-    this.$$parentForm.$setValidity(validationErrorKey, combinedState, this);
-  };
-
-  function createAndSet(ctrl, name, value, controller) {
-    if (!ctrl[name]) {
-      ctrl[name] = {};
-    }
-    set(ctrl[name], value, controller);
-  }
-
-  function unsetAndCleanup(ctrl, name, value, controller) {
-    if (ctrl[name]) {
-      unset(ctrl[name], value, controller);
-    }
-    if (isObjectEmpty(ctrl[name])) {
-      ctrl[name] = undefined;
-    }
-  }
-
-  function cachedToggleClass(ctrl, className, switchValue) {
-    if (switchValue && !ctrl.$$classCache[className]) {
-      ctrl.$$animate.addClass(ctrl.$$element, className);
-      ctrl.$$classCache[className] = true;
-    } else if (!switchValue && ctrl.$$classCache[className]) {
-      ctrl.$$animate.removeClass(ctrl.$$element, className);
-      ctrl.$$classCache[className] = false;
-    }
-  }
-
-  function toggleValidationCss(ctrl, validationErrorKey, isValid) {
-    validationErrorKey = validationErrorKey
-      ? `-${snakeCase(validationErrorKey, "-")}`
-      : "";
-
-    cachedToggleClass(ctrl, VALID_CLASS + validationErrorKey, isValid === true);
-    cachedToggleClass(
-      ctrl,
-      INVALID_CLASS + validationErrorKey,
-      isValid === false,
-    );
-  }
-}
-
-export function isObjectEmpty(obj) {
-  if (obj) {
-    for (const prop in obj) {
-      if (Object.prototype.hasOwnProperty.call(obj, prop)) {
-        return false;
-      }
-    }
-  }
-  return true;
 }

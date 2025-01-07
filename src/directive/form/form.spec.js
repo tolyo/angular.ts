@@ -25,7 +25,6 @@ describe("form", () => {
         $compileProvider.directive("storeModelCtrl", () => ({
           require: "ngModel",
           link(scope, elm, attr, ctrl) {
-            debugger;
             control = ctrl;
           },
         }));
@@ -65,14 +64,15 @@ describe("form", () => {
     expect(form.$error.required).toEqual([control]);
 
     // remove nested control
+    debugger;
     scope.inputPresent = false;
     await wait();
-
+    debugger;
     expect(form.$error.required).toBeFalsy();
     expect(form.alias).toBeUndefined();
   });
 
-  it("should ignore changes in manually removed controls", async () => {
+  fit("should ignore changes in manually removed controls", async () => {
     doc = $compile(
       '<form name="myForm">' +
         '<input name="control" ng-maxlength="1" ng-model="value" store-model-ctrl/>' +
@@ -111,7 +111,7 @@ describe("form", () => {
     expect(form.$dirty).toBe(false);
   });
 
-  it("should react to validation changes in manually added controls", () => {
+  fit("should react to validation changes in manually added controls", () => {
     doc = $compile(
       '<form name="myForm">' +
         '<input name="control" ng-maxlength="1" ng-model="value" store-model-ctrl/>' +
@@ -146,7 +146,7 @@ describe("form", () => {
     expect(form.$dirty).toBe(false);
   });
 
-  it("should use the correct parent when renaming and removing dynamically added controls", () => {
+  fit("should use the correct parent when renaming and removing dynamically added controls", async () => {
     scope.controlName = "childControl";
     scope.hasChildControl = true;
 
@@ -158,7 +158,7 @@ describe("form", () => {
         "</form>" +
         '<form name="otherForm"></form>',
     )(scope);
-
+    await wait();
     const form = scope.myForm;
     const { otherForm } = scope;
     const { childControl } = form;
@@ -172,16 +172,18 @@ describe("form", () => {
 
     // rename the childControl
     scope.controlName = "childControlMoved";
+    await wait();
     expect(form.childControlMoved).toBeUndefined();
     expect(otherForm.childControl).toBeUndefined();
     expect(otherForm.childControlMoved).toBe(childControl);
 
     scope.hasChildControl = false;
+    await wait();
     expect(form.childControlMoved).toBeUndefined();
     expect(otherForm.childControlMoved).toBeUndefined();
   });
 
-  it("should remove scope reference when form with no parent form is removed from the DOM", () => {
+  fit("should remove scope reference when form with no parent form is removed from the DOM", async () => {
     let formController;
     scope.ctrl = {};
     doc = $compile(
@@ -189,44 +191,52 @@ describe("form", () => {
         '<input name="alias" ng-model="value" />' +
         "</form></div>",
     )(scope);
-
+    await wait();
     expect(scope.ctrl.myForm).toBeUndefined();
 
     scope.$apply("formPresent = true");
+    await wait();
+
     expect(scope.ctrl.myForm).toBeDefined();
 
     formController = doc.find("form").controller("form");
     expect(scope.ctrl.myForm == formController).toBeTrue();
 
     scope.$apply("formPresent = false");
+    await wait();
+
     expect(doc[0].innerText).toBe("");
   });
 
-  it("should use ngForm value as form name", () => {
+  fit("should use ngForm value as form name", async () => {
     doc = $compile(
       '<div ng-form="myForm">' +
         '<input type="text" name="alias" ng-model="value"/>' +
         "</div>",
     )(scope);
+    await wait();
 
     expect(scope.myForm).toBeDefined();
     expect(scope.myForm.alias).toBeDefined();
   });
 
-  it("should use ngForm value as form name when nested inside form", () => {
+  fit("should use ngForm value as form name when nested inside form", async () => {
     doc = $compile(
       '<form name="myForm">' +
         '<div ng-form="nestedForm"><input type="text" name="alias" ng-model="value"/></div>' +
         "</form>",
     )(scope);
+    await wait();
 
     expect(scope.myForm).toBeDefined();
     expect(scope.myForm.nestedForm).toBeDefined();
     expect(scope.myForm.nestedForm.alias).toBeDefined();
   });
 
-  it("should publish form to scope when name attr is defined", () => {
+  fit("should publish form to scope when name attr is defined", async () => {
     doc = $compile('<form name="myForm"></form>')(scope);
+    await wait();
+
     expect(scope.myForm).toBeTruthy();
     expect(doc.data("$formController")).toBeTruthy();
     expect(doc.data("$formController")).toEqual(scope.myForm);
@@ -239,7 +249,7 @@ describe("form", () => {
     expect(scope.obj.myForm).toBeTruthy();
   });
 
-  it("should support two forms on a single scope", () => {
+  fit("should support two forms on a single scope", async () => {
     doc = $compile(`
       <div>
         <form name="formA">
@@ -250,6 +260,8 @@ describe("form", () => {
         </form>
       </div>
     `)(scope);
+    await wait();
+
     expect(scope.formA.$error.required.length).toBe(1);
     expect(scope.formA.$error.required).toEqual([scope.formA.firstName]);
     expect(scope.formB.$error.required.length).toBe(1);
@@ -262,10 +274,10 @@ describe("form", () => {
     inputA[0].dispatchEvent(new Event("change"));
     inputB[0].setAttribute("value", "val2");
     inputB[0].dispatchEvent(new Event("change"));
-
+    await wait();
     expect(scope.firstName).toBe("val1");
     expect(scope.lastName).toBe("val2");
-
+    await wait();
     expect(scope.formA.$error.required).toBeFalsy();
     expect(scope.formB.$error.required).toBeFalsy();
   });

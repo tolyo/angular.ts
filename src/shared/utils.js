@@ -1195,3 +1195,12 @@ function hasCustomOrDataAttribute(node, attr) {
     element.dataset[attr] === "true" || element.getAttribute(attr) === "true"
   );
 }
+
+/**
+ * @param {Object|null|undefined} obj
+ * @returns {boolean}
+ */
+export function isObjectEmpty(obj) {
+  if (!obj) return true;
+  return !Object.keys(obj).length;
+}

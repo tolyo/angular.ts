@@ -18,13 +18,9 @@ import {
   hasAnimate,
   isBoolean,
   snakeCase,
-} from "../../shared/utils.js";
-import {
   isObjectEmpty,
-  nullFormCtrl,
-  PENDING_CLASS,
-  setupValidity,
-} from "../form/form.js";
+} from "../../shared/utils.js";
+import { nullFormCtrl, PENDING_CLASS } from "../form/form.js";
 import { defaultModelOptions } from "../model-options/model-options.js";
 import { startingTag } from "../../shared/jqlite/jqlite.js";
 
