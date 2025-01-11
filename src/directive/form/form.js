@@ -19,7 +19,9 @@ import { isProxy } from "../../core/scope/scope.js";
 export const nullFormCtrl = {
   $addControl: () => {},
   $getControls: () => [],
-  $$renameControl: (control, name) => (control.$name = name),
+  $$renameControl: (control, name) => {
+    control.$name = name;
+  },
   $removeControl: () => {},
   $setValidity: () => {},
   $setDirty: () => {},
@@ -159,7 +161,7 @@ export class FormController {
     this.$$controls.push(control);
 
     if (control.$name) {
-      this[control.$name] = control;
+      this.$target[control.$name] = control;
     }
     control.$target.$$parentForm = this;
   }

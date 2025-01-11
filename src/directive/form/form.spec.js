@@ -928,7 +928,7 @@ describe("form", () => {
       expect(form.$dirty).toBe(false);
     });
 
-    xit("should use the correct parent when renaming and removing dynamically added forms", async () => {
+    it("should use the correct parent when renaming and removing dynamically added forms", async () => {
       scope.formName = "childForm";
       scope.hasChildForm = true;
 
@@ -948,7 +948,7 @@ describe("form", () => {
       const { otherForm } = scope;
       const { childForm } = form;
 
-      // remove child form and add it to another form
+      // // remove child form and add it to another form
       form.$removeControl(childForm);
       otherForm.$addControl(childForm);
 
@@ -957,11 +957,13 @@ describe("form", () => {
 
       // rename the childForm
       scope.formName = "childFormMoved";
+      await wait();
       expect(form.childFormMoved).toBeUndefined();
       expect(otherForm.childForm).toBeUndefined();
       expect(otherForm.childFormMoved).toBe(childForm);
 
       scope.hasChildForm = false;
+      await wait();
       expect(form.childFormMoved).toBeUndefined();
       expect(otherForm.childFormMoved).toBeUndefined();
     });
@@ -1254,7 +1256,7 @@ describe("form", () => {
     });
   });
 
-  xit("should rename nested form controls when interpolated name changes", async () => {
+  it("should rename nested form controls when interpolated name changes", async () => {
     scope.idA = "A";
     scope.idB = "X";
 
@@ -1284,7 +1286,7 @@ describe("form", () => {
     expect(formA.nestedY).toBe(formX);
   });
 
-  xit("should rename forms with no parent when interpolated name changes", async () => {
+  it("should rename forms with no parent when interpolated name changes", async () => {
     const element = $compile('<form name="name{{nameID}}"></form>')(scope);
     const element2 = $compile('<div ng-form="ngform{{nameID}}"></div>')(scope);
     await wait();
@@ -1307,7 +1309,7 @@ describe("form", () => {
     expect(form2.$name).toBe("ngformB");
   });
 
-  xit("should rename forms with an initially blank name", async () => {
+  it("should rename forms with an initially blank name", async () => {
     const element = $compile('<form name="{{name}}"></form>')(scope);
     await wait();
     const form = element.controller("form");
@@ -1315,6 +1317,7 @@ describe("form", () => {
     expect(form.$name).toBe("");
     scope.name = "foo";
     await wait();
+
     expect(scope.foo).toBe(form);
     expect(form.$name).toBe("foo");
     expect(scope.foo).toBe(form);
