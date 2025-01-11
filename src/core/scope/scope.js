@@ -503,7 +503,7 @@ export class Scope {
   deleteProperty(target, property) {
     // Currently deletes $model
     if (target[property] && target[property][isProxySymbol]) {
-      delete target[property];
+      target[property] = undefined;
 
       let listeners = this.watchers.get(property);
       if (listeners) {
@@ -523,7 +523,6 @@ export class Scope {
         this.scheduleListener(this.scheduled);
         this.scheduled = [];
       }
-
       return true;
     }
 

@@ -1242,7 +1242,6 @@ describe("ngModel", () => {
         expect(formCtrl.$invalid).toBe(true);
 
         ageCtrl.$setViewValue(22);
-        // debugger
         await wait();
 
         expect(usernameCtrl.$invalid).toBe(false);

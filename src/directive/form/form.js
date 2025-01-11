@@ -324,7 +324,10 @@ export class FormController {
     if (!list) {
       return;
     }
-    arrayRemove(list, controller);
+    const index = arrayRemove(list, controller);
+    if (index === -1) {
+      arrayRemove(list, controller.$target);
+    }
     if (list.length === 0) {
       delete object[property];
     }
@@ -599,7 +602,7 @@ const formDirectiveFactory = function (isNgForm) {
                 });
               }
               formElement.on("$destroy", () => {
-                controller.$$parentForm.$removeControl(controller);
+                controller.$target.$$parentForm.$removeControl(controller);
                 setter(scope, undefined);
                 extend(controller, nullFormCtrl); // stop propagating child destruction handlers upwards
               });
