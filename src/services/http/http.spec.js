@@ -1,6 +1,7 @@
-import { createInjector } from "../../core/di/injector";
-import { isObject } from "../../shared/utils";
-import { Angular } from "../../loader";
+import { createInjector } from "../../core/di/injector.js";
+import { isObject } from "../../shared/utils.js";
+import { Angular } from "../../loader.js";
+import { wait } from "../../shared/test-utils.js";
 
 export function getLastAjaxRequest() {
   let ajaxEntries = performance
@@ -83,7 +84,7 @@ describe("$http", function () {
     expect(response.config.method).toBe("GET");
   });
 
-  it("sets deffault headers on request", async function () {
+  it("sets default headers on request", async function () {
     await $http({
       url: "/mock/hello",
       headers: {
@@ -95,9 +96,7 @@ describe("$http", function () {
     });
     expect(response).toBeDefined();
 
-    expect(response.config.headers.Accept).toBe(
-      "application/json, text/plain, */*",
-    );
+    expect(response.config.headers.Accept).toBe("text/plain");
     expect(response.config.headers["Cache-Control"]).toBe("no-cache");
   });
 

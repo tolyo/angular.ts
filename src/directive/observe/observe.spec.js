@@ -1,4 +1,4 @@
-import { Angular } from "../../loader";
+import { Angular } from "../../loader.js";
 import { JQLite } from "../../shared/jqlite/jqlite.js";
 import { wait } from "../../shared/test-utils.js";
 describe("observe", () => {

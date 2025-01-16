@@ -2,7 +2,7 @@
   "name": "@angular-wave/angular.ts",
   "description": "A modern, optimized and typesafe version of AngularJS",
   "license": "MIT",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "type": "module",
   "main": "dist/angular-ts.esm.js",
   "browser": "dist/angular-ts.umd.js",
