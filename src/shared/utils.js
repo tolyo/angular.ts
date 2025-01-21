@@ -639,7 +639,6 @@ export function assertNotHasOwnProperty(name, context) {
 }
 
 export function stringify(value) {
-  
   if (value == null) {
     // null || undefined
     return "";

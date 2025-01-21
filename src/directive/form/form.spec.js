@@ -933,22 +933,24 @@ describe("form", () => {
       scope.hasChildForm = true;
 
       doc = $compile(
-        '<form name="myForm">' +
-          '<div ng-if="hasChildForm">' +
-          '<ng-form name="{{formName}}">' +
-          '<input name="childformcontrol" ng-maxlength="1" ng-model="value"/>' +
-          "</ng-form>" +
-          "</div>" +
-          "</form>" +
-          '<form name="otherForm"></form>',
+        `<form name="myForm">
+          <div ng-if="hasChildForm">
+            <ng-form name="{{formName}}">
+              <input name="childformcontrol" ng-maxlength="1" ng-model="value"/>
+            </ng-form>
+          </div>
+        </form>
+        
+        <form name="otherForm"></form>
+      `,
       )(scope);
 
       await wait();
       const form = scope.myForm;
-      const { otherForm } = scope;
-      const { childForm } = form;
+      const childForm = scope.myForm.childForm;
+      const otherForm = scope.otherForm;
 
-      // // remove child form and add it to another form
+      // remove child form and add it to another form
       form.$removeControl(childForm);
       otherForm.$addControl(childForm);
 
