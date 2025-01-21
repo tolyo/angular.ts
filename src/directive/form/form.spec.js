@@ -960,6 +960,7 @@ describe("form", () => {
       // rename the childForm
       scope.formName = "childFormMoved";
       await wait();
+
       expect(form.childFormMoved).toBeUndefined();
       expect(otherForm.childForm).toBeUndefined();
       expect(otherForm.childFormMoved).toBe(childForm);

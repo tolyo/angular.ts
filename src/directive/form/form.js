@@ -208,7 +208,8 @@ export class FormController {
    */
   $removeControl(control) {
     if (control.$name && this[control.$name] === control) {
-      delete this[control.$name];
+      // delete this[control.$name];
+      this.$target[control.$name] = undefined;
     }
     this.$pending &&
       Object.keys(this.$pending).forEach((name) => {
@@ -597,10 +598,16 @@ const formDirectiveFactory = function (isNgForm) {
                 setter(scope, controller);
                 attr.$observe(nameAttr, (newValue) => {
                   if (controller.$name === newValue) return;
-                  setter(scope, undefined);
+                  scope.$target[controller.$name] = undefined;
                   controller.$$parentForm.$$renameControl(controller, newValue);
-                  setter = getSetter(controller.$name);
-                  setter(scope, controller);
+                  if (
+                    scope.$target !== controller.$$parentForm &&
+                    controller.$$parentForm !== nullFormCtrl
+                  ) {
+                    // form moved
+                  } else {
+                    scope.$target[newValue] = controller;
+                  }
                 });
               }
               formElement.on("$destroy", () => {
