@@ -1396,18 +1396,20 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
           // PRELINKING
           for (i = 0, ii = preLinkFns.length; i < ii; i++) {
             linkFn = preLinkFns[i];
+            const controllers =
+              linkFn.require &&
+              getControllers(
+                linkFn.directiveName,
+                linkFn.require,
+                $element,
+                elementControllers,
+              );
             invokeLinkFn(
               linkFn,
               linkFn.isolateScope ? isolateScope : scope,
               $element,
               attrs,
-              linkFn.require &&
-                getControllers(
-                  linkFn.directiveName,
-                  linkFn.require,
-                  $element,
-                  elementControllers,
-                ),
+              controllers,
               transcludeFn,
             );
           }
@@ -1435,18 +1437,21 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
           // POSTLINKING
           for (i = postLinkFns.length - 1; i >= 0; i--) {
             linkFn = postLinkFns[i];
+            const controllers =
+              linkFn.require &&
+              getControllers(
+                linkFn.directiveName,
+                linkFn.require,
+                $element,
+                elementControllers,
+              );
+
             invokeLinkFn(
               linkFn,
               linkFn.isolateScope ? isolateScope : scope,
               $element,
               attrs,
-              linkFn.require &&
-                getControllers(
-                  linkFn.directiveName,
-                  linkFn.require,
-                  $element,
-                  elementControllers,
-                ),
+              controllers,
               transcludeFn,
             );
           }
