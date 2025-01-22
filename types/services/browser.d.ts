@@ -16,13 +16,13 @@ export function trimEmptyHash(url: string): string;
  */
 export class Browser {
     /**
-     * @param {import('../core/task-tracker-factory').TaskTracker} taskTracker
+     * @param {import('../core/task-tracker-factory.js').TaskTracker} taskTracker
      */
-    constructor(taskTracker: import("../core/task-tracker-factory").TaskTracker);
+    constructor(taskTracker: import("../core/task-tracker-factory.js").TaskTracker);
     /**
-     * @type {import('../core/task-tracker-factory').TaskTracker} taskTracker
+     * @type {import('../core/task-tracker-factory.js').TaskTracker} taskTracker
      */
-    taskTracker: import("../core/task-tracker-factory").TaskTracker;
+    taskTracker: import("../core/task-tracker-factory.js").TaskTracker;
     pendingDeferIds: {};
     /** @type {Array<UrlChangeListener>} */
     urlChangeListeners: Array<UrlChangeListener>;
@@ -33,8 +33,8 @@ export class Browser {
     lastHistoryState: any;
     /** @type {string} */
     lastBrowserUrl: string;
-    /** @type {JQLite} */
-    baseElement: JQLite;
+    /** @type {HTMLBaseElement | null} */
+    baseElement: HTMLBaseElement | null;
     $$completeOutstandingRequest: any;
     $$incOutstandingRequestCount: any;
     notifyWhenNoOutstandingRequests: any;
@@ -108,4 +108,3 @@ export class BrowserProvider {
     $get: (string | (($$taskTrackerFactory: import("../core/task-tracker-factory").TaskTracker) => Browser))[];
 }
 export type UrlChangeListener = (arg0: string, arg1: string | null) => any;
-import { JQLite } from "../shared/jqlite/jqlite.js";

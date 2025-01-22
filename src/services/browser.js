@@ -1,6 +1,5 @@
-import { JQLite } from "../shared/jqlite/jqlite.js";
-import { urlResolve } from "../core/url-utils/url-utils";
-import { equals } from "../shared/utils";
+import { urlResolve } from "../core/url-utils/url-utils.js";
+import { equals } from "../shared/utils.js";
 
 /**
  * Removes a trailing hash ('#') from the given URL if it exists.
@@ -24,11 +23,11 @@ export function trimEmptyHash(url) {
  */
 export class Browser {
   /**
-   * @param {import('../core/task-tracker-factory').TaskTracker} taskTracker
+   * @param {import('../core/task-tracker-factory.js').TaskTracker} taskTracker
    */
   constructor(taskTracker) {
     /**
-     * @type {import('../core/task-tracker-factory').TaskTracker} taskTracker
+     * @type {import('../core/task-tracker-factory.js').TaskTracker} taskTracker
      */
     this.taskTracker = taskTracker;
     this.pendingDeferIds = {};
@@ -42,10 +41,8 @@ export class Browser {
     this.lastHistoryState = null;
     /** @type {string} */
     this.lastBrowserUrl = window.location.href;
-    /** @type {JQLite} */
-    this.baseElement = JQLite(
-      Array.from(document.getElementsByTagName("base")),
-    );
+    /** @type {HTMLBaseElement | null} */
+    this.baseElement = document.querySelector("base");
 
     // Task-tracking API
     this.$$completeOutstandingRequest =
@@ -190,7 +187,7 @@ export class Browser {
    * @returns {string} The base href.
    */
   baseHref() {
-    const href = this.baseElement.attr("href");
+    const href = this.baseElement?.getAttribute("href");
     return href ? href.replace(/^(https?:)?\/\/[^/]*/, "") : "";
   }
 

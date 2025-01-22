@@ -772,7 +772,7 @@ export function removeElementData(element, name) {
  * @param {boolean} [createIfNecessary=false]
  * @returns {import("../../core/cache/cache").ExpandoStore}
  */
-function getExpando(element, createIfNecessary = false) {
+export function getExpando(element, createIfNecessary = false) {
   let expandoId = element[EXPANDO];
   let expandoStore = expandoId && CACHE.get(expandoId);
 

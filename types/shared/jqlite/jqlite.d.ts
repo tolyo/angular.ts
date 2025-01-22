@@ -159,6 +159,16 @@ export function snakeToCamel(name: string): string;
  */
 export function removeElementData(element: Element, name?: string): void;
 /**
+ * Stores data associated with an element inside the expando property of the DOM element.
+ *
+ * @see {@link https://developer.mozilla.org/en-US/docs/Glossary/Expando MDN Glossary: Expando}
+ *
+ * @param {Element} element
+ * @param {boolean} [createIfNecessary=false]
+ * @returns {import("../../core/cache/cache").ExpandoStore}
+ */
+export function getExpando(element: Element, createIfNecessary?: boolean): import("../../core/cache/cache").ExpandoStore;
+/**
  * Checks if the string contains HTML tags or entities.
  * @param {string} html
  * @returns {boolean} True if the string is plain text, false if it contains HTML tags or entities.
