@@ -5,7 +5,12 @@ import {
   assertNotHasOwnProperty,
   errorHandlingConfig,
 } from "./shared/utils";
-import { JQLite } from "./shared/jqlite/jqlite.js";
+import {
+  getInheritedData,
+  getInjector,
+  JQLite,
+  setCacheData,
+} from "./shared/jqlite/jqlite.js";
 import { annotate, createInjector } from "./core/di/injector";
 import { NgModule } from "./core/di/ng-module";
 import { CACHE } from "./core/cache/cache";
@@ -35,9 +40,6 @@ export class Angular {
 
     /** @type {string} */
     this.version = VERSION;
-
-    /** @type {typeof import('./shared/jqlite/jqlite').JQLite} */
-    this.element = JQLite;
 
     /** @type {!Array<string|any>} */
     this.bootsrappedModules = [];
@@ -113,9 +115,7 @@ export class Angular {
       strictDi: false,
     };
 
-    const jqLite = JQLite(element);
-
-    if (jqLite.injector()) {
+    if (getInjector(element)) {
       throw ngMinErr("btstrpd", "App already bootstrapped");
     }
 
@@ -126,7 +126,7 @@ export class Angular {
     this.bootsrappedModules.unshift([
       "$provide",
       ($provide) => {
-        $provide.value("$rootElement", jqLite);
+        $provide.value("$rootElement", element);
       },
     ]);
 
@@ -140,14 +140,15 @@ export class Angular {
       "$injector",
       /**
        * @param {import('./core/scope/scope').Scope} scope
-       * @param {JQLite} el
+       * @param {Element} el
        * @param {*} compile
        * @param {import("./core/di/internal-injector").InjectorService} $injector
        */
       (scope, el, compile, $injector) => {
+        debugger;
         // ng-route deps
         this.$injector = $injector;
-        el.data("$injector", $injector);
+        setCacheData(el, "$injector", $injector);
         compile(el)(scope);
 
         // https://github.com/angular-ui/ui-router/issues/3678

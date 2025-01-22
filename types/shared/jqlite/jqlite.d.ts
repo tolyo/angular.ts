@@ -195,6 +195,23 @@ export function dealoc(element: Element, onlyDescendants?: boolean): void;
  */
 export function getOrSetCacheData(element: Element, key: string | any, value?: any): any;
 /**
+ * Gets or sets cache data for a given element.
+ *
+ * @param {Element} element - The DOM element to get or set data on.
+ * @param {string} key - The key (as a string) to get/set or an object for mass-setting.
+ * @param {*} [value] - The value to set. If not provided, the function acts as a getter.
+ * @returns
+ */
+export function setCacheData(element: Element, key: string, value?: any): void;
+/**
+ *
+ * @param {Node} element
+ * @param {string|string[]} name
+ * @param {any} [value]
+ * @returns
+ */
+export function getInheritedData(element: Node, name: string | string[], value?: any): any;
+/**
  *
  * @param {Element} element
  * @param {boolean} keepData
@@ -218,4 +235,10 @@ export function getBooleanAttrName(element: any, name: any): any;
  * @param {NodeListOf<Element>|Element[]} nodes
  */
 export function cleanElementData(nodes: NodeListOf<Element> | Element[]): void;
+/**
+ * Return instance of injector attached to element
+ * @returns {import('../../core/di/internal-injector.js').InjectorService}
+ */
+export function getInjector(element: any): import("../../core/di/internal-injector.js").InjectorService;
+export function setData(element: any, key: any, value: any): any;
 export const BOOLEAN_ATTR: {};

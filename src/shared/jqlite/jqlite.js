@@ -949,6 +949,24 @@ export function getOrSetCacheData(element, key, value) {
 }
 
 /**
+ * Gets or sets cache data for a given element.
+ *
+ * @param {Element} element - The DOM element to get or set data on.
+ * @param {string} key - The key (as a string) to get/set or an object for mass-setting.
+ * @param {*} [value] - The value to set. If not provided, the function acts as a getter.
+ * @returns
+ */
+export function setCacheData(element, key, value) {
+  if (elementAcceptsData(element)) {
+    const expandoStore = getExpando(element, true);
+    const data = expandoStore && expandoStore.data;
+    data[kebabToCamel(key)] = value;
+  } else {
+    // TODO: check should occur perhaps prior at compilation level that this is a valid element
+  }
+}
+
+/**
  * Adds nodes or elements to the root array-like object.
  *
  * @param {JQLite} root - The array-like object to which elements will be added.
@@ -988,7 +1006,7 @@ function getController(element, name) {
  * @param {any} [value]
  * @returns
  */
-function getInheritedData(element, name, value) {
+export function getInheritedData(element, name, value) {
   // if element is the document object work with the html element instead
   // this makes $(document).scope() possible
   if (element.nodeType === Node.DOCUMENT_NODE) {
@@ -1185,5 +1203,38 @@ export function cleanElementData(nodes) {
     }
     removeElementData(nodes[i]);
     JQLite.prototype.off.call(JQLite(nodes[i]));
+  }
+}
+
+/**
+ * Return instance of injector attached to element
+ * @returns {import('../../core/di/internal-injector.js').InjectorService}
+ */
+export function getInjector(element) {
+  return getInheritedData(element, "$injector");
+}
+
+export function setData(element, key, value) {
+  let i;
+  const nodeCount = this.length;
+  if (isUndefined(value)) {
+    if (isObject(key)) {
+      // we are a write, but the object properties are the key/values
+      for (i = 0; i < nodeCount; i++) {
+        getOrSetCacheData(this[i], key);
+      }
+      return this;
+    }
+    // we are a read, so read the first child.
+    const jj = isUndefined(value) ? Math.min(nodeCount, 1) : nodeCount;
+    for (let j = 0; j < jj; j++) {
+      const nodeValue = getOrSetCacheData(this[j], key, value);
+      value = value ? value + nodeValue : nodeValue;
+    }
+    return value;
+  }
+  // we are a write, so apply to all children
+  for (i = 0; i < nodeCount; i++) {
+    getOrSetCacheData(this[i], key, value);
   }
 }
