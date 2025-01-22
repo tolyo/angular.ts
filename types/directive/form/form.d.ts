@@ -1,10 +1,8 @@
 export function setupValidity(instance: any): void;
-export function addSetValidityMethod(context: any): void;
-export function isObjectEmpty(obj: any): boolean;
 export namespace nullFormCtrl {
     function $addControl(): void;
     function $getControls(): any[];
-    function $$renameControl(control: any, name: any): any;
+    function $$renameControl(control: any, name: any): void;
     function $removeControl(): void;
     function $setValidity(): void;
     function $setDirty(): void;
@@ -177,6 +175,29 @@ export class FormController {
      */
     $setSubmitted(): void;
     $$setSubmitted(): void;
+    set(object: any, property: any, controller: any): void;
+    unset(object: any, property: any, controller: any): void;
+    /**
+     * Change the validity state of the form, and notify the parent form (if any).
+     *
+     * Application developers will rarely need to call this method directly. It is used internally, by
+     * {@link ngModel.NgModelController#$setValidity NgModelController.$setValidity()}, to propagate a
+     * control's validity state to the parent `FormController`.
+     *
+     * @param {string} validationErrorKey Name of the validator. The `validationErrorKey` will be
+     *        assigned to either `$error[validationErrorKey]` or `$pending[validationErrorKey]` (for
+     *        unfulfilled `$asyncValidators`), so that it is available for data-binding. The
+     *        `validationErrorKey` should be in camelCase and will get converted into dash-case for
+     *        class name. Example: `myError` will result in `ng-valid-my-error` and
+     *        `ng-invalid-my-error` classes and can be bound to as `{{ someForm.$error.myError }}`.
+     * @param {boolean} state Whether the current state is valid (true), invalid (false), pending
+     *        (undefined),  or skipped (null). Pending is used for unfulfilled `$asyncValidators`.
+     *        Skipped is used by AngularJS when validators do not run because of parse errors and when
+     *        `$asyncValidators` do not run because any of the `$validators` failed.
+     * @param {import("../model/model.js").NgModelController | FormController} controller - The controller whose validity state is
+     *        triggering the change.
+     */
+    $setValidity(validationErrorKey: string, state: boolean, controller: import("../model/model.js").NgModelController | FormController): void;
 }
 export const formDirective: (string | (($parse: any) => {
     name: string;

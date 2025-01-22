@@ -1,4 +1,4 @@
-export function $ViewDirectiveFill($compile: any, $controller: any, $transitions: any, $view: any): {
+export function $ViewDirectiveFill($compile: any, $controller: any, $transitions: any): {
     restrict: string;
     priority: number;
     compile: (tElement: any) => (scope: any, $element: any) => void;

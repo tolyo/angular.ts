@@ -503,6 +503,11 @@ export function directiveNormalize(name: string): string;
  * @returns {boolean}
  */
 export function hasAnimate(node: Node): boolean;
+/**
+ * @param {Object|null|undefined} obj
+ * @returns {boolean}
+ */
+export function isObjectEmpty(obj: any | null | undefined): boolean;
 export const ngAttrPrefixes: string[];
 /**
  * Error configuration object. May only contain the options that need to be updated.
