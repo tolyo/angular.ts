@@ -5,12 +5,7 @@ import {
   assertNotHasOwnProperty,
   errorHandlingConfig,
 } from "./shared/utils";
-import {
-  getInheritedData,
-  getInjector,
-  JQLite,
-  setCacheData,
-} from "./shared/jqlite/jqlite.js";
+import { getInjector, setCacheData } from "./shared/jqlite/jqlite.js";
 import { annotate, createInjector } from "./core/di/injector";
 import { NgModule } from "./core/di/ng-module";
 import { CACHE } from "./core/cache/cache";
@@ -145,7 +140,6 @@ export class Angular {
        * @param {import("./core/di/internal-injector").InjectorService} $injector
        */
       (scope, el, compile, $injector) => {
-        debugger;
         // ng-route deps
         this.$injector = $injector;
         setCacheData(el, "$injector", $injector);
