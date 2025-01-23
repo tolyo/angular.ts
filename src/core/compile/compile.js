@@ -1507,13 +1507,14 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                 );
                 return slotTranscludeRes;
               }
+
               if (isUndefined(slotTranscludeFn)) {
                 throw $compileMinErr(
                   "noslot",
                   'No parent directive that requires a transclusion with slot name "{0}". ' +
                     "Element: {1}",
                   slotName,
-                  startingTag($element),
+                  startingTag($element[0]),
                 );
               }
             } else {
@@ -1900,7 +1901,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                 );
               }
             } catch (e) {
-              $exceptionHandler(e, startingTag($compileNode));
+              $exceptionHandler(e, startingTag($compileNode[0]));
             }
           }
 
@@ -2444,7 +2445,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
             directive.name,
             wrapModuleNameIfDefined(directive.$$moduleName),
             what,
-            startingTag(element),
+            startingTag(element[0]),
           );
         }
       }
@@ -2840,7 +2841,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
           linkFn(scope, $element, attrs, controllers, transcludeFn);
         } catch (e) {
           console.error(e);
-          $exceptionHandler(e, startingTag($element));
+          $exceptionHandler(e, startingTag($element[0]));
         }
       }
 

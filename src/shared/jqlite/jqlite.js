@@ -157,7 +157,7 @@ JQLite.prototype.scope = function () {
   // Can't use JQLiteData here directly so we stay compatible with jQuery!
   return (
     getOrSetCacheData(this[0], "$scope") ||
-    getInheritedData(this[0].parentNode || this[0], ["$isolateScope", "$scope"])
+    getInheritedData(this.parentNode || this[0], ["$isolateScope", "$scope"])
   );
 };
 
@@ -1138,24 +1138,50 @@ function specialMouseHandlerWrapper(target, event, handler) {
 }
 
 /**
- * @param {string|JQLite} elementStr
- * @returns {string} Returns the string representation of the element.
+ * Extracts the starting tag from an HTML string or DOM element.
+ *
+ * @param {string|Element} elementOrStr - The HTML string or DOM element to process.
+ * @returns {string} The starting tag or processed result.
  */
-export function startingTag(elementStr) {
-  const clone = JQLite(elementStr)[0].cloneNode(true);
-  const element = JQLite(clone).empty();
-  const elemHtml = JQLite("<div></div>").append(element[0]).html();
-  try {
-    return element[0].nodeType === Node.TEXT_NODE
-      ? lowercase(elemHtml)
-      : elemHtml
-          .match(/^(<[^>]+>)/)[1]
-          .replace(/^<([\w-]+)/, function (match, nodeName) {
-            return "<" + lowercase(nodeName);
-          });
-  } catch (e) {
-    return lowercase(elemHtml);
+export function startingTag(elementOrStr) {
+  let clone;
+
+  if (typeof elementOrStr === "string") {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(elementOrStr, "text/html");
+    clone = doc.body.firstChild.cloneNode(true);
+  } else if (elementOrStr instanceof Element) {
+    clone = elementOrStr.cloneNode(true);
+  } else {
+    throw new Error("Input must be an HTML string or a DOM element.");
   }
+
+  while (clone.firstChild) {
+    clone.removeChild(clone.firstChild);
+  }
+
+  const divWrapper = document.createElement("div");
+  divWrapper.appendChild(clone);
+  const elemHtml = divWrapper.innerHTML;
+
+  try {
+    if (clone.nodeType === Node.TEXT_NODE) {
+      return elemHtml.toLowerCase();
+    } else if (clone.nodeType === Node.COMMENT_NODE) {
+      return `<!--${/** @type {Comment} **/ (clone).data.trim()}-->`;
+    } else {
+      const match = elemHtml.match(/^(<[^>]+>)/);
+      if (match) {
+        return match[1].replace(/^<([\w-]+)/, (_match, nodeName) => {
+          return "<" + nodeName.toLowerCase();
+        });
+      }
+    }
+  } catch (e) {
+    return elemHtml.toLowerCase();
+  }
+
+  return elemHtml.toLowerCase();
 }
 
 /**
@@ -1183,10 +1209,7 @@ export function getBlockNodes(nodes) {
 }
 
 export function getBooleanAttrName(element, name) {
-  // check dom last since we will most likely fail on name
   const booleanAttr = BOOLEAN_ATTR[name.toLowerCase()];
-
-  // booleanAttr is here twice to minimize DOM access
   return booleanAttr && BOOLEAN_ELEMENTS[getNodeName(element)] && booleanAttr;
 }
 
@@ -1215,26 +1238,84 @@ export function getInjector(element) {
 }
 
 export function setData(element, key, value) {
-  let i;
-  const nodeCount = this.length;
-  if (isUndefined(value)) {
-    if (isObject(key)) {
-      // we are a write, but the object properties are the key/values
-      for (i = 0; i < nodeCount; i++) {
-        getOrSetCacheData(this[i], key);
+  getOrSetCacheData(element, key, value);
+}
+
+/**
+ * Adds an event listener to each element in the JQLite collection.
+ *
+ * @param {Element} element
+ * @param {string} type - The event type(s) to listen for. Multiple event types can be specified, separated by a space.
+ * @param {Function} fn - The function to execute when the event is triggered.
+ */
+export function onEvent(element, type, fn) {
+  // Do not add event handlers to non-elements because they will not be cleaned up.
+  if (!elementAcceptsData(element)) {
+    return;
+  }
+
+  const expandoStore = getExpando(element, true);
+
+  if (!expandoStore.handle) {
+    expandoStore.handle = createEventHandler(element, expandoStore.events);
+  }
+  // http://jsperf.com/string-indexof-vs-split
+  const types = type.indexOf(" ") >= 0 ? type.split(" ") : [type];
+  let j = types.length;
+
+  const addHandler = function (type, specialHandlerWrapper, noEventListener) {
+    let eventFns = expandoStore.events[type];
+
+    if (!eventFns) {
+      eventFns = expandoStore.events[type] = [];
+      eventFns.specialHandlerWrapper = specialHandlerWrapper;
+      if (type !== "$destroy" && !noEventListener) {
+        element.addEventListener(type, (_el, evt) => {
+          expandoStore.handle(evt, type);
+        });
       }
-      return this;
     }
-    // we are a read, so read the first child.
-    const jj = isUndefined(value) ? Math.min(nodeCount, 1) : nodeCount;
-    for (let j = 0; j < jj; j++) {
-      const nodeValue = getOrSetCacheData(this[j], key, value);
-      value = value ? value + nodeValue : nodeValue;
+
+    eventFns.push(fn);
+  };
+
+  while (j--) {
+    type = types[j];
+    if (MOUSE_EVENT_MAP[type]) {
+      addHandler(MOUSE_EVENT_MAP[type], specialMouseHandlerWrapper);
+      addHandler(type, undefined, true);
+    } else {
+      addHandler(type);
     }
-    return value;
   }
-  // we are a write, so apply to all children
-  for (i = 0; i < nodeCount; i++) {
-    getOrSetCacheData(this[i], key, value);
+}
+
+/**
+ * Creates a DOM element from an HTML string.
+ * @param {string} htmlString - A string representing the HTML to parse.
+ * @returns {Element} - The parsed DOM element.
+ */
+export function createElementFromHTML(htmlString) {
+  const template = document.createElement("template");
+  template.innerHTML = htmlString.trim();
+  return /** @type {Element} */ (template.content.firstChild);
+}
+
+/**
+ * Appends nodes or an HTML string to a given DOM element.
+ * @param {Element} element - The element to append nodes to.
+ * @param {Node | Node[] | string} nodes - Nodes or HTML string to append.
+ */
+export function appendNodesToElement(element, nodes) {
+  if (typeof nodes === "string") {
+    const template = document.createElement("template");
+    template.innerHTML = nodes.trim();
+    nodes = Array.from(template.content.childNodes);
+  } else if (nodes instanceof Node) {
+    nodes = [nodes];
+  } else if (!Array.isArray(nodes)) {
+    throw new TypeError("Expected a Node, Node[], or HTML string");
   }
+
+  nodes.forEach((node) => element.appendChild(node));
 }

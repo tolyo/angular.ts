@@ -329,7 +329,7 @@ function parsePatternAttr(regex, patternExp, elm) {
       "Expected {0} to be a RegExp but was {1}. Element: {2}",
       patternExp,
       regex,
-      startingTag(elm),
+      startingTag(elm[0]),
     );
   }
 

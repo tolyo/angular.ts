@@ -39,7 +39,7 @@ export const ngOptionsDirective = [
             "'_select_ (as _label_)? for (_key_,)?_value_ in _collection_'" +
             " but got '{0}'. Element: {1}",
           optionsExp,
-          startingTag(selectElement),
+          startingTag(selectElement[0]),
         );
       }
 
