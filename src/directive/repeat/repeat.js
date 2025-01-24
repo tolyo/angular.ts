@@ -139,7 +139,7 @@ export const ngRepeatDirective = [
           $scope.$watch(rhs, (collection) => {
             var index,
               length,
-              previousNode = $element[0], // node that cloned nodes should be inserted after
+              previousNode = $element, // node that cloned nodes should be inserted after
               // initialized to the comment node anchor
               nextNode,
               // Same as lastBlockMap but it has the current state. It will become the

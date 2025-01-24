@@ -4,6 +4,7 @@ import {
   getBooleanAttrName,
   getOrSetCacheData,
   isTextNode,
+  onEvent,
   startingTag,
 } from "../../shared/jqlite/jqlite.js";
 import { identifierForController } from "../controller/controller.js";
@@ -1313,7 +1314,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
               newIsolateScopeDirective,
             );
             if (scopeBindingInfo.removeWatches) {
-              isolateScope.$on("$destroy", scopeBindingInfo.removeWatches);
+              onEvent(isolateScope, "$destroy", scopeBindingInfo.removeWatches);
             }
           }
 
@@ -1407,7 +1408,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
             invokeLinkFn(
               linkFn,
               linkFn.isolateScope ? isolateScope : scope,
-              $element,
+              $element[0],
               attrs,
               controllers,
               transcludeFn,
@@ -1449,7 +1450,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
             invokeLinkFn(
               linkFn,
               linkFn.isolateScope ? isolateScope : scope,
-              $element,
+              $element[0],
               attrs,
               controllers,
               transcludeFn,
@@ -2458,7 +2459,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
             compile: () => (scope, node) => {
               interpolateFn.expressions.forEach((x) => {
                 scope.$watch(x, () => {
-                  node[0].nodeValue = interpolateFn(scope);
+                  node.nodeValue = interpolateFn(scope);
                 });
               });
             },
@@ -2832,16 +2833,16 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
       function invokeLinkFn(
         linkFn,
         scope,
-        $element,
+        element,
         attrs,
         controllers,
         transcludeFn,
       ) {
         try {
-          linkFn(scope, $element, attrs, controllers, transcludeFn);
+          linkFn(scope, element, attrs, controllers, transcludeFn);
         } catch (e) {
           console.error(e);
-          $exceptionHandler(e, startingTag($element[0]));
+          $exceptionHandler(e, startingTag(element));
         }
       }
 

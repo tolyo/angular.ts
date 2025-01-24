@@ -190,57 +190,6 @@ JQLite.prototype.injector = function () {
 };
 
 /**
- * Adds an event listener to each element in the JQLite collection.
- *
- * @param {string} type - The event type(s) to listen for. Multiple event types can be specified, separated by a space.
- * @param {Function} fn - The function to execute when the event is triggered.
- * @returns {JQLite} The JQLite collection for chaining.
- */
-JQLite.prototype.on = function (type, fn) {
-  // Do not add event handlers to non-elements because they will not be cleaned up.
-  for (let i = 0; i < this.length; i++) {
-    const element = this[i];
-    if (!elementAcceptsData(element)) {
-      return;
-    }
-
-    const expandoStore = getExpando(element, true);
-
-    if (!expandoStore.handle) {
-      expandoStore.handle = createEventHandler(element, expandoStore.events);
-    }
-    // http://jsperf.com/string-indexof-vs-split
-    const types = type.indexOf(" ") >= 0 ? type.split(" ") : [type];
-    let j = types.length;
-
-    const addHandler = function (type, specialHandlerWrapper, noEventListener) {
-      let eventFns = expandoStore.events[type];
-
-      if (!eventFns) {
-        eventFns = expandoStore.events[type] = [];
-        eventFns.specialHandlerWrapper = specialHandlerWrapper;
-        if (type !== "$destroy" && !noEventListener) {
-          element.addEventListener(type, expandoStore.handle);
-        }
-      }
-
-      eventFns.push(fn);
-    };
-
-    while (j--) {
-      type = types[j];
-      if (MOUSE_EVENT_MAP[type]) {
-        addHandler(MOUSE_EVENT_MAP[type], specialMouseHandlerWrapper);
-        addHandler(type, undefined, true);
-      } else {
-        addHandler(type);
-      }
-    }
-  }
-  return this;
-};
-
-/**
  * Removes an event listener to each element in JQLite collection.
  *
  * @param {string} type - The event type(s) to remove listener from
@@ -770,7 +719,7 @@ export function removeElementData(element, name) {
  *
  * @param {Element} element
  * @param {boolean} [createIfNecessary=false]
- * @returns {import("../../core/cache/cache").ExpandoStore}
+ * @returns {import("../../core/cache/cache.js").ExpandoStore}
  */
 export function getExpando(element, createIfNecessary = false) {
   let expandoId = element[EXPANDO];
@@ -992,10 +941,10 @@ function addNodes(root, elements) {
 
 /**
  * @param {Node} element
- * @param {string} name
+ * @param {string} [name]
  * @returns
  */
-function getController(element, name) {
+export function getController(element, name) {
   return getInheritedData(element, `$${name || "ngController"}Controller`);
 }
 
@@ -1242,7 +1191,7 @@ export function setData(element, key, value) {
 }
 
 /**
- * Adds an event listener to each element in the JQLite collection.
+ * Adds an event listener to an element.
  *
  * @param {Element} element
  * @param {string} type - The event type(s) to listen for. Multiple event types can be specified, separated by a space.
@@ -1270,7 +1219,7 @@ export function onEvent(element, type, fn) {
       eventFns = expandoStore.events[type] = [];
       eventFns.specialHandlerWrapper = specialHandlerWrapper;
       if (type !== "$destroy" && !noEventListener) {
-        element.addEventListener(type, (_el, evt) => {
+        element.addEventListener(type, (evt) => {
           expandoStore.handle(evt, type);
         });
       }

@@ -1,3 +1,4 @@
+import { onEvent } from "../../shared/jqlite/jqlite.js";
 import { directiveNormalize } from "../../shared/utils.js";
 
 /*
@@ -55,7 +56,7 @@ export function createEventDirective(
       // sandbox was never meant to be a security feature anyway).
       const fn = $parse(attr[directiveName]);
       return function ngEventHandler(scope, element) {
-        element.on(eventName, (event) => {
+        onEvent(element, eventName, (event) => {
           const callback = function () {
             fn(scope, { $event: event });
           };

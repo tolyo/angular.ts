@@ -300,7 +300,7 @@ export function $ViewDirectiveFill($compile, $controller, $transitions) {
       return function (scope, $element) {
         const data = $element.data("$ngView");
         if (!data) {
-          $element.html(initial);
+          $element.innerHTML = initial;
           $compile($element[0].contentDocument || $element[0].childNodes)(
             scope,
           );
@@ -308,8 +308,8 @@ export function $ViewDirectiveFill($compile, $controller, $transitions) {
         }
         const cfg = data.$cfg || { viewDecl: {}, getTemplate: () => {} };
         const resolveCtx = cfg.path && new ResolveContext(cfg.path);
-        $element.html(cfg.getTemplate($element, resolveCtx) || initial);
-        trace.traceUIViewFill(data.$ngView, $element.html());
+        $element.innerHTML = cfg.getTemplate($element, resolveCtx) || initial;
+        trace.traceUIViewFill(data.$ngView, $element.innerHTML);
         const link = $compile(
           $element[0].contentDocument || $element[0].childNodes,
         );

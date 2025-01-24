@@ -1487,19 +1487,19 @@ describe("ngModel", () => {
     it("should set ng-empty or ng-not-empty when the view value changes", async () => {
       const element = $compile('<input ng-model="value" />')($rootScope);
       await wait();
-      expect(element.val()).toBe("");
+      expect(element.value).toBe("");
 
       $rootScope.value = "XXX";
       await wait();
-      expect(element.val()).toBe("XXX");
+      expect(element.value).toBe("XXX");
 
       element.val("");
       browserTrigger(element, "change");
-      expect(element.val()).toBe("");
+      expect(element.value).toBe("");
 
       element.val("YYY");
       browserTrigger(element, "change");
-      expect(element.val()).toBe("YYY");
+      expect(element.value).toBe("YYY");
     });
 
     it("should set css classes (ng-valid, ng-invalid, ng-pristine, ng-dirty, ng-untouched, ng-touched)", async () => {

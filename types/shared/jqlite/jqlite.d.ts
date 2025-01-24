@@ -46,14 +46,6 @@ export class JQLite {
      */
     injector(): import("../../core/di/internal-injector").InjectorService;
     /**
-     * Adds an event listener to each element in the JQLite collection.
-     *
-     * @param {string} type - The event type(s) to listen for. Multiple event types can be specified, separated by a space.
-     * @param {Function} fn - The function to execute when the event is triggered.
-     * @returns {JQLite} The JQLite collection for chaining.
-     */
-    on(type: string, fn: Function): JQLite;
-    /**
      * Removes an event listener to each element in JQLite collection.
      *
      * @param {string} type - The event type(s) to remove listener from
@@ -165,9 +157,9 @@ export function removeElementData(element: Element, name?: string): void;
  *
  * @param {Element} element
  * @param {boolean} [createIfNecessary=false]
- * @returns {import("../../core/cache/cache").ExpandoStore}
+ * @returns {import("../../core/cache/cache.js").ExpandoStore}
  */
-export function getExpando(element: Element, createIfNecessary?: boolean): import("../../core/cache/cache").ExpandoStore;
+export function getExpando(element: Element, createIfNecessary?: boolean): import("../../core/cache/cache.js").ExpandoStore;
 /**
  * Checks if the string contains HTML tags or entities.
  * @param {string} html
@@ -204,6 +196,12 @@ export function getOrSetCacheData(element: Element, key: string | any, value?: a
  */
 export function setCacheData(element: Element, key: string, value?: any): void;
 /**
+ * @param {Node} element
+ * @param {string} [name]
+ * @returns
+ */
+export function getController(element: Node, name?: string): any;
+/**
  *
  * @param {Node} element
  * @param {string|string[]} name
@@ -218,10 +216,12 @@ export function getInheritedData(element: Node, name: string | string[], value?:
  */
 export function removeElement(element: Element, keepData?: boolean): void;
 /**
- * @param {string|JQLite} elementStr
- * @returns {string} Returns the string representation of the element.
+ * Extracts the starting tag from an HTML string or DOM element.
+ *
+ * @param {string|Element} elementOrStr - The HTML string or DOM element to process.
+ * @returns {string} The starting tag or processed result.
  */
-export function startingTag(elementStr: string | JQLite): string;
+export function startingTag(elementOrStr: string | Element): string;
 /**
  * Return the DOM siblings between the first and last node in the given array.
  * @param {JQLite|Array} nodes An array-like object
@@ -240,5 +240,25 @@ export function cleanElementData(nodes: NodeListOf<Element> | Element[]): void;
  * @returns {import('../../core/di/internal-injector.js').InjectorService}
  */
 export function getInjector(element: any): import("../../core/di/internal-injector.js").InjectorService;
-export function setData(element: any, key: any, value: any): any;
+export function setData(element: any, key: any, value: any): void;
+/**
+ * Adds an event listener to an element.
+ *
+ * @param {Element} element
+ * @param {string} type - The event type(s) to listen for. Multiple event types can be specified, separated by a space.
+ * @param {Function} fn - The function to execute when the event is triggered.
+ */
+export function onEvent(element: Element, type: string, fn: Function): void;
+/**
+ * Creates a DOM element from an HTML string.
+ * @param {string} htmlString - A string representing the HTML to parse.
+ * @returns {Element} - The parsed DOM element.
+ */
+export function createElementFromHTML(htmlString: string): Element;
+/**
+ * Appends nodes or an HTML string to a given DOM element.
+ * @param {Element} element - The element to append nodes to.
+ * @param {Node | Node[] | string} nodes - Nodes or HTML string to append.
+ */
+export function appendNodesToElement(element: Element, nodes: Node | Node[] | string): void;
 export const BOOLEAN_ATTR: {};

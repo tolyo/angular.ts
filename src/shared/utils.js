@@ -1200,3 +1200,7 @@ export function isObjectEmpty(obj) {
   if (!obj) return true;
   return !Object.keys(obj).length;
 }
+
+export function createElement(str) {
+  return new DOMParser().parseFromString(str, "text/html").body.firstChild;
+}

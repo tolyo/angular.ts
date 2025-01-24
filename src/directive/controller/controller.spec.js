@@ -1,7 +1,7 @@
 import { Angular } from "../../loader";
 import { createInjector } from "../../core/di/injector";
 import { dealoc, JQLite } from "../../shared/jqlite/jqlite.js";
-import { bind } from "../../shared/utils";
+import { bind, createElement } from "../../shared/utils";
 import { wait } from "../../shared/test-utils";
 
 describe("ngController", () => {
@@ -114,7 +114,7 @@ describe("ngController", () => {
   });
 
   it("should work with ngInclude on the same element", (done) => {
-    element = JQLite(
+    element = createElement(
       '<div><div ng-controller="Greeter" ng-include="\'/mock/interpolation\'"></div></div>',
     );
     window.angular
@@ -122,12 +122,11 @@ describe("ngController", () => {
       .controller("Greeter", function GreeterController($scope) {
         $scope.expr = "Vojta";
       });
-
     injector = angular.bootstrap(element, ["myModule"]);
 
     $rootScope = injector.get("$rootScope");
     setTimeout(() => {
-      expect(element.text()).toEqual("Vojta");
+      expect(element.innerHTML).toEqual("Vojta");
       dealoc($rootScope);
       done();
     }, 200);

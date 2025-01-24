@@ -1,3 +1,4 @@
+import { onEvent } from "../../shared/jqlite/jqlite";
 import {
   isDefined,
   isUndefined,
@@ -112,16 +113,16 @@ function textInputType(scope, element, attr, ctrl) {
 }
 
 function baseInputType(scope, element, attr, ctrl) {
-  const type = element[0].type.toLowerCase();
+  const type = element.type.toLowerCase();
   let composing = false;
   // In composition mode, users are still inputting intermediate text buffer,
   // hold the listener until composition is done.
   // More about composition events: https://developer.mozilla.org/en-US/docs/Web/API/CompositionEvent
-  element.on("compositionstart", () => {
+  onEvent(element, "compositionstart", () => {
     composing = true;
   });
 
-  element.on("compositionend", () => {
+  onEvent(element, "compositionend", () => {
     composing = false;
     listener();
   });
@@ -134,7 +135,7 @@ function baseInputType(scope, element, attr, ctrl) {
       timeout = null;
     }
     if (composing) return;
-    let value = element.val();
+    let value = element.value;
     const event = ev && ev.type;
 
     // By default we will trim the value
@@ -156,7 +157,7 @@ function baseInputType(scope, element, attr, ctrl) {
   };
 
   ["input", "change", "paste", "drop", "cut"].forEach((event) => {
-    element.on(event, listener);
+    onEvent(element, event, listener);
   });
 
   // Some native input types (date-family) have the ability to change validity without
@@ -168,7 +169,7 @@ function baseInputType(scope, element, attr, ctrl) {
     ctrl.$$hasNativeValidators &&
     type === attr.type
   ) {
-    element.on(PARTIAL_VALIDATION_EVENTS, function (ev) {
+    onEvent(element, PARTIAL_VALIDATION_EVENTS, function (ev) {
       if (!timeout) {
         const validity = this[VALIDITY_STATE_PROPERTY];
         const origBadInput = validity.badInput;
@@ -189,8 +190,8 @@ function baseInputType(scope, element, attr, ctrl) {
   ctrl.$render = function () {
     // Workaround for Firefox validation #12102.
     const value = ctrl.$isEmpty(ctrl.$viewValue) ? "" : ctrl.$viewValue;
-    if (element.val() !== value) {
-      element.val(value);
+    if (element.value !== value) {
+      element.value = value;
     }
   };
 }
@@ -713,7 +714,7 @@ export function rangeInputType(scope, element, attr, ctrl) {
         // $render would cause the min / max validators to be applied with the wrong value
         function rangeRender() {
           originalRender();
-          ctrl.$setViewValue(element.val());
+          ctrl.$setViewValue(element.value);
         }
       : originalRender;
 
@@ -801,11 +802,11 @@ export function rangeInputType(scope, element, attr, ctrl) {
     }
 
     if (supportsRange) {
-      let elVal = element.val();
+      let elVal = element.value;
       // IE11 doesn't set the el val correctly if the minVal is greater than the element value
       if (minVal > elVal) {
         elVal = minVal;
-        element.val(elVal);
+        element.value = elVal;
       }
       ctrl.$setViewValue(elVal);
     } else {
@@ -822,7 +823,7 @@ export function rangeInputType(scope, element, attr, ctrl) {
     }
 
     if (supportsRange) {
-      let elVal = element.val();
+      let elVal = element.value;
       // IE11 doesn't set the el val correctly if the maxVal is less than the element value
       if (maxVal < elVal) {
         element.val(maxVal);
@@ -847,8 +848,8 @@ export function rangeInputType(scope, element, attr, ctrl) {
     if (!supportsRange) {
       // TODO(matsko): implement validateLater to reduce number of validations
       ctrl.$validate();
-    } else if (ctrl.$viewValue !== element.val()) {
-      ctrl.$setViewValue(element.val());
+    } else if (ctrl.$viewValue !== element.value) {
+      ctrl.$setViewValue(element.value);
     }
   }
 }
@@ -895,7 +896,7 @@ function radioInputType(scope, element, attr, ctrl) {
     }
   };
 
-  element.on("change", listener);
+  onEvent(element, "change", listener);
 
   ctrl.$render = function () {
     let { value } = attr;
@@ -953,7 +954,7 @@ function checkboxInputType(
     ctrl.$setViewValue(element[0].checked, ev && ev.type);
   };
 
-  element.on("change", listener);
+  onEvent(element, "change", listener);
 
   ctrl.$render = function () {
     element[0].checked = ctrl.$viewValue;

@@ -1157,17 +1157,17 @@ describe("ngOptions", () => {
         "ng-options": "item.label for item in arr track by item.id",
       });
 
-      expect(element.val()).toEqualUnknownValue();
+      expect(element.value).toEqualUnknownValue();
 
       scope.$apply(() => {
         scope.selected = scope.arr[0];
       });
-      expect(element.val()).toBe("10");
+      expect(element.value).toBe("10");
 
       scope.$apply(() => {
         scope.arr[0] = { id: 10, label: "new ten" };
       });
-      expect(element.val()).toBe("10");
+      expect(element.value).toBe("10");
 
       element.children()[1].selected = "selected";
       browserTrigger(element, "change");
@@ -1197,7 +1197,7 @@ describe("ngOptions", () => {
         scope.selected = { id: 10, label: "ten" };
       });
 
-      expect(element.val()).toEqual("10");
+      expect(element.value).toEqual("10");
 
       // Update the properties on the selected object, rather than replacing the whole object
       scope.$apply(() => {
@@ -1206,7 +1206,7 @@ describe("ngOptions", () => {
       });
 
       // The value of the select should change since the id property changed
-      expect(element.val()).toEqual("20");
+      expect(element.value).toEqual("20");
 
       // But the label of the selected option does not change
       const option = element.find("option").eq(1);
@@ -1228,7 +1228,7 @@ describe("ngOptions", () => {
           scope.selected = [{ id: 10, label: "ten" }];
         });
 
-        expect(element.val()).toEqual(["10"]);
+        expect(element.value).toEqual(["10"]);
 
         // Update the tracked property on the object in the selected array, rather than replacing the whole object
         scope.$apply(() => {
@@ -1236,7 +1236,7 @@ describe("ngOptions", () => {
         });
 
         // The value of the select should change since the id property changed
-        expect(element.val()).toEqual(["20"]);
+        expect(element.value).toEqual(["20"]);
 
         // But the label of the selected option does not change
         const option = element.find("option").eq(1);
@@ -1261,7 +1261,7 @@ describe("ngOptions", () => {
       });
 
       expect(scope.selected).not.toEqual(scope.arr[0]);
-      expect(element.val()).toEqual("20");
+      expect(element.value).toEqual("20");
       expect(scope.arr).toEqual([
         { id: 10, label: "ten" },
         { id: 20, label: "twenty" },
@@ -1277,12 +1277,12 @@ describe("ngOptions", () => {
       scope.$apply(() => {
         scope.selected = scope.arr[0];
       });
-      expect(element.val()).toBe("10");
+      expect(element.value).toBe("10");
 
       scope.$apply(() => {
         scope.arr[0] = { id: 10, label: "new ten" };
       });
-      expect(element.val()).toBe("10");
+      expect(element.value).toBe("10");
 
       element.children()[1].selected = 1;
       browserTrigger(element, "change");
@@ -1299,12 +1299,12 @@ describe("ngOptions", () => {
       scope.$apply(() => {
         scope.selected = scope.arr;
       });
-      expect(element.val()).toEqual(["10", "20"]);
+      expect(element.value).toEqual(["10", "20"]);
 
       scope.$apply(() => {
         scope.arr[0] = { id: 10, label: "new ten" };
       });
-      expect(element.val()).toEqual(["10", "20"]);
+      expect(element.value).toEqual(["10", "20"]);
 
       element.children()[0].selected = false;
       browserTrigger(element, "change");
@@ -1320,12 +1320,12 @@ describe("ngOptions", () => {
       scope.$apply(() => {
         scope.selected = scope.obj["1"];
       });
-      expect(element.val()).toBe("10");
+      expect(element.value).toBe("10");
 
       scope.$apply(() => {
         scope.obj["1"] = { score: 10, label: "ten" };
       });
-      expect(element.val()).toBe("10");
+      expect(element.value).toBe("10");
 
       setSelectValue(element, 1);
       expect(scope.selected).toEqual(scope.obj["2"]);
@@ -1341,12 +1341,12 @@ describe("ngOptions", () => {
       scope.$apply(() => {
         scope.selected = [scope.obj["1"]];
       });
-      expect(element.val()).toEqual(["10"]);
+      expect(element.value).toEqual(["10"]);
 
       scope.$apply(() => {
         scope.obj["1"] = { score: 10, label: "ten" };
       });
-      expect(element.val()).toEqual(["10"]);
+      expect(element.value).toEqual(["10"]);
 
       element.children()[1].selected = "selected";
       browserTrigger(element, "change");
@@ -1514,12 +1514,12 @@ describe("ngOptions", () => {
         scope.$apply(() => {
           scope.selected = scope.arr[0].subItem;
         });
-        expect(element.val()).toEqual("10");
+        expect(element.value).toEqual("10");
 
         scope.$apply(() => {
           scope.selected = scope.arr[1].subItem;
         });
-        expect(element.val()).toEqual("20");
+        expect(element.value).toEqual("20");
 
         // Now test view -> model
 
@@ -1538,7 +1538,7 @@ describe("ngOptions", () => {
             },
           ];
         });
-        expect(element.val()).toBe("10");
+        expect(element.value).toBe("10");
         expect(scope.selected.id).toBe(10);
       },
     );
@@ -1559,12 +1559,12 @@ describe("ngOptions", () => {
         scope.$apply(() => {
           scope.selected = [scope.arr[0].subItem];
         });
-        expect(element.val()).toEqual(["10"]);
+        expect(element.value).toEqual(["10"]);
 
         scope.$apply(() => {
           scope.selected = [scope.arr[1].subItem];
         });
-        expect(element.val()).toEqual(["20"]);
+        expect(element.value).toEqual(["20"]);
 
         // Now test view -> model
 
@@ -1584,7 +1584,7 @@ describe("ngOptions", () => {
             },
           ];
         });
-        expect(element.val()).toEqual(["10"]);
+        expect(element.value).toEqual(["10"]);
         expect(scope.selected[0].id).toEqual(10);
         expect(scope.selected.length).toBe(1);
       },
@@ -1606,12 +1606,12 @@ describe("ngOptions", () => {
         scope.$apply(() => {
           scope.selected = [scope.obj["10"].subItem];
         });
-        expect(element.val()).toEqual(["10"]);
+        expect(element.value).toEqual(["10"]);
 
         scope.$apply(() => {
           scope.selected = [scope.obj["10"].subItem];
         });
-        expect(element.val()).toEqual(["10"]);
+        expect(element.value).toEqual(["10"]);
 
         // Now test view -> model
 
@@ -1631,7 +1631,7 @@ describe("ngOptions", () => {
             },
           };
         });
-        expect(element.val()).toEqual(["10"]);
+        expect(element.value).toEqual(["10"]);
         expect(scope.selected[0].id).toBe(10);
         expect(scope.selected.length).toBe(1);
       },
@@ -1652,12 +1652,12 @@ describe("ngOptions", () => {
         scope.$apply(() => {
           scope.selected = scope.obj["10"].subItem;
         });
-        expect(element.val()).toEqual("10");
+        expect(element.value).toEqual("10");
 
         scope.$apply(() => {
           scope.selected = scope.obj["10"].subItem;
         });
-        expect(element.val()).toEqual("10");
+        expect(element.value).toEqual("10");
 
         // Now test view -> model
 
@@ -1676,7 +1676,7 @@ describe("ngOptions", () => {
             },
           };
         });
-        expect(element.val()).toEqual("10");
+        expect(element.value).toEqual("10");
         expect(scope.selected.id).toBe(10);
       },
     );
@@ -1999,7 +1999,7 @@ describe("ngOptions", () => {
         scope.selected = scope.values[1];
       });
 
-      expect(element.val()).toEqual("2");
+      expect(element.value).toEqual("2");
 
       const first = JQLite(element.find("option")[0]);
       expect(first.text()).toEqual("first");
@@ -2012,7 +2012,7 @@ describe("ngOptions", () => {
         scope.selected = scope.values[3];
       });
 
-      expect(element.val()).toEqual("4");
+      expect(element.value).toEqual("4");
     });
 
     it("should bind to scope value through expression", () => {
@@ -2159,7 +2159,7 @@ describe("ngOptions", () => {
       });
 
       expect(element.find("option").length).toEqual(2);
-      expect(element.val()).toEqual("?");
+      expect(element.value).toEqual("?");
       expect(JQLite(element.find("option")[0]).val()).toEqual("?");
 
       scope.$apply(() => {
@@ -2179,7 +2179,7 @@ describe("ngOptions", () => {
       });
 
       expect(element.find("option").length).toEqual(2);
-      expect(element.val()).toEqual("");
+      expect(element.value).toEqual("");
       expect(JQLite(element.find("option")[0]).val()).toEqual("");
 
       scope.$apply(() => {
@@ -2200,7 +2200,7 @@ describe("ngOptions", () => {
       });
 
       expect(element.find("option").length).toEqual(2);
-      expect(element.val()).toEqual("");
+      expect(element.value).toEqual("");
       expect(JQLite(element.find("option")[0]).val()).toEqual("");
 
       scope.$apply(() => {
@@ -2227,7 +2227,7 @@ describe("ngOptions", () => {
 
       expect(element.find("option").length).toEqual(2);
       expect(element.find("option").eq(0)).toEqualOption(null);
-      expect(element.val()).not.toEqualUnknownValue(null);
+      expect(element.value).not.toEqualUnknownValue(null);
       expect(element.find("option").eq(0)).not.toEqualUnknownOption(null);
     });
 
@@ -2240,7 +2240,7 @@ describe("ngOptions", () => {
       });
 
       expect(element.find("option").length).toEqual(2);
-      expect(element.val()).toEqualUnknownValue(scope.selected);
+      expect(element.value).toEqualUnknownValue(scope.selected);
       expect(element.find("option").eq(0)).toEqualUnknownOption(scope.selected);
 
       scope.$apply(() => {
@@ -2278,7 +2278,7 @@ describe("ngOptions", () => {
       });
 
       expect(element.find("option").length).toEqual(3);
-      expect(element.val()).toEqualUnknownValue();
+      expect(element.value).toEqualUnknownValue();
       expect(element.find("option").eq(0)).toEqualUnknownOption();
 
       setSelectValue(element, 1);
@@ -2311,7 +2311,7 @@ describe("ngOptions", () => {
           { id: 20, name: "B" },
         ];
       });
-      expect(element.val()).toEqualUnknownValue();
+      expect(element.value).toEqualUnknownValue();
       expect(element.find("option").eq(0).attr("selected")).toEqual("selected");
 
       scope.$apply(() => {
@@ -2338,7 +2338,7 @@ describe("ngOptions", () => {
       scope.$apply(() => {
         scope.selected = undefined;
       });
-      expect(element.val()).toEqualUnknownValue();
+      expect(element.value).toEqualUnknownValue();
       expect(element.find("option").eq(0).attr("selected")).toEqual("selected");
     });
 
@@ -2374,7 +2374,7 @@ describe("ngOptions", () => {
         scope.values.pop();
       });
 
-      expect(element.val()).toEqual("?");
+      expect(element.value).toEqual("?");
       expect(scope.selected).toEqual(null);
 
       // Check after model change
@@ -2388,7 +2388,7 @@ describe("ngOptions", () => {
         scope.values.pop();
       });
 
-      expect(element.val()).toEqual("?");
+      expect(element.value).toEqual("?");
       expect(scope.selected).toEqual(null);
     });
 
@@ -2534,7 +2534,7 @@ describe("ngOptions", () => {
     });
 
     it("should be selected, if it is available and no other option is selected", () => {
-      // selectedIndex is used here because JQLite incorrectly reports element.val()
+      // selectedIndex is used here because JQLite incorrectly reports element.value
       scope.$apply(() => {
         scope.values = [{ name: "A" }];
       });
@@ -3279,7 +3279,7 @@ describe("ngOptions", () => {
         true,
       );
 
-      expect(element.val()).toBe("");
+      expect(element.value).toBe("");
       const emptyOption = element.find("option").eq(0);
       expect(emptyOption[0].selected).toBe(true);
       expect(emptyOption.val()).toBe("");

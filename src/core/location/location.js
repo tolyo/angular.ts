@@ -1,4 +1,4 @@
-import { JQLite } from "../../shared/jqlite/jqlite.js";
+import { JQLite, onEvent } from "../../shared/jqlite/jqlite.js";
 import { urlResolve } from "../url-utils/url-utils";
 import {
   encodeUriSegment,
@@ -630,7 +630,7 @@ export class LocationProvider {
      *
      * @param {import('../scope/scope').Scope} $rootScope
      * @param {import('../../services/browser').Browser} $browser
-     * @param {JQLite} $rootElement
+     * @param {Element} $rootElement
      * @returns
      */
     ($rootScope, $browser, $rootElement) => {
@@ -685,8 +685,7 @@ export class LocationProvider {
           throw e;
         }
       }
-
-      $rootElement.on("click", (event) => {
+      onEvent($rootElement, "click", (event) => {
         const rewriteLinks = this.getHtml5Mode().rewriteLinks;
         // TODO(vojta): rewrite link when opening in new tab/window (in legacy browser)
         // currently we open nice url link and redirect then

@@ -146,9 +146,8 @@ export const ngIncludeFillContentDirective = [
         );
         return;
       }
-
-      $element.html(ctrl.template);
-      $compile($element[0].childNodes)(scope);
+      $element.innerHTML = ctrl.template;
+      Array.from($element.childNodes).forEach((el) => $compile(el)(scope));
     },
   }),
 ];

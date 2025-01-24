@@ -16,7 +16,7 @@ const nativeAriaNodeNames = [
 ];
 
 const isNodeOneOf = function (elem, nodeTypeArray) {
-  if (nodeTypeArray.indexOf(elem[0].nodeName) !== -1) {
+  if (nodeTypeArray.indexOf(elem.nodeName) !== -1) {
     return true;
   }
 };
@@ -68,7 +68,7 @@ export function AriaProvider() {
         scope.$watch(attr[attrName], (boolVal) => {
           // ensure boolean value
           boolVal = negate ? !boolVal : !!boolVal;
-          elem.attr(ariaAttr, boolVal);
+          elem.setAttribute(ariaAttr, boolVal);
         });
       }
     };
@@ -106,8 +106,8 @@ export function ngMessagesAriaDirective() {
     link(_scope, elem, attr) {
       if (Object.prototype.hasOwnProperty.call(attr, ARIA_DISABLE_ATTR)) return;
 
-      if (!elem.attr("aria-live")) {
-        elem.attr("aria-live", "assertive");
+      if (!elem.setAttribute("aria-live")) {
+        elem.setAttribute("aria-live", "assertive");
       }
     },
   };
@@ -123,12 +123,12 @@ export function ngClickAriaDirective($aria, $parse) {
       const fn = $parse(attr.ngClick);
       return function (scope, elem, attr) {
         if (!isNodeOneOf(elem, nativeAriaNodeNames)) {
-          if ($aria.config("bindRoleForClick") && !elem.attr("role")) {
-            elem.attr("role", "button");
+          if ($aria.config("bindRoleForClick") && !elem.setAttribute("role")) {
+            elem.setAttribute("role", "button");
           }
 
-          if ($aria.config("tabindex") && !elem.attr("tabindex")) {
-            elem.attr("tabindex", 0);
+          if ($aria.config("tabindex") && !elem.setAttribute("tabindex")) {
+            elem.setAttribute("tabindex", 0);
           }
 
           if (
@@ -214,9 +214,9 @@ export function ngModelAriaDirective($aria) {
   function shouldAttachAttr(attr, normalizedAttr, elem, allowNonAriaNodes) {
     return (
       $aria.config(normalizedAttr) &&
-      !elem.attr(attr) &&
+      !elem.getAttribute(attr) &&
       (allowNonAriaNodes || !isNodeOneOf(elem, nativeAriaNodeNames)) &&
-      (elem.attr("type") !== "hidden" || elem[0].nodeName !== "INPUT")
+      (elem.getAttribute("type") !== "hidden" || elem[0].nodeName !== "INPUT")
     );
   }
 
@@ -225,8 +225,8 @@ export function ngModelAriaDirective($aria) {
     // AND element type is equal to role (if custom element has a type equaling shape) <-- remove?
     // AND element is not in nativeAriaNodeNames
     return (
-      !elem.attr("role") &&
-      elem.attr("type") === role &&
+      !elem.setAttribute("role") &&
+      elem.setAttribute("type") === role &&
       !isNodeOneOf(elem, nativeAriaNodeNames)
     );
   }
@@ -275,7 +275,7 @@ export function ngModelAriaDirective($aria) {
           }
 
           function getCheckboxReaction() {
-            elem.attr(
+            elem.setAttribute(
               "aria-checked",
               (!ngModel.$isEmpty(ngModel.$viewValue)).toString(),
             );
@@ -285,7 +285,7 @@ export function ngModelAriaDirective($aria) {
             case "radio":
             case "checkbox":
               if (shouldAttachRole(shape, elem)) {
-                elem.attr("role", shape);
+                elem.setAttribute("role", shape);
               }
               if (
                 shouldAttachAttr("aria-checked", "ariaChecked", elem, false)
@@ -296,42 +296,42 @@ export function ngModelAriaDirective($aria) {
                 );
               }
               if (needsTabIndex) {
-                elem.attr("tabindex", 0);
+                elem.setAttribute("tabindex", 0);
               }
               break;
             case "range":
               if (shouldAttachRole(shape, elem)) {
-                elem.attr("role", "slider");
+                elem.setAttribute("role", "slider");
               }
               if ($aria.config("ariaValue")) {
                 const needsAriaValuemin =
-                  !elem.attr("aria-valuemin") &&
+                  !elem.setAttribute("aria-valuemin") &&
                   (Object.prototype.hasOwnProperty.call(attr, "min") ||
                     Object.prototype.hasOwnProperty.call(attr, "ngMin"));
                 const needsAriaValuemax =
-                  !elem.attr("aria-valuemax") &&
+                  !elem.setAttribute("aria-valuemax") &&
                   (Object.prototype.hasOwnProperty.call(attr, "max") ||
                     Object.prototype.hasOwnProperty.call(attr, "ngMax"));
-                const needsAriaValuenow = !elem.attr("aria-valuenow");
+                const needsAriaValuenow = !elem.setAttribute("aria-valuenow");
 
                 if (needsAriaValuemin) {
                   attr.$observe("min", (newVal) => {
-                    elem.attr("aria-valuemin", newVal);
+                    elem.setAttribute("aria-valuemin", newVal);
                   });
                 }
                 if (needsAriaValuemax) {
                   attr.$observe("max", (newVal) => {
-                    elem.attr("aria-valuemax", newVal);
+                    elem.setAttribute("aria-valuemax", newVal);
                   });
                 }
                 if (needsAriaValuenow) {
                   scope.$watch(ngAriaWatchModelValue, (newVal) => {
-                    elem.attr("aria-valuenow", newVal);
+                    elem.setAttribute("aria-valuenow", newVal);
                   });
                 }
               }
               if (needsTabIndex) {
-                elem.attr("tabindex", 0);
+                elem.setAttribute("tabindex", 0);
               }
               break;
           }
@@ -343,13 +343,13 @@ export function ngModelAriaDirective($aria) {
           ) {
             // ngModel.$error.required is undefined on custom controls
             attr.$observe("required", () => {
-              elem.attr("aria-required", (!!attr.required).toString());
+              elem.setAttribute("aria-required", (!!attr.required).toString());
             });
           }
 
           if (shouldAttachAttr("aria-invalid", "ariaInvalid", elem, true)) {
             scope.$watch("ngModel.$invalid", (newVal) => {
-              elem.attr("aria-invalid", (!!newVal).toString());
+              elem.setAttribute("aria-invalid", (!!newVal).toString());
             });
           }
         },
@@ -365,10 +365,10 @@ export function ngDblclickAriaDirective($aria) {
 
     if (
       $aria.config("tabindex") &&
-      !elem.attr("tabindex") &&
+      !elem.setAttribute("tabindex") &&
       !isNodeOneOf(elem, nativeAriaNodeNames)
     ) {
-      elem.attr("tabindex", 0);
+      elem.setAttribute("tabindex", 0);
     }
   };
 }

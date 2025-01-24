@@ -1787,7 +1787,7 @@ describe("select", () => {
           optionElements = element.find("option");
           expect(optionElements.length).toEqual(3);
           expect(scope.obj.value).toBe(null);
-          expect(element.val()).toBe("? object:null ?");
+          expect(element.value).toBe("? object:null ?");
         });
 
         it("should set the model to null when the currently selected option with $prop changes its value", () => {
@@ -1829,7 +1829,7 @@ describe("select", () => {
           optionElements = element.find("option");
           expect(optionElements.length).toEqual(4);
           expect(scope.obj.value).toBe(null);
-          expect(element.val()).toBe("? string:A ?");
+          expect(element.value).toBe("? string:A ?");
         });
 
         it("should set the model to null when the currently selected option with $prop is disabled", () => {
@@ -1871,7 +1871,7 @@ describe("select", () => {
           optionElements = element.find("option");
           expect(optionElements.length).toEqual(4);
           expect(scope.obj.value).toBe(null);
-          expect(element.val()).toBe("? object:null ?");
+          expect(element.value).toBe("? object:null ?");
         });
 
         it("should select a disabled option with $prop when the model is set to the matching value", () => {
@@ -1959,13 +1959,13 @@ describe("select", () => {
           optionElements = element.find("option");
           expect(optionElements.length).toEqual(4);
           expect(scope.obj.value).toBe(null);
-          expect(element.val()).toBe("? object:null ?");
+          expect(element.value).toBe("? object:null ?");
 
           A.disabled = false;
           optionElements = element.find("option");
           expect(optionElements.length).toEqual(4);
           expect(scope.obj.value).toBe(null);
-          expect(element.val()).toBe("? object:null ?");
+          expect(element.value).toBe("? object:null ?");
         });
 
         it("should select a newly added option with $prop when it matches the current model", () => {
@@ -2040,14 +2040,14 @@ describe("select", () => {
 
           scope.obj.value = "C";
           optionElements = element.find("option");
-          expect(element.val()).toBe(prop === "ngValue" ? "string:C" : "C");
+          expect(element.value).toBe(prop === "ngValue" ? "string:C" : "C");
           expect(optionElements.length).toEqual(3);
           expect(optionElements[2].selected).toBe(true);
           expect(scope.obj.value).toBe("C");
 
           scope.options = [{ name: "A" }, { name: "B" }, { name: "C" }];
           optionElements = element.find("option");
-          expect(element.val()).toBe(prop === "ngValue" ? "string:C" : "C");
+          expect(element.value).toBe(prop === "ngValue" ? "string:C" : "C");
           expect(optionElements.length).toEqual(3);
           expect(optionElements[2].selected).toBe(true);
           expect(scope.obj.value).toBe("C");
@@ -2109,7 +2109,7 @@ describe("select", () => {
             expect(scope.obj.value).toEqual([]);
 
             // Cover both jQuery 3.x ([]) and 2.x (null) behavior.
-            let val = element.val();
+            let val = element.value;
             if (val === null) {
               val = [];
             }
@@ -2172,7 +2172,7 @@ describe("select", () => {
             expect(scope.obj.value).toEqual([]);
 
             // Cover both jQuery 3.x ([]) and 2.x (null) behavior.
-            let val = element.val();
+            let val = element.value;
             if (val === null) {
               val = [];
             }
@@ -2235,7 +2235,7 @@ describe("select", () => {
             optionElements = element.find("option");
             expect(optionElements.length).toEqual(4);
             expect(scope.obj.value).toEqual(["D"]);
-            expect(element.val()).toEqual(
+            expect(element.value).toEqual(
               prop === "ngValue" ? ["string:D"] : ["D"],
             );
             expect(ngModelCtrlSpy).toHaveBeenCalledTimes(1);

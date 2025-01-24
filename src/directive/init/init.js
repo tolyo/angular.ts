@@ -1,3 +1,5 @@
+import { getController } from "../../shared/jqlite/jqlite.js";
+
 /**
  * @returns {import('../../types.js').Directive}
  */
@@ -7,8 +9,9 @@ export function ngInitDirective() {
     compile() {
       return {
         pre(scope, element, attrs) {
-          if (element.controller()) {
-            element.controller().$eval(attrs["ngInit"]);
+          const controller = getController(element);
+          if (controller) {
+            controller.$eval(attrs["ngInit"]);
           } else {
             scope.$eval(attrs.ngInit);
           }
