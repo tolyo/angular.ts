@@ -128,7 +128,7 @@ describe("templateFactory", () => {
       $stateRegistry.register({ name: "cmp", component: "myComponent" });
       $stateService.go("cmp");
       await wait(100);
-      expect(el.html()).toMatch(/\<my-component/);
+      expect(el.innerHTML).toMatch(/\<my-component/);
     });
 
     it("should prefix the components dom element with x- for components named dataFoo", () => {
@@ -137,13 +137,13 @@ describe("templateFactory", () => {
         component: "dataComponent",
       });
       $stateService.go("cmp");
-      expect(el.html()).toMatch(/\<x-data-component/);
+      expect(el.innerHTML).toMatch(/\<x-data-component/);
     });
 
     it("should prefix the components dom element with x- for components named xFoo", () => {
       $stateRegistry.register({ name: "cmp", component: "xComponent" });
       $stateService.go("cmp");
-      expect(el.html()).toMatch(/\<x-x-component/);
+      expect(el.innerHTML).toMatch(/\<x-x-component/);
     });
   });
 });

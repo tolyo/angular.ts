@@ -223,7 +223,7 @@ export const ngRepeatDirective = [
             // remove leftover items
             for (var blockKey in lastBlockMap) {
               block = lastBlockMap[blockKey];
-              elementsToRemove = getBlockNodes(block.clone);
+              elementsToRemove = block.clone;
               $animate.leave(elementsToRemove);
               if (elementsToRemove[0].parentNode) {
                 // if the element was not removed yet because of pending animation, mark it as deleted

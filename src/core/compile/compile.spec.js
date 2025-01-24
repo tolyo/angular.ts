@@ -732,7 +732,7 @@ describe("$compile", () => {
         $rootScope,
       );
       const text = element.children().eq(0);
-      // In old Safari, SVG elements don't have innerHTML, so element.html() won't work
+      // In old Safari, SVG elements don't have innerHTML, so element.innerHTML won't work
       // (https://bugs.webkit.org/show_bug.cgi?id=136903)
       expect(text.text()).toEqual("Hello angular");
       expect(log[0]).toEqual("123");
@@ -2504,7 +2504,7 @@ describe("$compile", () => {
       reloadModules();
       var el = $("<div my-directive></div>");
       $compile(el);
-      expect(el.html()).toBe('<div class="from-template"></div>');
+      expect(el.innerHTML).toBe('<div class="from-template"></div>');
     });
 
     fit("replaces any existing children", () => {
@@ -2516,7 +2516,7 @@ describe("$compile", () => {
       reloadModules();
       var el = $('<div my-directive><div class="existing"></div></div>');
       $compile(el);
-      expect(el.html()).toBe('<div class="from-template"></div>');
+      expect(el.innerHTML).toBe('<div class="from-template"></div>');
     });
 
     fit("compiles template contents also", () => {
@@ -2569,7 +2569,7 @@ describe("$compile", () => {
       reloadModules();
       var el = $("<div my-directive></div>");
       $compile(el);
-      expect(el.html()).toBe('<div class="from-template"></div>');
+      expect(el.innerHTML).toBe('<div class="from-template"></div>');
       expect(templateSpy.calls.first().args[0][0]).toBe(el[0]);
       expect(templateSpy.calls.first().args[1].myDirective).toBeDefined();
     });
@@ -2643,7 +2643,7 @@ describe("$compile", () => {
       var el = $("<div my-directive>Hello</div>");
       $compile(el);
       await wait();
-      expect(el.html()).toBe("");
+      expect(el.innerHTML).toBe("");
     });
 
     fit("populates element with template", (done) => {
@@ -3764,11 +3764,11 @@ describe("$compile", () => {
       $compile(el)($rootScope);
 
       await wait();
-      expect(el.html()).toEqual("My expression: ");
+      expect(el.innerHTML).toEqual("My expression: ");
 
       $rootScope.myExpr = "Hello";
       await wait();
-      expect(el.html()).toEqual("My expression: Hello");
+      expect(el.innerHTML).toEqual("My expression: Hello");
     });
 
     fit("is done for attributes", async () => {
@@ -3932,7 +3932,7 @@ describe("$compile", () => {
         $compile(el)($rootScope);
         await wait();
 
-        expect(el.html()).toEqual("Value is 42");
+        expect(el.innerHTML).toEqual("Value is 42");
       });
       expect().toBe();
     });
@@ -4965,7 +4965,7 @@ describe("$compile", () => {
       await wait();
 
       // object's children can't be compiled in this case, so we expect them to be raw
-      expect(element.html()).toBe("3");
+      expect(element.innerHTML).toBe("3");
     });
 
     fit('should detect anchor elements with the string "SVG" in the `href` attribute as an anchor', async () => {
@@ -5012,7 +5012,7 @@ describe("$compile", () => {
     fit("should allow modifying the DOM structure in post link fn", async () => {
       myModule.directive("removeNode", () => ({
         link($scope, $element) {
-          $element.remove();
+          removeElement($element);
         },
       }));
       reloadModules();
@@ -6291,7 +6291,7 @@ describe("$compile", () => {
 
               $rootScope.i = 1;
               await wait();
-              expect(element.html()).toContain("i = 1");
+              expect(element.innerHTML).toContain("i = 1");
             },
           );
 
@@ -8999,7 +8999,7 @@ describe("$compile", () => {
         $rootScope.value = "from-parent";
 
         await wait();
-        expect(element.html()).toBe("value: from-parent");
+        expect(element.innerHTML).toBe("value: from-parent");
       });
 
       fit("should not give the isolate scope to other directive template (with templateUrl)", async () => {
@@ -9020,7 +9020,7 @@ describe("$compile", () => {
         $rootScope.value = "from-parent";
 
         await wait();
-        expect(element.html()).toBe("value: from-parent");
+        expect(element.innerHTML).toBe("value: from-parent");
       });
 
       fit("should not give the isolate scope to regular child elements", async () => {
@@ -9031,7 +9031,7 @@ describe("$compile", () => {
         $rootScope.value = "from-parent";
 
         await wait();
-        expect(element.html()).toBe("value: from-parent");
+        expect(element.innerHTML).toBe("value: from-parent");
       });
 
       fit('should update parent scope when "="-bound NaN changes', async () => {
@@ -12774,7 +12774,7 @@ describe("$compile", () => {
           initInjector("test1");
           element = $compile("<div trans>unicorn!</div>")($rootScope);
           await wait();
-          expect(element.html()).toEqual(
+          expect(element.innerHTML).toEqual(
             '<div ng-transclude="">unicorn!</div>',
           );
         });
@@ -12787,7 +12787,7 @@ describe("$compile", () => {
           initInjector("test1");
           element = $compile("<div trans></div>")($rootScope);
           await wait();
-          expect(element.html()).toEqual(
+          expect(element.innerHTML).toEqual(
             '<div ng-transclude="">old stuff!</div>',
           );
         });
@@ -12800,10 +12800,10 @@ describe("$compile", () => {
           initInjector("test1");
           element = JQLite("<div trans></div>");
           const linkfn = $compile(element);
-          expect(element.html()).toEqual('<div ng-transclude=""></div>');
+          expect(element.innerHTML).toEqual('<div ng-transclude=""></div>');
           linkfn($rootScope);
           await wait();
-          expect(element.html()).toEqual(
+          expect(element.innerHTML).toEqual(
             '<div ng-transclude="">fallback content</div>',
           );
         });
@@ -12836,7 +12836,7 @@ describe("$compile", () => {
           initInjector("test1");
           element = $compile("<div trans>unicorn!</div>")($rootScope);
           await wait();
-          expect(element.html()).toEqual(
+          expect(element.innerHTML).toEqual(
             '<div ng-transclude="">unicorn!</div>',
           );
           expect(linkSpy).not.toHaveBeenCalled();
@@ -12858,7 +12858,7 @@ describe("$compile", () => {
           initInjector("test1");
           element = $compile("<div trans></div>")($rootScope);
           wait();
-          expect(element.html()).toEqual(
+          expect(element.innerHTML).toEqual(
             '<div ng-transclude=""><inner>old stuff! </inner></div>',
           );
           expect(linkSpy).toHaveBeenCalled();
@@ -12880,7 +12880,7 @@ describe("$compile", () => {
           initInjector("test1");
           element = $compile("<div trans>\n  \n</div>")($rootScope);
           await wait();
-          expect(element.html()).toEqual(
+          expect(element.innerHTML).toEqual(
             '<div ng-transclude=""><inner>old stuff! </inner></div>',
           );
           expect(linkSpy).toHaveBeenCalled();
@@ -12904,7 +12904,7 @@ describe("$compile", () => {
             $rootScope,
           );
           await wait();
-          expect(element.html()).toEqual(
+          expect(element.innerHTML).toEqual(
             '<div ng-transclude="">\n<!-- some comment -->  \n</div>',
           );
           expect(linkSpy).not.toHaveBeenCalled();
@@ -12928,7 +12928,7 @@ describe("$compile", () => {
           initInjector("test1");
           element = $compile("<div trans></div>")($rootScope);
           await wait();
-          expect(element.html()).toEqual(
+          expect(element.innerHTML).toEqual(
             '<div ng-transclude="optionalSlot"><inner>old stuff! </inner></div>',
           );
           expect(linkSpy).toHaveBeenCalled();
@@ -12942,7 +12942,7 @@ describe("$compile", () => {
           initInjector("test1");
           element = $compile("<div trans></div>")($rootScope);
           await wait();
-          expect(element.html()).toEqual('<div ng-transclude=""></div>');
+          expect(element.innerHTML).toEqual('<div ng-transclude=""></div>');
         });
 
         it("should throw on an ng-transclude element inside no transclusion directive", async () => {
@@ -13430,22 +13430,22 @@ describe("$compile", () => {
             );
 
             $rootScope.$apply("t = true");
-            expect(element.html()).toContain("some comment");
+            expect(element.innerHTML).toContain("some comment");
             // Expected scopes: $rootScope, ngIf, transclusion
             expect(countChildScopes($rootScope)).toBe(2);
 
             $rootScope.$apply("t = false");
-            expect(element.html()).not.toContain("some comment");
+            expect(element.innerHTML).not.toContain("some comment");
             // Expected scopes: $rootScope
             expect(countChildScopes($rootScope)).toBe(0);
 
             $rootScope.$apply("t = true");
-            expect(element.html()).toContain("some comment");
+            expect(element.innerHTML).toContain("some comment");
             // Expected scopes: $rootScope, ngIf, transclusion
             expect(countChildScopes($rootScope)).toBe(2);
 
             $rootScope.$apply("t = false");
-            expect(element.html()).not.toContain("some comment");
+            expect(element.innerHTML).not.toContain("some comment");
             // Expected scopes: $rootScope
             expect(countChildScopes($rootScope)).toBe(0);
           });
@@ -13454,22 +13454,22 @@ describe("$compile", () => {
             element = $compile("<div toggle>some text</div>")($rootScope);
 
             $rootScope.$apply("t = true");
-            expect(element.html()).toContain("some text");
+            expect(element.innerHTML).toContain("some text");
             // Expected scopes: $rootScope, ngIf, transclusion
             expect(countChildScopes($rootScope)).toBe(2);
 
             $rootScope.$apply("t = false");
-            expect(element.html()).not.toContain("some text");
+            expect(element.innerHTML).not.toContain("some text");
             // Expected scopes: $rootScope
             expect(countChildScopes($rootScope)).toBe(0);
 
             $rootScope.$apply("t = true");
-            expect(element.html()).toContain("some text");
+            expect(element.innerHTML).toContain("some text");
             // Expected scopes: $rootScope, ngIf, transclusion
             expect(countChildScopes($rootScope)).toBe(2);
 
             $rootScope.$apply("t = false");
-            expect(element.html()).not.toContain("some text");
+            expect(element.innerHTML).not.toContain("some text");
             // Expected scopes: $rootScope
             expect(countChildScopes($rootScope)).toBe(0);
           });

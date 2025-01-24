@@ -803,7 +803,9 @@ export function dealoc(element, onlyDescendants) {
     cleanElementData([element]);
   }
 
-  cleanElementData(element.querySelectorAll("*"));
+  if (elementAcceptsData(element)) {
+    cleanElementData(element.querySelectorAll("*"));
+  }
 }
 
 /**
@@ -893,7 +895,7 @@ export function getCacheData(element, key) {
     const expandoStore = getExpando(element, false); // Don't create if it doesn't exist
     const data = expandoStore && expandoStore.data;
     if (!key) {
-      return data;
+      return undefined;
     }
     return data && data[kebabToCamel(key)];
   }
@@ -987,7 +989,9 @@ export function setInheritedData(element, name, value) {
  * @param {boolean} keepData
  */
 export function removeElement(element, keepData = false) {
-  if (!keepData) dealoc(element);
+  if (!keepData) {
+    dealoc(element);
+  }
   const parent = element.parentNode;
   if (parent) parent.removeChild(element);
 }

@@ -1627,7 +1627,7 @@ describe("angular", () => {
         angular.bootstrap(element, ["doesntexist"]);
       }).toThrowError(/modulerr/);
 
-      expect(element.html()).toBe("{{1+2}}");
+      expect(element.innerHTML).toBe("{{1+2}}");
       dealoc(element);
     });
   });

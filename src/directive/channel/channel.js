@@ -8,17 +8,16 @@ import { EventBus } from "../../core/pubsub/pubsub";
  * When the scope is destroyed, the directive automatically unsubscribes from the channel.
  *
  *
- * @returns {import("../../types").Directive}
+ * @returns {import("../../types.js").Directive}
  */
 export function ngChannelDirective() {
   return {
     restrict: "EA",
     link: (scope, element, attrs) => {
-      const targetElement = element[0];
       const channel = attrs["ngChannel"];
 
       const key = EventBus.subscribe(channel, (val) => {
-        targetElement.innerHTML = val;
+        element.innerHTML = val;
       });
 
       scope.$on("$destroy", () => {

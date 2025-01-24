@@ -9,7 +9,7 @@ export function ngObserveDirective(source, prop) {
   return {
     restrict: "A",
     compile: () => (scope, element) => {
-      const targetElement = element[0];
+      const targetElement = element;
       if (prop === "") {
         prop = source;
       }

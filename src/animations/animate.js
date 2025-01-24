@@ -1,5 +1,5 @@
 import { isFunction, isObject, minErr, extend } from "../shared/utils";
-import { JQLite } from "../shared/jqlite/jqlite.js";
+import { JQLite, removeElement } from "../shared/jqlite/jqlite.js";
 import { NG_ANIMATE_CLASSNAME } from "./shared";
 
 /** @typedef {"enter"|"leave"|"move"|"addClass"|"setClass"|"removeClass"} AnimationMethod */
@@ -463,7 +463,7 @@ export function AnimateProvider($provide) {
          * When the function is called a promise is returned that will be resolved during the next
          * digest once the animation has completed.
          *
-         * @param {JQLite} element the element which will be removed from the DOM
+         * @param {Element} element the element which will be removed from the DOM
          * @param {AnimationOptions} [options] an optional collection of options/styles that will be applied to the element.
          * @returns {import('./animate-runner').AnimateRunner} the animation runner
          */
@@ -473,7 +473,7 @@ export function AnimateProvider($provide) {
             "leave",
             prepareAnimateOptions(options),
             () => {
-              element.remove();
+              removeElement(element);
             },
           );
         },

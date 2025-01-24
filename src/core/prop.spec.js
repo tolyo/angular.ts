@@ -207,15 +207,15 @@ describe("ngProp*", () => {
   it("should process property bindings in pre-linking phase at priority 100", async () => {
     compileProvider.directive("propLog", () => ({
       compile($element, $attrs) {
-        logs.push(`compile=${$element[0].myName}`);
+        logs.push(`compile=${$element.myName}`);
 
         return {
           pre($scope, $element, $attrs) {
-            logs.push(`preLinkP0=${$element[0].myName}`);
+            logs.push(`preLinkP0=${$element.myName}`);
             $rootScope.name = "pre0";
           },
           post($scope, $element, $attrs) {
-            logs.push(`postLink=${$element[0].myName}`);
+            logs.push(`postLink=${$element.myName}`);
             $rootScope.name = "post0";
           },
         };
@@ -227,7 +227,7 @@ describe("ngProp*", () => {
       compile() {
         return {
           pre($scope, $element, $attrs) {
-            logs.push(`preLinkP101=${$element[0].myName}`);
+            logs.push(`preLinkP101=${$element.myName}`);
             $rootScope.name = "pre101";
           },
         };
@@ -596,7 +596,7 @@ describe("ngProp*", () => {
           $rootScope,
         );
         $rootScope.html = '<div onclick="">hello</div>';
-        expect(element.html()).toEqual('<div onclick="">hello</div>');
+        expect(element.innerHTML).toEqual('<div onclick="">hello</div>');
       });
 
       it("should update html", () => {
@@ -604,9 +604,9 @@ describe("ngProp*", () => {
           $rootScope,
         );
         $rootScope.html = "hello";
-        expect(element.html()).toEqual("hello");
+        expect(element.innerHTML).toEqual("hello");
         $rootScope.html = "goodbye";
-        expect(element.html()).toEqual("goodbye");
+        expect(element.innerHTML).toEqual("goodbye");
       });
     });
 
@@ -645,7 +645,7 @@ describe("ngProp*", () => {
           $rootScope,
         );
         $rootScope.html = $sce.trustAsHtml('<div onclick="">hello</div>');
-        expect(element.html()).toEqual('<div onclick="">hello</div>');
+        expect(element.innerHTML).toEqual('<div onclick="">hello</div>');
       });
 
       it("should update html", () => {
@@ -653,9 +653,9 @@ describe("ngProp*", () => {
           $rootScope,
         );
         $rootScope.html = $sce.trustAsHtml("hello");
-        expect(element.html()).toEqual("hello");
+        expect(element.innerHTML).toEqual("hello");
         $rootScope.html = $sce.trustAsHtml("goodbye");
-        expect(element.html()).toEqual("goodbye");
+        expect(element.innerHTML).toEqual("goodbye");
       });
 
       it("should not cause infinite recursion for trustAsHtml object watches", () => {
@@ -668,7 +668,7 @@ describe("ngProp*", () => {
         $rootScope.getHtml = function () {
           return $sce.trustAsHtml('<div onclick="">hello</div>');
         };
-        expect(element.html()).toEqual('<div onclick="">hello</div>');
+        expect(element.innerHTML).toEqual('<div onclick="">hello</div>');
       });
 
       it("should handle custom $sce objects", () => {
@@ -708,9 +708,9 @@ describe("ngProp*", () => {
         $rootScope.getHtml = function () {
           return $sce.trustAsHtml(html);
         };
-        expect(element.html()).toEqual("hello");
+        expect(element.innerHTML).toEqual("hello");
         html = "goodbye";
-        expect(element.html()).toEqual("goodbye");
+        expect(element.innerHTML).toEqual("goodbye");
       });
     });
   });

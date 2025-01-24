@@ -6,6 +6,6 @@
  * When the scope is destroyed, the directive automatically unsubscribes from the channel.
  *
  *
- * @returns {import("../../types").Directive}
+ * @returns {import("../../types.js").Directive}
  */
-export function ngChannelDirective(): import("../../types").Directive;
+export function ngChannelDirective(): import("../../types.js").Directive;

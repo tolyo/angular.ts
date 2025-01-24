@@ -28,7 +28,7 @@ export class Attributes {
    * @param {*} $animate
    * @param {import("../exception-handler").ErrorHandler} $exceptionHandler
    * @param {*} $sce
-   * @param {import('../../shared/jqlite/jqlite').JQLite} [element]
+   * @param {Element} [element]
    * @param {*} [attributesToCopy]
    */
   constructor(
@@ -124,13 +124,13 @@ export class Attributes {
     // is set through this function since it may cause $updateClass to
     // become unstable.
 
-    const node = this.$$element[0];
+    const node = this.$$element;
     const booleanKey = getBooleanAttrName(node, key);
     const aliasedKey = ALIASED_ATTR[key];
     let observer = key;
 
     if (booleanKey) {
-      this.$$element[0][key] = value;
+      this.$$element[key] = value;
       attrName = booleanKey;
     } else if (aliasedKey) {
       this[aliasedKey] = value;
@@ -149,7 +149,7 @@ export class Attributes {
       }
     }
 
-    let nodeName = this.$$element[0].nodeName.toLowerCase();
+    let nodeName = this.$$element.nodeName.toLowerCase();
 
     // Sanitize img[srcset] values.
     if (nodeName === "img" && key === "srcset") {
@@ -158,7 +158,7 @@ export class Attributes {
 
     if (writeAttr !== false) {
       if (value === null || isUndefined(value)) {
-        this.$$element[0].removeAttribute(attrName);
+        this.$$element.removeAttribute(attrName);
         //
       } else if (SIMPLE_ATTR_NAME.test(attrName)) {
         // jQuery skips special boolean attrs treatment in XML nodes for
@@ -167,12 +167,12 @@ export class Attributes {
         // in XHTML, call `removeAttr` in such cases instead.
         // See https://github.com/jquery/jquery/issues/4249
         if (booleanKey && value === false) {
-          this.$$element[0].removeAttribute(attrName);
+          this.$$element.removeAttribute(attrName);
         } else {
-          this.$$element.attr(attrName, value);
+          this.$$element.setAttribute(attrName, value);
         }
       } else {
-        this.setSpecialAttr(this.$$element[0], attrName, value);
+        this.setSpecialAttr(this.$$element, attrName, value);
       }
     }
 

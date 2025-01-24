@@ -404,7 +404,11 @@ export function AnimateQueueProvider($animateProvider) {
         // the input data when running `$animateCss`.
         let options = initialOptions;
 
-        let element = stripCommentsFromElement(originalElement);
+        // strip comments
+
+        let element = Array.isArray(originalElement)
+          ? originalElement.filter((x) => x.nodeName !== "#comment")[0]
+          : originalElement;
         const node = getDomNode(element);
         const parentNode = node && node.parentNode;
 

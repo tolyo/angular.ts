@@ -63,7 +63,7 @@ export function ngIfDirective($animate) {
             childScope = null;
           }
           if (block) {
-            previousElements = getBlockNodes(block.clone);
+            previousElements = block.clone;
             if (hasAnimate(previousElements[0])) {
               $animate.leave(previousElements).done((response) => {
                 if (response !== false) previousElements = null;

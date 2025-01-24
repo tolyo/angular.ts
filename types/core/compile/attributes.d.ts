@@ -11,16 +11,16 @@ export class Attributes {
      * @param {*} $animate
      * @param {import("../exception-handler").ErrorHandler} $exceptionHandler
      * @param {*} $sce
-     * @param {import('../../shared/jqlite/jqlite').JQLite} [element]
+     * @param {Element} [element]
      * @param {*} [attributesToCopy]
      */
-    constructor($rootScope: import("../scope/scope").Scope, $animate: any, $exceptionHandler: import("../exception-handler").ErrorHandler, $sce: any, element?: import("../../shared/jqlite/jqlite").JQLite, attributesToCopy?: any);
+    constructor($rootScope: import("../scope/scope").Scope, $animate: any, $exceptionHandler: import("../exception-handler").ErrorHandler, $sce: any, element?: Element, attributesToCopy?: any);
     $rootScope: import("../scope/scope").Scope;
     $animate: any;
     $exceptionHandler: import("../exception-handler").ErrorHandler;
     $sce: any;
     $attr: {};
-    $$element: import("../../shared/jqlite/jqlite.js").JQLite;
+    $$element: Element;
     /**
      * Converts an attribute name (e.g. dash/colon/underscore-delimited string, optionally prefixed with `x-` or
      * `data-`) to its normalized, camelCase form.

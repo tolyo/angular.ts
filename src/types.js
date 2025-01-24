@@ -167,7 +167,7 @@
  *
  * @callback DirectiveLinkFn
  * @param {TScope} scope
- * @param {TElement} instanceElement
+ * @param {Element} instanceElement
  * @param {TAttributes} instanceAttributes
  * @param {TController} [controller]
  * @param {TranscludeFunction} [transclude]

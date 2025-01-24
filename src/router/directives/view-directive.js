@@ -6,6 +6,7 @@ import { ResolveContext } from "../resolve/resolve-context.js";
 import { trace } from "../common/trace.js";
 import { Ng1ViewConfig } from "../state/views.js";
 import {
+  dealoc,
   getCacheData,
   getInheritedData,
   JQLite,
@@ -229,7 +230,7 @@ export let ngView = [
               currentScope = null;
             }
             if (currentEl) {
-              const _viewData = currentEl.data("$ngViewAnim");
+              const _viewData = getCacheData(currentEl, "$ngViewAnim");
               trace.traceUIViewEvent("Animate out", _viewData);
               renderer.leave(currentEl, function () {
                 _viewData.$$animLeave.resolve();
@@ -260,8 +261,8 @@ export let ngView = [
              */
             newScope.$emit("$viewContentLoading", name);
             const cloned = $transclude(newScope, function (clone) {
-              clone.data("$ngViewAnim", $ngViewAnim);
-              clone.data("$ngView", $ngViewData);
+              setCacheData(clone, "$ngViewAnim", $ngViewAnim);
+              setCacheData(clone, "$ngView", $ngViewData);
               renderer.enter(clone, $element, function () {
                 animEnter.resolve();
                 if (currentScope)
@@ -300,24 +301,20 @@ export function $ViewDirectiveFill($compile, $controller, $transitions) {
     restrict: "EA",
     priority: -400,
     compile: function (tElement) {
-      const initial = tElement.html();
-      tElement.empty();
+      const initial = tElement.innerHTML;
+      dealoc(tElement, true);
       return function (scope, $element) {
         const data = getCacheData($element, "$ngView");
         if (!data) {
           $element.innerHTML = initial;
-          $compile($element[0].contentDocument || $element[0].childNodes)(
-            scope,
-          );
+          $compile($element.contentDocument || $element.childNodes)(scope);
           return;
         }
         const cfg = data.$cfg || { viewDecl: {}, getTemplate: () => {} };
         const resolveCtx = cfg.path && new ResolveContext(cfg.path);
         $element.innerHTML = cfg.getTemplate($element, resolveCtx) || initial;
         trace.traceUIViewFill(data.$ngView, $element.innerHTML);
-        const link = $compile(
-          $element[0].contentDocument || $element[0].childNodes,
-        );
+        const link = $compile($element.contentDocument || $element.childNodes);
         const controller = cfg.controller;
         const controllerAs = getControllerAs(cfg);
         const resolveAs = getResolveAs(cfg);
@@ -355,7 +352,7 @@ export function $ViewDirectiveFill($compile, $controller, $transitions) {
           const tagRegexp = new RegExp(`^(x-|data-)?${kebobName}$`, "i");
           const getComponentController = () => {
             const directiveEl = [].slice
-              .call($element[0].children)
+              .call($element.children)
               .filter((el) => el && el.tagName && tagRegexp.exec(el.tagName));
             return (
               directiveEl &&

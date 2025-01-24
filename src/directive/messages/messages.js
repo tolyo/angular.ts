@@ -254,7 +254,7 @@ function ngMessageDirectiveFactory(isDefault) {
         let dynamicExp;
 
         if (!isDefault) {
-          commentNode = element[0];
+          commentNode = element;
           staticExp = attrs.ngMessage || attrs.when;
           dynamicExp = attrs.ngMessageExp || attrs.whenExp;
 

@@ -101,7 +101,7 @@ describe("jqLite", () => {
 
         expect(nodes.length).toBe(1);
         expect(nodes[0].nodeName.toLowerCase()).toBe(customNodeName);
-        expect(nodes.html()).toBe("Hello, world !");
+        expect(nodes.innerHTML).toBe("Hello, world !");
 
         nodeNamesTested++;
       });
@@ -606,7 +606,7 @@ describe("jqLite", () => {
       const element = JQLite("<div><span>x</span></div>");
       element.find("span").on("$destroy", () => log.push("destroyed"));
       element.html("");
-      expect(element.html()).toBe("");
+      expect(element.innerHTML).toBe("");
       expect(log).toEqual(["destroyed"]);
     });
 
@@ -617,7 +617,7 @@ describe("jqLite", () => {
 
       element.empty();
 
-      expect(element.html()).toBe("");
+      expect(element.innerHTML).toBe("");
       expect(log).toEqual(["destroyed"]);
     });
 
@@ -938,16 +938,16 @@ describe("jqLite", () => {
   describe("html", () => {
     it("should return `undefined` on empty", () => {
       expect(JQLite().length).toEqual(0);
-      expect(JQLite().html()).toEqual(undefined);
+      expect(JQLite().innerHTML).toEqual(undefined);
     });
 
     it("should read/write a value", () => {
       const element = JQLite("<div>abc</div>");
       expect(element.length).toEqual(1);
       expect(element[0].innerHTML).toEqual("abc");
-      expect(element.html()).toEqual("abc");
+      expect(element.innerHTML).toEqual("abc");
       expect(element.html("xyz") === element).toBeTruthy();
-      expect(element.html()).toEqual("xyz");
+      expect(element.innerHTML).toEqual("xyz");
     });
   });
 
@@ -956,7 +956,7 @@ describe("jqLite", () => {
       const element = JQLite("<div>abc</div>");
       expect(element.length).toEqual(1);
       expect(element.empty() === element).toBeTruthy();
-      expect(element.html()).toEqual("");
+      expect(element.innerHTML).toEqual("");
     });
   });
 
@@ -1622,12 +1622,12 @@ describe("jqLite", () => {
     it("should append", () => {
       const root = JQLite("<div>");
       expect(root.append("<span>abc</span>")).toEqual(root);
-      expect(root.html().toLowerCase()).toEqual("<span>abc</span>");
+      expect(root.innerHTML.toLowerCase()).toEqual("<span>abc</span>");
     });
     it("should append text", () => {
       const root = JQLite("<div>");
       expect(root.append("text")).toEqual(root);
-      expect(root.html()).toEqual("text");
+      expect(root.innerHTML).toEqual("text");
     });
     it("should append to document fragment", () => {
       const root = JQLite(document.createDocumentFragment());
@@ -1645,27 +1645,27 @@ describe("jqLite", () => {
     it("should prepend to empty", () => {
       const root = JQLite("<div>");
       expect(root.prepend("<span>abc</span>")).toEqual(root);
-      expect(root.html().toLowerCase()).toEqual("<span>abc</span>");
+      expect(root.innerHTML.toLowerCase()).toEqual("<span>abc</span>");
     });
     it("should prepend to content", () => {
       const root = JQLite("<div>text</div>");
       expect(root.prepend("<span>abc</span>")).toEqual(root);
-      expect(root.html().toLowerCase()).toEqual("<span>abc</span>text");
+      expect(root.innerHTML.toLowerCase()).toEqual("<span>abc</span>text");
     });
     it("should prepend text to content", () => {
       const root = JQLite("<div>text</div>");
       expect(root.prepend("abc")).toEqual(root);
-      expect(root.html().toLowerCase()).toEqual("abctext");
+      expect(root.innerHTML.toLowerCase()).toEqual("abctext");
     });
     it("should prepend array to empty in the right order", () => {
       const root = JQLite("<div>");
       expect(root.prepend([a, b, c])).toBe(root);
-      expect(root.html()).toEqual("<div>A</div><div>B</div><div>C</div>");
+      expect(root.innerHTML).toEqual("<div>A</div><div>B</div><div>C</div>");
     });
     it("should prepend array to content in the right order", () => {
       const root = JQLite("<div>text</div>");
       expect(root.prepend([a, b, c])).toBe(root);
-      expect(root.html()).toBe("<div>A</div><div>B</div><div>C</div>text");
+      expect(root.innerHTML).toBe("<div>A</div><div>B</div><div>C</div>text");
     });
   });
 
@@ -1674,7 +1674,7 @@ describe("jqLite", () => {
       const root = JQLite("<div><span>abc</span></div>");
       const span = root.find("span");
       expect(span.remove()).toEqual(span);
-      expect(root.html()).toEqual("");
+      expect(root.innerHTML).toEqual("");
     });
   });
 
@@ -1683,7 +1683,7 @@ describe("jqLite", () => {
       const root = JQLite("<div><span>abc</span></div>");
       const span = root.find("span");
       expect(span.detach()).toEqual(span);
-      expect(root.html()).toEqual("");
+      expect(root.innerHTML).toEqual("");
     });
   });
 
@@ -1692,14 +1692,16 @@ describe("jqLite", () => {
       const root = JQLite("<div><span></span></div>");
       const span = root.find("span");
       expect(span.after("<i></i><b></b>")).toEqual(span);
-      expect(root.html().toLowerCase()).toEqual("<span></span><i></i><b></b>");
+      expect(root.innerHTML.toLowerCase()).toEqual(
+        "<span></span><i></i><b></b>",
+      );
     });
 
     it("should allow taking text", () => {
       const root = JQLite("<div><span></span></div>");
       const span = root.find("span");
       span.after("abc");
-      expect(root.html().toLowerCase()).toEqual("<span></span>abc");
+      expect(root.innerHTML.toLowerCase()).toEqual("<span></span>abc");
     });
 
     it("should not throw when the element has no parent", () => {
@@ -1746,7 +1748,7 @@ describe("jqLite", () => {
       const root = JQLite("<div><div>text</div></div>");
       const innerDiv = root.find("div");
       expect(innerDiv.length).toEqual(1);
-      expect(innerDiv.html()).toEqual("text");
+      expect(innerDiv.innerHTML).toEqual("text");
     });
 
     it("should find child by name and not care about text nodes", () => {
@@ -1763,8 +1765,8 @@ describe("jqLite", () => {
       const element = JQLite(
         "<div><span>aa</span></div><div><span>bb</span></div>",
       );
-      expect(element.find("span").eq(0).html()).toBe("aa");
-      expect(element.find("span").eq(-1).html()).toBe("bb");
+      expect(element.find("span").eq(0).innerHTML).toBe("aa");
+      expect(element.find("span").eq(-1).innerHTML).toBe("bb");
       expect(element.find("span").eq(20).length).toBe(0);
     });
   });

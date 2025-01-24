@@ -121,8 +121,7 @@ function SelectController($element, $scope) {
   self.writeValue = function writeSingleValue(value) {
     // Make sure to remove the selected attribute from the previously selected option
     // Otherwise, screen readers might get confused
-    const currentlySelectedOption =
-      $element[0].options[$element[0].selectedIndex];
+    const currentlySelectedOption = $element.options[$element.selectedIndex];
     if (currentlySelectedOption)
       setOptionSelectedStatus(JQLite(currentlySelectedOption), false);
 
@@ -133,7 +132,7 @@ function SelectController($element, $scope) {
       $element.value = hashedVal in self.selectValueMap ? hashedVal : value;
 
       // Set selected attribute and property on selected option for screen readers
-      const selectedOption = $element[0].options[$element[0].selectedIndex];
+      const selectedOption = $element.options[$element.selectedIndex];
       setOptionSelectedStatus(JQLite(selectedOption), true);
     } else {
       self.selectUnknownOrEmptyOption(value);
@@ -196,7 +195,7 @@ function SelectController($element, $scope) {
    */
   self.$isUnknownOptionSelected = function () {
     // Presence of the unknown option means it is selected
-    return $element[0].options[0] === self.unknownOption[0];
+    return $element.options[0] === self.unknownOption[0];
   };
 
   /**
@@ -207,7 +206,7 @@ function SelectController($element, $scope) {
   self.$isEmptyOptionSelected = function () {
     return (
       self.hasEmptyOption &&
-      $element[0].options[$element[0].selectedIndex] === self.emptyOption[0]
+      $element.options[$element.selectedIndex] === self.emptyOption[0]
     );
   };
 

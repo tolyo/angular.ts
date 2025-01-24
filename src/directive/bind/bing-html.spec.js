@@ -16,7 +16,7 @@ describe("ngBindHtml", () => {
   it("should set html", () => {
     const element = $compile('<div ng-bind-html="html"></div>')($rootScope);
     $rootScope.html = "<div>hello</div>";
-    expect(element.html()).toEqual("<div>hello</div>");
+    expect(element.innerHTML).toEqual("<div>hello</div>");
   });
 
   it("should reset html when value is null or undefined", () => {
@@ -24,10 +24,10 @@ describe("ngBindHtml", () => {
 
     [null, undefined, ""].forEach((val) => {
       $rootScope.html = "some val";
-      expect(element.html()).toEqual("some val");
+      expect(element.innerHTML).toEqual("some val");
 
       $rootScope.html = val;
-      expect(element.html()).toEqual("");
+      expect(element.innerHTML).toEqual("");
     });
   });
 });

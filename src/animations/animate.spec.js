@@ -198,7 +198,7 @@ describe("$animate", () => {
         from: { color: "green" },
         to: { borderColor: "purple" },
       });
-      const { style } = element[0];
+      const { style } = element;
       expect(style.color).toBe("green");
       expect(style.borderColor).toBe("purple");
     });

@@ -1989,7 +1989,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
             if (
               inheritType === "^^" &&
               $element[0] &&
-              $element[0].nodeType === Node.DOCUMENT_NODE
+              $element.nodeType === Node.DOCUMENT_NODE
             ) {
               // inheritedData() uses the documentElement when it finds the document, so we would
               // require from the element itself.

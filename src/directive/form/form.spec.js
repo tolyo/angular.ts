@@ -480,7 +480,7 @@ describe("form", () => {
       // let the browser process all events (and potentially reload the page)
       window.setTimeout(() => {
         nextTurn = true;
-        expect(doc.html()).toBe("");
+        expect(doc.innerHTML).toBe("");
         expect(destroyed).toBe(true);
         expect(submitted).toBe(false);
         // this is known corner-case that is not currently handled

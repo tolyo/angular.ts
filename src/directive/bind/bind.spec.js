@@ -164,17 +164,17 @@ describe("ng-bind", () => {
         element = $compile('<div ng-bind-html="html"></div>')($rootScope);
         $rootScope.html = '<div onclick="">hello</div>';
         await wait();
-        expect(element.html()).toEqual('<div onclick="">hello</div>');
+        expect(element.innerHTML).toEqual('<div onclick="">hello</div>');
       });
 
       it("should update html", async () => {
         element = $compile('<div ng-bind-html="html"></div>')($rootScope);
         $rootScope.html = "hello";
         await wait();
-        expect(element.html()).toEqual("hello");
+        expect(element.innerHTML).toEqual("hello");
         $rootScope.html = "goodbye";
         await wait();
-        expect(element.html()).toEqual("goodbye");
+        expect(element.innerHTML).toEqual("goodbye");
       });
     });
 
@@ -209,17 +209,17 @@ describe("ng-bind", () => {
         element = $compile('<div ng-bind-html="html"></div>')($rootScope);
         $rootScope.html = $sce.trustAsHtml('<div onclick="">hello</div>');
         await wait();
-        expect(element.html()).toEqual('<div onclick="">hello</div>');
+        expect(element.innerHTML).toEqual('<div onclick="">hello</div>');
       });
 
       it("should update html", async () => {
         element = $compile('<div ng-bind-html="html"></div>')(scope);
         scope.html = $sce.trustAsHtml("hello");
         await wait();
-        expect(element.html()).toEqual("hello");
+        expect(element.innerHTML).toEqual("hello");
         scope.html = $sce.trustAsHtml("goodbye");
         await wait();
-        expect(element.html()).toEqual("goodbye");
+        expect(element.innerHTML).toEqual("goodbye");
       });
 
       it("should not cause infinite recursion for trustAsHtml object watches", async () => {
@@ -231,7 +231,7 @@ describe("ng-bind", () => {
           return $sce.trustAsHtml('<div onclick="">hello</div>');
         };
         await wait();
-        expect(element.html()).toEqual('<div onclick="">hello</div>');
+        expect(element.innerHTML).toEqual('<div onclick="">hello</div>');
       });
 
       it("should handle custom $sce objects", async () => {
@@ -288,10 +288,10 @@ describe("ng-bind", () => {
             return $sce.trustAsHtml(html);
           };
           await wait();
-          expect(element.html()).toEqual("hello");
+          expect(element.innerHTML).toEqual("hello");
           html = "goodbye";
           await wait();
-          expect(element.html()).toEqual("goodbye");
+          expect(element.innerHTML).toEqual("goodbye");
         };
       });
     });

@@ -499,7 +499,7 @@ export function createDateInputType(type, regexp, parseDate) {
 }
 
 export function badInputChecker(scope, element, attr, ctrl, parserName) {
-  const node = element[0];
+  const node = element;
   const nativeValidation = (ctrl.$$hasNativeValidators = isObject(
     node.validity,
   ));
@@ -698,7 +698,7 @@ export function rangeInputType(scope, element, attr, ctrl) {
   let minVal = supportsRange ? 0 : undefined;
   let maxVal = supportsRange ? 100 : undefined;
   let stepVal = supportsRange ? 1 : undefined;
-  const { validity } = element[0];
+  const { validity } = element;
   const hasMinAttr = isDefined(attr.min);
   const hasMaxAttr = isDefined(attr.max);
   const hasStepAttr = isDefined(attr.step);
@@ -1029,7 +1029,7 @@ export function hiddenInputBrowserCacheDirective() {
 
       return {
         pre(scope, element) {
-          const node = element[0];
+          const node = element;
 
           // Support: Edge
           // Moving the DOM around prevents autofillling

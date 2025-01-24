@@ -54,7 +54,7 @@ export function ngSetterDirective($parse) {
       }
 
       scope.$on("$destroy", () => observer.disconnect());
-      updateModel(element.html());
+      updateModel(element.innerHTML);
     },
   };
 }
