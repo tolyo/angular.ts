@@ -19,7 +19,6 @@ let jqId = 1;
 
 const DASH_LOWERCASE_REGEXP = /-([a-z])/g;
 const UNDERSCORE_LOWERCASE_REGEXP = /_([a-z])/g;
-const MOUSE_EVENT_MAP = { mouseleave: "mouseout", mouseenter: "mouseover" };
 const JQLiteMinErr = minErr("jqLite");
 
 const SINGLE_TAG_REGEXP = /^<([\w-]+)\s*\/?>(?:<\/\1>|)$/;
@@ -226,9 +225,6 @@ JQLite.prototype.off = function (type, fn) {
 
       type.split(" ").forEach((type) => {
         removeHandler(type);
-        if (MOUSE_EVENT_MAP[type]) {
-          removeHandler(MOUSE_EVENT_MAP[type]);
-        }
       });
     }
 
@@ -1017,11 +1013,6 @@ function onReady(fn) {
 
 function createEventHandler(element, events) {
   const eventHandler = function (event, type) {
-    // jQuery specific api
-    event.isDefaultPrevented = function () {
-      return event.defaultPrevented;
-    };
-
     let eventFns = events[type || event.type];
     const eventFnsLength = eventFns ? eventFns.length : 0;
 
@@ -1067,23 +1058,6 @@ function createEventHandler(element, events) {
 
 function defaultHandlerWrapper(element, event, handler) {
   handler.call(element, event);
-}
-
-/**
- * @param {Node} target
- * @param {*} event
- * @param {*} handler
- */
-function specialMouseHandlerWrapper(target, event, handler) {
-  // Refer to jQuery's implementation of mouseenter & mouseleave
-  // Read about mouseenter and mouseleave:
-  // http://www.quirksmode.org/js/events_mouse.html#link8
-  const related = event.relatedTarget;
-  // For mousenter/leave call the handler if related is outside the target.
-  // NB: No relatedTarget if the mouse left/entered the browser window
-  if (!related || (related !== target && !target.contains(related))) {
-    handler.call(target, event);
-  }
 }
 
 /**
@@ -1188,55 +1162,6 @@ export function getInjector(element) {
 
 export function setData(element, key, value) {
   getOrSetCacheData(element, key, value);
-}
-
-/**
- * Adds an event listener to an element.
- *
- * @param {Element} element
- * @param {string} type - The event type(s) to listen for. Multiple event types can be specified, separated by a space.
- * @param {Function} fn - The function to execute when the event is triggered.
- */
-export function onEvent(element, type, fn) {
-  // Do not add event handlers to non-elements because they will not be cleaned up.
-  if (!elementAcceptsData(element)) {
-    return;
-  }
-
-  const expandoStore = getExpando(element, true);
-
-  if (!expandoStore.handle) {
-    expandoStore.handle = createEventHandler(element, expandoStore.events);
-  }
-  // http://jsperf.com/string-indexof-vs-split
-  const types = type.indexOf(" ") >= 0 ? type.split(" ") : [type];
-  let j = types.length;
-
-  const addHandler = function (type, specialHandlerWrapper, noEventListener) {
-    let eventFns = expandoStore.events[type];
-
-    if (!eventFns) {
-      eventFns = expandoStore.events[type] = [];
-      eventFns.specialHandlerWrapper = specialHandlerWrapper;
-      if (type !== "$destroy" && !noEventListener) {
-        element.addEventListener(type, (evt) => {
-          expandoStore.handle(evt, type);
-        });
-      }
-    }
-
-    eventFns.push(fn);
-  };
-
-  while (j--) {
-    type = types[j];
-    if (MOUSE_EVENT_MAP[type]) {
-      addHandler(MOUSE_EVENT_MAP[type], specialMouseHandlerWrapper);
-      addHandler(type, undefined, true);
-    } else {
-      addHandler(type);
-    }
-  }
 }
 
 /**

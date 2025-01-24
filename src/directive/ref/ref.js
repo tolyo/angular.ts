@@ -1,4 +1,3 @@
-import { onEvent } from "../../shared/jqlite/jqlite";
 import { getNodeName, minErr, directiveNormalize } from "../../shared/utils";
 
 /**
@@ -73,7 +72,7 @@ export const ngRefDirective = [
         setter(scope, refValue);
 
         // when the element is removed, remove it (nullify it)
-        onEvent(element, "$destroy", () => {
+        element.addEventListener("$destroy", () => {
           // only remove it if value has not changed,
           // because animations (and other procedures) may duplicate elements
           if (getter(scope) === refValue) {

@@ -1,4 +1,3 @@
-import { onEvent } from "../../shared/jqlite/jqlite";
 import {
   isDefined,
   isUndefined,
@@ -118,11 +117,11 @@ function baseInputType(scope, element, attr, ctrl) {
   // In composition mode, users are still inputting intermediate text buffer,
   // hold the listener until composition is done.
   // More about composition events: https://developer.mozilla.org/en-US/docs/Web/API/CompositionEvent
-  onEvent(element, "compositionstart", () => {
+  element.addEventListener("compositionstart", () => {
     composing = true;
   });
 
-  onEvent(element, "compositionend", () => {
+  element.addEventListener("compositionend", () => {
     composing = false;
     listener();
   });
@@ -157,7 +156,7 @@ function baseInputType(scope, element, attr, ctrl) {
   };
 
   ["input", "change", "paste", "drop", "cut"].forEach((event) => {
-    onEvent(element, event, listener);
+    element.addEventListener(event, listener);
   });
 
   // Some native input types (date-family) have the ability to change validity without
@@ -169,7 +168,7 @@ function baseInputType(scope, element, attr, ctrl) {
     ctrl.$$hasNativeValidators &&
     type === attr.type
   ) {
-    onEvent(element, PARTIAL_VALIDATION_EVENTS, function (ev) {
+    element.addEventListener(PARTIAL_VALIDATION_EVENTS, function (ev) {
       if (!timeout) {
         const validity = this[VALIDITY_STATE_PROPERTY];
         const origBadInput = validity.badInput;
@@ -896,7 +895,7 @@ function radioInputType(scope, element, attr, ctrl) {
     }
   };
 
-  onEvent(element, "change", listener);
+  element.addEventListener("change", listener);
 
   ctrl.$render = function () {
     let { value } = attr;
@@ -954,7 +953,7 @@ function checkboxInputType(
     ctrl.$setViewValue(element[0].checked, ev && ev.type);
   };
 
-  onEvent(element, "change", listener);
+  element.addEventListener("change", listener);
 
   ctrl.$render = function () {
     element[0].checked = ctrl.$viewValue;

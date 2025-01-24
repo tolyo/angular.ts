@@ -22,7 +22,7 @@ import {
 } from "../../shared/utils.js";
 import { nullFormCtrl, PENDING_CLASS } from "../form/form.js";
 import { defaultModelOptions } from "../model-options/model-options.js";
-import { onEvent, startingTag } from "../../shared/jqlite/jqlite.js";
+import { startingTag } from "../../shared/jqlite/jqlite.js";
 
 export const ngModelMinErr = minErr("ngModel");
 
@@ -1039,7 +1039,10 @@ export class NgModelController {
       this.$options.getOption("updateOn")
     );
     if (this.$$updateEvents) {
-      this.$$element.on(this.$$updateEvents, this.$$updateEventHandler);
+      this.$$element.addEventListener(
+        this.$$updateEvents,
+        this.$$updateEventHandler,
+      );
     }
   }
 
@@ -1125,7 +1128,7 @@ export function ngModelDirective() {
               modelCtrl.$setTouched();
             }
 
-            onEvent(element, "blur", () => {
+            element.addEventListener("blur", () => {
               if (modelCtrl.$touched) return;
 
               scope.$apply(setTouched);

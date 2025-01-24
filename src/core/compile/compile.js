@@ -4,7 +4,6 @@ import {
   getBooleanAttrName,
   getOrSetCacheData,
   isTextNode,
-  onEvent,
   startingTag,
 } from "../../shared/jqlite/jqlite.js";
 import { identifierForController } from "../controller/controller.js";
@@ -1314,7 +1313,10 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
               newIsolateScopeDirective,
             );
             if (scopeBindingInfo.removeWatches) {
-              onEvent(isolateScope, "$destroy", scopeBindingInfo.removeWatches);
+              isolateScope.addEventListener(
+                "$destroy",
+                scopeBindingInfo.removeWatches,
+              );
             }
           }
 

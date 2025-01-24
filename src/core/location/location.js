@@ -1,4 +1,4 @@
-import { JQLite, onEvent } from "../../shared/jqlite/jqlite.js";
+import { JQLite } from "../../shared/jqlite/jqlite.js";
 import { urlResolve } from "../url-utils/url-utils";
 import {
   encodeUriSegment,
@@ -685,7 +685,8 @@ export class LocationProvider {
           throw e;
         }
       }
-      onEvent($rootElement, "click", (event) => {
+
+      $rootElement.addEventListener("click", (event) => {
         const rewriteLinks = this.getHtml5Mode().rewriteLinks;
         // TODO(vojta): rewrite link when opening in new tab/window (in legacy browser)
         // currently we open nice url link and redirect then

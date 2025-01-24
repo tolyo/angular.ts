@@ -1,4 +1,3 @@
-import { onEvent } from "../../shared/jqlite/jqlite.js";
 import { directiveNormalize } from "../../shared/utils.js";
 
 /*
@@ -50,13 +49,9 @@ export function createEventDirective(
   return {
     restrict: "A",
     compile(_element, attr) {
-      // NOTE:
-      // We expose the powerful `$event` object on the scope that provides access to the Window,
-      // etc. This is OK, because expressions are not sandboxed any more (and the expression
-      // sandbox was never meant to be a security feature anyway).
       const fn = $parse(attr[directiveName]);
       return function ngEventHandler(scope, element) {
-        onEvent(element, eventName, (event) => {
+        element.addEventListener(eventName, (event) => {
           const callback = function () {
             fn(scope, { $event: event });
           };

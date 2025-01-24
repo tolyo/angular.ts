@@ -1,4 +1,3 @@
-import { onEvent } from "../shared/jqlite/jqlite";
 import { isDefined } from "../shared/utils";
 import {
   TRANSITION_DURATION_PROP,
@@ -867,7 +866,9 @@ export function AnimateCssProvider() {
             }
 
             if (events.length) {
-              onEvent(element, events.join(" "), onAnimationProgress);
+              events.forEach((x) => {
+                element.addEventListener(x, onAnimationProgress);
+              });
             }
 
             if (options.to) {

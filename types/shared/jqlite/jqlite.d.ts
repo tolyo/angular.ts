@@ -242,14 +242,6 @@ export function cleanElementData(nodes: NodeListOf<Element> | Element[]): void;
 export function getInjector(element: any): import("../../core/di/internal-injector.js").InjectorService;
 export function setData(element: any, key: any, value: any): void;
 /**
- * Adds an event listener to an element.
- *
- * @param {Element} element
- * @param {string} type - The event type(s) to listen for. Multiple event types can be specified, separated by a space.
- * @param {Function} fn - The function to execute when the event is triggered.
- */
-export function onEvent(element: Element, type: string, fn: Function): void;
-/**
  * Creates a DOM element from an HTML string.
  * @param {string} htmlString - A string representing the HTML to parse.
  * @returns {Element} - The parsed DOM element.

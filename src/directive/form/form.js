@@ -15,7 +15,6 @@ import {
   INVALID_CLASS,
 } from "../../shared/constants.js";
 import { isProxy } from "../../core/scope/scope.js";
-import { onEvent } from "../../shared/jqlite/jqlite.js";
 
 export const nullFormCtrl = {
   $addControl: () => {},
@@ -576,7 +575,7 @@ const formDirectiveFactory = function (isNgForm) {
 
                 // unregister the preventDefault listener so that we don't not leak memory but in a
                 // way that will achieve the prevention of the default action.
-                onEvent(formElement, "$destroy", () => {
+                formElement.addEventListener("$destroy", () => {
                   setTimeout(
                     () => {
                       formElement.removeEventListener(
@@ -611,7 +610,7 @@ const formDirectiveFactory = function (isNgForm) {
                   }
                 });
               }
-              onEvent(formElement, "$destroy", () => {
+              formElement.addEventListener("$destroy", () => {
                 controller.$target.$$parentForm.$removeControl(controller);
                 setter(scope, undefined);
                 extend(controller, nullFormCtrl); // stop propagating child destruction handlers upwards
