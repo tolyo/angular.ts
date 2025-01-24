@@ -915,7 +915,7 @@ describe("$compile", () => {
         "<input my-directive>",
         function (element, attrs) {
           attrs.$set("disabled", true);
-          expect(element[0]["disabled"]).toBe(true);
+          expect(element["disabled"]).toBe(true);
         },
       );
     });
@@ -926,7 +926,7 @@ describe("$compile", () => {
         "<input my-directive>",
         function (element, attrs) {
           attrs.$set("disabled", true, false);
-          expect(element[0]["disabled"]).toBe(true);
+          expect(element["disabled"]).toBe(true);
         },
       );
     });
@@ -1192,10 +1192,10 @@ describe("$compile", () => {
       return {
         link: {
           pre: function (scope, element) {
-            linkings.push(["pre", element[0]]);
+            linkings.push(["pre", element]);
           },
           post: function (scope, element) {
-            linkings.push(["post", element[0]]);
+            linkings.push(["post", element]);
           },
         },
       };
@@ -1256,7 +1256,7 @@ describe("$compile", () => {
     registerDirectives("myDirective", () => {
       return {
         link: function (scope, element, attrs) {
-          givenElements.push(element[0]);
+          givenElements.push(element);
           element.after("<div></div>");
         },
       };
@@ -3001,7 +3001,7 @@ describe("$compile", () => {
             transclude: true,
             templateUrl: "/public/my_directive.html",
             link: function (scope, element, attrs, ctrl, transclude) {
-              element[0].firstChild.append(transclude());
+              element.firstChild.append(transclude());
             },
           };
         },
@@ -3090,7 +3090,7 @@ describe("$compile", () => {
             transclude: true,
             template: "<div in-template></div>",
             link: function (scope, element, attrs, ctrl, transclude) {
-              element[0].append(transclude()[0]);
+              element.append(transclude()[0]);
             },
           };
         },
@@ -3390,7 +3390,7 @@ describe("$compile", () => {
             multiElement: true,
             template: "<div in-template></div>",
             link: function (scope, element, attrs, ctrl, transclude) {
-              element[0].append(transclude()[0]);
+              element.append(transclude()[0]);
             },
           };
         },
@@ -3468,7 +3468,7 @@ describe("$compile", () => {
             link: function (scope, element, attrs, ctrl, transcludeFn) {
               var myScope = scope.$new();
               transcludeFn(myScope, function (transclNode) {
-                element[0].append(transclNode[0]);
+                element.append(transclNode[0]);
               });
             },
           };
@@ -3489,7 +3489,7 @@ describe("$compile", () => {
             template: "<div in-template></div>",
             link: function (scope, element, attrs, ctrl, transcludeFn) {
               transcludeFn(function (transclNode) {
-                element[0].append(transclNode[0]);
+                element.append(transclNode[0]);
               });
             },
           };
@@ -3511,7 +3511,7 @@ describe("$compile", () => {
             link: function (scope, element, attrs, ctrl, transcludeFn) {
               transcludeFn(function (transclNode, transclScope) {
                 transclScope.dataFromTranscluder = "Hello from transcluder";
-                element[0].append(transclNode[0]);
+                element.append(transclNode[0]);
               });
             },
           };
@@ -4738,8 +4738,8 @@ describe("$compile", () => {
           '<circle cx="4" cy="4" r="2"></circle>' +
           "</svg-container></div>",
       );
-      $compile(element[0].childNodes)($rootScope);
-      document.body.appendChild(element[0]);
+      $compile(element.childNodes)($rootScope);
+      document.body.appendChild(element);
 
       const circle = element.find("circle");
 
@@ -4752,8 +4752,8 @@ describe("$compile", () => {
           "<svg-circle></svg-circle>" +
           "</svg></div>",
       );
-      $compile(element[0].childNodes)($rootScope);
-      document.body.appendChild(element[0]);
+      $compile(element.childNodes)($rootScope);
+      document.body.appendChild(element);
 
       const circle = element.find("circle");
       assertIsValidSvgCircle(circle[0]);
@@ -4765,8 +4765,8 @@ describe("$compile", () => {
           "<svg-circle></svg-circle>" +
           "</svg-container></div>",
       );
-      $compile(element[0].childNodes)($rootScope);
-      document.body.appendChild(element[0]);
+      $compile(element.childNodes)($rootScope);
+      document.body.appendChild(element);
 
       const circle = element.find("circle");
       assertIsValidSvgCircle(circle[0]);
@@ -4797,8 +4797,8 @@ describe("$compile", () => {
           `</svg-container>` +
           `</div>`,
       );
-      $compile(element[0].childNodes)($rootScope);
-      document.body.appendChild(element[0]);
+      $compile(element.childNodes)($rootScope);
+      document.body.appendChild(element);
 
       const referenceElem = element.find("div")[0];
       const testElem = element.find("div")[1];
@@ -4825,8 +4825,8 @@ describe("$compile", () => {
           `</svg-container>` +
           `</div>`,
       );
-      $compile(element[0].childNodes)($rootScope);
-      document.body.appendChild(element[0]);
+      $compile(element.childNodes)($rootScope);
+      document.body.appendChild(element);
 
       const referenceElem = element.find("div")[0];
       const testElem = element.find("div")[1];
@@ -4846,8 +4846,8 @@ describe("$compile", () => {
           '<circle cx="2" cy="2" r="1"></circle></svg-custom-transclude-container>' +
           "</div>",
       );
-      $compile(element[0].childNodes)($rootScope);
-      document.body.appendChild(element[0]);
+      $compile(element.childNodes)($rootScope);
+      document.body.appendChild(element);
 
       const circle = element.find("circle");
       assertIsValidSvgCircle(circle[0]);
@@ -4892,7 +4892,7 @@ describe("$compile", () => {
 
     fit("should not wrap root text nodes in spans", async () => {
       element = JQLite("<div>   <div>A</div>\n  <div>B</div>C\t\n  </div>");
-      $compile(element[0].childNodes)($rootScope);
+      $compile(element.childNodes)($rootScope);
       await wait();
       const spans = element.find("span");
       expect(spans.length).toEqual(0);
@@ -4902,7 +4902,7 @@ describe("$compile", () => {
       element = JQLite("<div>Name: {{name}}<br />\nColor: {{color}}</div>");
       $rootScope.name = "Lucas";
       $rootScope.color = "blue";
-      $compile(element[0].childNodes)($rootScope);
+      $compile(element.childNodes)($rootScope);
       await wait();
       expect(element.text()).toEqual("Name: Lucas\nColor: blue");
     });
@@ -4917,7 +4917,7 @@ describe("$compile", () => {
         expect(CACHE.size).toEqual(0);
         // First with only elements at the top level
         element = JQLite("<div><div></div></div>");
-        $compile(element[0].childNodes)($rootScope);
+        $compile(element.childNodes)($rootScope);
         // expect(CACHE.size).toEqual(2);
         element.empty();
         expect(CACHE.size).toEqual(0);
@@ -4925,19 +4925,19 @@ describe("$compile", () => {
         // Next with non-empty text nodes at the top level
         // (in this case the compiler will wrap them in a <span>)
         element = JQLite("<div>xxx</div>");
-        $compile(element[0].childNodes)($rootScope);
+        $compile(element.childNodes)($rootScope);
         element.empty();
         expect(CACHE.size).toEqual(0);
 
         // Next with comment nodes at the top level
         element = JQLite("<div><!-- comment --></div>");
-        $compile(element[0].childNodes)($rootScope);
+        $compile(element.childNodes)($rootScope);
         element.empty();
         expect(CACHE.size).toEqual(0);
 
         // Finally with empty text nodes at the top level
         element = JQLite("<div>   \n<div></div>   </div>");
-        $compile(element[0].childNodes)($rootScope);
+        $compile(element.childNodes)($rootScope);
         //expect(CACHE.size).toEqual(2);
         element.empty();
         expect(CACHE.size).toEqual(0);
@@ -4952,7 +4952,7 @@ describe("$compile", () => {
       element = JQLite("<div>{{1+2}}</div>");
 
       try {
-        element[0].childNodes[1] = {
+        element.childNodes[1] = {
           nodeType: 3,
           nodeName: "OBJECT",
           textContent: "fake node",
@@ -4975,9 +4975,9 @@ describe("$compile", () => {
           "</a></div>",
       );
 
-      $compile(element[0].childNodes)($rootScope);
+      $compile(element.childNodes)($rootScope);
       await wait();
-      document.body.appendChild(element[0]);
+      document.body.appendChild(element);
       expect(element.find("span").text()).toContain("Should render");
     });
 
@@ -5747,20 +5747,20 @@ describe("$compile", () => {
           "<span>example.com/cached-version</span>",
         );
         element = $compile("<div cross-domain-template></div>")($rootScope);
-        expect(element[0].outerHTML).toEqual(
+        expect(element.outerHTML).toEqual(
           '<div cross-domain-template=""></div>',
         );
         await wait();
-        expect(element[0].outerHTML).toEqual(
+        expect(element.outerHTML).toEqual(
           '<div cross-domain-template=""><span>example.com/cached-version</span></div>',
         );
       });
 
       fit("should load cross domain templates when trusted", (done) => {
         element = $compile("<div trusted-template></div>")($rootScope);
-        expect(element[0].outerHTML).toEqual('<div trusted-template=""></div>');
+        expect(element.outerHTML).toEqual('<div trusted-template=""></div>');
         setTimeout(() => {
-          expect(element[0].outerHTML).toEqual(
+          expect(element.outerHTML).toEqual(
             '<div trusted-template="">Hello</div>',
           );
           done();
@@ -5773,12 +5773,12 @@ describe("$compile", () => {
           $rootScope,
         );
 
-        expect(element[0].outerHTML).toEqual(
+        expect(element.outerHTML).toEqual(
           '<div><b hello=""></b><b cau=""></b></div>',
         );
 
         setTimeout(() => {
-          expect(element[0].outerHTML).toEqual(
+          expect(element.outerHTML).toEqual(
             `<div><b hello="">Hello</b><b cau=""><span>Cau!</span></b></div>`,
           );
           done();
@@ -5790,12 +5790,12 @@ describe("$compile", () => {
         element = $compile(
           "<div><b i-hello>ignore</b><b i-cau>ignore</b></div>",
         )($rootScope);
-        expect(element[0].outerHTML).toEqual(
+        expect(element.outerHTML).toEqual(
           '<div><b i-hello=""></b><b i-cau=""></b></div>',
         );
 
         setTimeout(() => {
-          expect(element[0].outerHTML).toBe(
+          expect(element.outerHTML).toBe(
             '<div><div i-hello="">Hello</div><span i-cau="">Cau!</span></div>',
           );
           done();
@@ -5808,7 +5808,7 @@ describe("$compile", () => {
         element = $compile('<div><b hello=""></b></div>')($rootScope);
 
         setTimeout(() => {
-          expect(element[0].outerHTML).toEqual(
+          expect(element.outerHTML).toEqual(
             '<div><b hello=""><span>Hello, Elvis!</span></b></div>',
           );
           done();
@@ -5820,7 +5820,7 @@ describe("$compile", () => {
         $rootScope.name = "Elvis";
         element = $compile("<div><b i-hello></b></div>")($rootScope);
         await wait();
-        expect(element[0].outerHTML).toBe(
+        expect(element.outerHTML).toBe(
           '<div><span i-hello="">Hello, Elvis!</span></div>',
         );
       });
@@ -5831,7 +5831,7 @@ describe("$compile", () => {
         element = $compile('<div><b hello=""></b></div>')($rootScope);
         await wait();
 
-        expect(element[0].outerHTML).toEqual(
+        expect(element.outerHTML).toEqual(
           '<div><b hello=""><span replace="">Hello, Elvis!</span></b></div>',
         );
       });
@@ -5840,7 +5840,7 @@ describe("$compile", () => {
         $rootScope.name = "Elvis";
         element = $compile("<div replace></div>")($rootScope);
         await wait;
-        expect(element[0].outerHTML).toEqual(
+        expect(element.outerHTML).toEqual(
           '<span replace="">Hello, Elvis!</span>',
         );
       });
@@ -5964,7 +5964,7 @@ describe("$compile", () => {
         element = $compile("<div><b 401>content</b></div>")($rootScope);
         setTimeout(() => {
           expect(errors.length).toBe(2);
-          expect(element[0].outerHTML).toBe('<div><b 401=""></b></div>');
+          expect(element.outerHTML).toBe('<div><b 401=""></b></div>');
           done();
         }, 1000);
       });
@@ -7251,18 +7251,14 @@ describe("$compile", () => {
           '<select ng-model="x"><option value="">Greet {{name}}!</option></select>',
         )($rootScope);
         await wait();
-        expect(
-          element[0].outerHTML.replace(' selected="selected"', ""),
-        ).toEqual(
+        expect(element.outerHTML.replace(' selected="selected"', "")).toEqual(
           '<select ng-model="x" class="ng-pristine ng-untouched ng-valid ng-empty" aria-invalid="false">' +
             '<option value="">Greet !</option>' +
             "</select>",
         );
         $rootScope.name = "Misko";
         await wait();
-        expect(
-          element[0].outerHTML.replace(' selected="selected"', ""),
-        ).toEqual(
+        expect(element.outerHTML.replace(' selected="selected"', "")).toEqual(
           '<select ng-model="x" class="ng-pristine ng-untouched ng-valid ng-empty" aria-invalid="false">' +
             '<option value="">Greet Misko!</option>' +
             "</select>",
@@ -7736,7 +7732,7 @@ describe("$compile", () => {
             attr.$set("disabled", "value");
             expect(element.attr("disabled")).toEqual("disabled");
 
-            element[0].removeAttribute("disabled");
+            element.removeAttribute("disabled");
 
             attr.$set("dISaBlEd", "VaLuE");
             expect(element.attr("disabled")).toEqual("disabled");
@@ -7746,23 +7742,23 @@ describe("$compile", () => {
             attr.$set("disabled", "value");
 
             spyOn(JQLite.prototype, "attr").and.callThrough();
-            spyOn(element[0], "removeAttribute").and.callThrough();
+            spyOn(element, "removeAttribute").and.callThrough();
 
             attr.$set("disabled", false);
 
             expect(element.attr).not.toHaveBeenCalled();
-            expect(element[0].removeAttribute).toHaveBeenCalledWith("disabled");
+            expect(element.removeAttribute).toHaveBeenCalledWith("disabled");
             expect(element.attr("disabled")).toEqual(undefined);
 
             attr.$set("disabled", "value");
 
             element.attr.calls.reset();
-            element[0].removeAttribute.calls.reset();
+            element.removeAttribute.calls.reset();
 
             attr.$set("dISaBlEd", false);
 
             expect(element.attr).not.toHaveBeenCalled();
-            expect(element[0].removeAttribute).toHaveBeenCalledWith("disabled");
+            expect(element.removeAttribute).toHaveBeenCalledWith("disabled");
             expect(element.attr("disabled")).toEqual(undefined);
           });
 
@@ -11794,9 +11790,9 @@ describe("$compile", () => {
         );
 
         element = element.children().eq(0);
-        expect(element[0].checked).toBe(false);
+        expect(element.checked).toBe(false);
         $rootScope.$children[0].model = true;
-        expect(element[0].checked).toBe(true);
+        expect(element.checked).toBe(true);
       });
 
       it("should share isolate scope with replaced directives (template)", () => {
@@ -13255,9 +13251,9 @@ describe("$compile", () => {
           }));
           initInjector("test1");
           element = JQLite("<div transclude></div>");
-          element[0].appendChild(document.createTextNode("1{{ value }}"));
-          element[0].appendChild(document.createTextNode("2{{ value }}"));
-          element[0].appendChild(document.createTextNode("3{{ value }}"));
+          element.appendChild(document.createTextNode("1{{ value }}"));
+          element.appendChild(document.createTextNode("2{{ value }}"));
+          element.appendChild(document.createTextNode("3{{ value }}"));
 
           const initialWatcherCount = countWatchers($rootScope);
           $compile(element)($rootScope);
@@ -13654,7 +13650,7 @@ describe("$compile", () => {
             module.directive("myExample", () => ({
               scope: {},
               link: function link(scope, element, attrs) {
-                const foo = element[0].querySelector(".foo");
+                const foo = element.querySelector(".foo");
                 scope.children = JQLite(foo).children().length;
               },
               template:
@@ -14614,9 +14610,9 @@ describe("$compile", () => {
       }));
       initInjector("test1");
       element = JQLite("<div transclude></div>");
-      element[0].appendChild(document.createTextNode("1{{ value }}"));
-      element[0].appendChild(document.createTextNode("2{{ value }}"));
-      element[0].appendChild(document.createTextNode("3{{ value }}"));
+      element.appendChild(document.createTextNode("1{{ value }}"));
+      element.appendChild(document.createTextNode("2{{ value }}"));
+      element.appendChild(document.createTextNode("3{{ value }}"));
 
       const initialWatcherCount = countWatchers($rootScope);
       $compile(element)($rootScope);
@@ -15643,15 +15639,15 @@ describe("$compile", () => {
 
       $rootScope.bar = "untrusted:test1";
       await wait();
-      expect(element[0].foo).toBe("unsafe:untrusted:test1");
+      expect(element.foo).toBe("unsafe:untrusted:test1");
 
       $rootScope.bar = $sce.trustAsCss("untrusted:test2");
       await wait();
-      expect(element[0].foo).toBe("unsafe:untrusted:test2");
+      expect(element.foo).toBe("unsafe:untrusted:test2");
 
       $rootScope.bar = $sce.trustAsMediaUrl("untrusted:test3");
       await wait();
-      expect(element[0].foo).toBe("untrusted:test3");
+      expect(element.foo).toBe("untrusted:test3");
     });
 
     it("should enforce the specified sce type for properties added for all elements (*)", async () => {
@@ -15668,15 +15664,15 @@ describe("$compile", () => {
 
       $rootScope.bar = "untrusted:test1";
       await wait();
-      expect(element[0].foo).toBe("unsafe:untrusted:test1");
+      expect(element.foo).toBe("unsafe:untrusted:test1");
 
       $rootScope.bar = $sce.trustAsCss("untrusted:test2");
       await wait();
-      expect(element[0].foo).toBe("unsafe:untrusted:test2");
+      expect(element.foo).toBe("unsafe:untrusted:test2");
 
       $rootScope.bar = $sce.trustAsMediaUrl("untrusted:test3");
       await wait();
-      expect(element[0].foo).toBe("untrusted:test3");
+      expect(element.foo).toBe("untrusted:test3");
     });
 
     it("should enforce the specific sce type when both an element specific and generic exist", async () => {
@@ -15694,15 +15690,15 @@ describe("$compile", () => {
 
       $rootScope.bar = "untrusted:test1";
       await wait();
-      expect(element[0].foo).toBe("unsafe:untrusted:test1");
+      expect(element.foo).toBe("unsafe:untrusted:test1");
 
       $rootScope.bar = $sce.trustAsCss("untrusted:test2");
       await wait();
-      expect(element[0].foo).toBe("unsafe:untrusted:test2");
+      expect(element.foo).toBe("unsafe:untrusted:test2");
 
       $rootScope.bar = $sce.trustAsMediaUrl("untrusted:test3");
       await wait();
-      expect(element[0].foo).toBe("untrusted:test3");
+      expect(element.foo).toBe("untrusted:test3");
     });
   });
 
@@ -15784,7 +15780,7 @@ describe("$compile", () => {
           "<span ng-repeat-end>{{i}}B;</span>" +
           "<div></div>",
       )($rootScope);
-      element = JQLite(element[0].parentNode.childNodes); // reset because repeater is top level.
+      element = JQLite(element.parentNode.childNodes); // reset because repeater is top level.
       expect(element.text()).toEqual("1A1B;2A2B;");
     });
 
@@ -15806,7 +15802,7 @@ describe("$compile", () => {
           "<div ng-repeat-end>{{i}}B;</div>" +
           "<div></div>",
       )($rootScope);
-      element = JQLite(element[0].parentNode.childNodes); // reset because repeater is top level.
+      element = JQLite(element.parentNode.childNodes); // reset because repeater is top level.
       expect(element.text()).toEqual("1A..1B;2A..2B;");
     });
 
@@ -15820,7 +15816,7 @@ describe("$compile", () => {
           "<div ng-repeat-end>){{i}};</div>" +
           "<div></div>",
       )($rootScope);
-      element = JQLite(element[0].parentNode.childNodes); // reset because repeater is top level.
+      element = JQLite(element.parentNode.childNodes); // reset because repeater is top level.
       expect(element.text()).toEqual("1(2-23-3)1;2(2-23-3)2;");
     });
 
@@ -16025,7 +16021,7 @@ describe("$compile", () => {
       )($rootScope);
 
       expect(element.text()).toBe("XY");
-      ///expect(angular.element(element[0].firstChild).data("x")).toBe("abc");
+      ///expect(angular.element(element.firstChild).data("x")).toBe("abc");
     });
 
     it("should throw error if unterminated (containing termination as a child)", () => {

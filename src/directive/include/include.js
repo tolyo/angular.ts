@@ -132,7 +132,7 @@ export const ngIncludeFillContentDirective = [
     priority: -400,
     require: "ngInclude",
     link(scope, $element, _$attr, ctrl) {
-      if (toString.call($element[0]).match(/SVG/)) {
+      if (toString.call($element).match(/SVG/)) {
         // WebKit: https://bugs.webkit.org/show_bug.cgi?id=135698 --- SVG elements do not
         // support innerHTML, so detect this here and try to generate the contents
         // specially.

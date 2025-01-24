@@ -865,10 +865,10 @@ describe("ngRepeat", () => {
       await wait();
       expect(element.text()).toBe("1|2|");
 
-      expect(element[0].children[0].outerHTML).toBe(
+      expect(element.children[0].outerHTML).toBe(
         '<div ng-repeat="i in items" rr="">1|</div>',
       );
-      expect(element[0].children[1].outerHTML).toBe(
+      expect(element.children[1].outerHTML).toBe(
         '<div ng-repeat="i in items" rr="">2|</div>',
       );
     });
@@ -890,10 +890,10 @@ describe("ngRepeat", () => {
       scope.items = [1, 2];
       await wait();
       expect(element.text()).toBe("1|2|");
-      expect(element[0].children[0].outerHTML).toBe(
+      expect(element.children[0].outerHTML).toBe(
         '<div ng-repeat="i in items" rr="">1|</div>',
       );
-      expect(element[0].children[1].outerHTML).toBe(
+      expect(element.children[1].outerHTML).toBe(
         '<div ng-repeat="i in items" rr="">2|</div>',
       );
     });
@@ -950,7 +950,7 @@ describe("ngRepeat", () => {
       // This cleans up to prevent memory leak
       scope.items = [];
       await wait();
-      expect(element[0].outerHTML).toBe(`<span>-</span>`);
+      expect(element.outerHTML).toBe(`<span>-</span>`);
       expect(logs.length).toBe(0);
     });
 
@@ -1022,13 +1022,13 @@ describe("ngRepeat", () => {
 
       // insert an extra element inside the second block
       const extra = JQLite("<strong></strong>")[0];
-      element[0].insertBefore(extra, ends[1]);
+      element.insertBefore(extra, ends[1]);
 
       scope.values.splice(1, 1);
       await wait();
       // expect the strong tag to be removed too
       expect(
-        Array.from(element[0].children).map((x) => x.tagName.toLowerCase()),
+        Array.from(element.children).map((x) => x.tagName.toLowerCase()),
       ).toEqual(["div", "span", "p", "div", "span", "p"]);
     });
 
@@ -1048,14 +1048,14 @@ describe("ngRepeat", () => {
 
       // insert an extra element inside the third block
       const extra = JQLite("<strong></strong>")[0];
-      element[0].insertBefore(extra, ends[2]);
+      element.insertBefore(extra, ends[2]);
 
       // move the third block to the beginning
       scope.values.unshift(scope.values.pop());
       await wait();
       // expect the strong tag to be moved too
       expect(
-        Array.from(element[0].children).map((x) => x.tagName.toLowerCase()),
+        Array.from(element.children).map((x) => x.tagName.toLowerCase()),
       ).toEqual([
         "div",
         "span",

@@ -506,7 +506,7 @@ export function badInputChecker(scope, element, attr, ctrl, parserName) {
 
   if (nativeValidation) {
     ctrl.$parsers.push((value) => {
-      const validity = element[0][VALIDITY_STATE_PROPERTY] || {};
+      const validity = element[VALIDITY_STATE_PROPERTY] || {};
       if (validity.badInput || validity.typeMismatch) {
         ctrl.$$parserName = parserName;
         return undefined;
@@ -693,8 +693,7 @@ export function rangeInputType(scope, element, attr, ctrl) {
   numberFormatterParser(ctrl);
   baseInputType(scope, element, attr, ctrl);
 
-  const supportsRange =
-    ctrl.$$hasNativeValidators && element[0].type === "range";
+  const supportsRange = ctrl.$$hasNativeValidators && element.type === "range";
   let minVal = supportsRange ? 0 : undefined;
   let maxVal = supportsRange ? 100 : undefined;
   let stepVal = supportsRange ? 1 : undefined;
@@ -886,7 +885,7 @@ function radioInputType(scope, element, attr, ctrl) {
 
   const listener = function (ev) {
     let value;
-    if (element[0].checked) {
+    if (element.checked) {
       value = attr.value;
       if (doTrim) {
         value = trim(value);
@@ -902,7 +901,7 @@ function radioInputType(scope, element, attr, ctrl) {
     if (doTrim) {
       value = trim(value);
     }
-    element[0].checked = value === ctrl.$viewValue;
+    element.checked = value === ctrl.$viewValue;
   };
 
   attr.$observe("value", ctrl.$render);
@@ -950,13 +949,13 @@ function checkboxInputType(
   );
 
   const listener = function (ev) {
-    ctrl.$setViewValue(element[0].checked, ev && ev.type);
+    ctrl.$setViewValue(element.checked, ev && ev.type);
   };
 
   element.addEventListener("change", listener);
 
   ctrl.$render = function () {
-    element[0].checked = ctrl.$viewValue;
+    element.checked = ctrl.$viewValue;
   };
 
   // Override the standard `$isEmpty` because the $viewValue of an empty checkbox is always set to `false`
@@ -1064,7 +1063,7 @@ export function ngValueDirective() {
     // Support: IE9 only
     // In IE9 values are converted to string (e.g. `input.value = null` results in `input.value === 'null'`).
     const propValue = isDefined(value) ? value : null;
-    element[0]["value"] = propValue;
+    element["value"] = propValue;
     attr.$set("value", value);
   }
 

@@ -23,13 +23,13 @@ describe("ngClick", () => {
     element = $compile('<div ng-click="clicked = true"></div>')($rootScope);
     expect($rootScope.clicked).toBeFalsy();
 
-    element[0].click();
+    element.click();
     expect($rootScope.clicked).toEqual(true);
   });
 
   it("should pass event object", () => {
     element = $compile('<div ng-click="event = $event"></div>')($rootScope);
-    element[0].click();
+    element.click();
     expect($rootScope.event).toBeDefined();
   });
 });

@@ -231,7 +231,7 @@ export function AnimationProvider() {
             extraClasses =
               (extraClasses ? `${extraClasses} ` : "") + NG_ANIMATE_CLASSNAME;
             const cacheKey = $$animateCache.cacheKey(
-              element[0],
+              element,
               animationEntry.event,
               extraClasses,
               options.removeClass,

@@ -27,7 +27,7 @@ describe("ngMessages", () => {
   });
 
   function messageChildren(element) {
-    return (element.length ? element[0] : element).querySelectorAll(
+    return (element.length ? element : element).querySelectorAll(
       "[ng-message], [ng-message-exp]",
     );
   }
@@ -552,7 +552,7 @@ describe("ngMessages", () => {
       const ctrl = element.controller("ngMessages");
       const deregisterSpy = spyOn(ctrl, "deregister").and.callThrough();
 
-      const nodeA = element[0].querySelector('[ng-message="a"]');
+      const nodeA = element.querySelector('[ng-message="a"]');
       JQLite(nodeA).remove(); // The next digest triggers the error
       // Make sure removing the element triggers the deregistration in ngMessages
       expect(trim(deregisterSpy.calls.mostRecent().args[0].nodeValue)).toBe("");
@@ -589,7 +589,7 @@ describe("ngMessages", () => {
         const ctrl = element.controller("ngMessages");
         const deregisterSpy = spyOn(ctrl, "deregister").and.callThrough();
 
-        const nodeB = element[0].querySelector('[ng-message="b"]');
+        const nodeB = element.querySelector('[ng-message="b"]');
         JQLite(nodeB).remove(); // The next digest triggers the error
         // Make sure removing the element triggers the deregistration in ngMessages
         expect(trim(deregisterSpy.calls.mostRecent().args[0].nodeValue)).toBe(
@@ -774,7 +774,7 @@ describe("ngMessages", () => {
     //         $rootScope.items[2].c = true;
     //       });
 
-    //       const elements = element[0].querySelectorAll("[ng-repeat]");
+    //       const elements = element.querySelectorAll("[ng-repeat]");
 
     //       // all three collections should have at least one error showing up
     //       expect(messageChildren(element).length).toBe(3);
@@ -830,12 +830,12 @@ describe("ngMessages", () => {
     //       element = $compile(html)($rootScope);
     //       ;
 
-    //       const includeElement = element[0].querySelector(
+    //       const includeElement = element.querySelector(
     //         "[ng-messages-include], ng-messages-include",
     //       );
     //       expect(includeElement).toBeFalsy();
 
-    //       const comment = element[0].childNodes[0];
+    //       const comment = element.childNodes[0];
     //       expect(comment.nodeType).toBe(8);
     //       expect(comment.nodeValue).toBe(" ngMessagesInclude: abc.html ");
     //     });
@@ -982,7 +982,7 @@ describe("ngMessages", () => {
     //   const ctrl = element.controller("ngMessages");
     //   const deregisterSpy = spyOn(ctrl, "deregister").and.callThrough();
 
-    //   const nodeB = element[0].querySelector('[ng-message="b"]');
+    //   const nodeB = element.querySelector('[ng-message="b"]');
     //   JQLite(nodeB).remove();
 
     //   // Make sure removing the element triggers the deregistration in ngMessages
@@ -1006,7 +1006,7 @@ describe("ngMessages", () => {
       $templateCache.set("messages2.html", "   ");
       element = $compile(html)($rootScope);
       expect(element.text()).toBe("");
-      expect(element[0].childNodes.length).toBe(2);
+      expect(element.childNodes.length).toBe(2);
     });
   });
 

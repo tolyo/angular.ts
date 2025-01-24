@@ -31,12 +31,12 @@ describe("channel", () => {
   it("should update innerHtml when EventBus emits a value", async () => {
     element = $compile('<div ng-channel="testChannel"></div>')($scope);
 
-    expect(element[0].innerHTML).toBe("");
+    expect(element.innerHTML).toBe("");
 
     EventBus.publish("testChannel", "New Content");
     await wait(10);
 
-    expect(element[0].innerHTML).toBe("New Content");
+    expect(element.innerHTML).toBe("New Content");
   });
 
   it("should unsubscribe from the EventBus when the scope is destroyed", () => {

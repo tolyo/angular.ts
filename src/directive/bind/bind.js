@@ -8,7 +8,7 @@ export function ngBindDirective() {
     restrict: "EA",
     link: (scope, element, attr) => {
       scope.$watch(attr.ngBind, (value) => {
-        element[0].textContent = stringify(value);
+        element.textContent = stringify(value);
       });
     },
   };
@@ -22,7 +22,7 @@ export function ngBindTemplateDirective() {
     restrict: "EA",
     link: (_scope, element, attr) => {
       attr.$observe("ngBindTemplate", (value) => {
-        element[0].textContent = isUndefined(value) ? "" : value;
+        element.textContent = isUndefined(value) ? "" : value;
       });
     },
   };

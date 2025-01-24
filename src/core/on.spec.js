@@ -26,7 +26,7 @@ describe("ngOn* event binding", () => {
       $rootScope,
     );
     element.triggerHandler("foo");
-    expect($rootScope.e.target).toBe(element[0]);
+    expect($rootScope.e.target).toBe(element);
   });
 
   it("should call the listener synchronously", () => {
@@ -122,7 +122,7 @@ describe("ngOn* event binding", () => {
     const cb = ($rootScope.cb = jasmine.createSpy("ng-on cb"));
     element.triggerHandler("asdf");
     expect(cb).toHaveBeenCalled();
-    expect(element[0].asdf).toBe(123);
+    expect(element.asdf).toBe(123);
   });
 
   it("should use the full ng-on-* attribute name in $attr mappings", () => {

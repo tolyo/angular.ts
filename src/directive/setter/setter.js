@@ -38,12 +38,12 @@ export function ngSetterDirective($parse) {
         }
 
         if (contentChanged) {
-          updateModel(element[0].innerHTML);
+          updateModel(element.innerHTML);
         }
       });
 
-      if (element && element[0]) {
-        observer.observe(element[0], {
+      if (element && element) {
+        observer.observe(element, {
           childList: true,
           subtree: true,
           characterData: true,

@@ -475,7 +475,7 @@ export function AnimateProvider($provide) {
             () => {
               // TODO no array should be here
               if (Array.isArray(element)) {
-                element.forEach(x => removeElement(x))
+                element.forEach((x) => removeElement(x));
               } else {
                 removeElement(element);
               }

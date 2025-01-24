@@ -27,10 +27,10 @@ describe("$aria", () => {
       )(scope);
 
       scope.$apply("val = false");
-      expect(element[0].hasAttribute("aria-checked")).toBeFalse();
+      expect(element.hasAttribute("aria-checked")).toBeFalse();
 
       scope.$apply("val = true");
-      expect(element[0].hasAttribute("aria-checked")).toBeFalse();
+      expect(element.hasAttribute("aria-checked")).toBeFalse();
     });
 
     it("should not attach aria-checked to custom radio controls", () => {
@@ -56,29 +56,29 @@ describe("$aria", () => {
         scope,
       );
       scope.$apply("val = false");
-      expect(element[0].hasAttribute("aria-disabled")).toBeFalse();
+      expect(element.hasAttribute("aria-disabled")).toBeFalse();
 
       scope.$apply("val = true");
-      expect(element[0].hasAttribute("aria-disabled")).toBeFalse();
+      expect(element.hasAttribute("aria-disabled")).toBeFalse();
     });
 
     // ariaHidden
     it("should not attach aria-hidden to `ngShow`", () => {
       element = $compile('<div ng-show="val" ng-aria-disable></div>')(scope);
       scope.$apply("val = false");
-      expect(element[0].hasAttribute("aria-hidden")).toBeFalse();
+      expect(element.hasAttribute("aria-hidden")).toBeFalse();
 
       scope.$apply("val = true");
-      expect(element[0].hasAttribute("aria-hidden")).toBeFalse();
+      expect(element.hasAttribute("aria-hidden")).toBeFalse();
     });
 
     it("should not attach aria-hidden to `ngHide`", () => {
       element = $compile('<div ng-hide="val" ng-aria-disable></div>')(scope);
       scope.$apply("val = false");
-      expect(element[0].hasAttribute("aria-hidden")).toBeFalse();
+      expect(element.hasAttribute("aria-hidden")).toBeFalse();
 
       scope.$apply("val = true");
-      expect(element[0].hasAttribute("aria-hidden")).toBeFalse();
+      expect(element.hasAttribute("aria-hidden")).toBeFalse();
     });
 
     // ariaInvalid
@@ -87,10 +87,10 @@ describe("$aria", () => {
         '<input ng-model="val" ng-minlength="10" ng-aria-disable />',
       )(scope);
       scope.$apply('val = "lt 10"');
-      expect(element[0].hasAttribute("aria-invalid")).toBeFalse();
+      expect(element.hasAttribute("aria-invalid")).toBeFalse();
 
       scope.$apply('val = "gt 10 characters"');
-      expect(element[0].hasAttribute("aria-invalid")).toBeFalse();
+      expect(element.hasAttribute("aria-invalid")).toBeFalse();
     });
 
     it("should not attach aria-invalid to custom controls", () => {
@@ -98,16 +98,16 @@ describe("$aria", () => {
         '<div role="textbox" ng-model="val" ng-minlength="10" ng-aria-disable></div>',
       )(scope);
       scope.$apply('val = "lt 10"');
-      expect(element[0].hasAttribute("aria-invalid")).toBeFalse();
+      expect(element.hasAttribute("aria-invalid")).toBeFalse();
 
       scope.$apply('val = "gt 10 characters"');
-      expect(element[0].hasAttribute("aria-invalid")).toBeFalse();
+      expect(element.hasAttribute("aria-invalid")).toBeFalse();
     });
 
     // ariaLive
     it("should not attach aria-live to `ngMessages`", () => {
       element = $compile('<div ng-messages="val" ng-aria-disable>')(scope);
-      expect(element[0].hasAttribute("aria-live")).toBeFalse();
+      expect(element.hasAttribute("aria-live")).toBeFalse();
     });
 
     // ariaReadonly
@@ -116,10 +116,10 @@ describe("$aria", () => {
         scope,
       );
       scope.$apply("val = false");
-      expect(element[0].hasAttribute("aria-readonly")).toBeFalse();
+      expect(element.hasAttribute("aria-readonly")).toBeFalse();
 
       scope.$apply("val = true");
-      expect(element[0].hasAttribute("aria-readonly")).toBeFalse();
+      expect(element.hasAttribute("aria-readonly")).toBeFalse();
     });
 
     // ariaRequired
@@ -127,7 +127,7 @@ describe("$aria", () => {
       element = $compile('<div ng-model="val" required ng-aria-disable></div>')(
         scope,
       );
-      expect(element[0].hasAttribute("aria-required")).toBeFalse();
+      expect(element.hasAttribute("aria-required")).toBeFalse();
     });
 
     it("should not attach aria-required to custom controls with `ngRequired`", () => {
@@ -135,10 +135,10 @@ describe("$aria", () => {
         '<div ng-model="val" ng-required="val" ng-aria-disable></div>',
       )(scope);
       scope.$apply("val = false");
-      expect(element[0].hasAttribute("aria-required")).toBeFalse();
+      expect(element.hasAttribute("aria-required")).toBeFalse();
 
       scope.$apply("val = true");
-      expect(element[0].hasAttribute("aria-required")).toBeFalse();
+      expect(element.hasAttribute("aria-required")).toBeFalse();
     });
 
     // ariaValue
@@ -146,19 +146,19 @@ describe("$aria", () => {
       element = $compile(
         '<input type="range" ng-model="val" min="0" max="100" ng-aria-disable />',
       )(scope);
-      expect(element[0].hasAttribute("aria-valuemax")).toBeFalse();
-      expect(element[0].hasAttribute("aria-valuemin")).toBeFalse();
-      expect(element[0].hasAttribute("aria-valuenow")).toBeFalse();
+      expect(element.hasAttribute("aria-valuemax")).toBeFalse();
+      expect(element.hasAttribute("aria-valuemin")).toBeFalse();
+      expect(element.hasAttribute("aria-valuenow")).toBeFalse();
 
       scope.$apply("val = 50");
-      expect(element[0].hasAttribute("aria-valuemax")).toBeFalse();
-      expect(element[0].hasAttribute("aria-valuemin")).toBeFalse();
-      expect(element[0].hasAttribute("aria-valuenow")).toBeFalse();
+      expect(element.hasAttribute("aria-valuemax")).toBeFalse();
+      expect(element.hasAttribute("aria-valuemin")).toBeFalse();
+      expect(element.hasAttribute("aria-valuenow")).toBeFalse();
 
       scope.$apply("val = 150");
-      expect(element[0].hasAttribute("aria-valuemax")).toBeFalse();
-      expect(element[0].hasAttribute("aria-valuemin")).toBeFalse();
-      expect(element[0].hasAttribute("aria-valuenow")).toBeFalse();
+      expect(element.hasAttribute("aria-valuemax")).toBeFalse();
+      expect(element.hasAttribute("aria-valuemin")).toBeFalse();
+      expect(element.hasAttribute("aria-valuenow")).toBeFalse();
     });
 
     it("should not attach aria-value* to custom controls", () => {
@@ -317,10 +317,10 @@ describe("$aria", () => {
     it("should not attach aria-hidden", () => {
       scope.$apply("val = false");
       element = $compile('<div ng-show="val"></div>')(scope);
-      expect(element[0].hasAttribute("aria-hidden")).toBeFalse();
+      expect(element.hasAttribute("aria-hidden")).toBeFalse();
 
       element = $compile('<div ng-hide="val"></div>')(scope);
-      expect(element[0].hasAttribute("aria-hidden")).toBeFalse();
+      expect(element.hasAttribute("aria-hidden")).toBeFalse();
     });
   });
 
@@ -382,10 +382,10 @@ describe("$aria", () => {
       const element = $compile('<div role="checkbox" ng-checked="val">')(scope);
 
       scope.$apply("val = true");
-      expect(element[0].getAttribute("aria-checked")).toBe("true");
+      expect(element.getAttribute("aria-checked")).toBe("true");
 
       scope.$apply("val = false");
-      expect(element[0].getAttribute("aria-checked")).toBe("false");
+      expect(element.getAttribute("aria-checked")).toBe("false");
     });
 
     it('should not attach to native input type="radio"', () => {

@@ -1129,7 +1129,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
           controllers,
           transcludeFn,
         ) {
-          element = groupScan(element[0], attrStart, attrEnd);
+          element = groupScan(element, attrStart, attrEnd);
           return linkFn(scope, element, attrs, controllers, transcludeFn);
         };
       }
@@ -1521,7 +1521,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                   'No parent directive that requires a transclusion with slot name "{0}". ' +
                     "Element: {1}",
                   slotName,
-                  startingTag($element[0]),
+                  startingTag($element),
                 );
               }
             } else {
@@ -1988,7 +1988,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
 
             if (
               inheritType === "^^" &&
-              $element[0] &&
+              $element &&
               $element.nodeType === Node.DOCUMENT_NODE
             ) {
               // inheritedData() uses the documentElement when it finds the document, so we would
@@ -2450,7 +2450,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
             directive.name,
             wrapModuleNameIfDefined(directive.$$moduleName),
             what,
-            startingTag(element[0]),
+            startingTag(element),
           );
         }
       }
@@ -2630,7 +2630,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
               pre: function ngPropPreLinkFn(scope, $element) {
                 function applyPropValue() {
                   const propValue = ngPropGetter(scope);
-                  $element[0][propName] = sanitizer(propValue);
+                  $element[propName] = sanitizer(propValue);
                 }
 
                 applyPropValue();

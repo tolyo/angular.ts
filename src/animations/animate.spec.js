@@ -32,9 +32,9 @@ describe("$animate", () => {
 
     it("should add element at the start of enter animation", () => {
       const child = $compile("<div></div>")($rootScope);
-      expect(element[0].childNodes.length).toBe(0);
+      expect(element.childNodes.length).toBe(0);
       $animate.enter(child, element);
-      expect(element[0].childNodes.length).toBe(1);
+      expect(element.childNodes.length).toBe(1);
     });
 
     it("should enter the element to the start of the parent container", () => {
@@ -51,9 +51,9 @@ describe("$animate", () => {
     it("should remove the element at the end of leave animation", () => {
       const child = $compile("<div></div>")($rootScope);
       element.append(child);
-      expect(element[0].childNodes.length).toBe(1);
+      expect(element.childNodes.length).toBe(1);
       $animate.leave(child);
-      expect(element[0].childNodes.length).toBe(0);
+      expect(element.childNodes.length).toBe(0);
     });
 
     it("should reorder the move animation", () => {
@@ -68,14 +68,14 @@ describe("$animate", () => {
 
     it("should apply styles instantly to the element", () => {
       $animate.animate(element, { color: "rgb(0, 0, 0)" });
-      expect(element[0].style.color).toBe("rgb(0, 0, 0)");
+      expect(element.style.color).toBe("rgb(0, 0, 0)");
 
       $animate.animate(
         element,
         { color: "rgb(255, 0, 0)" },
         { color: "rgb(0, 255, 0)" },
       );
-      expect(element[0].style.color).toBe("rgb(0, 255, 0)");
+      expect(element.style.color).toBe("rgb(0, 255, 0)");
     });
 
     it("should still perform DOM operations even if animations are disabled (post-digest)", () => {
@@ -186,14 +186,14 @@ describe("$animate", () => {
       assertColor("yellow");
 
       function assertColor(color) {
-        expect(element[0].style.color).toBe(color);
+        expect(element.style.color).toBe(color);
       }
     });
 
     it("should merge the from and to styles that are provided", () => {
       const element = JQLite("<div></div>");
 
-      element[0].style.color = "red";
+      element.style.color = "red";
       $animate.addClass(element, "on", {
         from: { color: "green" },
         to: { borderColor: "purple" },
@@ -226,7 +226,7 @@ describe("$animate", () => {
         $rootElement.append(parent);
 
         $animate[method](element, parent);
-        expect(element[0].parentNode).toBe(parent);
+        expect(element.parentNode).toBe(parent);
       });
     });
 
@@ -237,7 +237,7 @@ describe("$animate", () => {
         $rootElement.append(after);
 
         $animate[method](element, null, after);
-        expect(element[0].previousSibling).toBe(after);
+        expect(element.previousSibling).toBe(after);
       });
     });
 

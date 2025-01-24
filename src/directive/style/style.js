@@ -9,14 +9,14 @@ export function ngStyleDirective() {
         if (oldStyles) {
           const oldKeys = Object.keys(oldStyles);
           for (let i = 0, length = oldKeys.length; i < length; i++) {
-            element[0].style[oldKeys[i]] = "";
+            element.style[oldKeys[i]] = "";
           }
         }
         if (newStyles) {
           const newEntries = Object.entries(newStyles);
           for (let i = 0, length = newEntries.length; i < length; i++) {
             const [key, value] = newEntries[i];
-            element[0].style[key] = value;
+            element.style[key] = value;
           }
         }
       });

@@ -193,7 +193,7 @@ describe("select", () => {
           "<option>nah</option>" +
           "</select>",
       );
-      expect(element[0].value).toBe("me!");
+      expect(element.value).toBe("me!");
     });
 
     describe("required state", () => {
@@ -254,7 +254,7 @@ describe("select", () => {
         scope.$apply('selection = "a"');
         await wait();
         expect(element.classList.contains("ng-valid")).toBeTrue();
-        expect(element[0].value).toBe("a");
+        expect(element.value).toBe("a");
 
         setSelectValue(element, 0);
         expect(element.classList.contains("ng-invalid")).toBeTrue();
@@ -292,7 +292,7 @@ describe("select", () => {
 
         scope.$apply('selection = "c"');
         await wait();
-        expect(element[0].value).toBe(unknownValue("c"));
+        expect(element.value).toBe(unknownValue("c"));
         expect(element.classList.contains("ng-valid")).toBeTrue();
         expect(ngModelCtrl.$error.required).toBeFalsy();
       });
@@ -307,21 +307,21 @@ describe("select", () => {
           "</select>",
       );
       await wait();
-      expect(element[0].value).toBe("r2d2");
+      expect(element.value).toBe("r2d2");
 
       setSelectValue(element, 0);
-      expect(element[0].value).toBe("c3p0");
+      expect(element.value).toBe("c3p0");
       expect(scope.robot).toBe("c3p0");
 
       scope.robots.unshift("wallee");
       await wait();
-      expect(element[0].value).toBe("c3p0");
+      expect(element.value).toBe("c3p0");
       expect(scope.robot).toBe("c3p0");
 
       scope.robots = ["c3p0+", "r2d2+"];
       scope.robot = "r2d2+";
       await wait();
-      expect(element[0].value).toBe("r2d2+");
+      expect(element.value).toBe("r2d2+");
       expect(scope.robot).toBe("r2d2+");
     });
 
@@ -465,23 +465,23 @@ describe("select", () => {
             "</select>",
         );
 
-        expect(element[0].value).toBe("? string: ?");
+        expect(element.value).toBe("? string: ?");
 
         scope.dynamicOptions = [
           { val: "", display: "--empty--" },
           { val: "x", display: "robot x" },
           { val: "y", display: "robot y" },
         ];
-        expect(element[0].value).toBe("");
+        expect(element.value).toBe("");
 
         scope.robot = "x";
-        expect(element[0].value).toBe("x");
+        expect(element.value).toBe("x");
         scope.dynamicOptions.shift();
 
-        expect(element[0].value).toBe("x");
+        expect(element.value).toBe("x");
 
         scope.robot = undefined;
-        expect(element[0].value).toBe(unknownValue(undefined));
+        expect(element.value).toBe(unknownValue(undefined));
       });
 
       it("should cope use a dynamic empty option that is added to a static empty option", () => {
@@ -495,7 +495,7 @@ describe("select", () => {
             '<option ng-repeat="opt in dynamicOptions" value="{{opt.val}}">{{opt.display}}</option>' +
             "</select>",
         );
-        expect(element[0].value).toBe(unknownValue("x"));
+        expect(element.value).toBe(unknownValue("x"));
 
         scope.robot = undefined;
         expect(element.find("option").eq(0)[0].selected).toBe(true);
@@ -506,10 +506,10 @@ describe("select", () => {
           { val: "x", display: "robot x" },
           { val: "y", display: "robot y" },
         ];
-        expect(element[0].value).toBe("");
+        expect(element.value).toBe("");
 
         scope.dynamicOptions = [];
-        expect(element[0].value).toBe("");
+        expect(element.value).toBe("");
       });
 
       it("should select the empty option when model is undefined", () => {
@@ -521,7 +521,7 @@ describe("select", () => {
             "</select>",
         );
 
-        expect(element[0].value).toBe("");
+        expect(element.value).toBe("");
       });
 
       it("should support defining an empty option anywhere in the option list", () => {
@@ -533,7 +533,7 @@ describe("select", () => {
             "</select>",
         );
 
-        expect(element[0].value).toBe("");
+        expect(element.value).toBe("");
       });
 
       it("should set the model to empty string when empty option is selected", () => {
@@ -545,10 +545,10 @@ describe("select", () => {
             '<option value="y">robot y</option>' +
             "</select>",
         );
-        expect(element[0].value).toBe("x");
+        expect(element.value).toBe("x");
         setSelectValue(element, 0);
 
-        expect(element[0].value).toBe("");
+        expect(element.value).toBe("");
         expect(scope.robot).toBe("");
       });
 
@@ -562,10 +562,10 @@ describe("select", () => {
             "</select>",
         );
 
-        expect(element[0].value).toBe(unknownValue("other"));
+        expect(element.value).toBe(unknownValue("other"));
 
         scope.robot = undefined;
-        expect(element[0].value).toBe("");
+        expect(element.value).toBe("");
       });
 
       it("should support option without a value attribute", () => {
@@ -576,7 +576,7 @@ describe("select", () => {
             '<option value="y">robot y</option>' +
             "</select>",
         );
-        expect(element[0].value).toBe("? undefined:undefined ?");
+        expect(element.value).toBe("? undefined:undefined ?");
       });
 
       it("should support option without a value with other HTML attributes", () => {
@@ -587,7 +587,7 @@ describe("select", () => {
             '<option value="y">robot y</option>' +
             "</select>",
         );
-        expect(element[0].value).toBe("? undefined:undefined ?");
+        expect(element.value).toBe("? undefined:undefined ?");
       });
 
       describe("interactions with repeated options", () => {
@@ -599,7 +599,7 @@ describe("select", () => {
               '<option ng-repeat="r in robots">{{r}}</option>' +
               "</select>",
           );
-          expect(element[0].value).toBe("");
+          expect(element.value).toBe("");
         });
 
         it("should set model to empty string when selected", () => {
@@ -612,12 +612,12 @@ describe("select", () => {
           );
 
           setSelectValue(element, 1);
-          expect(element[0].value).toBe("c3p0");
+          expect(element.value).toBe("c3p0");
 
           expect(scope.robot).toBe("c3p0");
 
           setSelectValue(element, 0);
-          expect(element[0].value).toBe("");
+          expect(element.value).toBe("");
           expect(scope.robot).toBe("");
         });
 
@@ -631,14 +631,14 @@ describe("select", () => {
               "</select>",
           );
 
-          expect(element[0].value).toBe("c3p0");
+          expect(element.value).toBe("c3p0");
 
           scope.$apply(() => {
             scope.robots = ["wallee"];
             scope.robot = "";
           });
 
-          expect(element[0].value).toBe("");
+          expect(element.value).toBe("");
         });
       });
 
@@ -681,19 +681,19 @@ describe("select", () => {
             "</select>",
         );
 
-        expect(element[0].value).toBe(unknownValue(undefined));
+        expect(element.value).toBe(unknownValue(undefined));
 
         scope.$apply(() => {
           scope.robot = "r2d2";
         });
 
-        expect(element[0].value).toBe("r2d2");
+        expect(element.value).toBe("r2d2");
 
         scope.$apply(() => {
           scope.robot = "wallee";
         });
 
-        expect(element[0].value).toBe(unknownValue("wallee"));
+        expect(element.value).toBe(unknownValue("wallee"));
       });
 
       it("should NOT insert temporary unknown option when model is undefined and empty options is present", () => {
@@ -705,23 +705,23 @@ describe("select", () => {
             "</select>",
         );
 
-        expect(element[0].value).toBe("");
+        expect(element.value).toBe("");
         expect(scope.robot).toBeUndefined();
 
         scope.$apply(() => {
           scope.robot = null;
         });
-        expect(element[0].value).toBe("");
+        expect(element.value).toBe("");
 
         scope.$apply(() => {
           scope.robot = "r2d2";
         });
-        expect(element[0].value).toBe("r2d2");
+        expect(element.value).toBe("r2d2");
 
         scope.$apply(() => {
           delete scope.robot;
         });
-        expect(element[0].value).toBe("");
+        expect(element.value).toBe("");
       });
 
       it(
@@ -737,12 +737,12 @@ describe("select", () => {
               "</select>",
           );
 
-          expect(element[0].value).toBe(unknownValue("wallee"));
+          expect(element.value).toBe(unknownValue("wallee"));
 
           scope.$apply(() => {
             scope.robot = "r2d2";
           });
-          expect(element[0].value).toBe("r2d2");
+          expect(element.value).toBe("r2d2");
         },
       );
 
@@ -753,19 +753,19 @@ describe("select", () => {
               '<option ng-repeat="r in robots">{{r}}</option>' +
               "</select>",
           );
-          expect(element[0].value).toBe(unknownValue(undefined));
+          expect(element.value).toBe(unknownValue(undefined));
           expect(scope.robot).toBeUndefined();
 
           scope.$apply(() => {
             scope.robot = "r2d2";
           });
-          expect(element[0].value).toBe(unknownValue("r2d2"));
+          expect(element.value).toBe(unknownValue("r2d2"));
           expect(scope.robot).toBe("r2d2");
 
           scope.$apply(() => {
             scope.robots = ["c3p0", "r2d2"];
           });
-          expect(element[0].value).toBe("r2d2");
+          expect(element.value).toBe("r2d2");
           expect(scope.robot).toBe("r2d2");
         });
 
@@ -776,20 +776,20 @@ describe("select", () => {
               '<option ng-repeat="r in robots">{{r}}</option>' +
               "</select>",
           );
-          expect(element[0].value).toBe("");
+          expect(element.value).toBe("");
           expect(scope.robot).toBeUndefined();
 
           scope.$apply(() => {
             scope.robot = "r2d2";
           });
 
-          expect(element[0].value).toBe(unknownValue("r2d2"));
+          expect(element.value).toBe(unknownValue("r2d2"));
           expect(scope.robot).toBe("r2d2");
 
           scope.$apply(() => {
             scope.robots = ["c3p0", "r2d2"];
           });
-          expect(element[0].value).toBe("r2d2");
+          expect(element.value).toBe("r2d2");
           expect(scope.robot).toBe("r2d2");
         });
 
@@ -801,32 +801,32 @@ describe("select", () => {
               '<option ng-repeat="r in robots">{{r}}</option>' +
               "</select>",
           );
-          expect(element[0].value).toBe("r2d2");
+          expect(element.value).toBe("r2d2");
           expect(scope.robot).toBe("r2d2");
 
           scope.$apply(() => {
             scope.robots.pop();
           });
-          expect(element[0].value).toBe(unknownValue(null));
+          expect(element.value).toBe(unknownValue(null));
           expect(scope.robot).toBe(null);
 
           scope.$apply(() => {
             scope.robots.unshift("r2d2");
           });
-          expect(element[0].value).toBe(unknownValue(null));
+          expect(element.value).toBe(unknownValue(null));
           expect(scope.robot).toBe(null);
 
           scope.$apply(() => {
             scope.robot = "r2d2";
           });
 
-          expect(element[0].value).toBe("r2d2");
+          expect(element.value).toBe("r2d2");
 
           scope.$apply(() => {
             delete scope.robots;
           });
 
-          expect(element[0].value).toBe(unknownValue(null));
+          expect(element.value).toBe(unknownValue(null));
           expect(scope.robot).toBe(null);
         });
       });
@@ -845,7 +845,7 @@ describe("select", () => {
           '<select ng-model="mySelect"><option my-options="options"></option></select>',
         );
 
-        expect(element[0].value).toBe(unknownValue());
+        expect(element.value).toBe(unknownValue());
       },
     );
 
@@ -894,7 +894,7 @@ describe("select", () => {
 
       const selectCtrl = element.controller("select");
 
-      expect(element[0].value).toBe("? string: ?");
+      expect(element.value).toBe("? string: ?");
       expect(selectCtrl.$hasEmptyOption()).toBe(false);
       expect(selectCtrl.$isEmptyOptionSelected()).toBe(false);
 
@@ -904,35 +904,35 @@ describe("select", () => {
       ];
       scope.empty = true;
 
-      expect(element[0].value).toBe("");
+      expect(element.value).toBe("");
       expect(selectCtrl.$hasEmptyOption()).toBe(true);
       expect(selectCtrl.$isEmptyOptionSelected()).toBe(true);
       expect(selectCtrl.$isUnknownOptionSelected()).toBe(false);
 
       // empty -> selection
       scope.$apply('selected = "x"');
-      expect(element[0].value).toBe("x");
+      expect(element.value).toBe("x");
       expect(selectCtrl.$hasEmptyOption()).toBe(true);
       expect(selectCtrl.$isEmptyOptionSelected()).toBe(false);
       expect(selectCtrl.$isUnknownOptionSelected()).toBe(false);
 
       // remove empty
       scope.$apply("empty = false");
-      expect(element[0].value).toBe("x");
+      expect(element.value).toBe("x");
       expect(selectCtrl.$hasEmptyOption()).toBe(false);
       expect(selectCtrl.$isEmptyOptionSelected()).toBe(false);
       expect(selectCtrl.$isUnknownOptionSelected()).toBe(false);
 
       // selection -> unknown
       scope.$apply('selected = "unmatched"');
-      expect(element[0].value).toBe(unknownValue("unmatched"));
+      expect(element.value).toBe(unknownValue("unmatched"));
       expect(selectCtrl.$hasEmptyOption()).toBe(false);
       expect(selectCtrl.$isEmptyOptionSelected()).toBe(false);
       expect(selectCtrl.$isUnknownOptionSelected()).toBe(true);
 
       // add empty
       scope.$apply("empty = true");
-      expect(element[0].value).toBe(unknownValue("unmatched"));
+      expect(element.value).toBe(unknownValue("unmatched"));
       expect(selectCtrl.$hasEmptyOption()).toBe(true);
       expect(selectCtrl.$isEmptyOptionSelected()).toBe(false);
       expect(selectCtrl.$isUnknownOptionSelected()).toBe(true);
@@ -940,7 +940,7 @@ describe("select", () => {
       // unknown -> empty
       scope.$apply("selected = null");
 
-      expect(element[0].value).toBe("");
+      expect(element.value).toBe("");
       expect(selectCtrl.$hasEmptyOption()).toBe(true);
       expect(selectCtrl.$isEmptyOptionSelected()).toBe(true);
       expect(selectCtrl.$isUnknownOptionSelected()).toBe(false);
@@ -948,7 +948,7 @@ describe("select", () => {
       // empty -> unknown
       scope.$apply('selected = "unmatched"');
 
-      expect(element[0].value).toBe(unknownValue("unmatched"));
+      expect(element.value).toBe(unknownValue("unmatched"));
       expect(selectCtrl.$hasEmptyOption()).toBe(true);
       expect(selectCtrl.$isEmptyOptionSelected()).toBe(false);
       expect(selectCtrl.$isUnknownOptionSelected()).toBe(true);
@@ -956,7 +956,7 @@ describe("select", () => {
       // unknown -> selection
       scope.$apply('selected = "y"');
 
-      expect(element[0].value).toBe("y");
+      expect(element.value).toBe("y");
       expect(selectCtrl.$hasEmptyOption()).toBe(true);
       expect(selectCtrl.$isEmptyOptionSelected()).toBe(false);
       expect(selectCtrl.$isUnknownOptionSelected()).toBe(false);
@@ -964,7 +964,7 @@ describe("select", () => {
       // selection -> empty
       scope.$apply("selected = null");
 
-      expect(element[0].value).toBe("");
+      expect(element.value).toBe("");
       expect(selectCtrl.$hasEmptyOption()).toBe(true);
       expect(selectCtrl.$isEmptyOptionSelected()).toBe(true);
       expect(selectCtrl.$isUnknownOptionSelected()).toBe(false);
@@ -1260,7 +1260,7 @@ describe("select", () => {
 
       let optionElements = element.find("option");
 
-      expect(element[0].value).toBe("A");
+      expect(element.value).toBe("A");
       expect(optionElements[0].selected).toBeTrue();
       expect(optionElements[1].selected).toBeFalse();
 
@@ -1270,7 +1270,7 @@ describe("select", () => {
 
       optionElements = element.find("option");
 
-      expect(element[0].value).toBe("A");
+      expect(element.value).toBe("A");
       expect(optionElements[0].selected).toBeTrue();
       expect(optionElements[1].selected).toBeTrue();
     });
@@ -1285,18 +1285,18 @@ describe("select", () => {
           "</select>",
       );
 
-      expect(element[0].value).toBe("");
+      expect(element.value).toBe("");
       expect(scope.selection).toBeUndefined();
 
       scope.$apply(() => {
         scope.selection = ["A"];
       });
-      expect(element[0].value).toBe("A");
+      expect(element.value).toBe("A");
 
       scope.$apply(() => {
         scope.selection.push("B");
       });
-      expect(element[0].value).toBe("A");
+      expect(element.value).toBe("A");
     });
 
     it("should require", () => {
@@ -1322,7 +1322,7 @@ describe("select", () => {
       expect(element.classList.contains("ng-valid")).toBeTrue();
       expect(element.classList.contains("ng-pristine")).toBeTrue();
 
-      element[0].value = "B";
+      element.value = "B";
       browserTrigger(element, "change");
       expect(element.classList.contains("ng-valid")).toBeTrue();
       expect(element.classList.contains("ng-dirty")).toBeTrue();
@@ -1382,18 +1382,18 @@ describe("select", () => {
   describe("option", () => {
     it("should populate a missing value attribute with the option text", () => {
       compile('<select ng-model="x"><option selected>abc</option></select>');
-      expect(element[0].value).toBe(unknownValue(undefined));
+      expect(element.value).toBe(unknownValue(undefined));
     });
 
     it("should ignore the option text if the value attribute exists", () => {
       compile('<select ng-model="x"><option value="abc">xyz</option></select>');
-      expect(element[0].value).toBe(unknownValue(undefined));
+      expect(element.value).toBe(unknownValue(undefined));
     });
 
     it("should set value even if self closing HTML", () => {
       scope.x = "hello";
       compile('<select ng-model="x"><option>hello</select>');
-      expect(element[0].value).toBe("hello");
+      expect(element.value).toBe("hello");
     });
 
     it("should add options with interpolated value attributes", () => {
@@ -1583,7 +1583,7 @@ describe("select", () => {
 
           scope.selected = prop;
           expect(element.find("option").eq(0).value).toBe(hashKey(prop));
-          expect(element[0].selectedIndex).toBe(0);
+          expect(element.selectedIndex).toBe(0);
 
           scope.option = "UPDATEDVALUE";
           expect(selectController.removeOption.calls.count()).toBe(1);
@@ -1598,7 +1598,7 @@ describe("select", () => {
           }
 
           expect(scope.selected).toBe(null);
-          expect(element[0].selectedIndex).toBe(0);
+          expect(element.selectedIndex).toBe(0);
           expect(element.find("option").length).toBe(3);
           expect(element.find("option").eq(0)[0].selected).toBe(true);
           expect(element.find("option").eq(0).value).toBe(unknownValue(prop));
@@ -1608,7 +1608,7 @@ describe("select", () => {
           );
 
           scope.selected = "UPDATEDVALUE";
-          expect(element[0].selectedIndex).toBe(0);
+          expect(element.selectedIndex).toBe(0);
           expect(element.find("option").eq(0).value).toBe(
             "string:UPDATEDVALUE",
           );
@@ -1646,7 +1646,7 @@ describe("select", () => {
         compile(
           '<select ng-model="x"><option ng-value="ngvalue" value="{{value}}">{{textvalue}}</option></select>',
         );
-        expect(element[0].value).toBe(unknownValue(undefined));
+        expect(element.value).toBe(unknownValue(undefined));
       });
 
       it("should ignore option text with multiple interpolations if the ngValue attribute exists", () => {
@@ -1657,7 +1657,7 @@ describe("select", () => {
         compile(
           '<select ng-model="x"><option ng-value="ngvalue">{{textvalue}} {{textvalue2}}</option></select>',
         );
-        expect(element[0].value).toBe(unknownValue(undefined));
+        expect(element.value).toBe(unknownValue(undefined));
       });
 
       it("should select the first option if it is `undefined`", () => {
@@ -1673,7 +1673,7 @@ describe("select", () => {
             "</select>",
         );
 
-        expect(element[0].value).toBe("undefined:undefined");
+        expect(element.value).toBe("undefined:undefined");
       });
 
       describe("and select[multiple]", () => {
@@ -1700,7 +1700,7 @@ describe("select", () => {
           );
 
           expect(
-            Object.values(element[0].childNodes)
+            Object.values(element.childNodes)
               .map((x) => x.value)
               .join(""),
           ).toBe(
@@ -1916,7 +1916,7 @@ describe("select", () => {
           expect(scope.obj.value).toBe("B");
           // jQuery returns null for val() when the option is disabled, see
           // https://bugs.jquery.com/ticket/13097
-          expect(element[0].value).toBe(prop === "ngValue" ? "string:B" : "B");
+          expect(element.value).toBe(prop === "ngValue" ? "string:B" : "B");
           expect(optionElements.eq(1)[0].selected).toBe(true);
         });
 
@@ -2273,13 +2273,13 @@ describe("select", () => {
 
             let optionElements = element.find("option");
             expect(optionElements.length).toEqual(4);
-            expect(element[0].value).toBe("");
+            expect(element.value).toBe("");
 
             A.disabled = true;
             D.disabled = true;
             optionElements = element.find("option");
             expect(optionElements.length).toEqual(4);
-            expect(element[0].value).toBe("");
+            expect(element.value).toBe("");
 
             scope.obj.value = prop === "ngValue" ? [A, C, D] : ["A", "C", "D"];
             optionElements = element.find("option");
@@ -2430,7 +2430,7 @@ describe("select", () => {
             "</select>",
         );
 
-        expect(element[0].value).toBe("A");
+        expect(element.value).toBe("A");
         expect(element.classList.contains("ng-valid")).toBeTrue();
         expect(ngModelCtrl.$error.required).toBeFalsy();
 
@@ -2439,7 +2439,7 @@ describe("select", () => {
           scope.values = ["B", "C"];
         });
 
-        expect(element[0].value).toBe("");
+        expect(element.value).toBe("");
         expect(element.classList.contains("ng-invalid")).toBeTrue();
         expect(ngModelCtrl.$error.required).toBeTruthy();
         // ngModel sets undefined for invalid values

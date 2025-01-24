@@ -142,7 +142,7 @@ function SelectController($element, $scope) {
   // Tell the select control that an option, with the given value, has been added
   self.addOption = function (value, element) {
     // Skip comment nodes, as they only pollute the `optionsMap`
-    if (element[0].nodeType === Node.COMMENT_NODE) return;
+    if (element.nodeType === Node.COMMENT_NODE) return;
 
     assertNotHasOwnProperty(value, '"option value"');
     if (value === "") {
@@ -403,43 +403,39 @@ export function selectDirective() {
       // Read value now needs to check each option to see if it is selected
       selectCtrl.readValue = function readMultipleValue() {
         const array = [];
-        Array.from(element[0].getElementsByTagName("option")).forEach(
-          (option) => {
-            if (option.selected && !option.disabled) {
-              const val = option.value;
-              array.push(
-                val in selectCtrl.selectValueMap
-                  ? selectCtrl.selectValueMap[val]
-                  : val,
-              );
-            }
-          },
-        );
+        Array.from(element.getElementsByTagName("option")).forEach((option) => {
+          if (option.selected && !option.disabled) {
+            const val = option.value;
+            array.push(
+              val in selectCtrl.selectValueMap
+                ? selectCtrl.selectValueMap[val]
+                : val,
+            );
+          }
+        });
         return array;
       };
 
       // Write value now needs to set the selected property of each matching option
       selectCtrl.writeValue = function writeMultipleValue(value) {
-        Array.from(element[0].getElementsByTagName("option")).forEach(
-          (option) => {
-            const shouldBeSelected =
-              !!value &&
-              (includes(value, option.value) ||
-                includes(value, selectCtrl.selectValueMap[option.value]));
-            const currentlySelected = option.selected;
+        Array.from(element.getElementsByTagName("option")).forEach((option) => {
+          const shouldBeSelected =
+            !!value &&
+            (includes(value, option.value) ||
+              includes(value, selectCtrl.selectValueMap[option.value]));
+          const currentlySelected = option.selected;
 
-            // Support: IE 9-11 only, Edge 12-15+
-            // In IE and Edge adding options to the selection via shift+click/UP/DOWN
-            // will de-select already selected options if "selected" on those options was set
-            // more than once (i.e. when the options were already selected)
-            // So we only modify the selected property if necessary.
-            // Note: this behavior cannot be replicated via unit tests because it only shows in the
-            // actual user interface.
-            if (shouldBeSelected !== currentlySelected) {
-              setOptionSelectedStatus(JQLite(option), shouldBeSelected);
-            }
-          },
-        );
+          // Support: IE 9-11 only, Edge 12-15+
+          // In IE and Edge adding options to the selection via shift+click/UP/DOWN
+          // will de-select already selected options if "selected" on those options was set
+          // more than once (i.e. when the options were already selected)
+          // So we only modify the selected property if necessary.
+          // Note: this behavior cannot be replicated via unit tests because it only shows in the
+          // actual user interface.
+          if (shouldBeSelected !== currentlySelected) {
+            setOptionSelectedStatus(JQLite(option), shouldBeSelected);
+          }
+        });
       };
 
       // we have to do it on each watch since ngModel watches reference, but

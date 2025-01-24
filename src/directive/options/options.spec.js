@@ -187,7 +187,7 @@ describe("ngOptions", () => {
           .directive("oCompileContents", () => ({
             link(scope, element) {
               linkLog.push("linkCompileContents");
-              $compile(JQLite(element[0].childNodes))(scope);
+              $compile(JQLite(element.childNodes))(scope);
             },
           }))
 
@@ -196,7 +196,7 @@ describe("ngOptions", () => {
               const config = { childList: true };
 
               childListMutationObserver = new window.MutationObserver(() => {});
-              childListMutationObserver.observe(element[0], config);
+              childListMutationObserver.observe(element, config);
             },
           }));
 
@@ -813,7 +813,7 @@ describe("ngOptions", () => {
         "observe-child-list": "",
       });
 
-      const optionEls = element[0].querySelectorAll("option");
+      const optionEls = element.querySelectorAll("option");
       const records = childListMutationObserver.takeRecords();
 
       expect(records.length).toBe(1);
@@ -869,7 +869,7 @@ describe("ngOptions", () => {
 
         // jQuery returns null for val() when the option is disabled, see
         // https://bugs.jquery.com/ticket/13097
-        expect(element[0].value).toBe("number:1");
+        expect(element.value).toBe("number:1");
         expect(options.length).toEqual(4);
         expect(options.eq(0)[0].selected).toEqual(false);
         expect(options.eq(1)[0].selected).toEqual(true);
@@ -896,7 +896,7 @@ describe("ngOptions", () => {
 
         // jQuery returns null for val() when the option is disabled, see
         // https://bugs.jquery.com/ticket/13097
-        expect(element[0].value).toBe("number:1");
+        expect(element.value).toBe("number:1");
         expect(options.length).toEqual(4);
         expect(options.eq(0)[0].selected).toEqual(false);
         expect(options.eq(1)[0].selected).toEqual(true);
@@ -1472,8 +1472,8 @@ describe("ngOptions", () => {
       });
 
       const options = element.find("option");
-      element[0].selectedIndex = 2;
-      element[0].dispatchEvent(new Event("change"));
+      element.selectedIndex = 2;
+      element.dispatchEvent(new Event("change"));
       expect(scope.selected).toEqual(scope.arr[1]);
 
       scope.selected = {};
@@ -1930,7 +1930,7 @@ describe("ngOptions", () => {
       expect(optgroups[3].label).toBe("0");
 
       expect(options[0].textContent).toBe("A");
-      expect(options[0].parentNode).toBe(element[0]);
+      expect(options[0].parentNode).toBe(element);
 
       expect(options[1].textContent).toBe("B");
       expect(options[1].parentNode).toBe(optgroups[0]);
@@ -2259,13 +2259,13 @@ describe("ngOptions", () => {
         scope.values = [{ name: "A" }, { name: "B" }];
         createSingleSelect(true);
 
-        expect(element[0].value).toBe("?");
-        expect(element[0].length).toBe(4);
+        expect(element.value).toBe("?");
+        expect(element.length).toBe(4);
 
         scope.$apply("selected = values[1]");
 
-        expect(element[0].value).not.toBe("");
-        expect(element[0].length).toBe(3);
+        expect(element.value).not.toBe("");
+        expect(element.length).toBe(3);
       },
     );
 
@@ -2293,10 +2293,10 @@ describe("ngOptions", () => {
       scope.values = [{ name: "A" }, { name: "B" }];
       createSingleSelect(true);
 
-      expect(element[0].value).toBe("?");
+      expect(element.value).toBe("?");
 
       scope.selected = undefined;
-      expect(element[0].value).toBe("");
+      expect(element.value).toBe("");
     });
 
     it('should ensure that at least one option element has the "selected" attribute', () => {
@@ -2540,9 +2540,9 @@ describe("ngOptions", () => {
       });
       createSingleSelect(true);
       // ensure the first option (the blank option) is selected
-      expect(element[0].selectedIndex).toEqual(0);
+      expect(element.selectedIndex).toEqual(0);
       // ensure the option has not changed following the digest
-      expect(element[0].selectedIndex).toEqual(0);
+      expect(element.selectedIndex).toEqual(0);
     });
 
     it("should be selectable if select is multiple", () => {
@@ -2552,7 +2552,7 @@ describe("ngOptions", () => {
       setSelectValue(element, 0);
 
       // ensure selection and correct binding
-      expect(element[0].selectedIndex).toEqual(0);
+      expect(element.selectedIndex).toEqual(0);
       expect(scope.selected).toEqual([]);
     });
 
@@ -2565,15 +2565,15 @@ describe("ngOptions", () => {
         scope.isBlank = true;
       });
 
-      expect(element[0].value).toBe("");
+      expect(element.value).toBe("");
 
       scope.$apply("isBlank = false");
 
-      expect(element[0].value).toBe("?");
+      expect(element.value).toBe("?");
 
       scope.$apply("isBlank = true");
 
-      expect(element[0].value).toBe("");
+      expect(element.value).toBe("");
     });
 
     it("should be possible to use ngIf in the blank option when values are available upon linking", () => {
@@ -2591,7 +2591,7 @@ describe("ngOptions", () => {
 
       scope.$apply("isBlank = false");
 
-      expect(element[0].value).toBe("?");
+      expect(element.value).toBe("?");
     });
 
     it("should select the correct option after linking when the ngIf expression is initially falsy", () => {
@@ -2786,7 +2786,7 @@ describe("ngOptions", () => {
       const optionToSelect = options.eq(0);
       expect(optionToSelect.text()).toBe("Choose One");
       expect(optionToSelect[0].selected).toBe(true);
-      expect(element[0].value).toBe("");
+      expect(element.value).toBe("");
 
       dealoc(element);
     });
@@ -2806,7 +2806,7 @@ describe("ngOptions", () => {
       const optionToSelect = options.eq(0);
       expect(optionToSelect.text()).toBe("Choose One");
       expect(optionToSelect[0].selected).toBe(true);
-      expect(element[0].value).toBe("");
+      expect(element.value).toBe("");
 
       dealoc(element);
     });
@@ -3066,7 +3066,7 @@ describe("ngOptions", () => {
           "observe-child-list": "",
         });
 
-        const optionEls = element[0].querySelectorAll("option");
+        const optionEls = element.querySelectorAll("option");
         const records = childListMutationObserver.takeRecords();
 
         expect(records.length).toBe(1);
@@ -3204,7 +3204,7 @@ describe("ngOptions", () => {
       expect(ngModelCtrl.$error.required).toBeFalsy();
 
       scope.$apply('selection = "c"');
-      expect(element[0].value).toBe("?");
+      expect(element.value).toBe("?");
       expect(element.classList.contains("ng-valid")).toBeTrue();
       expect(ngModelCtrl.$error.required).toBeFalsy();
     });
@@ -3251,7 +3251,7 @@ describe("ngOptions", () => {
         scope.selection = scope.values[0];
       });
 
-      expect(element[0].value).toBe("string:A");
+      expect(element.value).toBe("string:A");
       expect(element.classList.contains("ng-valid")).toBeTrue();
       expect(ngModelCtrl.$error.required).toBeFalsy();
 
@@ -3259,7 +3259,7 @@ describe("ngOptions", () => {
         scope.values = ["C", "D"];
       });
 
-      expect(element[0].value).toBe("");
+      expect(element.value).toBe("");
       expect(element.classList.contains("ng-invalid")).toBeTrue();
       expect(ngModelCtrl.$error.required).toBeTruthy();
       // ngModel sets undefined for invalid values
@@ -3426,7 +3426,7 @@ describe("ngOptions", () => {
         scope.isBlank = true;
       });
 
-      expect(element[0].value).toBe("");
+      expect(element.value).toBe("");
       expect(selectCtrl.$hasEmptyOption()).toBe(true);
       expect(selectCtrl.$isEmptyOptionSelected()).toBe(true);
       expect(selectCtrl.$isUnknownOptionSelected()).toBe(false);
@@ -3436,7 +3436,7 @@ describe("ngOptions", () => {
         scope.selected = scope.values[0];
       });
 
-      expect(element[0].value).not.toBe("");
+      expect(element.value).not.toBe("");
       expect(selectCtrl.$hasEmptyOption()).toBe(true);
       expect(selectCtrl.$isEmptyOptionSelected()).toBe(false);
       expect(selectCtrl.$isUnknownOptionSelected()).toBe(false);
@@ -3444,7 +3444,7 @@ describe("ngOptions", () => {
       // remove empty
       scope.$apply("isBlank = false");
 
-      expect(element[0].value).not.toBe("");
+      expect(element.value).not.toBe("");
       expect(selectCtrl.$hasEmptyOption()).toBe(false);
       expect(selectCtrl.$isEmptyOptionSelected()).toBe(false);
       expect(selectCtrl.$isUnknownOptionSelected()).toBe(false);
@@ -3452,7 +3452,7 @@ describe("ngOptions", () => {
       // selection -> unknown
       scope.$apply('selected = "unmatched"');
 
-      expect(element[0].value).toBe("?");
+      expect(element.value).toBe("?");
       expect(selectCtrl.$hasEmptyOption()).toBe(false);
       expect(selectCtrl.$isEmptyOptionSelected()).toBe(false);
       expect(selectCtrl.$isUnknownOptionSelected()).toBe(true);
@@ -3460,7 +3460,7 @@ describe("ngOptions", () => {
       // add empty
       scope.$apply("isBlank = true");
 
-      expect(element[0].value).toBe("?");
+      expect(element.value).toBe("?");
       expect(selectCtrl.$hasEmptyOption()).toBe(true);
       expect(selectCtrl.$isEmptyOptionSelected()).toBe(false);
       expect(selectCtrl.$isUnknownOptionSelected()).toBe(true);
@@ -3470,7 +3470,7 @@ describe("ngOptions", () => {
         scope.selected = null;
       });
 
-      expect(element[0].value).toBe("");
+      expect(element.value).toBe("");
       expect(selectCtrl.$hasEmptyOption()).toBe(true);
       expect(selectCtrl.$isEmptyOptionSelected()).toBe(true);
       expect(selectCtrl.$isUnknownOptionSelected()).toBe(false);
@@ -3478,7 +3478,7 @@ describe("ngOptions", () => {
       // empty -> unknown
       scope.$apply('selected = "unmatched"');
 
-      expect(element[0].value).toBe("?");
+      expect(element.value).toBe("?");
       expect(selectCtrl.$hasEmptyOption()).toBe(true);
       expect(selectCtrl.$isEmptyOptionSelected()).toBe(false);
       expect(selectCtrl.$isUnknownOptionSelected()).toBe(true);
@@ -3488,7 +3488,7 @@ describe("ngOptions", () => {
         scope.selected = scope.values[1];
       });
 
-      expect(element[0].value).not.toBe("");
+      expect(element.value).not.toBe("");
       expect(selectCtrl.$hasEmptyOption()).toBe(true);
       expect(selectCtrl.$isEmptyOptionSelected()).toBe(false);
       expect(selectCtrl.$isUnknownOptionSelected()).toBe(false);
@@ -3496,7 +3496,7 @@ describe("ngOptions", () => {
       // selection -> empty
       scope.$apply("selected = null");
 
-      expect(element[0].value).toBe("");
+      expect(element.value).toBe("");
       expect(selectCtrl.$hasEmptyOption()).toBe(true);
       expect(selectCtrl.$isEmptyOptionSelected()).toBe(true);
       expect(selectCtrl.$isUnknownOptionSelected()).toBe(false);

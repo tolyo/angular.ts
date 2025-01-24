@@ -3492,14 +3492,14 @@ describe("input", () => {
       //     const element = $compile(tmpl)(scope);
 
       //     helper.changeInputValueTo("newValue");
-      //     expect(element[0].value).toBe("newValue");
-      //     expect(element[0].getAttribute("value")).toBeNull();
+      //     expect(element.value).toBe("newValue");
+      //     expect(element.getAttribute("value")).toBeNull();
 
       //     scope.$apply(() => {
       //       scope.value = "anotherValue";
       //     });
-      //     expect(element[0].value).toBe("anotherValue");
-      //     expect(element[0].getAttribute("value")).toBe("anotherValue");
+      //     expect(element.value).toBe("anotherValue");
+      //     expect(element.getAttribute("value")).toBe("anotherValue");
       //   },
       // );
 

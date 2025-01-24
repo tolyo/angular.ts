@@ -796,7 +796,7 @@ describe("parser", () => {
           return element;
         };
         expect(scope.$eval('fn()[0] = "lucas"')).toBe("lucas");
-        expect(element[0]).toBe("lucas");
+        expect(element).toBe("lucas");
         expect(count).toBe(1);
       });
 
@@ -842,7 +842,7 @@ describe("parser", () => {
           return 0;
         };
         expect(scope.$eval('element[fn()].name = "lucas"')).toBe("lucas");
-        expect(scope.element[0].name).toBe("lucas");
+        expect(scope.element.name).toBe("lucas");
         expect(count).toBe(1);
       });
     });

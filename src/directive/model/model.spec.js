@@ -1787,11 +1787,11 @@ describe("ngModel", () => {
   // TODO:
   // describe("animations", () => {
   //   function findElementAnimations(element, queue) {
-  //     const node = element[0];
+  //     const node = element;
   //     const animations = [];
   //     for (let i = 0; i < queue.length; i++) {
   //       const animation = queue[i];
-  //       if (animation.element[0] === node) {
+  //       if (animation.element === node) {
   //         animations.push(animation);
   //       }
   //     }

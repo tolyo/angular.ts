@@ -45,12 +45,12 @@ describe("observe", () => {
     const mutationObserverCallback =
       MutationObserver.calls.mostRecent().args[0];
     const mutationRecord = {
-      target: element[0],
+      target: element,
       attributeName: "test-attribute",
     };
 
     element.attr("test-attribute", "newValue");
-    element[0].setAttribute("test-attribute", "newValue");
+    element.setAttribute("test-attribute", "newValue");
 
     mutationObserverCallback([mutationRecord]);
     await wait();
@@ -63,12 +63,12 @@ describe("observe", () => {
     const mutationObserverCallback =
       MutationObserver.calls.mostRecent().args[0];
     const mutationRecord = {
-      target: element[0],
+      target: element,
       attributeName: "test-attribute",
     };
 
     element.attr("test-attribute", "existingValue");
-    element[0].setAttribute("test-attribute", "existingValue");
+    element.setAttribute("test-attribute", "existingValue");
 
     mutationObserverCallback([mutationRecord]);
 
@@ -92,12 +92,12 @@ describe("observe", () => {
     const mutationObserverCallback =
       MutationObserver.calls.mostRecent().args[0];
     const mutationRecord = {
-      target: element[0],
+      target: element,
       attributeName: "test-attribute",
     };
 
     element.attr("test-attribute", "newValue");
-    element[0].setAttribute("test-attribute", "newValue");
+    element.setAttribute("test-attribute", "newValue");
 
     mutationObserverCallback([mutationRecord]);
     await wait();

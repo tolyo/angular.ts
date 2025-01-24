@@ -62,15 +62,15 @@ describe("boolean attr directives", () => {
     )($rootScope);
 
     $rootScope.value = "true";
-    expect(element[0].checked).toBe(true);
+    expect(element.checked).toBe(true);
 
-    element[0].checked = !element[0].checked;
-    element[0].dispatchEvent(new Event("change"));
-    expect(element[0].checked).toBe(false);
+    element.checked = !element.checked;
+    element.dispatchEvent(new Event("change"));
+    expect(element.checked).toBe(false);
     expect($rootScope.value).toBe("false");
-    element[0].checked = !element[0].checked;
-    element[0].dispatchEvent(new Event("change"));
-    expect(element[0].checked).toBe(true);
+    element.checked = !element.checked;
+    element.dispatchEvent(new Event("change"));
+    expect(element.checked).toBe(true);
     expect($rootScope.value).toBe("true");
   });
 

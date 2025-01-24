@@ -442,8 +442,7 @@ export function isElement(node) {
  */
 export function getNodeName(element) {
   return lowercase(
-    /** @type {Element} */ (element).nodeName ||
-      (element[0] && element[0].nodeName),
+    /** @type {Element} */ (element).nodeName || (element && element.nodeName),
   );
 }
 

@@ -12,7 +12,7 @@ describe("binding", () => {
     errors = [];
 
   function childNode(element, index) {
-    return JQLite(element[0].childNodes[index]);
+    return JQLite(element.childNodes[index]);
   }
 
   beforeEach(function () {
@@ -76,7 +76,7 @@ describe("binding", () => {
     $rootScope.person.save = function () {
       savedCalled = true;
     };
-    element[0].dispatchEvent(
+    element.dispatchEvent(
       new MouseEvent("click", {
         bubbles: true,
         cancelable: true,
@@ -93,7 +93,7 @@ describe("binding", () => {
       log += "click;";
     };
     expect(log).toEqual("");
-    element[0].dispatchEvent(
+    element.dispatchEvent(
       new MouseEvent("click", {
         bubbles: true,
         cancelable: true,
@@ -112,7 +112,7 @@ describe("binding", () => {
     $rootScope.person.save = function () {
       savedCalled = true;
     };
-    element[0].dispatchEvent(
+    element.dispatchEvent(
       new MouseEvent("click", {
         bubbles: true,
         cancelable: true,
@@ -181,7 +181,7 @@ describe("binding", () => {
     )($rootScope);
     $rootScope.model = { items: [{ a: "A" }] };
     await wait();
-    expect(element[0].outerHTML).toBe(
+    expect(element.outerHTML).toBe(
       "<ul>" +
         "<!---->" +
         '<li ng-repeat="item in model.items"><span ng-bind="item.a">A</span></li>' +
@@ -205,15 +205,15 @@ describe("binding", () => {
     $rootScope.items = items;
 
     await wait();
-    expect(element[0].childNodes.length).toEqual(1);
+    expect(element.childNodes.length).toEqual(1);
 
     items.name = "misko";
     await wait();
-    expect(element[0].childNodes.length).toEqual(3);
+    expect(element.childNodes.length).toEqual(3);
 
     delete items.name;
     await wait();
-    expect(element[0].childNodes.length).toEqual(1);
+    expect(element.childNodes.length).toEqual(1);
   });
 
   it("IfAttrBindingThrowsErrorDecorateTheAttribute", async () => {
@@ -254,7 +254,7 @@ describe("binding", () => {
       { name: "b", item: ["b1", "b2"] },
     ];
     await wait();
-    expect(element[0].outerHTML).toBe(
+    expect(element.outerHTML).toBe(
       `<div>` +
         `<!---->` +
         `<div ng-repeat="m in model" name="a">` +
@@ -351,8 +351,8 @@ describe("binding", () => {
     )($rootScope);
     await wait();
 
-    const d1 = JQLite(element[0].childNodes[1]);
-    const d2 = JQLite(element[0].childNodes[3]);
+    const d1 = JQLite(element.childNodes[1]);
+    const d2 = JQLite(element.childNodes[3]);
     expect(d1[0].classList.contains("o")).toBeTruthy();
     expect(d2[0].classList.contains("e")).toBeTruthy();
     // expect(element).toBe(
@@ -372,7 +372,7 @@ describe("binding", () => {
     $rootScope.$eval('style={height: "10px"}');
     await wait();
 
-    expect(element[0].style["height"]).toBe("10px");
+    expect(element.style["height"]).toBe("10px");
 
     $rootScope.$eval("style={}");
     await wait();
@@ -413,7 +413,7 @@ describe("binding", () => {
     $rootScope.name = "World";
     await wait();
 
-    expect(element[0].outerHTML).toBe(`<pre>Hello World!</pre>`);
+    expect(element.outerHTML).toBe(`<pre>Hello World!</pre>`);
   });
 
   it("FillInOptionValueWhenMissing", async () => {
@@ -448,8 +448,8 @@ describe("binding", () => {
         '<input type="radio" ng-model="sex" value="male">' +
         "</div>",
     )($rootScope);
-    const female = JQLite(element[0].childNodes[0]);
-    const male = JQLite(element[0].childNodes[1]);
+    const female = JQLite(element.childNodes[0]);
+    const male = JQLite(element.childNodes[1]);
 
     female[0].click();
     browserTrigger(female, "change");
@@ -473,7 +473,7 @@ describe("binding", () => {
         "</ul>",
     )($rootScope);
     await wait();
-    expect(element[0].outerHTML).toBe(
+    expect(element.outerHTML).toBe(
       "<ul>" +
         "<!---->" +
         '<li ng-repeat="(k,v) in {a:0,b:1}" ng-bind="k + v">a0</li>' +
@@ -493,7 +493,7 @@ describe("binding", () => {
     $rootScope.watched = "change";
     await wait();
     expect($rootScope.name).toBe(123);
-    expect(element[0].outerHTML).toBe('<div ng-bind="name">123</div>');
+    expect(element.outerHTML).toBe('<div ng-bind="name">123</div>');
   });
 
   it("ItShouldHandleMultilineBindings", async () => {

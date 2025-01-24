@@ -33,40 +33,40 @@ describe("ngProp*", () => {
     const element = $compile(
       '<button ng-prop-disabled="isDisabled">Button</button>',
     )($rootScope);
-    expect(element[0].disabled).toBe(false);
+    expect(element.disabled).toBe(false);
     $rootScope.isDisabled = true;
-    expect(element[0].disabled).toBe(true);
+    expect(element.disabled).toBe(true);
     $rootScope.isDisabled = false;
-    expect(element[0].disabled).toBe(false);
+    expect(element.disabled).toBe(false);
   });
 
   it("should bind boolean properties (input checked)", () => {
     const element = $compile(
       '<input type="checkbox" ng-prop-checked="isChecked" />',
     )($rootScope);
-    expect(element[0].checked).toBe(false);
+    expect(element.checked).toBe(false);
     $rootScope.isChecked = true;
-    expect(element[0].checked).toBe(true);
+    expect(element.checked).toBe(true);
     $rootScope.isChecked = false;
-    expect(element[0].checked).toBe(false);
+    expect(element.checked).toBe(false);
   });
 
   it("should bind string properties (title)", () => {
     const element = $compile('<span ng-prop-title="title" />')($rootScope);
     $rootScope.title = 123;
-    expect(element[0].title).toBe("123");
+    expect(element.title).toBe("123");
     $rootScope.title = "foobar";
-    expect(element[0].title).toBe("foobar");
+    expect(element.title).toBe("foobar");
   });
 
   it("should bind variable type properties", () => {
     const element = $compile('<span ng-prop-asdf="asdf" />')($rootScope);
     $rootScope.asdf = 123;
-    expect(element[0].asdf).toBe(123);
+    expect(element.asdf).toBe(123);
     $rootScope.asdf = "foobar";
-    expect(element[0].asdf).toBe("foobar");
+    expect(element.asdf).toBe("foobar");
     $rootScope.asdf = true;
-    expect(element[0].asdf).toBe(true);
+    expect(element.asdf).toBe(true);
   });
 
   // https://github.com/angular/angular.js/issues/16797
@@ -74,32 +74,32 @@ describe("ngProp*", () => {
     const element = $compile('<span ng-prop-text="myText" />')($rootScope);
     // Initialize to truthy value
     $rootScope.myText = "abc";
-    expect(element[0].text).toBe("abc");
+    expect(element.text).toBe("abc");
 
     // Assert various falsey values get assigned to the property
     $rootScope.myText = "";
-    expect(element[0].text).toBe("");
+    expect(element.text).toBe("");
     $rootScope.myText = 0;
-    expect(element[0].text).toBe(0);
+    expect(element.text).toBe(0);
     $rootScope.myText = false;
-    expect(element[0].text).toBe(false);
+    expect(element.text).toBe(false);
     $rootScope.myText = undefined;
-    expect(element[0].text).toBeUndefined();
+    expect(element.text).toBeUndefined();
     $rootScope.myText = null;
-    expect(element[0].text).toBe(null);
+    expect(element.text).toBe(null);
   });
 
   it("should directly map special properties (class)", () => {
     const element = $compile('<span ng-prop-class="myText" />')($rootScope);
     $rootScope.myText = "abc";
-    expect(element[0].class).toBe("abc");
-    expect(element[0]).not.toHaveClass("abc");
+    expect(element.class).toBe("abc");
+    expect(element).not.toHaveClass("abc");
   });
 
   it("should support mixed case using underscore-separated names", () => {
     const element = $compile('<span ng-prop-a_bcd_e="value" />')($rootScope);
     $rootScope.value = 123;
-    expect(element[0].aBcdE).toBe(123);
+    expect(element.aBcdE).toBe(123);
   });
 
   it("should work with different prefixes", () => {
@@ -107,9 +107,9 @@ describe("ngProp*", () => {
     const element = $compile(
       '<span ng-prop-test="name" ng-Prop-test2="name" ng-Prop-test3="name"></span>',
     )($rootScope);
-    expect(element[0].test).toBe("Misko");
-    expect(element[0].test2).toBe("Misko");
-    expect(element[0].test3).toBe("Misko");
+    expect(element.test).toBe("Misko");
+    expect(element.test2).toBe("Misko");
+    expect(element.test3).toBe("Misko");
   });
 
   it('should work with the "href" property', () => {
@@ -117,7 +117,7 @@ describe("ngProp*", () => {
     const element = $compile("<a ng-prop-href=\"'test/' + value\"></a>")(
       $rootScope,
     );
-    expect(element[0].href).toMatch(/\/test\/test$/);
+    expect(element.href).toMatch(/\/test\/test$/);
   });
 
   it("should work if they are prefixed with x- or data- and different prefixes", () => {
@@ -126,11 +126,11 @@ describe("ngProp*", () => {
       '<span data-ng-prop-test2="name" ng-prop-test3="name" data-ng-prop-test4="name" ' +
         'ng-prop-test5="name" ng-prop-test6="name"></span>',
     )($rootScope);
-    expect(element[0].test2).toBe("Misko");
-    expect(element[0].test3).toBe("Misko");
-    expect(element[0].test4).toBe("Misko");
-    expect(element[0].test5).toBe("Misko");
-    expect(element[0].test6).toBe("Misko");
+    expect(element.test2).toBe("Misko");
+    expect(element.test3).toBe("Misko");
+    expect(element.test4).toBe("Misko");
+    expect(element.test5).toBe("Misko");
+    expect(element.test6).toBe("Misko");
   });
 
   it("should work independently of attributes with the same name", () => {
@@ -138,7 +138,7 @@ describe("ngProp*", () => {
       $rootScope,
     );
     $rootScope.asdf = 123;
-    expect(element[0].asdf).toBe(123);
+    expect(element.asdf).toBe(123);
     expect(element.attr("asdf")).toBe("foo");
   });
 
@@ -147,7 +147,7 @@ describe("ngProp*", () => {
       $rootScope,
     );
     $rootScope.asdf = 123;
-    expect(element[0].asdf).toBe(123);
+    expect(element.asdf).toBe(123);
     expect(element.attr("asdf")).toBe("foo");
   });
 
@@ -238,7 +238,7 @@ describe("ngProp*", () => {
     )($rootScope);
     $rootScope.name = "loader";
     await wait();
-    logs.push(`digest=${element[0].myName}`);
+    logs.push(`digest=${element.myName}`);
     expect(logs.join("; ")).toEqual(
       "compile=undefined; preLinkP101=undefined; preLinkP0=pre101; postLink=pre101; digest=loader",
     );
@@ -250,7 +250,7 @@ describe("ngProp*", () => {
       // Some browsers complain if you try to write `javascript:` into an `img[src]`
       // So for the test use something different
       $rootScope.testUrl = $sce.trustAsMediaUrl("someuntrustedthing:foo();");
-      expect(element[0].src).toEqual("someuntrustedthing:foo();");
+      expect(element.src).toEqual("someuntrustedthing:foo();");
     });
 
     it("should use $$sanitizeUri", async () => {
@@ -270,7 +270,7 @@ describe("ngProp*", () => {
       $rootScope.testUrl = "someUrl";
 
       await wait();
-      expect(element[0].src).toMatch(/^http:\/\/.*\/someSanitizedUrl$/);
+      expect(element.src).toMatch(/^http:\/\/.*\/someSanitizedUrl$/);
       expect($$sanitizeUri).toHaveBeenCalledWith($rootScope.testUrl, true);
     });
 
@@ -293,7 +293,7 @@ describe("ngProp*", () => {
       // protocol name.
       $rootScope.testUrl = $sce.trustAsMediaUrl("untrusted:foo();");
       await wait();
-      expect(element[0].src).toBe("untrusted:foo();");
+      expect(element.src).toBe("untrusted:foo();");
     });
   });
 
@@ -301,28 +301,28 @@ describe("ngProp*", () => {
     it("should NOT require trusted values for trusted URI values", () => {
       $rootScope.testUrl = "http://example.com/image.png"; // `http` is trusted
       let element = $compile('<a ng-prop-href="testUrl"></a>')($rootScope);
-      expect(element[0].href).toEqual("http://example.com/image.png");
+      expect(element.href).toEqual("http://example.com/image.png");
 
       element = $compile('<a ng-prop-href="testUrl"></a>')($rootScope);
-      expect(element[0].href).toEqual("http://example.com/image.png");
+      expect(element.href).toEqual("http://example.com/image.png");
     });
 
     it("should accept trusted values for non-trusted URI values", () => {
       $rootScope.testUrl = $sce.trustAsUrl("javascript:foo()"); // `javascript` is not trusted
       let element = $compile('<a ng-prop-href="testUrl"></a>')($rootScope);
-      expect(element[0].href).toEqual("javascript:foo()");
+      expect(element.href).toEqual("javascript:foo()");
 
       element = $compile('<a ng-prop-href="testUrl"></a>')($rootScope);
-      expect(element[0].href).toEqual("javascript:foo()");
+      expect(element.href).toEqual("javascript:foo()");
     });
 
     it("should sanitize non-trusted values", () => {
       $rootScope.testUrl = "javascript:foo()"; // `javascript` is not trusted
       let element = $compile('<a ng-prop-href="testUrl"></a>')($rootScope);
-      expect(element[0].href).toEqual("unsafe:javascript:foo()");
+      expect(element.href).toEqual("unsafe:javascript:foo()");
 
       element = $compile('<a ng-prop-href="testUrl"></a>')($rootScope);
-      expect(element[0].href).toEqual("unsafe:javascript:foo()");
+      expect(element.href).toEqual("unsafe:javascript:foo()");
     });
 
     it("should not sanitize href on elements other than anchor", async () => {
@@ -332,7 +332,7 @@ describe("ngProp*", () => {
       $rootScope.testUrl = "javascript:doEvilStuff()";
       await wait();
 
-      expect(element[0].href).toBe("javascript:doEvilStuff()");
+      expect(element.href).toBe("javascript:doEvilStuff()");
     });
 
     it("should not sanitize properties other then those configured", async () => {
@@ -340,7 +340,7 @@ describe("ngProp*", () => {
       $rootScope.testUrl = "javascript:doEvilStuff()";
       await wait();
 
-      expect(element[0].title).toBe("javascript:doEvilStuff()");
+      expect(element.title).toBe("javascript:doEvilStuff()");
     });
 
     it("should use $$sanitizeUri", async () => {
@@ -359,14 +359,14 @@ describe("ngProp*", () => {
       let element = $compile('<a ng-prop-href="testUrl"></a>')($rootScope);
       $rootScope.testUrl = "someUrl";
       await wait();
-      expect(element[0].href).toMatch(/^http:\/\/.*\/someSanitizedUrl$/);
+      expect(element.href).toMatch(/^http:\/\/.*\/someSanitizedUrl$/);
       expect($$sanitizeUri).toHaveBeenCalledWith($rootScope.testUrl, false);
 
       $$sanitizeUri.calls.reset();
 
       element = $compile('<a ng-prop-href="testUrl"></a>')($rootScope);
       await wait();
-      expect(element[0].href).toMatch(/^http:\/\/.*\/someSanitizedUrl$/);
+      expect(element.href).toMatch(/^http:\/\/.*\/someSanitizedUrl$/);
       expect($$sanitizeUri).toHaveBeenCalledWith($rootScope.testUrl, false);
     });
 
@@ -399,7 +399,7 @@ describe("ngProp*", () => {
       );
       $rootScope.testUrl = "different_page";
       await wait();
-      expect(element[0].src).toMatch(/\/different_page$/);
+      expect(element.src).toMatch(/\/different_page$/);
     });
 
     it("should clear out src properties for a different domain", async () => {
@@ -441,7 +441,7 @@ describe("ngProp*", () => {
       );
       await wait();
 
-      expect(element[0].src).toEqual("javascript:doTrustedStuff()");
+      expect(element.src).toEqual("javascript:doTrustedStuff()");
     });
   });
 
@@ -461,7 +461,7 @@ describe("ngProp*", () => {
 
       $rootScope.testUrl = $sce.trustAsResourceUrl("https://example.com/");
       await wait();
-      expect(element[0].href).toContain("https://example.com/");
+      expect(element.href).toContain("https://example.com/");
 
       $rootScope.testUrl = "https://not.example.com/";
       expect(async () => {
@@ -487,7 +487,7 @@ describe("ngProp*", () => {
       );
       $rootScope.testUrl = "different_page";
       await wait();
-      expect(element[0].action).toMatch(/\/different_page$/);
+      expect(element.action).toMatch(/\/different_page$/);
     });
 
     it("should clear out action property for a different domain", async () => {
@@ -529,7 +529,7 @@ describe("ngProp*", () => {
       );
       await wait();
 
-      expect(element[0].action).toEqual("javascript:doTrustedStuff()");
+      expect(element.action).toEqual("javascript:doTrustedStuff()");
     });
   });
 
@@ -561,15 +561,13 @@ describe("ngProp*", () => {
 
       $rootScope.testUrl = "./css1.css";
       await wait();
-      expect(element[0].href).toContain("css1.css");
+      expect(element.href).toContain("css1.css");
 
       $rootScope.testUrl = $sce.trustAsResourceUrl(
         "https://elsewhere.example.org/css2.css",
       );
       await wait();
-      expect(element[0].href).toContain(
-        "https://elsewhere.example.org/css2.css",
-      );
+      expect(element.href).toContain("https://elsewhere.example.org/css2.css");
     });
   });
 
@@ -731,7 +729,7 @@ describe("ngProp*", () => {
     it("should set style for trusted values", () => {
       const element = $compile('<div ng-prop-style="style"></div>')($rootScope);
       $rootScope.style = $sce.trustAsCss("margin-left: 10px");
-      expect(element[0].style["margin-left"]).toEqual("10px");
+      expect(element.style["margin-left"]).toEqual("10px");
     });
   });
 });

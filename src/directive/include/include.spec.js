@@ -589,7 +589,7 @@ describe("ngInclude", () => {
         $rootScope = injector.get("$rootScope");
         await wait();
         await wait(100);
-        expect(root[0]).toBe(element[0]);
+        expect(root[0]).toBe(element);
       });
     });
 

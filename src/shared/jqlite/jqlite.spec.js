@@ -240,7 +240,7 @@ describe("jqLite", () => {
 
     it("should walk up the dom to find data", () => {
       const element = JQLite("<ul><li><p><b>deep deep</b><p></li></ul>");
-      const deepChild = JQLite(element[0].getElementsByTagName("b")[0]);
+      const deepChild = JQLite(element.getElementsByTagName("b")[0]);
       element.data("myData", "abc");
       expect(deepChild.inheritedData("myData")).toBe("abc");
       dealoc(element);
@@ -248,7 +248,7 @@ describe("jqLite", () => {
 
     it("should return undefined when no data was found", () => {
       const element = JQLite("<ul><li><p><b>deep deep</b><p></li></ul>");
-      const deepChild = JQLite(element[0].getElementsByTagName("b")[0]);
+      const deepChild = JQLite(element.getElementsByTagName("b")[0]);
       expect(deepChild.inheritedData("myData")).toBeFalsy();
       dealoc(element);
     });
@@ -321,7 +321,7 @@ describe("jqLite", () => {
 
     it("should walk up the dom to find scope", () => {
       const element = JQLite("<ul><li><p><b>deep deep</b><p></li></ul>");
-      const deepChild = JQLite(element[0].getElementsByTagName("b")[0]);
+      const deepChild = JQLite(element.getElementsByTagName("b")[0]);
       element.data("$scope", scope);
       expect(deepChild.scope()).toBe(scope);
       dealoc(element);
@@ -329,7 +329,7 @@ describe("jqLite", () => {
 
     it("should return undefined when no scope was found", () => {
       const element = JQLite("<ul><li><p><b>deep deep</b><p></li></ul>");
-      const deepChild = JQLite(element[0].getElementsByTagName("b")[0]);
+      const deepChild = JQLite(element.getElementsByTagName("b")[0]);
       expect(deepChild.scope()).toBeFalsy();
       dealoc(element);
     });
@@ -345,7 +345,7 @@ describe("jqLite", () => {
 
     it("should not walk up the dom to find scope", () => {
       const element = JQLite("<ul><li><p><b>deep deep</b><p></li></ul>");
-      const deepChild = JQLite(element[0].getElementsByTagName("b")[0]);
+      const deepChild = JQLite(element.getElementsByTagName("b")[0]);
       element.data("$isolateScope", scope);
       expect(deepChild.isolateScope()).toBeUndefined();
       dealoc(element);
@@ -922,7 +922,7 @@ describe("jqLite", () => {
     it("should read/write value", () => {
       const element = JQLite("<div>ab</div><span>c</span>");
       expect(element.length).toEqual(2);
-      expect(element[0].innerHTML).toEqual("ab");
+      expect(element.innerHTML).toEqual("ab");
       expect(element[1].innerHTML).toEqual("c");
       expect(element.text()).toEqual("abc");
       expect(element.text("xyz") === element).toBeTruthy();
@@ -944,7 +944,7 @@ describe("jqLite", () => {
     it("should read/write a value", () => {
       const element = JQLite("<div>abc</div>");
       expect(element.length).toEqual(1);
-      expect(element[0].innerHTML).toEqual("abc");
+      expect(element.innerHTML).toEqual("abc");
       expect(element.innerHTML).toEqual("abc");
       expect(element.html("xyz") === element).toBeTruthy();
       expect(element.innerHTML).toEqual("xyz");
@@ -1060,7 +1060,7 @@ describe("jqLite", () => {
       element.on("click", clickSpy1);
       element.on("click", clickSpy2);
       element.on("click", clickSpy3);
-      element[0].addEventListener("click", clickSpy4);
+      element.addEventListener("click", clickSpy4);
 
       browserTrigger(element, "click");
 
@@ -1692,7 +1692,9 @@ describe("jqLite", () => {
       const root = JQLite("<div><span></span></div>");
       const span = root.find("span");
       expect(span.after("<i></i><b></b>")).toEqual(span);
-      expect(root.innerHTML.toLowerCase()).toEqual("<span></span><i></i><b></b>");
+      expect(root.innerHTML.toLowerCase()).toEqual(
+        "<span></span><i></i><b></b>",
+      );
     });
 
     it("should allow taking text", () => {
@@ -1807,7 +1809,7 @@ describe("jqLite", () => {
       element.triggerHandler("click");
       event = pokeSpy.calls.mostRecent().args[0];
       expect(event.preventDefault).toBeDefined();
-      expect(event.target).toEqual(element[0]);
+      expect(event.target).toEqual(element);
       expect(event.type).toEqual("click");
     });
 
@@ -1870,7 +1872,7 @@ describe("jqLite", () => {
       actualEvent = pokeSpy.calls.mostRecent().args[0];
       expect(actualEvent.preventDefault).toBeDefined();
       expect(actualEvent.someProp).toEqual("someValue");
-      expect(actualEvent.target).toEqual(element[0]);
+      expect(actualEvent.target).toEqual(element);
       expect(actualEvent.type).toEqual("click");
     });
 

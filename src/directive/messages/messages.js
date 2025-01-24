@@ -119,7 +119,7 @@ class NgMessageCtrl {
       this.messages[nextKey] = {
         message: messageCtrl,
       };
-      this.insertMessageNode(this.$element[0], comment, nextKey);
+      this.insertMessageNode(this.$element, comment, nextKey);
       comment.$$ngMessageNode = nextKey;
       this.latestKey++;
     }
@@ -133,7 +133,7 @@ class NgMessageCtrl {
     } else {
       const key = comment.$$ngMessageNode;
       delete comment.$$ngMessageNode;
-      this.removeMessageNode(this.$element[0], comment, key);
+      this.removeMessageNode(this.$element, comment, key);
       delete this.messages[key];
     }
     this.reRender();

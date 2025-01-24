@@ -1,3 +1,4 @@
+import { getCacheData, setCacheData } from "../../shared/jqlite/jqlite.js";
 import { hasAnimate, isObject, isString } from "../../shared/utils.js";
 
 function classDirective(name, selector) {
@@ -16,11 +17,11 @@ function classDirective(name, selector) {
       restrict: "EA",
       /**
        * @param {import("../../core/scope/scope").Scope} scope
-       * @param {import("../../shared/jqlite/jqlite.js").JQLite} element
+       * @param {Element} element
        * @param {import("../../core/compile/attributes").Attributes} attr
        */
       link(scope, element, attr) {
-        let classCounts = element.data("$classCounts");
+        let classCounts = getCacheData(element, "$classCounts");
         let oldModulo = true;
         let oldClassString;
 
@@ -28,7 +29,7 @@ function classDirective(name, selector) {
           // Use Object.create(null) to prevent class assumptions involving property
           // names in Object.prototype
           classCounts = Object.create(null);
-          element.data("$classCounts", classCounts);
+          setCacheData(element, "$classCounts", classCounts);
         }
 
         if (name !== "ngClass") {
@@ -49,7 +50,7 @@ function classDirective(name, selector) {
 
         function addClasses(classString) {
           classString = digestClassCounts(split(classString), 1);
-          if (hasAnimate(element[0])) {
+          if (hasAnimate(element)) {
             attr.$addClass(classString);
           } else {
             scope.$postUpdate(() => {
@@ -62,7 +63,7 @@ function classDirective(name, selector) {
 
         function removeClasses(classString) {
           classString = digestClassCounts(split(classString), -1);
-          if (hasAnimate(element[0])) {
+          if (hasAnimate(element)) {
             attr.$removeClass(classString);
           } else {
             scope.$postUpdate(() => {
@@ -82,7 +83,7 @@ function classDirective(name, selector) {
 
           const toRemoveString = digestClassCounts(toRemoveArray, -1);
           const toAddString = digestClassCounts(toAddArray, 1);
-          if (hasAnimate(element[0])) {
+          if (hasAnimate(element)) {
             attr.$addClass(toAddString);
             attr.$removeClass(toRemoveString);
           } else {

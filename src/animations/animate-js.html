@@ -14,14 +14,14 @@
             return {
               addClass: function (element, className, doneFn) {
                 anime({
-                  targets: element[0],
+                  targets: element,
                   translateX: parseInt(className),
                 });
               },
               removeClass: function (element, className, doneFn) {},
               setClass: function (element, className, removedClass, doneFn) {
                 anime({
-                  targets: element[0],
+                  targets: element,
                   translateX: parseInt(className),
                 });
               },

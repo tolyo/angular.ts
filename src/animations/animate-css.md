@@ -46,7 +46,7 @@
 - ngModule.animation('.fold-animation', ['$animateCss', function($animateCss) {
 - return {
 -     enter: function(element, doneFn) {
--       let height = element[0].offsetHeight;
+-       let height = element.offsetHeight;
 -       return $animateCss(element, {
 -         from: { height:'0px' },
 -         to: { height:height + 'px' },
@@ -79,7 +79,7 @@
 - ngModule.animation('.fold-animation', ['$animateCss', function($animateCss) {
 - return {
 -     enter: function(element, doneFn) {
--       let height = element[0].offsetHeight;
+-       let height = element.offsetHeight;
 -       return $animateCss(element, {
 -         addClass: 'red large-text pulse-twice',
 -         easing: 'ease-out',

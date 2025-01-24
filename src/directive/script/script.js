@@ -10,7 +10,7 @@ export function scriptDirective($templateCache) {
     terminal: true,
     compile(element, attr) {
       if (attr.type === "text/ng-template") {
-        $templateCache.set(attr.id, element[0].text);
+        $templateCache.set(attr.id, element.text);
       }
     },
   };

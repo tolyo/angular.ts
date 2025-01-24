@@ -800,17 +800,16 @@ function parseHtml(html) {
 export function dealoc(element, onlyDescendants) {
   if (!element) return;
   if (Array.isArray(element)) {
-    element.forEach(x => dealoc(x, onlyDescendants))
+    element.forEach((x) => dealoc(x, onlyDescendants));
   } else {
     if (!onlyDescendants && elementAcceptsData(element)) {
       cleanElementData([element]);
     }
-  
+
     if (elementAcceptsData(element)) {
       cleanElementData(element.querySelectorAll("*"));
     }
   }
-  
 }
 
 /**
@@ -995,8 +994,8 @@ export function setInheritedData(element, name, value) {
  */
 export function removeElement(element, keepData = false) {
   if (!keepData) {
-    dealoc(element)
-  };
+    dealoc(element);
+  }
   const parent = element.parentNode;
   if (parent) parent.removeChild(element);
 }

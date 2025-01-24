@@ -43,16 +43,16 @@ describe("event directives", () => {
       )($rootScope);
       // Support: Chrome 60+
       // We need to add the form to the DOM in order for `submit` events to be properly fired.
-      document.getElementById("dummy").appendChild(element[0]);
+      document.getElementById("dummy").appendChild(element);
 
       // prevent submit within the test harness
-      element[0].addEventListener("submit", (e) => {
+      element.addEventListener("submit", (e) => {
         e.preventDefault();
       });
 
       expect($rootScope.submitted).toBeUndefined();
 
-      element[0].dispatchEvent(new Event("submit"));
+      element.dispatchEvent(new Event("submit"));
       expect($rootScope.submitted).toEqual(true);
     });
 
@@ -70,16 +70,16 @@ describe("event directives", () => {
       )($rootScope);
       // Support: Chrome 60+ (on Windows)
       // We need to add the form to the DOM in order for `submit` events to be properly fired.
-      document.getElementById("dummy").appendChild(element[0]);
+      document.getElementById("dummy").appendChild(element);
 
       // prevent submit within the test harness
-      element[0].addEventListener("submit", (e) => {
+      element.addEventListener("submit", (e) => {
         e.preventDefault();
       });
 
       expect($rootScope.formSubmitted).toBeUndefined();
 
-      element[0].dispatchEvent(new Event("submit"));
+      element.dispatchEvent(new Event("submit"));
       expect($rootScope.formSubmitted).toEqual("foo");
     });
   });
@@ -133,7 +133,7 @@ describe("event directives", () => {
       element.triggerHandler("click");
       await wait();
       // TODO
-      // expect(scope.e.target).toBe(element[0]);
+      // expect(scope.e.target).toBe(element);
       expect(scope.e.target).toBeDefined();
     });
   });
@@ -216,7 +216,7 @@ describe("event directives", () => {
       };
 
       $rootScope.do = function () {
-        element[0].click();
+        element.click();
       };
 
       $rootScope.do();
@@ -255,7 +255,7 @@ describe("event directives", () => {
         throw new Error("listener error");
       };
 
-      element[0].click();
+      element.click();
       logs.push("done");
       await wait();
       expect(logs[0]).toEqual("listener error");
