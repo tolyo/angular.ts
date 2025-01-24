@@ -473,7 +473,12 @@ export function AnimateProvider($provide) {
             "leave",
             prepareAnimateOptions(options),
             () => {
-              removeElement(element);
+              // TODO no array should be here
+              if (Array.isArray(element)) {
+                element.forEach(x => removeElement(x))
+              } else {
+                removeElement(element);
+              }
             },
           );
         },

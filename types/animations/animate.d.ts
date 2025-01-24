@@ -306,11 +306,11 @@ export class AnimateProvider {
          * When the function is called a promise is returned that will be resolved during the next
          * digest once the animation has completed.
          *
-         * @param {JQLite} element the element which will be removed from the DOM
+         * @param {Element} element the element which will be removed from the DOM
          * @param {AnimationOptions} [options] an optional collection of options/styles that will be applied to the element.
          * @returns {import('./animate-runner').AnimateRunner} the animation runner
          */
-        leave(element: JQLite, options?: AnimationOptions): import("./animate-runner").AnimateRunner;
+        leave(element: Element, options?: AnimationOptions): import("./animate-runner").AnimateRunner;
         /**
          * Triggers an addClass animation surrounding the addition of the provided CSS class(es). Upon
          * execution, the addClass operation will only be handled after the next digest and it will not trigger an

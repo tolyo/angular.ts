@@ -597,7 +597,7 @@ describe("jqLite", () => {
       element.on("$destroy", function () {
         log += "destroy;";
       });
-      element.remove();
+      removeElement(element);
       expect(log).toEqual("destroy;");
     });
 
@@ -1692,9 +1692,7 @@ describe("jqLite", () => {
       const root = JQLite("<div><span></span></div>");
       const span = root.find("span");
       expect(span.after("<i></i><b></b>")).toEqual(span);
-      expect(root.innerHTML.toLowerCase()).toEqual(
-        "<span></span><i></i><b></b>",
-      );
+      expect(root.innerHTML.toLowerCase()).toEqual("<span></span><i></i><b></b>");
     });
 
     it("should allow taking text", () => {
