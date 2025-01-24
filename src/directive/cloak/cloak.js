@@ -6,7 +6,7 @@ export function ngCloakDirective() {
     restrict: "EA",
     compile(element, attr) {
       attr.$set("ngCloak", undefined);
-      element[0].classList.remove("ng-cloak");
+      element.classList.remove("ng-cloak");
     },
   };
 }

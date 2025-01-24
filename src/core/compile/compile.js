@@ -1,9 +1,11 @@
 import {
-  JQLite,
   cleanElementData,
   getBooleanAttrName,
+  getCacheData,
+  getInheritedData,
   getOrSetCacheData,
   isTextNode,
+  setCacheData,
   startingTag,
 } from "../../shared/jqlite/jqlite.js";
 import { identifierForController } from "../controller/controller.js";
@@ -588,7 +590,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
         ignoreDirective,
         previousCompileContext,
       ) {
-        let jqCompileNodes = JQLite($compileNodes);
+        let jqCompileNodes = [$compileNodes];
 
         /**
          * @type {CompositeLinkFn}
@@ -655,9 +657,9 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
               ),
             );
           } else if (cloneConnectFn) {
-            let elements = jqCompileNodes
-              .elements()
-              .map((element) => element.cloneNode(true));
+            let elements = jqCompileNodes.map((element) =>
+              element.cloneNode(true),
+            );
             $linkNode = new JQLite(elements);
           } else {
             $linkNode = jqCompileNodes;
@@ -708,7 +710,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
        * @param {NodeList|JQLite} nodeList an array of nodes or NodeList to compile
        * @param {*} transcludeFn A linking function, where the
        *        scope argument is auto-generated to the new child of the transcluded parent scope.
-       * @param {JQLite} [$rootElement] If the nodeList is the root of the compilation tree then
+       * @param {Element} [$rootElement] If the nodeList is the root of the compilation tree then
        *        the rootElement must be set the JQLite collection of the compile root. This is
        *        needed so that the JQLite collection items can be replaced with widgets.
        * @param {number=} [maxPriority] Max directive priority.
@@ -1224,7 +1226,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
         let hasTranscludeDirective = false;
         let hasTemplate = false;
         let { hasElementTranscludeDirective } = previousCompileContext;
-        let $compileNode = (templateAttrs.$$element = JQLite(compileNode));
+        let $compileNode = (templateAttrs.$$element = compileNode);
         let directive;
         let directiveName;
         let $template;
@@ -1329,7 +1331,8 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
             // Controller instance is bound to the scope
             const controllerInstance = controller();
             controller.instance = controllerScope.$new(controllerInstance);
-            $element.data(
+            setCacheData(
+              $element,
               `$${controllerDirective.name}Controller`,
               controller.instance,
             );
@@ -1410,7 +1413,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
             invokeLinkFn(
               linkFn,
               linkFn.isolateScope ? isolateScope : scope,
-              $element[0],
+              $element,
               attrs,
               controllers,
               transcludeFn,
@@ -1452,7 +1455,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
             invokeLinkFn(
               linkFn,
               linkFn.isolateScope ? isolateScope : scope,
-              $element[0],
+              $element,
               attrs,
               controllers,
               transcludeFn,
@@ -1491,7 +1494,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
             }
             if (!futureParentElement) {
               futureParentElement = hasElementTranscludeDirective
-                ? $element.parent()
+                ? $element.parentElement
                 : $element;
             }
             if (slotName) {
@@ -1654,11 +1657,10 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
               hasElementTranscludeDirective = true;
               terminalPriority = directive.priority;
               $template = $compileNode;
-              $compileNode = templateAttrs.$$element = JQLite(
-                document.createComment(""),
-              );
-              compileNode = $compileNode[0];
-              replaceWith(jqCollection, sliceArgs($template), compileNode);
+              $compileNode = templateAttrs.$$element =
+                document.createComment("");
+              compileNode = $compileNode;
+              replaceWith(jqCollection, [$template], compileNode);
 
               childTranscludeFn = compilationGenerator(
                 mightHaveMultipleTransclusionError,
@@ -1904,7 +1906,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                 );
               }
             } catch (e) {
-              $exceptionHandler(e, startingTag($compileNode[0]));
+              $exceptionHandler(e, startingTag($compileNode));
             }
           }
 
@@ -1974,7 +1976,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
 
           // If only parents then start at the parent element
           if (inheritType === "^^") {
-            $element = $element.parent();
+            $element = $element.parentElement;
             // Otherwise attempt getting the controller from elementControllers in case
             // the element is transcluded (and has no data) and to avoid .data if possible
           } else {
@@ -1995,8 +1997,8 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
               value = null;
             } else {
               value = inheritType
-                ? $element.inheritedData(dataName)
-                : $element.data(dataName);
+                ? getInheritedData($element, dataName)
+                : getCacheData($element, dataName);
             }
           }
 
@@ -2072,7 +2074,8 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
           // Instead, we save the controllers for the element in a local hash and attach to .data
           // later, once we have the actual element.
           elementControllers[directive.name] = controllerInstance;
-          $element.data(
+          setCacheData(
+            $element,
             `$${directive.name}Controller`,
             controllerInstance.instance,
           );
@@ -2733,7 +2736,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                     if (name === "class") {
                       attr.$updateClass(
                         newValue,
-                        attr.$$element[0].classList.value,
+                        attr.$$element.classList.value,
                       );
                     } else {
                       attr.$set(name, newValue);

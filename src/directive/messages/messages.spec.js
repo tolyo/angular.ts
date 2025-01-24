@@ -330,15 +330,15 @@ describe("ngMessages", () => {
       $rootScope.col = {};
     });
 
-    expect(element[0].classList.contains("ng-active")).toBe(false);
-    expect(element[0].classList.contains("ng-inactive")).toBe(true);
+    expect(element.classList.contains("ng-active")).toBe(false);
+    expect(element.classList.contains("ng-inactive")).toBe(true);
 
     $rootScope.$apply(() => {
       $rootScope.col = { ready: true };
     });
 
-    expect(element[0].classList.contains("ng-active")).toBe(true);
-    expect(element[0].classList.contains("ng-inactive")).toBe(false);
+    expect(element.classList.contains("ng-active")).toBe(true);
+    expect(element.classList.contains("ng-inactive")).toBe(false);
   });
 
   it("should automatically re-render the messages when other directives dynamically change them", () => {
@@ -659,28 +659,28 @@ describe("ngMessages", () => {
       });
 
       expect(element.text().trim()).toBe("");
-      expect(element[0].classList.contains("ng-active")).toBeFalse();
+      expect(element.classList.contains("ng-active")).toBeFalse();
 
       $rootScope.$apply(() => {
         $rootScope.col = { unexpected: true };
       });
 
       expect(element.text().trim()).toBe("Default message is set");
-      expect(element[0].classList.contains("ng-active")).toBeTrue();
+      expect(element.classList.contains("ng-active")).toBeTrue();
 
       $rootScope.$apply(() => {
         $rootScope.col = { unexpected: false };
       });
 
       expect(element.text().trim()).toBe("");
-      expect(element[0].classList.contains("ng-active")).toBeFalse();
+      expect(element.classList.contains("ng-active")).toBeFalse();
 
       $rootScope.$apply(() => {
         $rootScope.col = { val: true, unexpected: true };
       });
 
       expect(element.text().trim()).toBe("Message is set");
-      expect(element[0].classList.contains("ng-active")).toBeTrue();
+      expect(element.classList.contains("ng-active")).toBeTrue();
     });
 
     it("should not render a default message with ng-messages-multiple if another error matches", () => {

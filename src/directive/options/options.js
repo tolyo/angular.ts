@@ -240,7 +240,7 @@ export const ngOptionsDirective = [
       const providedEmptyOption = !!selectCtrl.emptyOption;
 
       const unknownOption = JQLite(optionTemplate.cloneNode(false));
-      unknownOption.val("?");
+      unknownOption.value = "?";
 
       let options;
       const ngOptions = parseOptionsExpression(

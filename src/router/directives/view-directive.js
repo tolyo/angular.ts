@@ -5,7 +5,12 @@ import { parse } from "../../shared/hof.js";
 import { ResolveContext } from "../resolve/resolve-context.js";
 import { trace } from "../common/trace.js";
 import { Ng1ViewConfig } from "../state/views.js";
-import { JQLite } from "../../shared/jqlite/jqlite.js";
+import {
+  getCacheData,
+  getInheritedData,
+  JQLite,
+  setCacheData,
+} from "../../shared/jqlite/jqlite.js";
 import { getLocals } from "../state/state-registry.js";
 /**
  * `ng-view`: A viewport directive which is filled in by a view from the active state.
@@ -166,7 +171,7 @@ export let ngView = [
           const onloadExp = attrs["onload"] || "",
             autoScrollExp = attrs["autoscroll"],
             renderer = getRenderer(),
-            inherited = $element.inheritedData("$ngView") || rootData,
+            inherited = getInheritedData($element, "$ngView") || rootData,
             name =
               $interpolate(attrs["ngView"] || attrs["name"] || "")(scope) ||
               "$default";
@@ -202,7 +207,7 @@ export let ngView = [
             updateView(config);
           }
 
-          $element.data("$ngView", { $ngView: activeUIView });
+          setCacheData($element, "$ngView", { $ngView: activeUIView });
           updateView();
           const unregister = $view.registerUIView(activeUIView);
           scope.$on("$destroy", function () {
@@ -298,7 +303,7 @@ export function $ViewDirectiveFill($compile, $controller, $transitions) {
       const initial = tElement.html();
       tElement.empty();
       return function (scope, $element) {
-        const data = $element.data("$ngView");
+        const data = getCacheData($element, "$ngView");
         if (!data) {
           $element.innerHTML = initial;
           $compile($element[0].contentDocument || $element[0].childNodes)(
@@ -333,7 +338,7 @@ export function $ViewDirectiveFill($compile, $controller, $transitions) {
           // Then, when a component is created, tell the $view service, so it can invoke hooks
           // $view.componentLoaded(controllerInstance, { $scope: scope, $element: $element });
           // scope.$on('$destroy', () => $view.componentUnloaded(controllerInstance, { $scope: scope, $element: $element }));
-          $element.data("$ngControllerController", controllerInstance);
+          setCacheData($element, "$ngControllerController", controllerInstance);
           $element
             .children()
             .data("$ngControllerController", controllerInstance);

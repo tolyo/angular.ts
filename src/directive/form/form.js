@@ -108,7 +108,7 @@ export class FormController {
     this.$$success = {};
     this.$pending = undefined;
     this.$$classCache = {};
-    const isValid = this.$$element[0].classList.contains(VALID_CLASS);
+    const isValid = this.$$element.classList.contains(VALID_CLASS);
     this.$$classCache[VALID_CLASS] = isValid;
     this.$$classCache[INVALID_CLASS] = !isValid;
   }
@@ -640,5 +640,5 @@ export const ngFormDirective = formDirectiveFactory("ngForm");
 export function setupValidity(instance) {
   instance.$$classCache = {};
   instance.$$classCache[INVALID_CLASS] = !(instance.$$classCache[VALID_CLASS] =
-    instance.$$element[0].classList.contains(VALID_CLASS));
+    instance.$$element.classList.contains(VALID_CLASS));
 }

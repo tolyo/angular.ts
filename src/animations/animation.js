@@ -310,7 +310,7 @@ export function AnimationProvider() {
 
               const prepareClassName = element.data(PREPARE_CLASSES_KEY);
               if (prepareClassName) {
-                element[0].classList.add(prepareClassName);
+                element.classList.add(prepareClassName);
               }
             }
           }
@@ -463,7 +463,7 @@ export function AnimationProvider() {
           element.className += ` ${tempClasses}`;
           let prepareClassName = element.data(PREPARE_CLASSES_KEY);
           if (prepareClassName) {
-            element[0].classList.remove(prepareClassName);
+            element.classList.remove(prepareClassName);
             prepareClassName = null;
           }
         }
@@ -500,7 +500,7 @@ export function AnimationProvider() {
           if (tempClasses) {
             tempClasses
               .split(" ")
-              .forEach((cls) => element[0].classList.remove(cls));
+              .forEach((cls) => element.classList.remove(cls));
           }
 
           runner.complete(!rejected);

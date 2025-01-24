@@ -26,10 +26,10 @@ describe("ngShow / ngHide", () => {
       element = JQLite('<div ng-show="exp"></div>');
       element = $compile(element)($scope);
       await wait();
-      expect(element[0].classList.contains("ng-hide")).toBeTrue();
+      expect(element.classList.contains("ng-hide")).toBeTrue();
       $scope.exp = true;
       await wait();
-      expect(element[0].classList.contains("ng-hide")).toBeFalse();
+      expect(element.classList.contains("ng-hide")).toBeFalse();
     });
 
     // https://github.com/angular/angular.js/issues/5414
@@ -38,17 +38,17 @@ describe("ngShow / ngHide", () => {
       element = $compile(element)($scope);
       $scope.exp = function () {};
       await wait();
-      expect(element[0].classList.contains("ng-hide")).toBeFalse();
+      expect(element.classList.contains("ng-hide")).toBeFalse();
     });
 
     it("should make hidden element visible", async () => {
       element = JQLite('<div class="ng-hide" ng-show="exp"></div>');
       element = $compile(element)($scope);
       await wait();
-      expect(element[0].classList.contains("ng-hide")).toBeTrue();
+      expect(element.classList.contains("ng-hide")).toBeTrue();
       $scope.exp = true;
       await wait();
-      expect(element[0].classList.contains("ng-hide")).toBeFalse();
+      expect(element.classList.contains("ng-hide")).toBeFalse();
     });
 
     ["false", "undefined", "null", "NaN", "''", "0"].forEach((x) => {
@@ -56,7 +56,7 @@ describe("ngShow / ngHide", () => {
         element = JQLite(`<div ng-show="${x}"></div>`);
         element = $compile(element)($scope);
         await wait();
-        expect(element[0].classList.contains("ng-hide")).toBeTrue();
+        expect(element.classList.contains("ng-hide")).toBeTrue();
       });
     });
 
@@ -67,7 +67,7 @@ describe("ngShow / ngHide", () => {
           element = JQLite(`<div ng-show="${x}"></div>`);
           element = $compile(element)($scope);
           await wait();
-          expect(element[0].classList.contains("ng-hide")).toBeFalse();
+          expect(element.classList.contains("ng-hide")).toBeFalse();
         },
       );
     });
@@ -79,7 +79,7 @@ describe("ngShow / ngHide", () => {
           element = JQLite(`<div ng-show="${x}"></div>`);
           element = $compile(element)($scope);
           await wait();
-          expect(element[0].classList.contains("ng-hide")).toBeFalse();
+          expect(element.classList.contains("ng-hide")).toBeFalse();
         },
       );
     });
@@ -90,10 +90,10 @@ describe("ngShow / ngHide", () => {
       element = JQLite('<div ng-hide="exp"></div>');
       element = $compile(element)($scope);
       await wait();
-      expect(element[0].classList.contains("ng-hide")).toBeFalse();
+      expect(element.classList.contains("ng-hide")).toBeFalse();
       $scope.exp = true;
       await wait();
-      expect(element[0].classList.contains("ng-hide")).toBeTrue();
+      expect(element.classList.contains("ng-hide")).toBeTrue();
     });
 
     ["false", "undefined", "null", "NaN", "''", "0"].forEach((x) => {
@@ -101,7 +101,7 @@ describe("ngShow / ngHide", () => {
         element = JQLite(`<div ng-hide="${x}"></div>`);
         element = $compile(element)($scope);
         await wait();
-        expect(element[0].classList.contains("ng-hide")).toBeFalse();
+        expect(element.classList.contains("ng-hide")).toBeFalse();
       });
     });
 
@@ -112,7 +112,7 @@ describe("ngShow / ngHide", () => {
           element = JQLite(`<div ng-hide="${x}"></div>`);
           element = $compile(element)($scope);
           await wait();
-          expect(element[0].classList.contains("ng-hide")).toBeTrue();
+          expect(element.classList.contains("ng-hide")).toBeTrue();
         },
       );
     });
@@ -122,7 +122,7 @@ describe("ngShow / ngHide", () => {
         element = JQLite(`<div ng-hide="${x}"></div>`);
         element = $compile(element)($scope);
         await wait();
-        expect(element[0].classList.contains("ng-hide")).toBeTrue();
+        expect(element.classList.contains("ng-hide")).toBeTrue();
       });
     });
   });

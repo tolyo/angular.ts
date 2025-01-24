@@ -278,11 +278,11 @@ describe("binding", () => {
     $rootScope.hidden = 3;
     await wait();
 
-    expect(element[0].classList.contains("ng-hide")).toBe(true);
+    expect(element.classList.contains("ng-hide")).toBe(true);
 
     $rootScope.hidden = 2;
     await wait();
-    expect(element[0].classList.contains("ng-hide")).toBe(false);
+    expect(element.classList.contains("ng-hide")).toBe(false);
   });
 
   it("HideBinding", async () => {
@@ -290,23 +290,23 @@ describe("binding", () => {
 
     $rootScope.hidden = "true";
     await wait();
-    expect(element[0].classList.contains("ng-hide")).toBeTrue();
+    expect(element.classList.contains("ng-hide")).toBeTrue();
 
     $rootScope.hidden = "false";
     await wait();
-    expect(element[0].classList.contains("ng-hide")).toBeTrue();
+    expect(element.classList.contains("ng-hide")).toBeTrue();
 
     $rootScope.hidden = 0;
     await wait();
-    expect(element[0].classList.contains("ng-hide")).toBeFalse();
+    expect(element.classList.contains("ng-hide")).toBeFalse();
 
     $rootScope.hidden = false;
     await wait();
-    expect(element[0].classList.contains("ng-hide")).toBeFalse();
+    expect(element.classList.contains("ng-hide")).toBeFalse();
 
     $rootScope.hidden = "";
     await wait();
-    expect(element[0].classList.contains("ng-hide")).toBeFalse();
+    expect(element.classList.contains("ng-hide")).toBeFalse();
   });
 
   it("ShowBinding", async () => {
@@ -314,19 +314,19 @@ describe("binding", () => {
 
     $rootScope.show = "true";
     await wait();
-    expect(element[0].classList.contains("ng-hide")).toBeFalse();
+    expect(element.classList.contains("ng-hide")).toBeFalse();
 
     $rootScope.show = "false";
     await wait();
-    expect(element[0].classList.contains("ng-hide")).toBeFalse();
+    expect(element.classList.contains("ng-hide")).toBeFalse();
 
     $rootScope.show = false;
     await wait();
-    expect(element[0].classList.contains("ng-hide")).toBeTrue();
+    expect(element.classList.contains("ng-hide")).toBeTrue();
 
     $rootScope.show = "";
     await wait();
-    expect(element[0].classList.contains("ng-hide")).toBeTrue();
+    expect(element.classList.contains("ng-hide")).toBeTrue();
   });
 
   it("BindClass", async () => {
@@ -335,12 +335,12 @@ describe("binding", () => {
     $rootScope.clazz = "testClass";
     await wait();
 
-    expect(element[0].classList.contains("testClass")).toBeTrue();
+    expect(element.classList.contains("testClass")).toBeTrue();
 
     $rootScope.clazz = ["a", "b"];
     await wait();
-    expect(element[0].classList.contains("a")).toBeTrue();
-    expect(element[0].classList.contains("b")).toBeTrue();
+    expect(element.classList.contains("a")).toBeTrue();
+    expect(element.classList.contains("b")).toBeTrue();
   });
 
   it("BindClassEvenOdd", async () => {

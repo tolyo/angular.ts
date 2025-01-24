@@ -24,7 +24,7 @@ describe("select", () => {
 
   function setSelectValue(selectElement, optionIndex) {
     const option = selectElement.find("option").eq(optionIndex);
-    selectElement.val(option.value);
+    selectElement.value = option.value;
     browserTrigger(element, "change");
   }
 
@@ -208,18 +208,18 @@ describe("select", () => {
 
         scope.selection = "a";
         await wait();
-        expect(element[0].classList.contains("ng-valid")).toBeTrue();
+        expect(element.classList.contains("ng-valid")).toBeTrue();
         expect(ngModelCtrl.$error.required).toBeFalsy();
 
         let options = element.find("option");
 
         // view -> model
         setSelectValue(element, 0);
-        expect(element[0].classList.contains("ng-invalid")).toBeTrue();
+        expect(element.classList.contains("ng-invalid")).toBeTrue();
         expect(ngModelCtrl.$error.required).toBeTruthy();
 
         setSelectValue(element, 1);
-        expect(element[0].classList.contains("ng-valid")).toBeTrue();
+        expect(element.classList.contains("ng-valid")).toBeTrue();
         expect(ngModelCtrl.$error.required).toBeFalsy();
 
         // // model -> view
@@ -227,7 +227,7 @@ describe("select", () => {
         await wait();
         options = element.find("option");
         expect(options[0].selected).toBe(true);
-        expect(element[0].classList.contains("ng-invalid")).toBeTrue();
+        expect(element.classList.contains("ng-invalid")).toBeTrue();
         expect(ngModelCtrl.$error.required).toBeTruthy();
       });
 
@@ -245,23 +245,23 @@ describe("select", () => {
         const options = element.find("option");
 
         setSelectValue(element, 0);
-        expect(element[0].classList.contains("ng-valid")).toBeTrue();
+        expect(element.classList.contains("ng-valid")).toBeTrue();
 
         scope.$apply("required = true");
         await wait();
-        expect(element[0].classList.contains("ng-invalid")).toBeTrue();
+        expect(element.classList.contains("ng-invalid")).toBeTrue();
 
         scope.$apply('selection = "a"');
         await wait();
-        expect(element[0].classList.contains("ng-valid")).toBeTrue();
+        expect(element.classList.contains("ng-valid")).toBeTrue();
         expect(element[0].value).toBe("a");
 
         setSelectValue(element, 0);
-        expect(element[0].classList.contains("ng-invalid")).toBeTrue();
+        expect(element.classList.contains("ng-invalid")).toBeTrue();
 
         scope.$apply("required = false");
         await wait();
-        expect(element[0].classList.contains("ng-valid")).toBeTrue();
+        expect(element.classList.contains("ng-valid")).toBeTrue();
       });
 
       it("should not be invalid if no required attribute is present", async () => {
@@ -272,8 +272,8 @@ describe("select", () => {
             "</select>",
         );
         await wait();
-        expect(element[0].classList.contains("ng-valid")).toBeTrue();
-        expect(element[0].classList.contains("ng-pristine")).toBeTrue();
+        expect(element.classList.contains("ng-valid")).toBeTrue();
+        expect(element.classList.contains("ng-pristine")).toBeTrue();
       });
 
       it("should NOT set the error if the unknown option is selected", async () => {
@@ -287,13 +287,13 @@ describe("select", () => {
         scope.selection = "a";
         await wait();
 
-        expect(element[0].classList.contains("ng-valid")).toBeTrue();
+        expect(element.classList.contains("ng-valid")).toBeTrue();
         expect(ngModelCtrl.$error.required).toBeFalsy();
 
         scope.$apply('selection = "c"');
         await wait();
         expect(element[0].value).toBe(unknownValue("c"));
-        expect(element[0].classList.contains("ng-valid")).toBeTrue();
+        expect(element.classList.contains("ng-valid")).toBeTrue();
         expect(ngModelCtrl.$error.required).toBeFalsy();
       });
     });
@@ -1312,20 +1312,20 @@ describe("select", () => {
       });
 
       expect(scope.form.select.$error.required).toBeTruthy();
-      expect(element[0].classList.contains("ng-invalid")).toBeTrue();
-      expect(element[0].classList.contains("ng-pristine")).toBeTrue();
+      expect(element.classList.contains("ng-invalid")).toBeTrue();
+      expect(element.classList.contains("ng-pristine")).toBeTrue();
 
       scope.$apply(() => {
         scope.selection = ["A"];
       });
 
-      expect(element[0].classList.contains("ng-valid")).toBeTrue();
-      expect(element[0].classList.contains("ng-pristine")).toBeTrue();
+      expect(element.classList.contains("ng-valid")).toBeTrue();
+      expect(element.classList.contains("ng-pristine")).toBeTrue();
 
       element[0].value = "B";
       browserTrigger(element, "change");
-      expect(element[0].classList.contains("ng-valid")).toBeTrue();
-      expect(element[0].classList.contains("ng-dirty")).toBeTrue();
+      expect(element.classList.contains("ng-valid")).toBeTrue();
+      expect(element.classList.contains("ng-dirty")).toBeTrue();
     });
 
     describe("calls to $render", () => {
@@ -2431,7 +2431,7 @@ describe("select", () => {
         );
 
         expect(element[0].value).toBe("A");
-        expect(element[0].classList.contains("ng-valid")).toBeTrue();
+        expect(element.classList.contains("ng-valid")).toBeTrue();
         expect(ngModelCtrl.$error.required).toBeFalsy();
 
         scope.$apply(() => {
@@ -2440,7 +2440,7 @@ describe("select", () => {
         });
 
         expect(element[0].value).toBe("");
-        expect(element[0].classList.contains("ng-invalid")).toBeTrue();
+        expect(element.classList.contains("ng-invalid")).toBeTrue();
         expect(ngModelCtrl.$error.required).toBeTruthy();
         // ngModel sets undefined for invalid values
         expect(scope.selection).toBeUndefined();

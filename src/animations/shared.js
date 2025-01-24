@@ -166,11 +166,11 @@ export function extractElementNode(element) {
 export function applyAnimationClassesFactory() {
   return function (element, options) {
     if (options.addClass) {
-      element[0].classList.add(...options.addClass.trim().split(" "));
+      element.classList.add(...options.addClass.trim().split(" "));
       options.addClass = null;
     }
     if (options.removeClass) {
-      element[0].classList.remove(...options.removeClass.trim().split(" "));
+      element.classList.remove(...options.removeClass.trim().split(" "));
       options.removeClass = null;
     }
   };
@@ -350,13 +350,13 @@ export function clearGeneratedClasses(element, options) {
   if (options.preparationClasses) {
     options.preparationClasses
       .split(" ")
-      .forEach((cls) => element[0].classList.remove(cls));
+      .forEach((cls) => element.classList.remove(cls));
     options.preparationClasses = null;
   }
   if (options.activeClasses) {
     options.activeClasses
       .split(" ")
-      .forEach((cls) => element[0].classList.remove(cls));
+      .forEach((cls) => element.classList.remove(cls));
     options.activeClasses = null;
   }
 }

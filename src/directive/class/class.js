@@ -54,7 +54,7 @@ function classDirective(name, selector) {
           } else {
             scope.$postUpdate(() => {
               if (classString !== "") {
-                element[0].classList.add(...classString.trim().split(" "));
+                element.classList.add(...classString.trim().split(" "));
               }
             });
           }
@@ -67,7 +67,7 @@ function classDirective(name, selector) {
           } else {
             scope.$postUpdate(() => {
               if (classString !== "") {
-                element[0].classList.remove(...classString.trim().split(" "));
+                element.classList.remove(...classString.trim().split(" "));
               }
             });
           }
@@ -87,10 +87,10 @@ function classDirective(name, selector) {
             attr.$removeClass(toRemoveString);
           } else {
             if (toAddString !== "") {
-              element[0].classList.add(...toAddString.trim().split(" "));
+              element.classList.add(...toAddString.trim().split(" "));
             }
             if (toRemoveString !== "") {
-              element[0].classList.remove(...toRemoveString.trim().split(" "));
+              element.classList.remove(...toRemoveString.trim().split(" "));
             }
           }
         }

@@ -1056,7 +1056,7 @@ describe("$compile", () => {
         "<my-directive></my-directive>",
         function (element, attrs) {
           attrs.$addClass("some-class");
-          expect(element[0].classList.contains("some-class")).toBe(true);
+          expect(element.classList.contains("some-class")).toBe(true);
         },
       );
     });
@@ -1067,7 +1067,7 @@ describe("$compile", () => {
         '<my-directive class="some-class"></my-directive>',
         function (element, attrs) {
           attrs.$removeClass("some-class");
-          expect(element[0].classList.contains("some-class")).toBe(false);
+          expect(element.classList.contains("some-class")).toBe(false);
         },
       );
     });
@@ -1078,10 +1078,10 @@ describe("$compile", () => {
         '<my-directive class="one three four"></my-directive>',
         function (element, attrs) {
           attrs.$updateClass("one two three", "one three four");
-          expect(element[0].classList.contains("one")).toBe(true);
-          expect(element[0].classList.contains("two")).toBe(true);
-          expect(element[0].classList.contains("three")).toBe(true);
-          expect(element[0].classList.contains("four")).toBe(false);
+          expect(element.classList.contains("one")).toBe(true);
+          expect(element.classList.contains("two")).toBe(true);
+          expect(element.classList.contains("three")).toBe(true);
+          expect(element.classList.contains("four")).toBe(false);
         },
       );
     });
@@ -5339,7 +5339,7 @@ describe("$compile", () => {
           $rootScope,
         );
         await wait();
-        expect(element[0].classList.contains("class_2")).toBeTrue();
+        expect(element.classList.contains("class_2")).toBeTrue();
       });
 
       fit("should merge interpolated css class", async () => {
@@ -5352,10 +5352,10 @@ describe("$compile", () => {
         $rootScope.cls = "two";
         await wait();
 
-        expect(element[0].classList.contains("one")).toBeTrue();
-        expect(element[0].classList.contains("two")).toBeTrue(); // interpolated
-        expect(element[0].classList.contains("three")).toBeTrue();
-        expect(element[0].classList.contains("log")).toBeTrue(); // merged from replace directive template
+        expect(element.classList.contains("one")).toBeTrue();
+        expect(element.classList.contains("two")).toBeTrue(); // interpolated
+        expect(element.classList.contains("three")).toBeTrue();
+        expect(element.classList.contains("log")).toBeTrue(); // merged from replace directive template
       });
 
       fit("should merge interpolated css class with ngRepeat", async () => {
@@ -5987,8 +5987,8 @@ describe("$compile", () => {
           node[0].classList.add("clonefn-class");
         });
         await wait();
-        expect(element[0].classList.contains("template-class")).toBeTrue();
-        expect(element[0].classList.contains("clonefn-class")).toBeTrue();
+        expect(element.classList.contains("template-class")).toBeTrue();
+        expect(element.classList.contains("clonefn-class")).toBeTrue();
       });
 
       describe("delay compile / linking functions until after template is resolved", () => {
@@ -16070,7 +16070,7 @@ describe("$compile", () => {
 
   //     ;
 
-  //     expect(element[0].classList.contains("fire")).toBe(true);
+  //     expect(element.classList.contains("fire")).toBe(true);
 
   //     $rootScope.val1 = "ice";
   //     $rootScope.val2 = "rice";
@@ -16080,9 +16080,9 @@ describe("$compile", () => {
   //     expect(data.event).toBe("addClass");
   //     expect(data.args[1]).toBe("ice rice");
 
-  //     expect(element[0].classList.contains("ice")).toBe(true);
-  //     expect(element[0].classList.contains("rice")).toBe(true);
-  //     expect(element[0].classList.contains("fire")).toBe(true);
+  //     expect(element.classList.contains("ice")).toBe(true);
+  //     expect(element.classList.contains("rice")).toBe(true);
+  //     expect(element.classList.contains("fire")).toBe(true);
 
   //     $rootScope.val2 = "dice";
   //     ;
@@ -16095,9 +16095,9 @@ describe("$compile", () => {
   //     expect(data.event).toBe("removeClass");
   //     expect(data.args[1]).toBe("rice");
 
-  //     expect(element[0].classList.contains("ice")).toBe(true);
-  //     expect(element[0].classList.contains("dice")).toBe(true);
-  //     expect(element[0].classList.contains("fire")).toBe(true);
+  //     expect(element.classList.contains("ice")).toBe(true);
+  //     expect(element.classList.contains("dice")).toBe(true);
+  //     expect(element.classList.contains("fire")).toBe(true);
 
   //     $rootScope.val1 = "";
   //     $rootScope.val2 = "";
@@ -16107,9 +16107,9 @@ describe("$compile", () => {
   //     expect(data.event).toBe("removeClass");
   //     expect(data.args[1]).toBe("ice dice");
 
-  //     expect(element[0].classList.contains("ice")).toBe(false);
-  //     expect(element[0].classList.contains("dice")).toBe(false);
-  //     expect(element[0].classList.contains(ist.contains("fire")).toBe(true);
+  //     expect(element.classList.contains("ice")).toBe(false);
+  //     expect(element.classList.contains("dice")).toBe(false);
+  //     expect(element.classList.contains(ist.contains("fire")).toBe(true);
   //   });
   // });
 

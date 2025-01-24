@@ -117,7 +117,7 @@ describe("ngView", () => {
       name: "n",
       template: "nState",
       controller: function ($scope, $element) {
-        const data = $element.data("$ngViewAnim");
+        const data = getCacheData($element, "$ngViewAnim");
         $scope.$on("$destroy", () => {
           log += "destroy;";
         });

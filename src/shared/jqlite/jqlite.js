@@ -156,7 +156,7 @@ JQLite.prototype.scope = function () {
   // Can't use JQLiteData here directly so we stay compatible with jQuery!
   return (
     getOrSetCacheData(this[0], "$scope") ||
-    getInheritedData(this.parentNode || this[0], ["$isolateScope", "$scope"])
+    getInheritedData(this[0].parentNode || this[0], ["$isolateScope", "$scope"])
   );
 };
 
@@ -799,12 +799,11 @@ function parseHtml(html) {
  */
 export function dealoc(element, onlyDescendants) {
   if (!element) return;
-  if (!onlyDescendants && elementAcceptsData(element))
+  if (!onlyDescendants && elementAcceptsData(element)) {
     cleanElementData([element]);
-
-  if (element.querySelectorAll) {
-    cleanElementData(element.querySelectorAll("*"));
   }
+
+  cleanElementData(element.querySelectorAll("*"));
 }
 
 /**
@@ -883,6 +882,25 @@ export function setCacheData(element, key, value) {
 }
 
 /**
+ * Gets cache data for a given element.
+ *
+ * @param {Element} element - The DOM element to get data from.
+ * @param {string} [key] - The key (as a string) to retrieve. If not provided, returns all data.
+ * @returns {*} - The retrieved data for the given key or all data if no key is provided.
+ */
+export function getCacheData(element, key) {
+  if (elementAcceptsData(element)) {
+    const expandoStore = getExpando(element, false); // Don't create if it doesn't exist
+    const data = expandoStore && expandoStore.data;
+    if (!key) {
+      return data;
+    }
+    return data && data[kebabToCamel(key)];
+  }
+  return undefined;
+}
+
+/**
  * Adds nodes or elements to the root array-like object.
  *
  * @param {JQLite} root - The array-like object to which elements will be added.
@@ -919,10 +937,20 @@ export function getController(element, name) {
  *
  * @param {Node} element
  * @param {string|string[]} name
+ * @returns
+ */
+export function getInheritedData(element, name) {
+  return getOrSetCacheData(/** @type {Element} */ (element), name);
+}
+
+/**
+ *
+ * @param {Node} element
+ * @param {string|string[]} name
  * @param {any} [value]
  * @returns
  */
-export function getInheritedData(element, name, value) {
+export function setInheritedData(element, name, value) {
   // if element is the document object work with the html element instead
   // this makes $(document).scope() possible
   if (element.nodeType === Node.DOCUMENT_NODE) {

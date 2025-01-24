@@ -41,6 +41,7 @@ export class Angular {
 
     /** @type {Function} */
     this.doBootstrap;
+    window["angular"] = this;
     publishExternalAPI(this);
   }
 

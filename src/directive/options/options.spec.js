@@ -3090,24 +3090,24 @@ describe("ngOptions", () => {
         scope.values = ["a", "b"];
         scope.selection = scope.values[0];
       });
-      expect(element[0].classList.contains("ng-valid")).toBeTrue();
+      expect(element.classList.contains("ng-valid")).toBeTrue();
       expect(ngModelCtrl.$error.required).toBeFalsy();
 
       const options = element.find("option");
 
       // // view -> model
       setSelectValue(element, 0);
-      expect(element[0].classList.contains("ng-invalid")).toBeTrue();
+      expect(element.classList.contains("ng-invalid")).toBeTrue();
       expect(ngModelCtrl.$error.required).toBeTruthy();
 
       setSelectValue(element, 1);
-      expect(element[0].classList.contains("ng-valid")).toBeTrue();
+      expect(element.classList.contains("ng-valid")).toBeTrue();
       expect(ngModelCtrl.$error.required).toBeFalsy();
 
       // // model -> view
       scope.$apply("selection = null");
       expect(options[0].selected).toBe(true);
-      expect(element[0].classList.contains("ng-invalid")).toBeTrue();
+      expect(element.classList.contains("ng-invalid")).toBeTrue();
       expect(ngModelCtrl.$error.required).toBeTruthy();
     });
 
@@ -3132,19 +3132,19 @@ describe("ngOptions", () => {
       const options = element.find("option");
 
       setSelectValue(element, 0);
-      expect(element[0].classList.contains("ng-valid")).toBeTrue();
+      expect(element.classList.contains("ng-valid")).toBeTrue();
 
       scope.$apply("required = true");
-      expect(element[0].classList.contains("ng-invalid")).toBeTrue();
+      expect(element.classList.contains("ng-invalid")).toBeTrue();
 
       scope.$apply("value = values[0]");
-      expect(element[0].classList.contains("ng-valid")).toBeTrue();
+      expect(element.classList.contains("ng-valid")).toBeTrue();
 
       setSelectValue(element, 0);
-      expect(element[0].classList.contains("ng-invalid")).toBeTrue();
+      expect(element.classList.contains("ng-invalid")).toBeTrue();
 
       scope.$apply("required = false");
-      expect(element[0].classList.contains("ng-valid")).toBeTrue();
+      expect(element.classList.contains("ng-valid")).toBeTrue();
     });
 
     it("should treat an empty array as invalid when `multiple` attribute used", () => {
@@ -3166,14 +3166,14 @@ describe("ngOptions", () => {
         ];
         scope.required = true;
       });
-      expect(element[0].classList.contains("ng-invalid")).toBeTrue();
+      expect(element.classList.contains("ng-invalid")).toBeTrue();
 
       scope.$apply(() => {
         // ngModelWatch does not set objectEquality flag
         // array must be replaced in order to trigger $formatters
         scope.value = [scope.values[0]];
       });
-      expect(element[0].classList.contains("ng-valid")).toBeTrue();
+      expect(element.classList.contains("ng-valid")).toBeTrue();
     });
 
     it("should NOT set the error if the empty option is present but required attribute is not", () => {
@@ -3183,8 +3183,8 @@ describe("ngOptions", () => {
 
       createSingleSelect();
 
-      expect(element[0].classList.contains("ng-valid")).toBeTrue();
-      expect(element[0].classList.contains("ng-pristine")).toBeTrue();
+      expect(element.classList.contains("ng-valid")).toBeTrue();
+      expect(element.classList.contains("ng-pristine")).toBeTrue();
       expect(ngModelCtrl.$error.required).toBeFalsy();
     });
 
@@ -3200,12 +3200,12 @@ describe("ngOptions", () => {
         scope.selection = "a";
       });
 
-      expect(element[0].classList.contains("ng-valid")).toBeTrue();
+      expect(element.classList.contains("ng-valid")).toBeTrue();
       expect(ngModelCtrl.$error.required).toBeFalsy();
 
       scope.$apply('selection = "c"');
       expect(element[0].value).toBe("?");
-      expect(element[0].classList.contains("ng-valid")).toBeTrue();
+      expect(element.classList.contains("ng-valid")).toBeTrue();
       expect(ngModelCtrl.$error.required).toBeFalsy();
     });
 
@@ -3228,11 +3228,11 @@ describe("ngOptions", () => {
       });
 
       setSelectValue(element, 2);
-      expect(element[0].classList.contains("ng-valid")).toBeTrue();
+      expect(element.classList.contains("ng-valid")).toBeTrue();
       expect(scope.value).toBe(false);
 
       scope.$apply("required = true");
-      expect(element[0].classList.contains("ng-valid")).toBeTrue();
+      expect(element.classList.contains("ng-valid")).toBeTrue();
       expect(scope.value).toBe(false);
     });
 
@@ -3252,7 +3252,7 @@ describe("ngOptions", () => {
       });
 
       expect(element[0].value).toBe("string:A");
-      expect(element[0].classList.contains("ng-valid")).toBeTrue();
+      expect(element.classList.contains("ng-valid")).toBeTrue();
       expect(ngModelCtrl.$error.required).toBeFalsy();
 
       scope.$apply(() => {
@@ -3260,7 +3260,7 @@ describe("ngOptions", () => {
       });
 
       expect(element[0].value).toBe("");
-      expect(element[0].classList.contains("ng-invalid")).toBeTrue();
+      expect(element.classList.contains("ng-invalid")).toBeTrue();
       expect(ngModelCtrl.$error.required).toBeTruthy();
       // ngModel sets undefined for invalid values
       expect(scope.selection).toBeUndefined();
@@ -3329,7 +3329,7 @@ describe("ngOptions", () => {
       };
 
       setSelectValue(element, 3);
-      expect(element[0].classList.contains("ng-invalid")).toBeTrue();
+      expect(element.classList.contains("ng-invalid")).toBeTrue();
       expect(scope.value).toBeUndefined();
       expect(element).toEqualSelectValue("third");
     });
@@ -3346,7 +3346,7 @@ describe("ngOptions", () => {
       };
 
       setSelectValue(element, 3);
-      expect(element[0].classList.contains("ng-valid")).toBeTrue();
+      expect(element.classList.contains("ng-valid")).toBeTrue();
       expect(scope.value).toBe("third");
       expect(element).toEqualSelectValue("third");
     });

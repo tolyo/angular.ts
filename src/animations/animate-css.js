@@ -382,7 +382,7 @@ export function AnimateCssProvider() {
         }
 
         if (!options.$$skipPreparationClasses) {
-          element[0].classList.add(
+          element.classList.add(
             ...preparationClasses.split(" ").filter((x) => x !== ""),
           );
         }
@@ -580,11 +580,11 @@ export function AnimateCssProvider() {
           animationPaused = false;
 
           if (preparationClasses && !options.$$skipPreparationClasses) {
-            element[0].classList.remove(...preparationClasses.split(" "));
+            element.classList.remove(...preparationClasses.split(" "));
           }
           activeClasses = pendClasses(preparationClasses, ACTIVE_CLASS_SUFFIX);
           if (activeClasses) {
-            element[0].classList.remove(...activeClasses.split(" "));
+            element.classList.remove(...activeClasses.split(" "));
           }
 
           blockKeyframeAnimations(node, false);
@@ -773,7 +773,7 @@ export function AnimateCssProvider() {
             });
 
             applyAnimationClasses(element, options);
-            element[0].classList.add(
+            element.classList.add(
               ...activeClasses.split(" ").filter((x) => x !== ""),
             );
             if (flags.recalculateTimingStyles) {

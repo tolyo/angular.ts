@@ -367,18 +367,16 @@ describe("ngModel", () => {
         };
 
         ctrl.$setViewValue("123");
-        expect(element[0].classList.contains("ng-valid-parse")).toBeTrue();
-        expect(element[0].classList.contains("ng-invalid-parse")).toBeFalse();
-        expect(
-          element[0].classList.contains("ng-invalid-always-fail"),
-        ).toBeTrue();
+        expect(element.classList.contains("ng-valid-parse")).toBeTrue();
+        expect(element.classList.contains("ng-invalid-parse")).toBeFalse();
+        expect(element.classList.contains("ng-invalid-always-fail")).toBeTrue();
 
         parserIsFailing = true;
         ctrl.$setViewValue("12345");
-        expect(element[0].classList.contains("ng-valid-parse")).toBeFalse();
-        expect(element[0].classList.contains("ng-invalid-parse")).toBeTrue();
+        expect(element.classList.contains("ng-valid-parse")).toBeFalse();
+        expect(element.classList.contains("ng-invalid-parse")).toBeTrue();
         expect(
-          element[0].classList.contains("ng-invalid-always-fail"),
+          element.classList.contains("ng-invalid-always-fail"),
         ).toBeFalse();
         dealoc(element);
       });
@@ -1507,36 +1505,36 @@ describe("ngModel", () => {
         $rootScope,
       );
       await wait();
-      expect(element[0].classList.contains("ng-valid")).toBeTrue();
-      expect(element[0].classList.contains("ng-pristine")).toBeTrue();
-      expect(element[0].classList.contains("ng-touched")).toBeFalse();
-      expect(element[0].classList.contains("ng-valid-email")).toBe(true);
-      expect(element[0].classList.contains("ng-invalid-email")).toBe(false);
+      expect(element.classList.contains("ng-valid")).toBeTrue();
+      expect(element.classList.contains("ng-pristine")).toBeTrue();
+      expect(element.classList.contains("ng-touched")).toBeFalse();
+      expect(element.classList.contains("ng-valid-email")).toBe(true);
+      expect(element.classList.contains("ng-invalid-email")).toBe(false);
 
       $rootScope.$apply("value = 'invalid-email'");
       await wait();
-      expect(element[0].classList.contains("ng-invalid")).toBeTrue();
-      expect(element[0].classList.contains("ng-pristine")).toBeTrue();
-      expect(element[0].classList.contains("ng-valid-email")).toBe(false);
-      expect(element[0].classList.contains("ng-invalid-email")).toBe(true);
+      expect(element.classList.contains("ng-invalid")).toBeTrue();
+      expect(element.classList.contains("ng-pristine")).toBeTrue();
+      expect(element.classList.contains("ng-valid-email")).toBe(false);
+      expect(element.classList.contains("ng-invalid-email")).toBe(true);
 
       element.value = "invalid-again";
       browserTrigger(element, "change");
-      expect(element[0].classList.contains("ng-invalid")).toBeTrue();
-      expect(element[0].classList.contains("ng-dirty")).toBeTrue();
-      expect(element[0].classList.contains("ng-valid-email")).toBe(false);
-      expect(element[0].classList.contains("ng-invalid-email")).toBe(true);
+      expect(element.classList.contains("ng-invalid")).toBeTrue();
+      expect(element.classList.contains("ng-dirty")).toBeTrue();
+      expect(element.classList.contains("ng-valid-email")).toBe(false);
+      expect(element.classList.contains("ng-invalid-email")).toBe(true);
 
       element.value = "vojta@google.com";
       browserTrigger(element, "change");
-      expect(element[0].classList.contains("ng-valid")).toBeTrue();
-      expect(element[0].classList.contains("ng-dirty")).toBeTrue();
-      expect(element[0].classList.contains("ng-valid-email")).toBe(true);
-      expect(element[0].classList.contains("ng-invalid-email")).toBe(false);
+      expect(element.classList.contains("ng-valid")).toBeTrue();
+      expect(element.classList.contains("ng-dirty")).toBeTrue();
+      expect(element.classList.contains("ng-valid-email")).toBe(true);
+      expect(element.classList.contains("ng-invalid-email")).toBe(false);
 
       browserTrigger(element, "blur");
 
-      expect(element[0].classList.contains("ng-touched")).toBeTrue();
+      expect(element.classList.contains("ng-touched")).toBeTrue();
 
       dealoc(element);
     });
@@ -1546,8 +1544,8 @@ describe("ngModel", () => {
         '<input type="email" ng-model="value" required />',
       )($rootScope);
       await wait();
-      expect(element[0].classList.contains("ng-invalid")).toBeTrue();
-      expect(element[0].classList.contains("ng-invalid-required")).toBeTrue();
+      expect(element.classList.contains("ng-invalid")).toBeTrue();
+      expect(element.classList.contains("ng-invalid-required")).toBeTrue();
 
       dealoc(element);
     });

@@ -825,7 +825,7 @@ export function rangeInputType(scope, element, attr, ctrl) {
       let elVal = element.value;
       // IE11 doesn't set the el val correctly if the maxVal is less than the element value
       if (maxVal < elVal) {
-        element.val(maxVal);
+        element.value = maxVal;
         // IE11 and Chrome don't set the value to the minVal when max < min
         elVal = maxVal < minVal ? minVal : maxVal;
       }

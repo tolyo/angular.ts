@@ -2,6 +2,7 @@ import { tail, unnestR, uniqR, removeFrom } from "../../shared/common";
 import { isString, isObject } from "../../shared/utils";
 
 import { parse } from "../../shared/hof";
+import { getInheritedData } from "../../shared/jqlite/jqlite";
 /** @ignore */
 function parseStateRef(ref) {
   const paramsOnly = ref.match(/^\s*({[^}]*})\s*$/);
@@ -15,7 +16,7 @@ function parseStateRef(ref) {
 }
 /** @ignore */
 function stateContext(el) {
-  const $ngView = el.parent().inheritedData("$ngView");
+  const $ngView = getInheritedData(el.parentElement, "$ngView");
   const path = parse("$cfg.path")($ngView);
   return path ? tail(path).state.name : undefined;
 }
@@ -352,11 +353,9 @@ export function $StateRefActiveDirective(
           (cls) => !addClasses.includes(cls),
         );
         $scope.$evalAsync(() => {
-          addClasses.forEach((className) =>
-            $element[0].classList.add(className),
-          );
+          addClasses.forEach((className) => $element.classList.add(className));
           removeClasses.forEach((className) =>
-            $element[0].classList.remove(className),
+            $element.classList.remove(className),
           );
         });
       }

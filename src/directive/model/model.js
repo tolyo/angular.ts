@@ -161,7 +161,7 @@ export class NgModelController {
     this.$$hasNativeValidators = false;
 
     this.$$classCache = {};
-    const isValid = this.$$element[0].classList.contains(VALID_CLASS);
+    const isValid = this.$$element.classList.contains(VALID_CLASS);
     this.$$classCache[VALID_CLASS] = isValid;
     this.$$classCache[INVALID_CLASS] = !isValid;
 
@@ -339,16 +339,16 @@ export class NgModelController {
         this.$$animate.removeClass(this.$$element, NOT_EMPTY_CLASS);
         this.$$animate.addClass(this.$$element, EMPTY_CLASS);
       } else {
-        this.$$element[0].classList.remove(NOT_EMPTY_CLASS);
-        this.$$element[0].classList.add(EMPTY_CLASS);
+        this.$$element.classList.remove(NOT_EMPTY_CLASS);
+        this.$$element.classList.add(EMPTY_CLASS);
       }
     } else {
       if (hasAnimate(this.$$element[0])) {
         this.$$animate.removeClass(this.$$element, EMPTY_CLASS);
         this.$$animate.addClass(this.$$element, NOT_EMPTY_CLASS);
       } else {
-        this.$$element[0].classList.remove(EMPTY_CLASS);
-        this.$$element[0].classList.add(NOT_EMPTY_CLASS);
+        this.$$element.classList.remove(EMPTY_CLASS);
+        this.$$element.classList.add(NOT_EMPTY_CLASS);
       }
     }
   }
@@ -367,8 +367,8 @@ export class NgModelController {
       this.$$animate.removeClass(this.$$element, EMPTY_CLASS);
       this.$$animate.addClass(this.$$element, PRISTINE_CLASS);
     } else {
-      this.$$element[0].classList.remove(EMPTY_CLASS);
-      this.$$element[0].classList.add(PRISTINE_CLASS);
+      this.$$element.classList.remove(EMPTY_CLASS);
+      this.$$element.classList.add(PRISTINE_CLASS);
     }
   }
 
@@ -386,8 +386,8 @@ export class NgModelController {
       this.$$animate.removeClass(this.$$element, PRISTINE_CLASS);
       this.$$animate.addClass(this.$$element, DIRTY_CLASS);
     } else {
-      this.$$element[0].classList.remove(PRISTINE_CLASS);
-      this.$$element[0].classList.add(DIRTY_CLASS);
+      this.$$element.classList.remove(PRISTINE_CLASS);
+      this.$$element.classList.add(DIRTY_CLASS);
     }
     this.$$parentForm.$setDirty();
   }
@@ -406,8 +406,8 @@ export class NgModelController {
     if (hasAnimate(this.$$element[0])) {
       this.$$animate.setClass(this.$$element, UNTOUCHED_CLASS, TOUCHED_CLASS);
     } else {
-      this.$$element[0].classList.remove(TOUCHED_CLASS);
-      this.$$element[0].classList.add(UNTOUCHED_CLASS);
+      this.$$element.classList.remove(TOUCHED_CLASS);
+      this.$$element.classList.add(UNTOUCHED_CLASS);
     }
   }
 
@@ -424,8 +424,8 @@ export class NgModelController {
     if (hasAnimate(this.$$element[0])) {
       this.$$animate.setClass(this.$$element, TOUCHED_CLASS, UNTOUCHED_CLASS);
     } else {
-      this.$$element[0].classList.remove(UNTOUCHED_CLASS);
-      this.$$element[0].classList.add(TOUCHED_CLASS);
+      this.$$element.classList.remove(UNTOUCHED_CLASS);
+      this.$$element.classList.add(TOUCHED_CLASS);
     }
   }
 
@@ -1090,7 +1090,7 @@ export function ngModelDirective() {
       /** @param {import("../../shared/jqlite/jqlite.js").JQLite} element  */
       (element) => {
         // Setup initial state of the control
-        element[0].classList.add(PRISTINE_CLASS, UNTOUCHED_CLASS, VALID_CLASS);
+        element.classList.add(PRISTINE_CLASS, UNTOUCHED_CLASS, VALID_CLASS);
 
         return {
           pre: (scope, _element, attr, ctrls) => {

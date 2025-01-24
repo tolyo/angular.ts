@@ -80,9 +80,9 @@ describe("$animate", () => {
 
     it("should still perform DOM operations even if animations are disabled (post-digest)", () => {
       $animate.enabled(false);
-      expect(element[0].classList.contains("ng-hide")).toBeFalse();
+      expect(element.classList.contains("ng-hide")).toBeFalse();
       $animate.addClass(element, "ng-hide");
-      expect(element[0].classList.contains("ng-hide")).toBeTrue();
+      expect(element.classList.contains("ng-hide")).toBeTrue();
     });
 
     it("should run each method and return a promise", () => {
@@ -208,7 +208,7 @@ describe("$animate", () => {
 
       $animate.addClass(element, "ng-hide");
       $animate.removeClass(element, "ng-hide");
-      expect(element[0].classList.contains("ng-hide")).toBeFalse();
+      expect(element.classList.contains("ng-hide")).toBeFalse();
     });
 
     it("should avoid cancelling out remove/add if the element does not contain the class", () => {
@@ -216,7 +216,7 @@ describe("$animate", () => {
 
       $animate.removeClass(element, "ng-hide");
       $animate.addClass(element, "ng-hide");
-      expect(element[0].classList.contains("ng-hide")).toBeTrue();
+      expect(element.classList.contains("ng-hide")).toBeTrue();
     });
 
     ["enter", "move"].forEach((method) => {
@@ -376,22 +376,22 @@ describe("$animate", () => {
 
         $rootScope.$apply(() => {
           $animate.addClass(element, "test-class1");
-          expect(element[0].classList.contains("test-class1")).toBeFalse();
+          expect(element.classList.contains("test-class1")).toBeFalse();
 
           $animate.removeClass(element, "test-class1");
 
           $animate.addClass(element, "test-class2");
-          expect(element[0].classList.contains("test-class2")).toBeFalse();
+          expect(element.classList.contains("test-class2")).toBeFalse();
 
           $animate.setClass(element, "test-class3", "test-class4");
-          expect(element[0].classList.contains("test-class3")).toBeFalse();
-          expect(element[0].classList.contains("test-class4")).toBeFalse();
+          expect(element.classList.contains("test-class3")).toBeFalse();
+          expect(element.classList.contains("test-class4")).toBeFalse();
         });
 
-        expect(element[0].classList.contains("test-class1")).toBeFalse();
-        expect(element[0].classList.contains("test-class4")).toBeFalse();
-        expect(element[0].classList.contains("test-class2")).toBeTrue();
-        expect(element[0].classList.contains("test-class3")).toBeTrue();
+        expect(element.classList.contains("test-class1")).toBeFalse();
+        expect(element.classList.contains("test-class4")).toBeFalse();
+        expect(element.classList.contains("test-class2")).toBeTrue();
+        expect(element.classList.contains("test-class3")).toBeTrue();
       });
 
       it("should defer class manipulation until postDigest when outside of digest", () => {
@@ -401,9 +401,9 @@ describe("$animate", () => {
         $animate.removeClass(element, "test-class1");
         $animate.addClass(element, "test-class2");
         $animate.setClass(element, "test-class3", "test-class4");
-        expect(element[0].classList.contains("test-class1")).toBeFalse();
-        expect(element[0].classList.contains("test-class2")).toBeTrue();
-        expect(element[0].classList.contains("test-class3")).toBeTrue();
+        expect(element.classList.contains("test-class1")).toBeFalse();
+        expect(element.classList.contains("test-class2")).toBeTrue();
+        expect(element.classList.contains("test-class3")).toBeTrue();
       });
 
       it("should perform class manipulation in expected order at end of digest", () => {
@@ -416,7 +416,7 @@ describe("$animate", () => {
           $animate.removeClass(element, "test-class3");
           $animate.addClass(element, "test-class3");
         });
-        expect(element[0].classList.contains("test-class3")).toBeTrue();
+        expect(element.classList.contains("test-class3")).toBeTrue();
       });
 
       it("should return a promise which is resolved on a different turn", () => {
@@ -432,7 +432,7 @@ describe("$animate", () => {
           $animate.removeClass(element, "test4");
         });
 
-        expect(element[0].classList.contains("test3")).toBeTrue();
+        expect(element.classList.contains("test3")).toBeTrue();
       });
 
       it("should defer class manipulation until end of digest for SVG", () => {
