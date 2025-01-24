@@ -335,7 +335,7 @@ export class NgModelController {
 
   $$updateEmptyClasses(value) {
     if (this.$isEmpty(value)) {
-      if (hasAnimate(this.$$element[0])) {
+      if (hasAnimate(this.$$element)) {
         this.$$animate.removeClass(this.$$element, NOT_EMPTY_CLASS);
         this.$$animate.addClass(this.$$element, EMPTY_CLASS);
       } else {
@@ -343,7 +343,7 @@ export class NgModelController {
         this.$$element.classList.add(EMPTY_CLASS);
       }
     } else {
-      if (hasAnimate(this.$$element[0])) {
+      if (hasAnimate(this.$$element)) {
         this.$$animate.removeClass(this.$$element, EMPTY_CLASS);
         this.$$animate.addClass(this.$$element, NOT_EMPTY_CLASS);
       } else {
@@ -363,7 +363,7 @@ export class NgModelController {
   $setPristine() {
     this.$dirty = false;
     this.$pristine = true;
-    if (hasAnimate(this.$$element[0])) {
+    if (hasAnimate(this.$$element)) {
       this.$$animate.removeClass(this.$$element, EMPTY_CLASS);
       this.$$animate.addClass(this.$$element, PRISTINE_CLASS);
     } else {
@@ -382,7 +382,7 @@ export class NgModelController {
   $setDirty() {
     this.$dirty = true;
     this.$pristine = false;
-    if (hasAnimate(this.$$element[0])) {
+    if (hasAnimate(this.$$element)) {
       this.$$animate.removeClass(this.$$element, PRISTINE_CLASS);
       this.$$animate.addClass(this.$$element, DIRTY_CLASS);
     } else {
@@ -403,7 +403,7 @@ export class NgModelController {
   $setUntouched() {
     this.$touched = false;
     this.$untouched = true;
-    if (hasAnimate(this.$$element[0])) {
+    if (hasAnimate(this.$$element)) {
       this.$$animate.setClass(this.$$element, UNTOUCHED_CLASS, TOUCHED_CLASS);
     } else {
       this.$$element.classList.remove(TOUCHED_CLASS);
@@ -421,7 +421,7 @@ export class NgModelController {
   $setTouched() {
     this.$touched = true;
     this.$untouched = false;
-    if (hasAnimate(this.$$element[0])) {
+    if (hasAnimate(this.$$element)) {
       this.$$animate.setClass(this.$$element, TOUCHED_CLASS, UNTOUCHED_CLASS);
     } else {
       this.$$element.classList.remove(UNTOUCHED_CLASS);

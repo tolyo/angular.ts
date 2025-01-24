@@ -190,6 +190,14 @@ export function getOrSetCacheData(element: Element, key: string | any, value?: a
  */
 export function setCacheData(element: Element, key: string, value?: any): void;
 /**
+ * Gets cache data for a given element.
+ *
+ * @param {Element} element - The DOM element to get data from.
+ * @param {string} [key] - The key (as a string) to retrieve. If not provided, returns all data.
+ * @returns {*} - The retrieved data for the given key or all data if no key is provided.
+ */
+export function getCacheData(element: Element, key?: string): any;
+/**
  * @param {Node} element
  * @param {string} [name]
  * @returns
@@ -199,10 +207,17 @@ export function getController(element: Node, name?: string): any;
  *
  * @param {Node} element
  * @param {string|string[]} name
+ * @returns
+ */
+export function getInheritedData(element: Node, name: string | string[]): any;
+/**
+ *
+ * @param {Node} element
+ * @param {string|string[]} name
  * @param {any} [value]
  * @returns
  */
-export function getInheritedData(element: Node, name: string | string[], value?: any): any;
+export function setInheritedData(element: Node, name: string | string[], value?: any): any;
 /**
  *
  * @param {Element} element

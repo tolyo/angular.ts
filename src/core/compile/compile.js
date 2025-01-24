@@ -1,5 +1,6 @@
 import {
   cleanElementData,
+  createElementFromHTML,
   getBooleanAttrName,
   getCacheData,
   getInheritedData,
@@ -650,17 +651,17 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
             // might change, so we need to recreate the namespace adapted compileNodes
             // for call to the link function.
             // Note: This will already clone the nodes...
-            $linkNode = JQLite(
-              wrapTemplate(
-                namespace,
-                JQLite("<div></div>").append(jqCompileNodes).html(),
-              ),
+            const wrappedTemplate = wrapTemplate(
+              namespace,
+              createElementFromHTML("<div></div>").append(jqCompileNodes)
+                .innerHTML,
             );
+            $linkNode = createElementFromHTML(wrappedTemplate);
           } else if (cloneConnectFn) {
             let elements = jqCompileNodes.map((element) =>
               element.cloneNode(true),
             );
-            $linkNode = new JQLite(elements);
+            $linkNode = elements;
           } else {
             $linkNode = jqCompileNodes;
           }
@@ -1263,7 +1264,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
             attrs = templateAttrs;
             $element = templateAttrs.$$element;
           } else {
-            $element = JQLite(linkNode);
+            $element = linkNode;
             attrs = new Attributes(
               $rootScope,
               $animate,
@@ -1715,20 +1716,18 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                 );
 
                 // Add the matching elements into their slot
-                JQLite($compileNode[0].childNodes)
-                  .elements()
-                  .forEach((node) => {
-                    const slotName =
-                      slotMap[directiveNormalize(getNodeName(node))];
-                    if (slotName) {
-                      filledSlots[slotName] = true;
-                      slots[slotName] =
-                        slots[slotName] || document.createDocumentFragment();
-                      slots[slotName].appendChild(node);
-                    } else {
-                      $template.appendChild(node);
-                    }
-                  });
+                $compileNode[0].childNodes.forEach((node) => {
+                  const slotName =
+                    slotMap[directiveNormalize(getNodeName(node))];
+                  if (slotName) {
+                    filledSlots[slotName] = true;
+                    slots[slotName] =
+                      slots[slotName] || document.createDocumentFragment();
+                    slots[slotName].appendChild(node);
+                  } else {
+                    $template.appendChild(node);
+                  }
+                });
 
                 // Check for required slots that were not filled
                 Object.entries(filledSlots).forEach(([slotName, filled]) => {
