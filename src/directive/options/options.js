@@ -290,7 +290,7 @@ export const ngOptionsDirective = [
         };
 
         selectCtrl.readValue = function readNgOptionsValue() {
-          const selectedOption = options.selectValueMap[selectElement.val()];
+          const selectedOption = options.selectValueMap[selectElement.value];
 
           if (selectedOption && !selectedOption.disabled) {
             selectCtrl.unselectEmptyOption();
@@ -329,7 +329,7 @@ export const ngOptionsDirective = [
         };
 
         selectCtrl.readValue = function readNgOptionsMultiple() {
-          const selectedValues = selectElement.val() || [];
+          const selectedValues = selectElement.value || [];
           const selections = [];
           selectedValues.forEach((value) => {
             const option = options.selectValueMap[value];
@@ -373,7 +373,7 @@ export const ngOptionsDirective = [
           // options that are added by ngIf etc. (rendering of the node is async because of
           // lazy transclusion)
           selectCtrl.registerOption = function (optionScope, optionEl) {
-            if (optionEl.val() === "") {
+            if (optionEl.value === "") {
               selectCtrl.hasEmptyOption = true;
               selectCtrl.emptyOption = optionEl;
               // This ensures the new empty option is selected if previously no option was selected

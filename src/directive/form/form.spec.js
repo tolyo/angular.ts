@@ -376,9 +376,9 @@ describe("form", () => {
       const inputElm = form.find("input").eq(0);
       inputElm[0].setAttribute("value", "a");
       inputElm[0].dispatchEvent(new Event("click"));
-      expect(inputElm.val()).toBe("a");
+      expect(inputElm.value).toBe("a");
       form.find("button")[0].click();
-      expect(inputElm.val()).toBe("");
+      expect(inputElm.value).toBe("");
       dealoc(form);
     });
 
@@ -394,9 +394,9 @@ describe("form", () => {
       const inputElm = form.find("input").eq(0);
       inputElm[0].setAttribute("value", "a");
       inputElm[0].dispatchEvent(new Event("click"));
-      expect(inputElm.val()).toBe("a");
+      expect(inputElm.value).toBe("a");
       form.find("button")[0].click();
-      expect(inputElm.val()).toBe("");
+      expect(inputElm.value).toBe("");
       dealoc(form);
     });
   });

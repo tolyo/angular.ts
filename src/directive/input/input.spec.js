@@ -36,7 +36,7 @@ describe("input", () => {
 
     scope.$apply("name = 'misko'");
     await wait();
-    expect(inputElm.val()).toBe("misko");
+    expect(inputElm.value).toBe("misko");
   });
 
   it('should update the model on "blur" event', async () => {
@@ -210,7 +210,7 @@ describe("input", () => {
         inputElm[0].dispatchEvent(
           new Event("keydown", { target: inputElm[0] }),
         );
-        inputElm.val("f");
+        inputElm.value = "f";
         inputElm[0].dispatchEvent(new Event("change"));
         expect(inputElm[0].classList.contains("ng-dirty")).toBeTrue();
 
@@ -248,7 +248,7 @@ describe("input", () => {
         )(scope);
         scope.$apply("obj = { abc: { name: 'Misko'} }");
         await wait();
-        expect(inputElm.val()).toEqual("Misko");
+        expect(inputElm.value).toEqual("Misko");
       });
 
       it("should ignore input without ngModel directive", async () => {
@@ -279,14 +279,14 @@ describe("input", () => {
         scope.$apply("age = null");
         await wait();
         expect(scope.age).toBeNull();
-        expect(inputElm.val()).toEqual("");
+        expect(inputElm.value).toEqual("");
       });
 
       it("should render 0 even if it is a number", async () => {
         inputElm = $compile('<input type="text" ng-model="value" />')(scope);
         scope.$apply("value = 0");
         await wait();
-        expect(inputElm.val()).toBe("0");
+        expect(inputElm.value).toBe("0");
       });
 
       it("should render the $viewValue when $modelValue is empty", async () => {
@@ -301,7 +301,7 @@ describe("input", () => {
         ctrl.$viewValue = "abc";
         ctrl.$render();
         await wait();
-        expect(inputElm.val()).toBe("abc");
+        expect(inputElm.value).toBe("abc");
       });
     });
 
@@ -315,7 +315,7 @@ describe("input", () => {
           scope.january = "2013-01";
         });
         await wait();
-        expect(inputElm.val()).toBe("2013-01");
+        expect(inputElm.value).toBe("2013-01");
       });
 
       it("should throw if the model is a Date object", async () => {
@@ -346,11 +346,11 @@ describe("input", () => {
           scope.value = "2013-01";
         });
 
-        expect(inputElm.val()).toBe("2013-01");
+        expect(inputElm.value).toBe("2013-01");
 
         inputElm[0].setAttribute("value", "stuff");
         inputElm[0].dispatchEvent(new Event("change"));
-        expect(inputElm.val()).toBe("2013-01");
+        expect(inputElm.value).toBe("2013-01");
         expect(scope.value).toBe("2013-01");
       });
 
@@ -360,18 +360,18 @@ describe("input", () => {
         scope.$apply("test = null");
         await wait();
         expect(scope.test).toBeNull();
-        expect(inputElm.val()).toEqual("");
+        expect(inputElm.value).toEqual("");
       });
 
       it("should come up blank when no value specified", async () => {
         inputElm = $compile('<input type="month" ng-model="test" />')(scope);
         await wait();
-        expect(inputElm.val()).toBe("");
+        expect(inputElm.value).toBe("");
 
         scope.$apply("test = null");
         await wait();
         expect(scope.test).toBeNull();
-        expect(inputElm.val()).toBe("");
+        expect(inputElm.value).toBe("");
       });
 
       it("should parse empty string to null", async () => {
@@ -524,7 +524,7 @@ describe("input", () => {
           scope.secondWeek = "2013-W02";
         });
         await wait();
-        expect(inputElm.val()).toBe("2013-W02");
+        expect(inputElm.value).toBe("2013-W02");
       });
 
       it("should set scope to a string value", async () => {
@@ -553,12 +553,12 @@ describe("input", () => {
           scope.secondWeek = "2013-W02";
         });
         await wait();
-        expect(inputElm.val()).toBe("2013-W02");
+        expect(inputElm.value).toBe("2013-W02");
 
         // set to text for browsers with datetime-local validation.
         inputElm[0].value = "stuff";
         inputElm[0].dispatchEvent(new Event("change"));
-        expect(inputElm.val()).toBe("");
+        expect(inputElm.value).toBe("");
         expect(scope.value).toBeUndefined();
       });
 
@@ -568,18 +568,18 @@ describe("input", () => {
         scope.$apply("test = null");
         await wait();
         expect(scope.test).toBeNull();
-        expect(inputElm.val()).toEqual("");
+        expect(inputElm.value).toEqual("");
       });
 
       it("should come up blank when no value specified", async () => {
         inputElm = $compile('<input type="week" ng-model="test" />')(scope);
         await wait();
-        expect(inputElm.val()).toBe("");
+        expect(inputElm.value).toBe("");
 
         scope.$apply("test = null");
         await wait();
         expect(scope.test).toBeNull();
-        expect(inputElm.val()).toBe("");
+        expect(inputElm.value).toBe("");
       });
 
       it("should parse empty string to null", async () => {
@@ -724,7 +724,7 @@ describe("input", () => {
           scope.halfSecondToNextYear = "2013-12-16T11:30";
         });
         await wait();
-        expect(inputElm.val()).toBe("2013-12-16T11:30");
+        expect(inputElm.value).toBe("2013-12-16T11:30");
       });
 
       it("should bind to the model if a valid String.", async () => {
@@ -735,7 +735,7 @@ describe("input", () => {
         inputElm[0].value = "2013-12-16T11:30";
         inputElm[0].dispatchEvent(new Event("change"));
 
-        expect(inputElm.val()).toBe("2013-12-16T11:30");
+        expect(inputElm.value).toBe("2013-12-16T11:30");
         expect(scope.halfSecondToNextYear).toBe("2013-12-16T11:30");
       });
 
@@ -748,13 +748,13 @@ describe("input", () => {
           scope.breakMe = "2013-12-16T11:30";
         });
         await wait();
-        expect(inputElm.val()).toBe("2013-12-16T11:30");
+        expect(inputElm.value).toBe("2013-12-16T11:30");
 
         // set to text for browsers with datetime-local validation.
 
         inputElm[0].value = "stuff";
         inputElm[0].dispatchEvent(new Event("change"));
-        expect(inputElm.val()).toBe("");
+        expect(inputElm.value).toBe("");
         expect(scope.breakMe).toBeNull();
       });
 
@@ -766,7 +766,7 @@ describe("input", () => {
         scope.$apply("test = null");
         await wait();
         expect(scope.test).toBeNull();
-        expect(inputElm.val()).toEqual("");
+        expect(inputElm.value).toEqual("");
       });
 
       it("should come up blank when no value specified", async () => {
@@ -774,12 +774,12 @@ describe("input", () => {
           scope,
         );
         await wait();
-        expect(inputElm.val()).toBe("");
+        expect(inputElm.value).toBe("");
 
         scope.$apply("test = null");
         await wait();
         expect(scope.test).toBeNull();
-        expect(inputElm.val()).toBe("");
+        expect(inputElm.value).toBe("");
       });
 
       it("should parse empty string to null", async () => {
@@ -987,7 +987,7 @@ describe("input", () => {
           scope.threeFortyOnePm = "15:41:00.500";
         });
 
-        expect(inputElm.val()).toBe("15:41:00.500");
+        expect(inputElm.value).toBe("15:41:00.500");
       });
 
       it("should bind to mode if a valid String object.", () => {
@@ -998,7 +998,7 @@ describe("input", () => {
         inputElm[0].value = "15:41:00.500";
         inputElm[0].dispatchEvent(new Event("change"));
 
-        expect(inputElm.val()).toBe("15:41:00.500");
+        expect(inputElm.value).toBe("15:41:00.500");
         expect(scope.threeFortyOnePm).toBe("15:41:00.500");
       });
 
@@ -1009,11 +1009,11 @@ describe("input", () => {
           scope.breakMe = "16:25:00.000";
         });
 
-        expect(inputElm.val()).toBe("16:25:00.000");
+        expect(inputElm.value).toBe("16:25:00.000");
 
         inputElm[0].value = "stuff";
         inputElm[0].dispatchEvent(new Event("change"));
-        expect(inputElm.val()).toBe("");
+        expect(inputElm.value).toBe("");
         expect(scope.breakMe).toBeNull();
       });
 
@@ -1023,18 +1023,18 @@ describe("input", () => {
         scope.$apply("test = null");
 
         expect(scope.test).toBeNull();
-        expect(inputElm.val()).toEqual("");
+        expect(inputElm.value).toEqual("");
       });
 
       it("should set blank when no value specified", () => {
         inputElm = $compile('<input type="time" ng-model="test" />')(scope);
 
-        expect(inputElm.val()).toBe("");
+        expect(inputElm.value).toBe("");
 
         scope.$apply("test = null");
 
         expect(scope.test).toBeNull();
-        expect(inputElm.val()).toBe("");
+        expect(inputElm.value).toBe("");
       });
 
       it("should parse empty string to null", () => {
@@ -1075,7 +1075,7 @@ describe("input", () => {
         scope.$apply(() => {
           scope.value = "01:02:03.000";
         });
-        expect(inputElm.val()).toBe("01:02:03.000");
+        expect(inputElm.value).toBe("01:02:03.000");
       });
 
       describe("min", () => {
@@ -1230,7 +1230,7 @@ describe("input", () => {
           scope.val = "1977-10-22";
         });
 
-        expect(inputElm.val()).toBe("1977-10-22");
+        expect(inputElm.value).toBe("1977-10-22");
       });
 
       it("should bind to scope when the model is an valid String", () => {
@@ -1249,12 +1249,12 @@ describe("input", () => {
           scope.arrMatey = "2014-09-14";
         });
 
-        expect(inputElm.val()).toBe("2014-09-14");
+        expect(inputElm.value).toBe("2014-09-14");
 
         // set to text for browsers with date validation.
         inputElm[0].value = "1-2-3";
         inputElm[0].dispatchEvent(new Event("change"));
-        expect(inputElm.val()).toBe("");
+        expect(inputElm.value).toBe("");
         expect(scope.arrMatey).toBeNull();
       });
 
@@ -1264,18 +1264,18 @@ describe("input", () => {
         scope.$apply("test = null");
 
         expect(scope.test).toBeNull();
-        expect(inputElm.val()).toEqual("");
+        expect(inputElm.value).toEqual("");
       });
 
       it("should come up blank when no value specified", () => {
         inputElm = $compile('<input type="date" ng-model="test" />')(scope);
 
-        expect(inputElm.val()).toBe("");
+        expect(inputElm.value).toBe("");
 
         scope.$apply("test = null");
 
         expect(scope.test).toBeNull();
-        expect(inputElm.val()).toBe("");
+        expect(inputElm.value).toBe("");
       });
 
       it("should parse empty string to null", () => {
@@ -1601,12 +1601,12 @@ describe("input", () => {
         inputElm = $compile('<input type="number" ng-model="age"/>')(scope);
 
         scope.$apply("age = 123");
-        expect(inputElm.val()).toBe("123");
+        expect(inputElm.value).toBe("123");
 
         inputElm[0].value = "123X";
         inputElm[0].dispatchEvent(new Event("change"));
 
-        expect(inputElm.val()).toBe("");
+        expect(inputElm.value).toBe("");
         expect(scope.age).toBeNull();
         expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
       });
@@ -1617,18 +1617,18 @@ describe("input", () => {
         scope.$apply("age = null");
 
         expect(scope.age).toBeNull();
-        expect(inputElm.val()).toEqual("");
+        expect(inputElm.value).toEqual("");
       });
 
       it("should come up blank when no value specified", () => {
         inputElm = $compile('<input type="number" ng-model="age" />')(scope);
 
-        expect(inputElm.val()).toBe("");
+        expect(inputElm.value).toBe("");
 
         scope.$apply("age = null");
 
         expect(scope.age).toBeNull();
-        expect(inputElm.val()).toBe("");
+        expect(inputElm.value).toBe("");
       });
 
       it("should parse empty string to null", () => {
@@ -1767,7 +1767,7 @@ describe("input", () => {
 
         inputElm[0].value = "123X";
         inputElm[0].dispatchEvent(new Event("change"));
-        expect(inputElm.val()).toBe("");
+        expect(inputElm.value).toBe("");
 
         expect(scope.age).toBeNull();
         expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
@@ -1775,7 +1775,7 @@ describe("input", () => {
 
         inputElm[0].value = "123";
         inputElm[0].dispatchEvent(new Event("change"));
-        expect(inputElm.val()).toBe("123");
+        expect(inputElm.value).toBe("123");
         expect(scope.age).toBe(123);
         expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
         expect(ctrl.$error.number).toBeFalsy();
@@ -2086,7 +2086,7 @@ describe("input", () => {
             )(scope);
             inputElm = formElm.find("input");
             scope.$digest();
-            expect(inputElm.val()).toBe("20");
+            expect(inputElm.value).toBe("20");
             expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
             expect(scope.value).toBe(20);
             expect(scope.form.alias.$error.step).toBeFalsy();
@@ -2094,20 +2094,20 @@ describe("input", () => {
             inputElm[0].value = "18";
             inputElm[0].dispatchEvent(new Event("change"));
             expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
-            expect(inputElm.val()).toBe("18");
+            expect(inputElm.value).toBe("18");
             expect(scope.value).toBeUndefined();
             expect(scope.form.alias.$error.step).toBeTruthy();
 
             inputElm[0].value = "10";
             inputElm[0].dispatchEvent(new Event("change"));
             expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
-            expect(inputElm.val()).toBe("10");
+            expect(inputElm.value).toBe("10");
             expect(scope.value).toBe(10);
             expect(scope.form.alias.$error.step).toBeFalsy();
 
             scope.$apply("value = 12");
             expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
-            expect(inputElm.val()).toBe("12");
+            expect(inputElm.value).toBe("12");
             expect(scope.value).toBe(12);
             expect(scope.form.alias.$error.step).toBeTruthy();
           });
@@ -2125,7 +2125,7 @@ describe("input", () => {
 
             // Step changes, but value matches
             scope.$apply("step = 5");
-            expect(inputElm.val()).toBe("10");
+            expect(inputElm.value).toBe("10");
             expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
             expect(scope.value).toBe(10);
             expect(scope.form.alias.$error.step).toBeFalsy();
@@ -2134,28 +2134,28 @@ describe("input", () => {
             scope.$apply("step = 6");
             expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
             expect(scope.value).toBeUndefined();
-            expect(inputElm.val()).toBe("10");
+            expect(inputElm.value).toBe("10");
             expect(scope.form.alias.$error.step).toBeTruthy();
 
             // null = valid
             scope.$apply("step = null");
             expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
             expect(scope.value).toBe(10);
-            expect(inputElm.val()).toBe("10");
+            expect(inputElm.value).toBe("10");
             expect(scope.form.alias.$error.step).toBeFalsy();
 
             // Step val as string
             scope.$apply('step = "7"');
             expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
             expect(scope.value).toBeUndefined();
-            expect(inputElm.val()).toBe("10");
+            expect(inputElm.value).toBe("10");
             expect(scope.form.alias.$error.step).toBeTruthy();
 
             // unparsable string is ignored
             scope.$apply('step = "abc"');
             expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
             expect(scope.value).toBe(10);
-            expect(inputElm.val()).toBe("10");
+            expect(inputElm.value).toBe("10");
             expect(scope.form.alias.$error.step).toBeFalsy();
           });
 
@@ -2168,7 +2168,7 @@ describe("input", () => {
             )(scope);
             const ngModel = inputElm.controller("ngModel");
             scope.$digest();
-            expect(inputElm.val()).toBe("10");
+            expect(inputElm.value).toBe("10");
             expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
             expect(ngModel.$error.step).toBe(true);
             expect(scope.value).toBe(10); // an initially invalid value should not be changed
@@ -2179,7 +2179,7 @@ describe("input", () => {
             expect(scope.value).toBe(15);
 
             scope.$apply("step = 3");
-            expect(inputElm.val()).toBe("15");
+            expect(inputElm.value).toBe("15");
             expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
             expect(ngModel.$error.step).toBe(true);
             expect(scope.value).toBeUndefined();
@@ -2192,18 +2192,18 @@ describe("input", () => {
             scope.$apply("min = 10; step = 20");
             inputElm[0].value = "30";
             inputElm[0].dispatchEvent(new Event("change"));
-            expect(inputElm.val()).toBe("30");
+            expect(inputElm.value).toBe("30");
             expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
             expect(scope.value).toBe(30);
 
             scope.$apply("min = 5");
-            expect(inputElm.val()).toBe("30");
+            expect(inputElm.value).toBe("30");
             expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
             expect(ngModel.$error.step).toBe(true);
             expect(scope.value).toBeUndefined();
 
             scope.$apply("step = 0.00000001");
-            expect(inputElm.val()).toBe("30");
+            expect(inputElm.value).toBe("30");
             expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
             expect(scope.value).toBe(30);
 
@@ -2211,7 +2211,7 @@ describe("input", () => {
             scope.$apply("min = 0.2; step = (0.3 - 0.2)");
             inputElm[0].value = "0.3";
             inputElm[0].dispatchEvent(new Event("change"));
-            expect(inputElm.val()).toBe("0.3");
+            expect(inputElm.value).toBe("0.3");
             expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
             expect(ngModel.$error.step).toBe(true);
             expect(scope.value).toBeUndefined();
@@ -2224,7 +2224,7 @@ describe("input", () => {
             )(scope);
             const ngModel = inputElm.controller("ngModel");
 
-            expect(inputElm.val()).toBe("");
+            expect(inputElm.value).toBe("");
             expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
             expect(scope.value).toBeUndefined();
 
@@ -2284,7 +2284,7 @@ describe("input", () => {
           scope.$apply("value = 0");
 
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
-          expect(inputElm.val()).toBe("0");
+          expect(inputElm.value).toBe("0");
           expect(scope.form.alias.$error.required).toBeFalsy();
         });
 
@@ -2335,7 +2335,7 @@ describe("input", () => {
             scope.$apply("value = 0");
 
             expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
-            expect(inputElm.val()).toBe("0");
+            expect(inputElm.value).toBe("0");
             expect(scope.form.numberInput.$error.required).toBeFalsy();
           });
 
@@ -2520,13 +2520,13 @@ describe("input", () => {
 
         scope.$apply("age = null");
 
-        expect(inputElm.val()).toEqual("50");
+        expect(inputElm.value).toEqual("50");
       });
 
       it("should set model to 50 when no value specified and default min/max", () => {
         inputElm = $compile('<input type="range" ng-model="age" />')(scope);
 
-        expect(inputElm.val()).toBe("50");
+        expect(inputElm.value).toBe("50");
 
         scope.$apply("age = null");
 
@@ -2537,7 +2537,7 @@ describe("input", () => {
         inputElm = $compile('<input type="range" ng-model="age" />')(scope);
 
         scope.$apply("age = 10");
-        expect(inputElm.val()).toBe("10");
+        expect(inputElm.value).toBe("10");
 
         inputElm[0].value = "";
         inputElm[0].dispatchEvent(new Event("change"));
@@ -2583,7 +2583,7 @@ describe("input", () => {
           )(scope);
           inputElm = formElm.find("input");
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
-          expect(inputElm.val()).toBe("-3");
+          expect(inputElm.value).toBe("-3");
           expect(scope.value).toBe(-3);
           expect(scope.form.alias.$error.min).toBeFalsy();
         });
@@ -2615,13 +2615,13 @@ describe("input", () => {
             '<input type="range" ng-model="value" name="alias" min="{{min}}" />',
           )(scope);
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
-          expect(inputElm.val()).toBe("0");
+          expect(inputElm.value).toBe("0");
           expect(scope.value).toBe(0);
 
           scope.$apply("value = 5; min = 10");
 
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
-          expect(inputElm.val()).toBe("10");
+          expect(inputElm.value).toBe("10");
           expect(scope.value).toBe(10);
         });
 
@@ -2637,22 +2637,22 @@ describe("input", () => {
           scope.min = 20;
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
           expect(scope.value).toBe(20);
-          expect(inputElm.val()).toBe("20");
+          expect(inputElm.value).toBe("20");
 
           scope.min = null;
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
           expect(scope.value).toBe(20);
-          expect(inputElm.val()).toBe("20");
+          expect(inputElm.value).toBe("20");
 
           scope.min = "15";
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
           expect(scope.value).toBe(20);
-          expect(inputElm.val()).toBe("20");
+          expect(inputElm.value).toBe("20");
 
           scope.min = "abc";
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
           expect(scope.value).toBe(20);
-          expect(inputElm.val()).toBe("20");
+          expect(inputElm.value).toBe("20");
         });
       });
 
@@ -2666,7 +2666,7 @@ describe("input", () => {
           )(scope);
           inputElm = formElm.find("input");
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
-          expect(inputElm.val()).toBe("130");
+          expect(inputElm.value).toBe("130");
           expect(scope.value).toBe(130);
           expect(scope.form.alias.$error.max).toBeFalsy();
         });
@@ -2697,13 +2697,13 @@ describe("input", () => {
             '<input type="range" ng-model="value" name="alias" max="{{max}}" />',
           )(scope);
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
-          expect(inputElm.val()).toBe("100");
+          expect(inputElm.value).toBe("100");
           expect(scope.value).toBe(100);
 
           scope.$apply("value = 90; max = 10");
 
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
-          expect(inputElm.val()).toBe("10");
+          expect(inputElm.value).toBe("10");
           expect(scope.value).toBe(10);
         });
 
@@ -2719,22 +2719,22 @@ describe("input", () => {
           scope.max = 0;
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
           expect(scope.value).toBe(0);
-          expect(inputElm.val()).toBe("0");
+          expect(inputElm.value).toBe("0");
 
           scope.max = null;
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
           expect(scope.value).toBe(0);
-          expect(inputElm.val()).toBe("0");
+          expect(inputElm.value).toBe("0");
 
           scope.max = "4";
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
           expect(scope.value).toBe(0);
-          expect(inputElm.val()).toBe("0");
+          expect(inputElm.value).toBe("0");
 
           scope.max = "abc";
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
           expect(scope.value).toBe(0);
-          expect(inputElm.val()).toBe("0");
+          expect(inputElm.value).toBe("0");
         });
       });
 
@@ -2745,7 +2745,7 @@ describe("input", () => {
           inputElm = $compile(
             '<input type="range" ng-model="value" name="alias" max="{{max}}" min="{{min}}" />',
           )(scope);
-          expect(inputElm.val()).toBe("60");
+          expect(inputElm.value).toBe("60");
           expect(scope.value).toBe(60);
         });
 
@@ -2754,11 +2754,11 @@ describe("input", () => {
           inputElm = $compile(
             '<input type="range" ng-model="value" name="alias" max="{{max}}" min="{{min}}" />',
           )(scope);
-          expect(inputElm.val()).toBe("70");
+          expect(inputElm.value).toBe("70");
           expect(scope.value).toBe(70);
 
           scope.max = 20;
-          expect(inputElm.val()).toBe("40");
+          expect(inputElm.value).toBe("40");
           expect(scope.value).toBe(40);
         });
       });
@@ -2812,31 +2812,31 @@ describe("input", () => {
           inputElm = formElm.find("input");
 
           scope.$apply("value = 10");
-          expect(inputElm.val()).toBe("10");
+          expect(inputElm.value).toBe("10");
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
           expect(scope.value).toBe(10);
           expect(scope.form.alias.$error.step).toBeFalsy();
 
           scope.$apply("value = 5");
-          expect(inputElm.val()).toBe("5");
+          expect(inputElm.value).toBe("5");
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
           expect(scope.value).toBe(5);
           expect(scope.form.alias.$error.step).toBeFalsy();
 
           scope.$apply("value = 7.5");
-          expect(inputElm.val()).toBe("10");
+          expect(inputElm.value).toBe("10");
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
           expect(scope.value).toBe(10);
           expect(scope.form.alias.$error.step).toBeFalsy();
 
           scope.$apply("value = 7");
-          expect(inputElm.val()).toBe("5");
+          expect(inputElm.value).toBe("5");
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
           expect(scope.value).toBe(5);
           expect(scope.form.alias.$error.step).toBeFalsy();
 
           scope.$apply("value = 9");
-          expect(inputElm.val()).toBe("10");
+          expect(inputElm.value).toBe("10");
           expect(inputElm[0].classList.contains("ng-valid")).toBeTrue();
           expect(scope.value).toBe(10);
           expect(scope.form.alias.$error.step).toBeFalsy();
@@ -3424,7 +3424,7 @@ describe("input", () => {
         inputElm = $compile('<textarea ng-model="name"></textarea>')(scope);
 
         scope.$apply("name = 'Adam'");
-        expect(inputElm.val()).toEqual("Adam");
+        expect(inputElm.value).toEqual("Adam");
 
         inputElm[0].value = "Shyam";
         inputElm[0].dispatchEvent(new Event("change"));

@@ -456,14 +456,14 @@ describe("binding", () => {
     expect($rootScope.sex).toBe("female");
     expect(female[0].checked).toBe(true);
     expect(male[0].checked).toBe(false);
-    expect(female.val()).toBe("female");
+    expect(female.value).toBe("female");
 
     male[0].click();
     browserTrigger(male, "change");
     expect($rootScope.sex).toBe("male");
     expect(female[0].checked).toBe(false);
     expect(male[0].checked).toBe(true);
-    expect(male.val()).toBe("male");
+    expect(male.value).toBe("male");
   });
 
   it("ItShouldRepeatOnHashes", async () => {

@@ -24,7 +24,7 @@ describe("select", () => {
 
   function setSelectValue(selectElement, optionIndex) {
     const option = selectElement.find("option").eq(optionIndex);
-    selectElement.val(option.val());
+    selectElement.val(option.value);
     browserTrigger(element, "change");
   }
 
@@ -1535,14 +1535,14 @@ describe("select", () => {
               "</select>",
           );
 
-          expect(element.find("option").eq(0).val()).toBe("? string:NOMATCH ?");
+          expect(element.find("option").eq(0).value).toBe("? string:NOMATCH ?");
 
           scope.selected = prop;
-          expect(element.find("option").eq(0).val()).toBe(hashKey(prop));
+          expect(element.find("option").eq(0).value).toBe(hashKey(prop));
 
           // Reset
           scope.selected = false;
-          expect(element.find("option").eq(0).val()).toBe("? boolean:false ?");
+          expect(element.find("option").eq(0).value).toBe("? boolean:false ?");
 
           setSelectValue(element, 0);
           if (isNumberNaN(prop)) {
@@ -1579,10 +1579,10 @@ describe("select", () => {
           spyOn(selectController, "removeOption").and.callThrough();
 
           expect(selectController.removeOption).not.toHaveBeenCalled();
-          expect(element.find("option").eq(0).val()).toBe("? string:NOMATCH ?");
+          expect(element.find("option").eq(0).value).toBe("? string:NOMATCH ?");
 
           scope.selected = prop;
-          expect(element.find("option").eq(0).val()).toBe(hashKey(prop));
+          expect(element.find("option").eq(0).value).toBe(hashKey(prop));
           expect(element[0].selectedIndex).toBe(0);
 
           scope.option = "UPDATEDVALUE";
@@ -1601,15 +1601,15 @@ describe("select", () => {
           expect(element[0].selectedIndex).toBe(0);
           expect(element.find("option").length).toBe(3);
           expect(element.find("option").eq(0)[0].selected).toBe(true);
-          expect(element.find("option").eq(0).val()).toBe(unknownValue(prop));
+          expect(element.find("option").eq(0).value).toBe(unknownValue(prop));
           expect(element.find("option").eq(1)[0].selected).toBe(false);
-          expect(element.find("option").eq(1).val()).toBe(
+          expect(element.find("option").eq(1).value).toBe(
             "string:UPDATEDVALUE",
           );
 
           scope.selected = "UPDATEDVALUE";
           expect(element[0].selectedIndex).toBe(0);
-          expect(element.find("option").eq(0).val()).toBe(
+          expect(element.find("option").eq(0).value).toBe(
             "string:UPDATEDVALUE",
           );
         });
@@ -1631,11 +1631,11 @@ describe("select", () => {
 
         scope.option = "init";
         expect(log[0]).toBe("init");
-        expect(element.find("option").eq(1).val()).toBe("string:init");
+        expect(element.find("option").eq(1).value).toBe("string:init");
 
         optionAttr.$set("value", "update");
         expect(log[1]).toBe("update");
-        expect(element.find("option").eq(1).val()).toBe("string:update");
+        expect(element.find("option").eq(1).value).toBe("string:update");
       });
 
       it("should ignore the option text / value attribute if the ngValue attribute exists", () => {

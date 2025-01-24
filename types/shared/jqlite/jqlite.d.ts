@@ -80,12 +80,6 @@ export class JQLite {
      */
     text(value?: string): JQLite | string;
     /**
-     * Gets or sets the values of form elements such as input, select and textarea in a JQLite collection.
-     * @param {any} value
-     * @returns {JQLite|any}
-     */
-    val(value: any): JQLite | any;
-    /**
      * @param {string|Object} name
      * @param {any} value
      * @returns

@@ -8980,7 +8980,7 @@ describe("$compile", () => {
         $rootScope.value = "from-parent";
 
         await wait();
-        expect(element.find("input").val()).toBe("from-parent");
+        expect(element.find("input").value).toBe("from-parent");
         expect(componentScope).not.toBe(regularScope);
         expect(componentScope.$parent).toBe(regularScope);
       });

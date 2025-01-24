@@ -1493,11 +1493,11 @@ describe("ngModel", () => {
       await wait();
       expect(element.value).toBe("XXX");
 
-      element.val("");
+      element.value = "";
       browserTrigger(element, "change");
       expect(element.value).toBe("");
 
-      element.val("YYY");
+      element.value = "YYY";
       browserTrigger(element, "change");
       expect(element.value).toBe("YYY");
     });
@@ -1520,14 +1520,14 @@ describe("ngModel", () => {
       expect(element[0].classList.contains("ng-valid-email")).toBe(false);
       expect(element[0].classList.contains("ng-invalid-email")).toBe(true);
 
-      element.val("invalid-again");
+      element.value = "invalid-again";
       browserTrigger(element, "change");
       expect(element[0].classList.contains("ng-invalid")).toBeTrue();
       expect(element[0].classList.contains("ng-dirty")).toBeTrue();
       expect(element[0].classList.contains("ng-valid-email")).toBe(false);
       expect(element[0].classList.contains("ng-invalid-email")).toBe(true);
 
-      element.val("vojta@google.com");
+      element.value = "vojta@google.com";
       browserTrigger(element, "change");
       expect(element[0].classList.contains("ng-valid")).toBeTrue();
       expect(element[0].classList.contains("ng-dirty")).toBeTrue();
@@ -1585,9 +1585,9 @@ describe("ngModel", () => {
       createInput("text");
       scope.$apply('val = {part: "a"}');
       await wait();
-      expect(inputElm.val()).toBe("a");
+      expect(inputElm.value).toBe("a");
 
-      inputElm.val("b");
+      inputElm.value = "b";
       browserTrigger(inputElm, "change");
       expect(scope.val).toEqual({ part: "b" });
     });
@@ -1596,9 +1596,9 @@ describe("ngModel", () => {
       createInput("number");
       scope.$apply("val = {part: 1}");
       await wait();
-      expect(inputElm.val()).toBe("1");
+      expect(inputElm.value).toBe("1");
 
-      inputElm.val("2");
+      inputElm.value = "2";
       browserTrigger(inputElm, "change");
       expect(scope.val).toEqual({ part: 2 });
     });
@@ -1607,9 +1607,9 @@ describe("ngModel", () => {
       createInput("date");
       scope.val = { part: "2000-11-08" };
       await wait();
-      expect(inputElm.val()).toBe("2000-11-08");
+      expect(inputElm.value).toBe("2000-11-08");
 
-      inputElm.val("2001-12-09");
+      inputElm.value = "2001-12-09";
       browserTrigger(inputElm, "change");
       expect(scope.val).toEqual({ part: "2001-12-09" });
     });

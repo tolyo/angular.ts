@@ -63,17 +63,17 @@ function SelectController($element, $scope) {
 
   self.renderUnknownOption = function (val) {
     const unknownVal = self.generateUnknownOptionValue(val);
-    self.unknownOption.val(unknownVal);
+    self.unknownOption.value = unknownVal;
     $element.prepend(self.unknownOption);
     setOptionSelectedStatus(self.unknownOption, true);
-    $element.val(unknownVal);
+    $element.value = unknownVal;
   };
 
   self.updateUnknownOption = function (val) {
     const unknownVal = self.generateUnknownOptionValue(val);
-    self.unknownOption.val(unknownVal);
+    self.unknownOption.value = unknownVal;
     setOptionSelectedStatus(self.unknownOption, true);
-    $element.val(unknownVal);
+    $element.value = unknownVal;
   };
 
   self.generateUnknownOptionValue = function (val) {
@@ -86,7 +86,7 @@ function SelectController($element, $scope) {
 
   self.selectEmptyOption = function () {
     if (self.emptyOption) {
-      $element.val("");
+      $element.value = "";
       setOptionSelectedStatus(self.emptyOption, true);
     }
   };
@@ -130,7 +130,7 @@ function SelectController($element, $scope) {
       self.removeUnknownOption();
 
       const hashedVal = hashKey(value);
-      $element.val(hashedVal in self.selectValueMap ? hashedVal : value);
+      $element.value = hashedVal in self.selectValueMap ? hashedVal : value;
 
       // Set selected attribute and property on selected option for screen readers
       const selectedOption = $element[0].options[$element[0].selectedIndex];

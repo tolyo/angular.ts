@@ -65,7 +65,7 @@ describe("ngChange", () => {
 
       el[0].setAttribute("value", "a");
       el[0].dispatchEvent(new Event("change"));
-      expect(el.val()).toBe("b");
+      expect(el.value).toBe("b");
     });
   });
 });

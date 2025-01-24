@@ -459,7 +459,7 @@ describe("ngModelOptions", () => {
           expect($rootScope.name).toEqual("b");
 
           $rootScope.$apply("name = undefined");
-          expect(inputElm.val()).toBe("");
+          expect(inputElm.value).toBe("");
           ctrl.$overrideModelOptions({ updateOn: "blur mousedown" });
 
           changeGivenInputTo(inputElm, "a");
@@ -719,11 +719,11 @@ describe("ngModelOptions", () => {
       //   )($rootScope);
 
       //   changeGivenInputTo(inputElm, "a");
-      //   expect(inputElm.val()).toBe("a");
+      //   expect(inputElm.value).toBe("a");
       //   $rootScope.form.alias.$rollbackViewValue();
-      //   expect(inputElm.val()).toBe("");
+      //   expect(inputElm.value).toBe("");
       //   browserTrigger(inputElm, "blur");
-      //   expect(inputElm.val()).toBe("");
+      //   expect(inputElm.value).toBe("");
       // });
 
       // it("should allow canceling pending updates", () => {
@@ -774,11 +774,11 @@ describe("ngModelOptions", () => {
       //   )($rootScope);
 
       //   changeGivenInputTo(inputElm, "a");
-      //   expect(inputElm.val()).toBe("a");
+      //   expect(inputElm.value).toBe("a");
       //   $rootScope.form.alias.$rollbackViewValue();
-      //   expect(inputElm.val()).toBe("");
+      //   expect(inputElm.value).toBe("");
       //   $timeout.flush(3000);
-      //   expect(inputElm.val()).toBe("");
+      //   expect(inputElm.value).toBe("");
       // });
       //});
 
@@ -792,7 +792,7 @@ describe("ngModelOptions", () => {
           const spy = ($rootScope.name = jasmine.createSpy("setterSpy"));
           changeGivenInputTo(inputElm, "a");
           expect(spy).not.toHaveBeenCalled();
-          expect(inputElm.val()).toBe("a");
+          expect(inputElm.value).toBe("a");
         });
 
         it("should not try to invoke a model if getterSetter is not set", () => {
@@ -803,7 +803,7 @@ describe("ngModelOptions", () => {
           const spy = ($rootScope.name = jasmine.createSpy("setterSpy"));
           changeGivenInputTo(inputElm, "a");
           expect(spy).not.toHaveBeenCalled();
-          expect(inputElm.val()).toBe("a");
+          expect(inputElm.value).toBe("a");
         });
 
         it("should try to invoke a function model if getterSetter is true", () => {
@@ -816,10 +816,10 @@ describe("ngModelOptions", () => {
             .createSpy("setterSpy")
             .and.callFake(() => "b"));
           await wait();
-          expect(inputElm.val()).toBe("b");
+          expect(inputElm.value).toBe("b");
 
           changeGivenInputTo(inputElm, "a");
-          expect(inputElm.val()).toBe("b");
+          expect(inputElm.value).toBe("b");
           expect(spy).toHaveBeenCalledWith("a");
           expect($rootScope.name).toBe(spy);
         });
@@ -832,7 +832,7 @@ describe("ngModelOptions", () => {
 
           $rootScope.name = "c";
           changeGivenInputTo(inputElm, "d");
-          expect(inputElm.val()).toBe("d");
+          expect(inputElm.value).toBe("d");
           expect($rootScope.name).toBe("d");
         });
 
@@ -869,7 +869,7 @@ describe("ngModelOptions", () => {
           spyOn($rootScope.someService, "getterSetter").and.callThrough();
           await wait();
 
-          expect(inputElm.val()).toBe("a");
+          expect(inputElm.value).toBe("a");
           expect($rootScope.someService.getterSetter).toHaveBeenCalledWith();
           expect($rootScope.someService.value).toBe("a");
 
@@ -879,7 +879,7 @@ describe("ngModelOptions", () => {
 
           $rootScope.someService.value = "c";
           await wait();
-          expect(inputElm.val()).toBe("c");
+          expect(inputElm.value).toBe("c");
           expect($rootScope.someService.getterSetter).toHaveBeenCalledWith();
         });
       });
@@ -946,10 +946,10 @@ describe("ngModelOptions", () => {
           };
           $rootScope.$apply("value = '12345'");
 
-          expect(inputElm.val()).toBe("12345");
+          expect(inputElm.value).toBe("12345");
           expect($rootScope.form.input.$pending.promiseValidator).toBe(true);
           defer.reject();
-          expect(inputElm.val()).toBe("12345");
+          expect(inputElm.value).toBe("12345");
           expect(inputElm[0].classList.contains("ng-invalid")).toBeTrue();
         });
 

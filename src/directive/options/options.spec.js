@@ -30,7 +30,7 @@ describe("ngOptions", () => {
 
   function setSelectValue(selectElement, optionIndex) {
     const option = selectElement.find("option").eq(optionIndex);
-    selectElement.val(option.val());
+    selectElement.value = option.value;
     browserTrigger(element, "change");
   }
 
@@ -40,7 +40,7 @@ describe("ngOptions", () => {
         return {
           compare(_actual_, value, multiple) {
             const errors = [];
-            let actual = _actual_.val();
+            let actual = _actual_.value;
 
             if (multiple) {
               value = value.map((val) => hashKey(val));
@@ -1251,7 +1251,7 @@ describe("ngOptions", () => {
         "ng-options": "item.label for item in arr track by item.id",
       });
 
-      element.val("10");
+      element.value = "10";
       browserTrigger(element, "change");
 
       expect(scope.selected).toEqual(scope.arr[0]);
@@ -1523,7 +1523,7 @@ describe("ngOptions", () => {
 
         // Now test view -> model
 
-        element.val("10");
+        element.value = "10";
         browserTrigger(element, "change");
         expect(scope.selected).toEqual(scope.arr[0].subItem);
 
@@ -2160,7 +2160,7 @@ describe("ngOptions", () => {
 
       expect(element.find("option").length).toEqual(2);
       expect(element.value).toEqual("?");
-      expect(JQLite(element.find("option")[0]).val()).toEqual("?");
+      expect(JQLite(element.find("option")[0]).value).toEqual("?");
 
       scope.$apply(() => {
         scope.selected = scope.values[0];
@@ -2180,14 +2180,14 @@ describe("ngOptions", () => {
 
       expect(element.find("option").length).toEqual(2);
       expect(element.value).toEqual("");
-      expect(JQLite(element.find("option")[0]).val()).toEqual("");
+      expect(JQLite(element.find("option")[0]).value).toEqual("");
 
       scope.$apply(() => {
         scope.selected = scope.values[0];
       });
 
       expect(element).toEqualSelectValue(scope.selected);
-      expect(JQLite(element.find("option")[0]).val()).toEqual("");
+      expect(JQLite(element.find("option")[0]).value).toEqual("");
       expect(element.find("option").length).toEqual(2);
     });
 
@@ -2201,7 +2201,7 @@ describe("ngOptions", () => {
 
       expect(element.find("option").length).toEqual(2);
       expect(element.value).toEqual("");
-      expect(JQLite(element.find("option")[0]).val()).toEqual("");
+      expect(JQLite(element.find("option")[0]).value).toEqual("");
 
       scope.$apply(() => {
         scope.selected = scope.values[0];
@@ -2451,7 +2451,7 @@ describe("ngOptions", () => {
       // check blank option is first and is compiled
       expect(element.find("option").length).toBe(2);
       option = element.find("option").eq(0);
-      expect(option.val()).toBe("");
+      expect(option.value).toBe("");
       expect(option.text()).toBe("blank is so blank");
 
       scope.$apply(() => {
@@ -2461,7 +2461,7 @@ describe("ngOptions", () => {
       // check blank option is first and is compiled
       expect(element.find("option").length).toBe(2);
       option = element.find("option").eq(0);
-      expect(option.val()).toBe("");
+      expect(option.value).toBe("");
       expect(option.text()).toBe("blank is not so blank");
     });
 
@@ -2479,7 +2479,7 @@ describe("ngOptions", () => {
       // check blank option is first and is compiled
       expect(element.find("option").length).toBe(2);
       option = element.find("option").eq(0);
-      expect(option.val()).toBe("");
+      expect(option.value).toBe("");
       expect(option.text()).toBe("blank is so blank");
     });
 
@@ -2495,7 +2495,7 @@ describe("ngOptions", () => {
       // check blank option is first and is compiled
       expect(element.find("option").length).toBe(2);
       option = element.find("option").eq(0);
-      expect(option.val()).toBe("");
+      expect(option.value).toBe("");
       expect(option.text()).toBe("is blank");
     });
 
@@ -2586,7 +2586,7 @@ describe("ngOptions", () => {
 
       options = element.find("option");
       expect(options.length).toBe(2);
-      expect(options.eq(0).val()).toBe("");
+      expect(options.eq(0).value).toBe("");
       expect(options.eq(0).text()).toBe("blank");
 
       scope.$apply("isBlank = false");
@@ -2740,7 +2740,7 @@ describe("ngOptions", () => {
         scope.selected = scope.values[0];
       });
 
-      element.val("");
+      element.value = "";
       browserTrigger(element, "change");
       expect(scope.selected).toEqual(null);
     });
@@ -3282,7 +3282,7 @@ describe("ngOptions", () => {
       expect(element.value).toBe("");
       const emptyOption = element.find("option").eq(0);
       expect(emptyOption[0].selected).toBe(true);
-      expect(emptyOption.val()).toBe("");
+      expect(emptyOption.value).toBe("");
     });
   });
 
