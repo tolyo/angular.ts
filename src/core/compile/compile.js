@@ -595,6 +595,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
           ? [createElementFromHTML($compileNodes)]
           : [$compileNodes];
 
+        debugger;
         /**
          * @type {CompositeLinkFn}
          */
@@ -738,7 +739,6 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
          */
         var nodeLinkFn;
         let childNodes;
-        let childLinkFn;
         let linkFnFound;
         let nodeLinkFnFound;
 
@@ -771,19 +771,22 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
             nodeLinkFn = null;
           }
 
-          childLinkFn =
+          let childLinkFn;
+
+          if (
             (nodeLinkFn && nodeLinkFn.terminal) ||
             !(childNodes = nodeList[i].childNodes) ||
             !childNodes.length
-              ? null
-              : compileNodes(
-                  childNodes,
-                  nodeLinkFn
-                    ? (nodeLinkFn.transcludeOnThisElement ||
-                        !nodeLinkFn.templateOnThisElement) &&
-                        nodeLinkFn.transclude
-                    : transcludeFn,
-                );
+          ) {
+            childLinkFn = null;
+          } else {
+            let transcluded = nodeLinkFn
+              ? (nodeLinkFn.transcludeOnThisElement ||
+                  !nodeLinkFn.templateOnThisElement) &&
+                nodeLinkFn.transclude
+              : transcludeFn;
+            childLinkFn = compileNodes(childNodes, transcluded);
+          }
 
           if (nodeLinkFn || childLinkFn) {
             linkFns.push(i, nodeLinkFn, childLinkFn);
