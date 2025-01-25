@@ -35,23 +35,23 @@ describe("ng-bind", () => {
     it("should set text", async () => {
       element = $compile('<div ng-bind="a"></div>')($rootScope);
       await wait();
-      expect(element.text()).toEqual("");
+      expect(element.textContent).toEqual("");
       $rootScope.a = "misko";
       await wait();
-      expect(element.text()).toEqual("misko");
+      expect(element.textContent).toEqual("misko");
     });
 
     it("should set text to blank if undefined", async () => {
       element = $compile('<div ng-bind="a"></div>')($rootScope);
       $rootScope.a = "misko";
       await wait();
-      expect(element.text()).toEqual("misko");
+      expect(element.textContent).toEqual("misko");
       $rootScope.a = undefined;
       await wait();
-      expect(element.text()).toEqual("");
+      expect(element.textContent).toEqual("");
       $rootScope.a = null;
       await wait();
-      expect(element.text()).toEqual("");
+      expect(element.textContent).toEqual("");
     });
 
     it("should suppress rendering of falsy values", async () => {
@@ -64,7 +64,7 @@ describe("ng-bind", () => {
           "</div>",
       )($rootScope);
       await wait();
-      expect(element.text()).toEqual("-0false");
+      expect(element.textContent).toEqual("-0false");
     });
 
     [
@@ -76,7 +76,7 @@ describe("ng-bind", () => {
         $rootScope.value = prop[0];
         element = $compile('<div ng-bind="value"></div>')($rootScope);
         await wait();
-        expect(element.text()).toEqual(prop[1]);
+        expect(element.textContent).toEqual(prop[1]);
       });
     });
 
@@ -88,22 +88,22 @@ describe("ng-bind", () => {
       };
       element = $compile('<div ng-bind="value"></div>')($rootScope);
       await wait();
-      expect(element.text()).toEqual("foo");
+      expect(element.textContent).toEqual("foo");
     });
 
     it("should NOT use toString on array objects", async () => {
       $rootScope.value = [];
       element = $compile('<div ng-bind="value"></div>')($rootScope);
       await wait();
-      expect(element.text()).toEqual("[]");
+      expect(element.textContent).toEqual("[]");
     });
 
     it("should NOT use toString on Date objects", async () => {
       $rootScope.value = new Date(2014, 10, 10, 0, 0, 0);
       element = $compile('<div ng-bind="value"></div>')($rootScope);
       await wait();
-      expect(element.text()).toBe(JSON.stringify($rootScope.value));
-      expect(element.text()).not.toEqual($rootScope.value.toString());
+      expect(element.textContent).toBe(JSON.stringify($rootScope.value));
+      expect(element.textContent).not.toEqual($rootScope.value.toString());
     });
   });
 
@@ -114,7 +114,7 @@ describe("ng-bind", () => {
       );
       $rootScope.name = "Misko";
       await wait();
-      expect(element.text()).toEqual("Hello Misko!");
+      expect(element.textContent).toEqual("Hello Misko!");
     });
 
     it("should render object as JSON ignore $$", async () => {
@@ -122,7 +122,7 @@ describe("ng-bind", () => {
         $rootScope,
       );
       await wait();
-      expect(JSON.parse(element.text())).toEqual({ key: "value" });
+      expect(JSON.parse(element.textContent)).toEqual({ key: "value" });
     });
   });
 

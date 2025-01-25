@@ -500,9 +500,9 @@ export function optionDirective($interpolate) {
       } else {
         // If the value attribute is not defined then we fall back to the
         // text content of the option element, which may be interpolated
-        interpolateTextFn = $interpolate(element.text(), true);
+        interpolateTextFn = $interpolate(element.textContent, true);
         if (!interpolateTextFn) {
-          attr.$set("value", element.text());
+          attr.$set("value", element.textContent);
         }
       }
 

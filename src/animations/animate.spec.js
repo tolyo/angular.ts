@@ -45,7 +45,7 @@ describe("$animate", () => {
       const child = JQLite("<div>first</div>");
       $animate.enter(child, element);
 
-      expect(element.text()).toEqual("first 0 1 2 3 4");
+      expect(element.textContent).toEqual("first 0 1 2 3 4");
     });
 
     it("should remove the element at the end of leave animation", () => {
@@ -61,9 +61,9 @@ describe("$animate", () => {
       const child2 = $compile("<div>2</div>")($rootScope);
       element.append(child1);
       element.append(child2);
-      expect(element.text()).toBe("12");
+      expect(element.textContent).toBe("12");
       $animate.move(child1, element, child2);
-      expect(element.text()).toBe("21");
+      expect(element.textContent).toBe("21");
     });
 
     it("should apply styles instantly to the element", () => {

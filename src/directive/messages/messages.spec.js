@@ -48,13 +48,13 @@ describe("ngMessages", () => {
         '  <div ng-message="val">Message is set</div>' +
         "</div>",
     )($rootScope);
-    expect(element.text()).not.toContain("Message is set");
+    expect(element.textContent).not.toContain("Message is set");
 
     $rootScope.$apply(() => {
       $rootScope.col = { val: true };
     });
 
-    expect(element.text()).toContain("Message is set");
+    expect(element.textContent).toContain("Message is set");
   });
 
   it("should render the same message if multiple message keys match", () => {
@@ -63,31 +63,31 @@ describe("ngMessages", () => {
         '  <div ng-message="one, two, three">Message is set</div>' +
         "</div>",
     )($rootScope);
-    expect(element.text()).not.toContain("Message is set");
+    expect(element.textContent).not.toContain("Message is set");
 
     $rootScope.$apply(() => {
       $rootScope.col = { one: true };
     });
 
-    expect(element.text()).toContain("Message is set");
+    expect(element.textContent).toContain("Message is set");
 
     $rootScope.$apply(() => {
       $rootScope.col = { two: true, one: false };
     });
 
-    expect(element.text()).toContain("Message is set");
+    expect(element.textContent).toContain("Message is set");
 
     $rootScope.$apply(() => {
       $rootScope.col = { three: true, two: false };
     });
 
-    expect(element.text()).toContain("Message is set");
+    expect(element.textContent).toContain("Message is set");
 
     $rootScope.$apply(() => {
       $rootScope.col = { three: false };
     });
 
-    expect(element.text()).not.toContain("Message is set");
+    expect(element.textContent).not.toContain("Message is set");
   });
 
   it("should use the when attribute when an element directive is used", () => {
@@ -96,13 +96,13 @@ describe("ngMessages", () => {
         '  <ng-message when="val">Message is set</div>' +
         "</ng-messages>",
     )($rootScope);
-    expect(element.text()).not.toContain("Message is set");
+    expect(element.textContent).not.toContain("Message is set");
 
     $rootScope.$apply(() => {
       $rootScope.col = { val: true };
     });
 
-    expect(element.text()).toContain("Message is set");
+    expect(element.textContent).toContain("Message is set");
   });
 
   it("should render the same message if multiple message keys match based on the when attribute", () => {
@@ -111,31 +111,31 @@ describe("ngMessages", () => {
         '  <ng-message when=" one two three ">Message is set</div>' +
         "</ng-messages>",
     )($rootScope);
-    expect(element.text()).not.toContain("Message is set");
+    expect(element.textContent).not.toContain("Message is set");
 
     $rootScope.$apply(() => {
       $rootScope.col = { one: true };
     });
 
-    expect(element.text()).toContain("Message is set");
+    expect(element.textContent).toContain("Message is set");
 
     $rootScope.$apply(() => {
       $rootScope.col = { two: true, one: false };
     });
 
-    expect(element.text()).toContain("Message is set");
+    expect(element.textContent).toContain("Message is set");
 
     $rootScope.$apply(() => {
       $rootScope.col = { three: true, two: false };
     });
 
-    expect(element.text()).toContain("Message is set");
+    expect(element.textContent).toContain("Message is set");
 
     $rootScope.$apply(() => {
       $rootScope.col = { three: false };
     });
 
-    expect(element.text()).not.toContain("Message is set");
+    expect(element.textContent).not.toContain("Message is set");
   });
 
   it("should allow a dynamic expression to be set when ng-message-exp is used", () => {
@@ -144,32 +144,32 @@ describe("ngMessages", () => {
         '  <div ng-message-exp="variable">Message is crazy</div>' +
         "</div>",
     )($rootScope);
-    expect(element.text()).not.toContain("Message is crazy");
+    expect(element.textContent).not.toContain("Message is crazy");
 
     $rootScope.$apply(() => {
       $rootScope.variable = "error";
       $rootScope.col = { error: true };
     });
 
-    expect(element.text()).toContain("Message is crazy");
+    expect(element.textContent).toContain("Message is crazy");
 
     $rootScope.$apply(() => {
       $rootScope.col = { error: false, failure: true };
     });
 
-    expect(element.text()).not.toContain("Message is crazy");
+    expect(element.textContent).not.toContain("Message is crazy");
 
     $rootScope.$apply(() => {
       $rootScope.variable = ["failure"];
     });
 
-    expect(element.text()).toContain("Message is crazy");
+    expect(element.textContent).toContain("Message is crazy");
 
     $rootScope.$apply(() => {
       $rootScope.variable = null;
     });
 
-    expect(element.text()).not.toContain("Message is crazy");
+    expect(element.textContent).not.toContain("Message is crazy");
   });
 
   it("should allow a dynamic expression to be set when the when-exp attribute is used", () => {
@@ -178,32 +178,32 @@ describe("ngMessages", () => {
         '  <ng-message when-exp="variable">Message is crazy</ng-message>' +
         "</ng-messages>",
     )($rootScope);
-    expect(element.text()).not.toContain("Message is crazy");
+    expect(element.textContent).not.toContain("Message is crazy");
 
     $rootScope.$apply(() => {
       $rootScope.variable = "error, failure";
       $rootScope.col = { error: true };
     });
 
-    expect(element.text()).toContain("Message is crazy");
+    expect(element.textContent).toContain("Message is crazy");
 
     $rootScope.$apply(() => {
       $rootScope.col = { error: false, failure: true };
     });
 
-    expect(element.text()).toContain("Message is crazy");
+    expect(element.textContent).toContain("Message is crazy");
 
     $rootScope.$apply(() => {
       $rootScope.variable = [];
     });
 
-    expect(element.text()).not.toContain("Message is crazy");
+    expect(element.textContent).not.toContain("Message is crazy");
 
     $rootScope.$apply(() => {
       $rootScope.variable = null;
     });
 
-    expect(element.text()).not.toContain("Message is crazy");
+    expect(element.textContent).not.toContain("Message is crazy");
   });
 
   // they(
@@ -229,7 +229,7 @@ describe("ngMessages", () => {
   //       $rootScope.$apply(() => {
   //         $rootScope.col = prop;
   //       });
-  //       expect(element.text()).not.toContain("Message is set");
+  //       expect(element.textContent).not.toContain("Message is set");
   //     });
   //   },
   // );
@@ -251,7 +251,7 @@ describe("ngMessages", () => {
   //       });
 
   //       expect(messageChildren(element).length).toBe(0);
-  //       expect(trim(element.text())).toEqual("");
+  //       expect(trim(element.textContent)).toEqual("");
 
   //       $rootScope.$apply(() => {
   //         $rootScope.col = {
@@ -261,7 +261,7 @@ describe("ngMessages", () => {
   //       });
 
   //       expect(messageChildren(element).length).toBe(1);
-  //       expect(trim(element.text())).toEqual("This message is blue");
+  //       expect(trim(element.textContent)).toEqual("This message is blue");
 
   //       $rootScope.$apply(() => {
   //         $rootScope.col = {
@@ -270,13 +270,13 @@ describe("ngMessages", () => {
   //       });
 
   //       expect(messageChildren(element).length).toBe(1);
-  //       expect(trim(element.text())).toEqual("This message is red");
+  //       expect(trim(element.textContent)).toEqual("This message is red");
 
   //       $rootScope.$apply(() => {
   //         $rootScope.col = null;
   //       });
   //       expect(messageChildren(element).length).toBe(0);
-  //       expect(trim(element.text())).toEqual("");
+  //       expect(trim(element.textContent)).toEqual("");
 
   //       $rootScope.$apply(() => {
   //         $rootScope.col = {
@@ -286,7 +286,7 @@ describe("ngMessages", () => {
   //       });
 
   //       expect(messageChildren(element).length).toBe(0);
-  //       expect(trim(element.text())).toEqual("");
+  //       expect(trim(element.textContent)).toEqual("");
   //     });
   //   },
   // );
@@ -309,14 +309,14 @@ describe("ngMessages", () => {
     });
 
     ["one", "two", "three"].forEach((key) => {
-      expect(s(element.text())).toEqual(`Message#${key}`);
+      expect(s(element.textContent)).toEqual(`Message#${key}`);
 
       $rootScope.$apply(() => {
         $rootScope.col[key] = false;
       });
     });
 
-    expect(s(element.text())).toEqual("");
+    expect(s(element.textContent)).toEqual("");
   });
 
   it("should add ng-active/ng-inactive CSS classes to the element when errors are/aren't displayed", () => {
@@ -361,21 +361,21 @@ describe("ngMessages", () => {
     });
 
     expect(messageChildren(element).length).toBe(0);
-    expect(trim(element.text())).toEqual("");
+    expect(trim(element.textContent)).toEqual("");
 
     $rootScope.$apply(() => {
       $rootScope.col = { hair: true };
     });
 
     expect(messageChildren(element).length).toBe(1);
-    expect(trim(element.text())).toEqual("Your hair is too long");
+    expect(trim(element.textContent)).toEqual("Your hair is too long");
 
     $rootScope.$apply(() => {
       $rootScope.col = { age: true, hair: true };
     });
 
     expect(messageChildren(element).length).toBe(1);
-    expect(trim(element.text())).toEqual("Your age is incorrect");
+    expect(trim(element.textContent)).toEqual("Your age is incorrect");
 
     $rootScope.$apply(() => {
       // remove the age!
@@ -383,7 +383,7 @@ describe("ngMessages", () => {
     });
 
     expect(messageChildren(element).length).toBe(1);
-    expect(trim(element.text())).toEqual("Your hair is too long");
+    expect(trim(element.textContent)).toEqual("Your hair is too long");
 
     $rootScope.$apply(() => {
       // remove the hair!
@@ -392,7 +392,7 @@ describe("ngMessages", () => {
     });
 
     expect(messageChildren(element).length).toBe(1);
-    expect(trim(element.text())).toEqual("Enter something");
+    expect(trim(element.textContent)).toEqual("Enter something");
   });
 
   it("should be compatible with ngBind", () => {
@@ -415,7 +415,7 @@ describe("ngMessages", () => {
     });
 
     expect(messageChildren(element).length).toBe(1);
-    expect(trim(element.text())).toEqual("Fill in the text field.");
+    expect(trim(element.textContent)).toEqual("Fill in the text field.");
 
     $rootScope.$apply(() => {
       $rootScope.col.required = false;
@@ -423,14 +423,14 @@ describe("ngMessages", () => {
     });
 
     expect(messageChildren(element).length).toBe(1);
-    expect(trim(element.text())).toEqual("Extra error message.");
+    expect(trim(element.textContent)).toEqual("Extra error message.");
 
     $rootScope.$apply(() => {
       $rootScope.errorMessages.extra = "New error message.";
     });
 
     expect(messageChildren(element).length).toBe(1);
-    expect(trim(element.text())).toEqual("New error message.");
+    expect(trim(element.textContent)).toEqual("New error message.");
   });
 
   // issue #12856
@@ -521,7 +521,7 @@ describe("ngMessages", () => {
         });
 
         expect(messageChildren(element).length).toBe(1);
-        expect(trim(element.text())).toEqual("A");
+        expect(trim(element.textContent)).toEqual("A");
 
         $rootScope.$apply("show = false");
 
@@ -547,7 +547,7 @@ describe("ngMessages", () => {
       });
 
       expect(messageChildren(element).length).toBe(1);
-      expect(trim(element.text())).toEqual("A");
+      expect(trim(element.textContent)).toEqual("A");
 
       const ctrl = element.controller("ngMessages");
       const deregisterSpy = spyOn(ctrl, "deregister").and.callThrough();
@@ -584,7 +584,7 @@ describe("ngMessages", () => {
         });
 
         expect(messageChildren(element).length).toBe(2);
-        expect(trim(element.text())).toEqual("AB");
+        expect(trim(element.textContent)).toEqual("AB");
 
         const ctrl = element.controller("ngMessages");
         const deregisterSpy = spyOn(ctrl, "deregister").and.callThrough();
@@ -596,7 +596,7 @@ describe("ngMessages", () => {
           "",
         );
         expect(messageChildren(element).length).toBe(1);
-        expect(trim(element.text())).toEqual("A");
+        expect(trim(element.textContent)).toEqual("A");
       },
     );
   });
@@ -613,12 +613,12 @@ describe("ngMessages", () => {
       $rootScope.items = { a: true };
     });
 
-    expect(element.text()).toBe("A");
+    expect(element.textContent).toBe("A");
     const watchers = countWatchers($rootScope);
 
     $rootScope.$apply("items.a = false");
 
-    expect(element.text()).toBe("");
+    expect(element.textContent).toBe("");
     // We don't know exactly how many watchers are on the scope, only that there should be
     // one less now
     expect(countWatchers($rootScope)).toBe(watchers - 1);
@@ -658,28 +658,28 @@ describe("ngMessages", () => {
         $rootScope.col = { unexpected: false };
       });
 
-      expect(element.text().trim()).toBe("");
+      expect(element.textContent.trim()).toBe("");
       expect(element.classList.contains("ng-active")).toBeFalse();
 
       $rootScope.$apply(() => {
         $rootScope.col = { unexpected: true };
       });
 
-      expect(element.text().trim()).toBe("Default message is set");
+      expect(element.textContent.trim()).toBe("Default message is set");
       expect(element.classList.contains("ng-active")).toBeTrue();
 
       $rootScope.$apply(() => {
         $rootScope.col = { unexpected: false };
       });
 
-      expect(element.text().trim()).toBe("");
+      expect(element.textContent.trim()).toBe("");
       expect(element.classList.contains("ng-active")).toBeFalse();
 
       $rootScope.$apply(() => {
         $rootScope.col = { val: true, unexpected: true };
       });
 
-      expect(element.text().trim()).toBe("Message is set");
+      expect(element.textContent.trim()).toBe("Message is set");
       expect(element.classList.contains("ng-active")).toBeTrue();
     });
 
@@ -692,19 +692,19 @@ describe("ngMessages", () => {
           "</div>",
       )($rootScope);
 
-      expect(element.text().trim()).toBe("");
+      expect(element.textContent.trim()).toBe("");
 
       $rootScope.$apply(() => {
         $rootScope.col = { val: true, other: false, unexpected: false };
       });
 
-      expect(element.text().trim()).toBe("Message is set");
+      expect(element.textContent.trim()).toBe("Message is set");
 
       $rootScope.$apply(() => {
         $rootScope.col = { val: true, other: true, unexpected: true };
       });
 
-      expect(element.text().trim()).toBe(
+      expect(element.textContent.trim()).toBe(
         "Message is set  Other message is set",
       );
 
@@ -712,7 +712,7 @@ describe("ngMessages", () => {
         $rootScope.col = { val: false, other: false, unexpected: true };
       });
 
-      expect(element.text().trim()).toBe("Default message is set");
+      expect(element.textContent.trim()).toBe("Default message is set");
     });
 
     it("should handle a default message with ngIf", () => {
@@ -724,21 +724,21 @@ describe("ngMessages", () => {
       )($rootScope);
       $rootScope.default = true;
       $rootScope.col = { unexpected: true };
-      expect(element.text().trim()).toBe("Default message is set");
+      expect(element.textContent.trim()).toBe("Default message is set");
 
       $rootScope.$apply("default = false");
 
-      expect(element.text().trim()).toBe("");
+      expect(element.textContent.trim()).toBe("");
 
       $rootScope.$apply("default = true");
 
-      expect(element.text().trim()).toBe("Default message is set");
+      expect(element.textContent.trim()).toBe("Default message is set");
 
       $rootScope.$apply(() => {
         $rootScope.col = { val: true };
       });
 
-      expect(element.text().trim()).toBe("Message is set");
+      expect(element.textContent.trim()).toBe("Message is set");
     });
   });
 
@@ -783,7 +783,7 @@ describe("ngMessages", () => {
     //       expect(messageChildren(elements[2]).length).toBe(1);
 
     //       // this is the standard order of the displayed error messages
-    //       expect(element.text().trim()).toBe("ABC");
+    //       expect(element.textContent.trim()).toBe("ABC");
 
     //       $rootScope.$apply(() => {
     //         $rootScope.items[0].a = false;
@@ -797,7 +797,7 @@ describe("ngMessages", () => {
 
     //       // with the 2nd item gone and the values changed
     //       // we should see both 1 and 3 changed
-    //       expect(element.text().trim()).toBe("A");
+    //       expect(element.textContent.trim()).toBe("A");
 
     //       $rootScope.$apply(() => {
     //         // add the value for the 2nd item back
@@ -806,7 +806,7 @@ describe("ngMessages", () => {
     //       });
 
     //       // when reversed we get back to our original value
-    //       expect(element.text().trim()).toBe("ABC");
+    //       expect(element.textContent.trim()).toBe("ABC");
     //     });
     //   },
     // );
@@ -873,7 +873,7 @@ describe("ngMessages", () => {
     //       });
 
     //       expect(messageChildren(element).length).toBe(1);
-    //       expect(trim(element.text())).toEqual("A");
+    //       expect(trim(element.textContent)).toEqual("A");
 
     //       $rootScope.$apply(() => {
     //         $rootScope.data = {
@@ -882,7 +882,7 @@ describe("ngMessages", () => {
     //       });
 
     //       expect(messageChildren(element).length).toBe(1);
-    //       expect(trim(element.text())).toEqual("C");
+    //       expect(trim(element.textContent)).toEqual("C");
     //     });
     //   },
     // );
@@ -909,11 +909,13 @@ describe("ngMessages", () => {
       };
 
       expect(messageChildren(element).length).toBe(1);
-      expect(trim(element.text())).toEqual("Your value is that of failure");
+      expect(trim(element.textContent)).toEqual(
+        "Your value is that of failure",
+      );
 
       setTimeout(() => {
         expect(messageChildren(element).length).toBe(1);
-        expect(trim(element.text())).toEqual("You did not enter a value");
+        expect(trim(element.textContent)).toEqual("You did not enter a value");
         done();
       }, 10);
     });
@@ -943,7 +945,7 @@ describe("ngMessages", () => {
       });
 
       expect(messageChildren(element).length).toBe(1);
-      expect(trim(element.text())).toEqual("AAA");
+      expect(trim(element.textContent)).toEqual("AAA");
 
       $rootScope.$apply(() => {
         $rootScope.data = {
@@ -953,7 +955,7 @@ describe("ngMessages", () => {
       });
 
       expect(messageChildren(element).length).toBe(1);
-      expect(trim(element.text())).toEqual("B");
+      expect(trim(element.textContent)).toEqual("B");
 
       $rootScope.$apply(() => {
         $rootScope.data = {
@@ -962,7 +964,7 @@ describe("ngMessages", () => {
       });
 
       expect(messageChildren(element).length).toBe(1);
-      expect(trim(element.text())).toEqual("C");
+      expect(trim(element.textContent)).toEqual("C");
     });
 
     // it("should properly detect a previous message, even if it was registered later", () => {
@@ -977,7 +979,7 @@ describe("ngMessages", () => {
     //   element = $compile(html)($rootScope);
     //   $rootScope.$apply("items = {b: true, c: true}");
 
-    //   expect(element.text()).toBe("B");
+    //   expect(element.textContent).toBe("B");
 
     //   const ctrl = element.controller("ngMessages");
     //   const deregisterSpy = spyOn(ctrl, "deregister").and.callThrough();
@@ -992,7 +994,7 @@ describe("ngMessages", () => {
 
     //   $rootScope.$apply("items.a = true");
 
-    //   expect(element.text()).toBe("A");
+    //   expect(element.textContent).toBe("A");
     // });
 
     it("should not throw if the template is empty", () => {
@@ -1005,7 +1007,7 @@ describe("ngMessages", () => {
       $templateCache.set("messages1.html", "");
       $templateCache.set("messages2.html", "   ");
       element = $compile(html)($rootScope);
-      expect(element.text()).toBe("");
+      expect(element.textContent).toBe("");
       expect(element.childNodes.length).toBe(2);
     });
   });
@@ -1033,7 +1035,7 @@ describe("ngMessages", () => {
     //       });
 
     //       expect(messageChildren(element).length).toBe(2);
-    //       expect(s(element.text())).toContain("13");
+    //       expect(s(element.textContent)).toContain("13");
     //     });
     //   },
     // );
@@ -1061,14 +1063,14 @@ describe("ngMessages", () => {
       });
 
       expect(messageChildren(element).length).toBe(2);
-      expect(s(element.text())).toEqual("XZ");
+      expect(s(element.textContent)).toEqual("XZ");
 
       $rootScope.$apply(() => {
         $rootScope.data.y = {};
       });
 
       expect(messageChildren(element).length).toBe(3);
-      expect(s(element.text())).toEqual("XYZ");
+      expect(s(element.textContent)).toEqual("XYZ");
     });
 
     it("should render and override all truthy messages from a remote template", () => {
@@ -1096,14 +1098,14 @@ describe("ngMessages", () => {
       });
 
       expect(messageChildren(element).length).toBe(2);
-      expect(s(element.text())).toEqual("ZZZX");
+      expect(s(element.textContent)).toEqual("ZZZX");
 
       $rootScope.$apply(() => {
         $rootScope.data.y = {};
       });
 
       expect(messageChildren(element).length).toBe(3);
-      expect(s(element.text())).toEqual("YYYZZZX");
+      expect(s(element.textContent)).toEqual("YYYZZZX");
     });
   });
 });

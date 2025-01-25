@@ -80,6 +80,6 @@ describe("style", () => {
       $rootScope.bind = "value";
     });
 
-    expect(element.text()).toBe("value");
+    expect(element.textContent).toBe("value");
   });
 });

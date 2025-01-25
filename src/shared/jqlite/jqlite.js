@@ -281,36 +281,6 @@ JQLite.prototype.html = function (value) {
 };
 
 /**
- * Get the combined text contents of each element in the JQLite collection
- * or set the text contents of all elements.
- * @param {string} [value]
- * @returns {JQLite|string}
- */
-JQLite.prototype.text = function (value) {
-  let res = "";
-  for (let i = 0; i < this.length; i++) {
-    const element = this[i];
-    if (isUndefined(value)) {
-      // read
-      const { nodeType } = element;
-      res +=
-        nodeType === Node.ELEMENT_NODE || nodeType === Node.TEXT_NODE
-          ? element.textContent
-          : "";
-    } else {
-      // write
-      element.textContent = value;
-    }
-  }
-
-  if (isUndefined(value)) {
-    return res;
-  } else {
-    return this;
-  }
-};
-
-/**
  * @param {string|Object} name
  * @param {any} value
  * @returns

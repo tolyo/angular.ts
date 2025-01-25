@@ -576,7 +576,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
       //= ===============================
 
       /**
-       *
+       * Entry poin for the '$compile' service
        * @param {string|NodeList} $compileNodes
        * @param {*} transcludeFn
        * @param {*} maxPriority
@@ -591,7 +591,9 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
         ignoreDirective,
         previousCompileContext,
       ) {
-        let jqCompileNodes = [$compileNodes];
+        let jqCompileNodes = isString($compileNodes)
+          ? [createElementFromHTML($compileNodes)]
+          : [$compileNodes];
 
         /**
          * @type {CompositeLinkFn}
@@ -668,7 +670,8 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
 
           if (transcludeControllers) {
             for (const controllerName in transcludeControllers) {
-              $linkNode.data(
+              setCacheData(
+                $linkNode,
                 `$${controllerName}Controller`,
                 transcludeControllers[controllerName].instance,
               );

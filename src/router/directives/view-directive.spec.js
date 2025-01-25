@@ -657,7 +657,7 @@ describe("ngView", () => {
   //     // Enter Animation
   //     animation = $animate.queue.shift();
   //     expect(animation.event).toBe("enter");
-  //     expect(animation.element.text() + "-1").toBe(content + "-1");
+  //     expect(animation.element.textContent + "-1").toBe(content + "-1");
 
   //     $state.transitionTo(aState);
   //     await wait(100);
@@ -665,11 +665,11 @@ describe("ngView", () => {
   //     // Enter Animation
   //     animation = $animate.queue.shift();
   //     expect(animation.event).toBe("enter");
-  //     expect(animation.element.text() + "-2").toBe(aState.template + "-2");
+  //     expect(animation.element.textContent + "-2").toBe(aState.template + "-2");
   //     // Leave Animation
   //     animation = $animate.queue.shift();
   //     expect(animation.event).toBe("leave");
-  //     expect(animation.element.text() + "-3").toBe(content + "-3");
+  //     expect(animation.element.textContent + "-3").toBe(content + "-3");
 
   //     $state.transitionTo(bState);
   //     await wait(100);
@@ -677,11 +677,11 @@ describe("ngView", () => {
   //     // Enter Animation
   //     animation = $animate.queue.shift();
   //     expect(animation.event).toBe("enter");
-  //     expect(animation.element.text() + "-4").toBe(bState.template + "-4");
+  //     expect(animation.element.textContent + "-4").toBe(bState.template + "-4");
   //     // Leave Animation
   //     animation = $animate.queue.shift();
   //     expect(animation.event).toBe("leave");
-  //     expect(animation.element.text() + "-5").toBe(aState.template + "-5");
+  //     expect(animation.element.textContent + "-5").toBe(aState.template + "-5");
 
   //     // No more animations
   //     expect($animate.queue.length).toBe(0);
@@ -709,14 +709,14 @@ describe("ngView", () => {
 
   //     animation = $animate.queue.shift();
   //     expect(animation.event).toBe("addClass");
-  //     expect(animation.element.text()).toBe(content);
+  //     expect(animation.element.textContent).toBe(content);
 
   //     scope.classOn = false;
   //     ;
 
   //     animation = $animate.queue.shift();
   //     expect(animation.event).toBe("removeClass");
-  //     expect(animation.element.text()).toBe(content);
+  //     expect(animation.element.textContent).toBe(content);
 
   //     // No more animations
   //     expect($animate.queue.length).toBe(0);
@@ -741,12 +741,12 @@ describe("ngView", () => {
   //     // $ViewDirective enter animation - Basically it's just the <!-- ngView --> comment
   //     animation = $animate.queue.shift();
   //     expect(animation.event).toBe("enter");
-  //     expect(animation.element.text()).toBe("");
+  //     expect(animation.element.textContent).toBe("");
 
   //     // $ViewDirectiveFill enter animation - The second ngView directive that files in the content
   //     animation = $animate.queue.shift();
   //     expect(animation.event).toBe("enter");
-  //     expect(animation.element.text()).toBe(content);
+  //     expect(animation.element.textContent).toBe(content);
 
   //     scope.shouldShow = false;
   //     ;
@@ -754,7 +754,7 @@ describe("ngView", () => {
   //     // ngView leave animation
   //     animation = $animate.queue.shift();
   //     expect(animation.event).toBe("leave");
-  //     expect(animation.element.text()).toBe(content);
+  //     expect(animation.element.textContent).toBe(content);
 
   //     // No more animations
   //     expect($animate.queue.length).toBe(0);

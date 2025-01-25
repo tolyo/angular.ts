@@ -924,9 +924,9 @@ describe("jqLite", () => {
       expect(element.length).toEqual(2);
       expect(element.innerHTML).toEqual("ab");
       expect(element[1].innerHTML).toEqual("c");
-      expect(element.text()).toEqual("abc");
+      expect(element.textContent).toEqual("abc");
       expect(element.text("xyz") === element).toBeTruthy();
-      expect(element.text()).toEqual("xyzxyz");
+      expect(element.textContent).toEqual("xyzxyz");
     });
 
     it("should return text only for element or text nodes", () => {

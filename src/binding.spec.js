@@ -64,7 +64,7 @@ describe("binding", () => {
     element = $compile('<div ng-bind="model.a">x</div>')($rootScope);
     $rootScope.model = { a: 123 };
     await wait();
-    expect(element.text()).toBe("123");
+    expect(element.textContent).toBe("123");
   });
 
   it("InputTypeButtonActionExecutesInScope", () => {
@@ -405,7 +405,7 @@ describe("binding", () => {
     )($rootScope);
     $rootScope.a = 123;
     await wait();
-    expect(element.text()).toBe("123{{a}}{{b}}{{c}}");
+    expect(element.textContent).toBe("123{{a}}{{b}}{{c}}");
   });
 
   it("ShouldTemplateBindPreElements", async () => {
@@ -499,6 +499,6 @@ describe("binding", () => {
   it("ItShouldHandleMultilineBindings", async () => {
     element = $compile("<div>{{\n 1 \n + \n 2 \n}}</div>")($rootScope);
     await wait();
-    expect(element.text()).toBe("3");
+    expect(element.textContent).toBe("3");
   });
 });

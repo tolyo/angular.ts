@@ -1545,7 +1545,7 @@ describe("angular", () => {
       });
       await wait();
       expect(template.text()).toEqual('{{greeting = "hello world"}}');
-      expect(element.text()).toEqual("hello world");
+      expect(element.textContent).toEqual("hello world");
       expect(element).toEqual(templateClone);
       expect($rootScope.greeting).toEqual("hello world");
     });
@@ -1555,7 +1555,7 @@ describe("angular", () => {
       element = $compile(template)($rootScope, () => {});
       await wait();
       expect(template.text()).toEqual('{{greeting = "hello world"}}');
-      expect(element.text()).toEqual("hello world");
+      expect(element.textContent).toEqual("hello world");
       expect($rootScope.greeting).toEqual("hello world");
     });
   });

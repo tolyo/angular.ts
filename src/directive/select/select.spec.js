@@ -182,7 +182,7 @@ describe("select", () => {
       scope.a = "foo";
       scope.b = "bar";
       await wait();
-      expect(element.text()).toBe("foobarC");
+      expect(element.textContent).toBe("foobarC");
     });
 
     it("should not interfere with selection via selected attr if ngModel directive is not present", () => {

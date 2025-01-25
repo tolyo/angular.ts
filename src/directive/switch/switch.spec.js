@@ -34,19 +34,19 @@ describe("ngSwitch", () => {
     expect(element.innerHTML).toEqual("<!----><!----><!---->");
     $scope.select = 1;
     await wait();
-    expect(element.text()).toEqual("first:");
+    expect(element.textContent).toEqual("first:");
     $scope.name = "shyam";
     await wait();
-    expect(element.text()).toEqual("first:shyam");
+    expect(element.textContent).toEqual("first:shyam");
     $scope.select = 2;
     await wait();
-    expect(element.text()).toEqual("second:shyam");
+    expect(element.textContent).toEqual("second:shyam");
     $scope.name = "misko";
     await wait();
-    expect(element.text()).toEqual("second:misko");
+    expect(element.textContent).toEqual("second:misko");
     $scope.select = true;
     await wait();
-    expect(element.text()).toEqual("true:misko");
+    expect(element.textContent).toEqual("true:misko");
   });
 
   it("should show all switch-whens that match the current value", async () => {
@@ -61,21 +61,21 @@ describe("ngSwitch", () => {
     expect(element.innerHTML).toEqual("<!----><!----><!----><!---->");
     $scope.select = 1;
     await wait();
-    expect(element.text()).toEqual("first:, first too:");
+    expect(element.textContent).toEqual("first:, first too:");
     $scope.name = "shyam";
     await wait();
-    expect(element.text()).toEqual("first:shyam, first too:shyam");
+    expect(element.textContent).toEqual("first:shyam, first too:shyam");
 
     $scope.select = 2;
     await wait();
-    expect(element.text()).toEqual("second:shyam");
+    expect(element.textContent).toEqual("second:shyam");
     $scope.name = "misko";
     await wait();
-    expect(element.text()).toEqual("second:misko");
+    expect(element.textContent).toEqual("second:misko");
 
     $scope.select = true;
     await wait();
-    expect(element.text()).toEqual("true:misko");
+    expect(element.textContent).toEqual("true:misko");
   });
 
   it("should show all elements between start and end markers that match the current value", () => {
@@ -111,10 +111,10 @@ describe("ngSwitch", () => {
         "</ng-switch>",
     )($scope);
     await wait();
-    expect(element.text()).toEqual("other");
+    expect(element.textContent).toEqual("other");
     $scope.select = 1;
     await wait();
-    expect(element.text()).toEqual("one");
+    expect(element.textContent).toEqual("one");
   });
 
   it("should show all default elements between start and end markers when no match", () => {
@@ -151,10 +151,10 @@ describe("ngSwitch", () => {
         "</ul>",
     )($scope);
     await wait();
-    expect(element.text()).toEqual("other, other too");
+    expect(element.textContent).toEqual("other, other too");
     $scope.select = 1;
     await wait();
-    expect(element.text()).toEqual("one");
+    expect(element.textContent).toEqual("one");
   });
 
   it("should always display the elements that do not match a switch", async () => {
@@ -168,10 +168,10 @@ describe("ngSwitch", () => {
         "</ul>",
     )($scope);
     await wait();
-    expect(element.text()).toEqual("always other, other too ");
+    expect(element.textContent).toEqual("always other, other too ");
     $scope.select = 1;
     await wait();
-    expect(element.text()).toEqual("always one ");
+    expect(element.textContent).toEqual("always one ");
   });
 
   it(
@@ -193,10 +193,10 @@ describe("ngSwitch", () => {
           "</ul>",
       )($scope);
       await wait();
-      expect(element.text()).toEqual("135678");
+      expect(element.textContent).toEqual("135678");
       $scope.select = 1;
       await wait();
-      expect(element.text()).toEqual("12368");
+      expect(element.textContent).toEqual("12368");
     },
   );
 
@@ -216,10 +216,10 @@ describe("ngSwitch", () => {
           "</ul>",
       )($scope);
       await wait();
-      expect(element.text()).toEqual("3567");
+      expect(element.textContent).toEqual("3567");
       $scope.select = 1;
       await wait();
-      expect(element.text()).toEqual("236");
+      expect(element.textContent).toEqual("236");
     },
   );
 
@@ -260,19 +260,19 @@ describe("ngSwitch", () => {
         "</div>",
     )($scope);
     $scope.$apply('value="foo";foos=["one", "two"]');
-    expect(element.text()).toEqual("foo:one|foo:two|");
+    expect(element.textContent).toEqual("foo:one|foo:two|");
 
     $scope.$apply('value="foo";foos=["one"]');
-    expect(element.text()).toEqual("foo:one|");
+    expect(element.textContent).toEqual("foo:one|");
 
     $scope.$apply('value="foo";foos=["one","two","three"]');
-    expect(element.text()).toEqual("foo:one|foo:two|foo:three|");
+    expect(element.textContent).toEqual("foo:one|foo:two|foo:three|");
 
     $scope.$apply('value="bar";bars=["up", "down"]');
-    expect(element.text()).toEqual("bar:up|bar:down|");
+    expect(element.textContent).toEqual("bar:up|bar:down|");
 
     $scope.$apply('value="bar";bars=["up", "down", "forwards", "backwards"]');
-    expect(element.text()).toEqual(
+    expect(element.textContent).toEqual(
       "bar:up|bar:down|bar:forwards|bar:backwards|",
     );
   });
@@ -325,12 +325,12 @@ describe("ngSwitch", () => {
     )($scope);
     await wait();
 
-    expect(element.text()).toEqual("first");
+    expect(element.textContent).toEqual("first");
 
     $scope.select = 2;
     await wait();
     spy.calls.reset();
-    expect(element.text()).toEqual("second");
+    expect(element.textContent).toEqual("second");
     // If ngSwitch re-introduces code that triggers a digest after an element is removed (in an
     // animation .then callback), flushing the queue ensures the callback will be called, and the test
     // fails
@@ -362,10 +362,10 @@ describe("ngSwitch", () => {
     )(scope);
 
     scope.$apply();
-    expect(element.text()).toBe("FOO 1FOO 2");
+    expect(element.textContent).toBe("FOO 1FOO 2");
 
     scope.$apply('value = "bar"');
-    expect(element.text()).toBe("BAZ");
+    expect(element.textContent).toBe("BAZ");
   });
 
   describe("ngSwitchWhen separator", () => {
@@ -380,15 +380,15 @@ describe("ngSwitch", () => {
 
       $scope.$apply('mode = "a"');
       expect(element.children().length).toBe(2);
-      expect(element.text()).toBe("Block1|Block2|");
+      expect(element.textContent).toBe("Block1|Block2|");
       $scope.$apply('mode = "b"');
 
       expect(element.children().length).toBe(1);
-      expect(element.text()).toBe("Block1|");
+      expect(element.textContent).toBe("Block1|");
       $scope.$apply('mode = "c"');
 
       expect(element.children().length).toBe(1);
-      expect(element.text()).toBe("Block3|");
+      expect(element.textContent).toBe("Block3|");
     });
 
     it("should be possible to use a separator at the end of the value", () => {
@@ -402,15 +402,15 @@ describe("ngSwitch", () => {
 
       $scope.$apply('mode = "a"');
       expect(element.children().length).toBe(2);
-      expect(element.text()).toBe("Block1|Block2|");
+      expect(element.textContent).toBe("Block1|Block2|");
       $scope.$apply('mode = ""');
 
       expect(element.children().length).toBe(1);
-      expect(element.text()).toBe("Block1|");
+      expect(element.textContent).toBe("Block1|");
       $scope.$apply('mode = "c"');
 
       expect(element.children().length).toBe(1);
-      expect(element.text()).toBe("Block3|");
+      expect(element.textContent).toBe("Block3|");
     });
 
     it("should be possible to use the empty string as a separator", () => {
@@ -424,15 +424,15 @@ describe("ngSwitch", () => {
 
       $scope.$apply('mode = "a"');
       expect(element.children().length).toBe(2);
-      expect(element.text()).toBe("Block1|Block2|");
+      expect(element.textContent).toBe("Block1|Block2|");
       $scope.$apply('mode = "b"');
 
       expect(element.children().length).toBe(1);
-      expect(element.text()).toBe("Block1|");
+      expect(element.textContent).toBe("Block1|");
       $scope.$apply('mode = "c"');
 
       expect(element.children().length).toBe(1);
-      expect(element.text()).toBe("Block3|");
+      expect(element.textContent).toBe("Block3|");
     });
 
     it("should be possible to use separators that are multiple characters long", () => {
@@ -446,15 +446,15 @@ describe("ngSwitch", () => {
 
       $scope.$apply('mode = "a"');
       expect(element.children().length).toBe(2);
-      expect(element.text()).toBe("Block1|Block2|");
+      expect(element.textContent).toBe("Block1|Block2|");
       $scope.$apply('mode = "b|a"');
 
       expect(element.children().length).toBe(1);
-      expect(element.text()).toBe("Block1|");
+      expect(element.textContent).toBe("Block1|");
       $scope.$apply('mode = "c"');
 
       expect(element.children().length).toBe(1);
-      expect(element.text()).toBe("Block3|");
+      expect(element.textContent).toBe("Block3|");
     });
 
     it("should ignore multiple appearances of the same item", () => {
@@ -468,15 +468,15 @@ describe("ngSwitch", () => {
 
       $scope.$apply('mode = "a"');
       expect(element.children().length).toBe(2);
-      expect(element.text()).toBe("Block1|Block2|");
+      expect(element.textContent).toBe("Block1|Block2|");
       $scope.$apply('mode = "b"');
 
       expect(element.children().length).toBe(1);
-      expect(element.text()).toBe("Block1|");
+      expect(element.textContent).toBe("Block1|");
       $scope.$apply('mode = "c"');
 
       expect(element.children().length).toBe(1);
-      expect(element.text()).toBe("Block3|");
+      expect(element.textContent).toBe("Block3|");
     });
   });
 });
@@ -575,7 +575,7 @@ describe("ngSwitch", () => {
 
 //       item = $animate.queue.shift();
 //       expect(item.event).toBe("enter");
-//       expect(item.element.text()).toBe("one");
+//       expect(item.element.textContent).toBe("one");
 //     }));
 
 //     it("should fire off the leave animation", inject((
@@ -601,18 +601,18 @@ describe("ngSwitch", () => {
 
 //       item = $animate.queue.shift();
 //       expect(item.event).toBe("enter");
-//       expect(item.element.text()).toBe("two");
+//       expect(item.element.textContent).toBe("two");
 
 //       $scope.val = "three";
 //       ;
 
 //       item = $animate.queue.shift();
 //       expect(item.event).toBe("leave");
-//       expect(item.element.text()).toBe("two");
+//       expect(item.element.textContent).toBe("two");
 
 //       item = $animate.queue.shift();
 //       expect(item.event).toBe("enter");
-//       expect(item.element.text()).toBe("three");
+//       expect(item.element.textContent).toBe("three");
 //     }));
 
 //     it("should work with svg elements when the svg container is transcluded", () => {

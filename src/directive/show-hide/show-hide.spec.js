@@ -176,7 +176,7 @@ describe("ngShow / ngHide", () => {
 
 //       item = $animate.queue.shift();
 //       expect(item.event).toBe("removeClass");
-//       expect(item.element.text()).toBe("data");
+//       expect(item.element.textContent).toBe("data");
 //       expect(item.element).toBeShown();
 
 //       $scope.on = false;
@@ -184,7 +184,7 @@ describe("ngShow / ngHide", () => {
 
 //       item = $animate.queue.shift();
 //       expect(item.event).toBe("addClass");
-//       expect(item.element.text()).toBe("data");
+//       expect(item.element.textContent).toBe("data");
 //       expect(item.element).toBeHidden();
 //     }));
 
@@ -227,7 +227,7 @@ describe("ngShow / ngHide", () => {
 
 //       item = $animate.queue.shift();
 //       expect(item.event).toBe("addClass");
-//       expect(item.element.text()).toBe("datum");
+//       expect(item.element.textContent).toBe("datum");
 //       expect(item.element).toBeHidden();
 
 //       $scope.off = false;
@@ -235,7 +235,7 @@ describe("ngShow / ngHide", () => {
 
 //       item = $animate.queue.shift();
 //       expect(item.event).toBe("removeClass");
-//       expect(item.element.text()).toBe("datum");
+//       expect(item.element.textContent).toBe("datum");
 //       expect(item.element).toBeShown();
 //     }));
 

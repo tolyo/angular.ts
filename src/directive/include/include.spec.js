@@ -43,7 +43,7 @@ describe("ngInclude", () => {
       const injector = angular.bootstrap(element);
       $rootScope = injector.get("$rootScope");
       setTimeout(() => {
-        expect(element.text()).toEqual("hello");
+        expect(element.textContent).toEqual("hello");
         dealoc($rootScope);
         done();
       }, 200);
@@ -58,7 +58,7 @@ describe("ngInclude", () => {
         "http://localhost:4000/mock/hello",
       );
       await wait(100);
-      expect(element.text()).toEqual("Hello");
+      expect(element.textContent).toEqual("Hello");
       dealoc($rootScope);
     });
 
@@ -85,7 +85,7 @@ describe("ngInclude", () => {
       $rootScope.expr = "Alibaba";
       $rootScope.url = "/mock/interpolation";
       setTimeout(() => {
-        expect(element.text()).toEqual("Alibaba");
+        expect(element.textContent).toEqual("Alibaba");
         done();
       }, 200);
     });
@@ -106,11 +106,11 @@ describe("ngInclude", () => {
       $rootScope.expr = "igor";
       $rootScope.url = "/mock/interpolation";
       setTimeout(() => {
-        expect(element.text()).toEqual("igor");
+        expect(element.textContent).toEqual("igor");
         $rootScope.url = undefined;
       }, 100);
       setTimeout(() => {
-        expect(element.text()).toEqual("");
+        expect(element.textContent).toEqual("");
         done();
       }, 300);
     });
@@ -189,7 +189,7 @@ describe("ngInclude", () => {
       expect($rootScope.loaded).not.toBeDefined();
       $rootScope.url = "/mock/hello";
       setTimeout(() => {
-        expect(element.text()).toEqual("Hello");
+        expect(element.textContent).toEqual("Hello");
         expect($rootScope.loaded).toBe(true);
         done();
       }, 100);
@@ -206,14 +206,14 @@ describe("ngInclude", () => {
       $rootScope.url = "/mock/hello";
       setTimeout(() => {
         expect($rootScope.$children.length).toBe(2);
-        expect(element.text()).toBe("Hello");
+        expect(element.textContent).toBe("Hello");
 
         $rootScope.url = "/mock/401";
       }, 100);
 
       setTimeout(() => {
         expect($rootScope.$children.length).toBe(1);
-        expect(element.text()).toBe("");
+        expect(element.textContent).toBe("");
 
         $rootScope.url = "/mock/hello";
       }, 200);
@@ -238,14 +238,14 @@ describe("ngInclude", () => {
       $rootScope.url = "/mock/hello";
       await wait(100);
 
-      expect(element.text()).toEqual("Hello");
+      expect(element.textContent).toEqual("Hello");
       $rootScope.url = null;
       await wait(100);
-      expect(element.text()).toEqual("");
+      expect(element.textContent).toEqual("");
       $rootScope.url = "/mock/hello";
       await wait();
       // No request being made
-      expect(element.text()).toEqual("Hello");
+      expect(element.textContent).toEqual("Hello");
     });
 
     it("should clear content when error during xhr request", async () => {
@@ -255,7 +255,7 @@ describe("ngInclude", () => {
       $rootScope = injector.get("$rootScope");
       $rootScope.url = "/mock/401";
       await wait();
-      expect(element.text()).toBe("");
+      expect(element.textContent).toBe("");
     });
 
     it("should be async even if served from cache", (done) => {
@@ -266,7 +266,7 @@ describe("ngInclude", () => {
       $rootScope.url = "/mock/hello";
 
       setTimeout(() => {
-        expect(element.text()).toBe("Hello");
+        expect(element.textContent).toBe("Hello");
         done();
       }, 200);
     });
@@ -281,10 +281,10 @@ describe("ngInclude", () => {
       $rootScope.templateUrl = "/mock/hello";
       $rootScope.expr = "test";
       $rootScope.templateUrl = "/mock/interpolation";
-      expect(element.text()).toBe("");
+      expect(element.textContent).toBe("");
 
       setTimeout(() => {
-        expect(element.text()).toBe("test");
+        expect(element.textContent).toBe("test");
         done();
       }, 200);
     });
@@ -299,17 +299,17 @@ describe("ngInclude", () => {
       $rootScope.hrefUrl = "fooUrl1";
       $rootScope.includeUrl = "/mock/hello";
       await wait(100);
-      expect(element.text()).toBe("Hello");
+      expect(element.textContent).toBe("Hello");
       expect(element.find("span").attr("foo")).toBe("#/fooUrl1");
 
       $rootScope.hrefUrl = "fooUrl2";
       await wait(100);
-      expect(element.text()).toBe("Hello");
+      expect(element.textContent).toBe("Hello");
       expect(element.find("span").attr("foo")).toBe("#/fooUrl2");
 
       $rootScope.includeUrl = "/mock/hello2";
       await wait(100);
-      expect(element.text()).toBe("Hello2");
+      expect(element.textContent).toBe("Hello2");
       expect(element.find("span").attr("foo")).toBe("#/fooUrl2");
     });
 
@@ -351,7 +351,7 @@ describe("ngInclude", () => {
       $rootScope.show = true;
       $rootScope.show = false;
       setTimeout(() => {
-        expect(element.text()).toBe("");
+        expect(element.textContent).toBe("");
         done();
       }, 200);
     });
@@ -365,7 +365,7 @@ describe("ngInclude", () => {
 
       $rootScope.url = "/mock/hello";
       setTimeout(() => {
-        expect(element.text()).toEqual("Hello");
+        expect(element.textContent).toEqual("Hello");
         $rootScope.$apply('url = "/mock/hello2"');
       }, 200);
 
@@ -374,7 +374,7 @@ describe("ngInclude", () => {
       }, 300);
 
       setTimeout(() => {
-        expect(element.text()).toEqual("Hello2");
+        expect(element.textContent).toEqual("Hello2");
         expect(spy).not.toHaveBeenCalled();
         done();
       }, 400);
@@ -565,7 +565,7 @@ describe("ngInclude", () => {
         let contentOnLink;
         window.angular.module("myModule", []).directive("test", () => ({
           link(scope, element) {
-            contentOnLink = element.text();
+            contentOnLink = element.textContent;
           },
         }));
         element = JQLite("<div><div ng-include=\"'/mock/hello'\" test></div>");
@@ -639,7 +639,7 @@ describe("ngInclude", () => {
 
     //     const animation = $animate.queue.pop();
     //     expect(animation.event).toBe("enter");
-    //     expect(animation.element.text()).toBe("data");
+    //     expect(animation.element.textContent).toBe("data");
     //   });
 
     //   it("should fire off the leave animation", () => {
@@ -653,14 +653,14 @@ describe("ngInclude", () => {
 
     //     let animation = $animate.queue.shift();
     //     expect(animation.event).toBe("enter");
-    //     expect(animation.element.text()).toBe("data");
+    //     expect(animation.element.textContent).toBe("data");
 
     //     $rootScope.tpl = "";
     //     ;
 
     //     animation = $animate.queue.shift();
     //     expect(animation.event).toBe("leave");
-    //     expect(animation.element.text()).toBe("data");
+    //     expect(animation.element.textContent).toBe("data");
     //   });
 
     //   it("should animate two separate ngInclude elements", () => {

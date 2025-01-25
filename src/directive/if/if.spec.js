@@ -191,7 +191,7 @@ describe("ngIf", () => {
       injector = angular.bootstrap(element, ["myModule"]);
 
       setTimeout(() => {
-        expect(element.text()).toBe("Hello");
+        expect(element.textContent).toBe("Hello");
         done();
       }, 300);
     });
@@ -209,15 +209,15 @@ describe("ngIf", () => {
         )($scope),
       );
       await wait();
-      expect(element.text()).toBe("before;start;1;2;3;end;after;");
+      expect(element.textContent).toBe("before;start;1;2;3;end;after;");
 
       $scope.things.push(4);
       await wait();
-      expect(element.text()).toBe("before;start;1;2;3;4;end;after;");
+      expect(element.textContent).toBe("before;start;1;2;3;4;end;after;");
 
       $scope.show = false;
       await wait();
-      expect(element.text()).toBe("before;after;");
+      expect(element.textContent).toBe("before;after;");
     });
 
     it("should restore the element to its compiled state", async () => {
@@ -246,17 +246,17 @@ describe("ngIf", () => {
       $compile(element)($rootScope);
       $rootScope.show = true;
       await wait();
-      expect(element.text()).toBe("");
+      expect(element.textContent).toBe("");
       await wait();
-      expect(element.text()).toBe("");
+      expect(element.textContent).toBe("");
 
       await wait(100);
-      expect(element.text()).toBe("hello");
+      expect(element.textContent).toBe("hello");
 
       $rootScope.show = false;
       await wait();
       expect(element.children().length).toBe(0);
-      expect(element.text()).toBe("");
+      expect(element.textContent).toBe("");
     });
 
     it("should not trigger a digest when the element is removed", async () => {
@@ -311,7 +311,7 @@ describe("ngIf", () => {
           $rootScope,
         );
         await wait();
-        expect(element.text().trim()).toEqual(
+        expect(element.textContent.trim()).toEqual(
           "val=value in iso scope-transcluded content",
         );
       });

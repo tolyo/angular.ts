@@ -1,3 +1,4 @@
+import { removeElementData } from "../shared/jqlite/jqlite";
 import { isDefined } from "../shared/utils";
 import {
   TRANSITION_DURATION_PROP,
@@ -628,7 +629,7 @@ export function AnimateCssProvider() {
           const animationTimerData = element.data(ANIMATE_TIMER_KEY);
           if (animationTimerData) {
             clearTimeout(animationTimerData[0].timer);
-            element.removeData(ANIMATE_TIMER_KEY);
+            removeElementData(element, ANIMATE_TIMER_KEY);
           }
 
           // if the preparation function fails then the promise is not setup

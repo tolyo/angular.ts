@@ -381,7 +381,7 @@ describe("ngRef", () => {
     //         '<my-component ng-ref="myComponent">{{myComponent.text}}</my-component>';
     //       const element = $compile(template)($rootScope);
     //       await wait();
-    //       expect(element.text()).toBe("SUCCESS");
+    //       expect(element.textContent).toBe("SUCCESS");
     //       dealoc(element);
     //     });
     //   });
@@ -410,7 +410,7 @@ describe("ngRef", () => {
     //         "</div>";
     //       const element = $compile(template)($rootScope);
     //       await wait();
-    //       expect(element.text()).toBe("SUCCESS");
+    //       expect(element.textContent).toBe("SUCCESS");
     //       dealoc(element);
     //     });
     //   });
@@ -436,13 +436,13 @@ describe("ngRef", () => {
     //       const element = $compile(template)($rootScope);
 
     //       $rootScope.$apply("present = false");
-    //       expect(element.text()).toBe("");
+    //       expect(element.textContent).toBe("");
     //       $rootScope.$apply("present = true");
-    //       expect(element.text()).toBe("SUCCESS");
+    //       expect(element.textContent).toBe("SUCCESS");
     //       $rootScope.$apply("present = false");
-    //       expect(element.text()).toBe("");
+    //       expect(element.textContent).toBe("");
     //       $rootScope.$apply("present = true");
-    //       expect(element.text()).toBe("SUCCESS");
+    //       expect(element.textContent).toBe("SUCCESS");
     //       dealoc(element);
     //     });
     //   });
@@ -482,15 +482,15 @@ describe("ngRef", () => {
     //         "</div>";
     //       const element = $compile(template)($rootScope);
     //       await wait();
-    //       expect(element.text()).toBe("");
+    //       expect(element.textContent).toBe("");
 
     //       myComponentController.transclude("transcludedOk");
     //       await wait();
-    //       expect(element.text()).toBe("transcludedOk");
+    //       expect(element.textContent).toBe("transcludedOk");
 
     //       myComponentController.destroy();
     //       await wait();
-    //       expect(element.text()).toBe("");
+    //       expect(element.textContent).toBe("");
     //     });
     //   });
 
@@ -518,7 +518,7 @@ describe("ngRef", () => {
     //         "</div>";
     //       const element = $compile(template)($rootScope);
     //       await wait();
-    //       expect(element.text()).toBe("SUCCESS");
+    //       expect(element.textContent).toBe("SUCCESS");
     //       dealoc(element);
     //     });
     //   });
