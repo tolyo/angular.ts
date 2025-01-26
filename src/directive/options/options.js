@@ -1,4 +1,8 @@
-import { removeElement, startingTag } from "../../shared/jqlite/jqlite.js";
+import {
+  emptyElement,
+  removeElement,
+  startingTag,
+} from "../../shared/jqlite/jqlite.js";
 import {
   assertArg,
   equals,
@@ -218,6 +222,13 @@ export const ngOptionsDirective = [
     const optionTemplate = document.createElement("option");
     const optGroupTemplate = document.createElement("optgroup");
 
+    /**
+     *
+     * @param {import("../../core/scope/scope.js").Scope} scope
+     * @param {Element} selectElement
+     * @param {*} attr
+     * @param {*} ctrls
+     */
     function ngOptionsPostLink(scope, selectElement, attr, ctrls) {
       const selectCtrl = ctrls[0];
       const ngModelCtrl = ctrls[1];
@@ -226,7 +237,7 @@ export const ngOptionsDirective = [
       // The emptyOption allows the application developer to provide their own custom "empty"
       // option when the viewValue does not match any of the option values.
       for (
-        let i = 0, children = selectElement.children(), ii = children.length;
+        let i = 0, children = selectElement.childNodes, ii = children.length;
         i < ii;
         i++
       ) {
@@ -238,7 +249,7 @@ export const ngOptionsDirective = [
       }
 
       // The empty option will be compiled and rendered before we first generate the options
-      selectElement.empty();
+      emptyElement(selectElement);
 
       const providedEmptyOption = !!selectCtrl.emptyOption;
 
@@ -307,14 +318,14 @@ export const ngOptionsDirective = [
         // If we are using `track by` then we must watch the tracked value on the model
         // since ngModel only watches for object identity change
         // FIXME: When a user selects an option, this watch will fire needlessly
-        if (ngOptions.trackBy) {
-          scope.$watch(
-            () => ngOptions.getTrackByValue(ngModelCtrl.$viewValue),
-            () => {
-              ngModelCtrl.$render();
-            },
-          );
-        }
+        // if (ngOptions.trackBy) {
+        //   scope.$watch(
+        //     () => ngOptions.getTrackByValue(ngModelCtrl.$viewValue),
+        //     () => {
+        //       ngModelCtrl.$render();
+        //     },
+        //   );
+        // }
       } else {
         selectCtrl.writeValue = function writeNgOptionsMultiple(values) {
           // The options might not be defined yet when ngModel tries to render

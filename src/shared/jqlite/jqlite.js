@@ -1170,3 +1170,18 @@ export function appendNodesToElement(element, nodes) {
 
   nodes.forEach((node) => element.appendChild(node));
 }
+
+/**
+ * Remove element from the DOM and clear CACHE data, associated with the node.
+ * @param {Element} element
+ */
+export function emptyElement(element) {
+  dealoc(element, true);
+  switch (element.nodeType) {
+    case Node.ELEMENT_NODE:
+    case Node.DOCUMENT_NODE:
+    case Node.DOCUMENT_FRAGMENT_NODE:
+      element.replaceChildren();
+      break;
+  }
+}

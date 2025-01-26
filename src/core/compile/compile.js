@@ -1,6 +1,7 @@
 import {
   cleanElementData,
   createElementFromHTML,
+  emptyElement,
   getBooleanAttrName,
   getCacheData,
   getInheritedData,
@@ -45,10 +46,15 @@ import { ngObserveDirective } from "../../directive/observe/observe.js";
  */
 
 /**
+ * @typedef {Function} TranscludeFn
+ */
+
+/**
  * @description A function returned by the '$compile' service that links a compiled template to a scope.
  *
  * @callback PublicLinkFn
  * @param {import('../scope/scope.js').Scope} scope - The scope to be linked to the template
+ * @param {TranscludeFn} [transcludeFn] - Transclude function
  *
  */
 
@@ -63,6 +69,10 @@ import { ngObserveDirective } from "../../directive/observe/observe.js";
  * @param {*} [previousCompileContext] - An optional context from a previous compilation. TODO
  *
  * @returns {PublicLinkFn|null} A public link function or null.
+ */
+
+/**
+ * @typedef {Function} NodeLinkFn
  */
 
 const $compileMinErr = minErr("$compile");
@@ -1756,7 +1766,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                 for (const slotName in slots) {
                   if (slots[slotName]) {
                     // Only define a transclusion function if the slot was filled
-                    const slotCompileNodes = JQLite(slots[slotName].childNodes);
+                    const slotCompileNodes = slots[slotName].childNodes;
                     slots[slotName] = compilationGenerator(
                       mightHaveMultipleTransclusionError,
                       slotCompileNodes,
@@ -1765,10 +1775,10 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                   }
                 }
 
-                $template = JQLite($template.childNodes);
+                $template = $template.childNodes;
               }
 
-              $compileNode.empty(); // clear contents
+              emptyElement($compileNode); // clear contents
               childTranscludeFn = compilationGenerator(
                 mightHaveMultipleTransclusionError,
                 $template,
@@ -2269,7 +2279,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
           : origAsyncDirective.templateUrl;
         const { templateNamespace } = origAsyncDirective;
 
-        $compileNode.empty();
+        emptyElement($compileNode);
 
         $templateRequest(templateUrl)
           .then((content) => {

@@ -4,6 +4,7 @@ import {
   dealoc,
   JQLite,
   getOrSetCacheData,
+  emptyElement,
 } from "../../shared/jqlite/jqlite.js";
 import {
   isFunction,
@@ -4919,27 +4920,27 @@ describe("$compile", () => {
         element = JQLite("<div><div></div></div>");
         $compile(element.childNodes)($rootScope);
         // expect(CACHE.size).toEqual(2);
-        element.empty();
+        emptyElement(element);
         expect(CACHE.size).toEqual(0);
 
         // Next with non-empty text nodes at the top level
         // (in this case the compiler will wrap them in a <span>)
         element = JQLite("<div>xxx</div>");
         $compile(element.childNodes)($rootScope);
-        element.empty();
+        emptyElement(element);
         expect(CACHE.size).toEqual(0);
 
         // Next with comment nodes at the top level
         element = JQLite("<div><!-- comment --></div>");
         $compile(element.childNodes)($rootScope);
-        element.empty();
+        emptyElement(element);
         expect(CACHE.size).toEqual(0);
 
         // Finally with empty text nodes at the top level
         element = JQLite("<div>   \n<div></div>   </div>");
         $compile(element.childNodes)($rootScope);
         //expect(CACHE.size).toEqual(2);
-        element.empty();
+        emptyElement(element);
         expect(CACHE.size).toEqual(0);
       });
     });

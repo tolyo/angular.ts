@@ -1,5 +1,5 @@
 import { minErr } from "../../shared/utils";
-import { startingTag } from "../../shared/jqlite/jqlite.js";
+import { emptyElement, startingTag } from "../../shared/jqlite/jqlite.js";
 
 /**
  * Directive that marks the insertion point for the transcluded DOM of the nearest parent directive that uses transclusion.
@@ -20,13 +20,18 @@ import { startingTag } from "../../shared/jqlite/jqlite.js";
 const ngTranscludeMinErr = minErr("ngTransclude");
 export const ngTranscludeDirective = [
   "$compile",
+  /**
+   *
+   * @param {import("../../core/compile/compile.js").CompileFn} $compile
+   * @returns {import("../../types").Directive}
+   */
   function ($compile) {
     return {
       restrict: "EA",
       compile: function ngTranscludeCompile(tElement) {
         // Remove and cache any original content to act as a fallback
-        const fallbackLinkFn = $compile(tElement[0].childNodes);
-        tElement.empty();
+        const fallbackLinkFn = $compile(tElement.childNodes);
+        emptyElement(tElement);
 
         return function ngTranscludePostLink(
           $scope,

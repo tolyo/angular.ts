@@ -1,5 +1,5 @@
 import { isDefined } from "../../shared/utils";
-import { buildFragment } from "../../shared/jqlite/jqlite.js";
+import { buildFragment, emptyElement } from "../../shared/jqlite/jqlite.js";
 import { hasAnimate } from "../../shared/utils";
 import { domInsert } from "../../animations/animate";
 
@@ -127,6 +127,10 @@ export const ngIncludeDirective = [
 // is called.
 export const ngIncludeFillContentDirective = [
   "$compile",
+  /**
+   * @param {import("../../core/compile/compile.js").CompileFn} $compile
+   * @returns {import("../../types.js").Directive}
+   */
   ($compile) => ({
     restrict: "EA",
     priority: -400,
@@ -136,9 +140,12 @@ export const ngIncludeFillContentDirective = [
         // WebKit: https://bugs.webkit.org/show_bug.cgi?id=135698 --- SVG elements do not
         // support innerHTML, so detect this here and try to generate the contents
         // specially.
-        $element.empty();
+        emptyElement($element);
         $compile(buildFragment(ctrl.template).childNodes)(
           scope,
+          /**
+           * @param {Element} clone
+           */
           (clone) => {
             $element.append(clone);
           },

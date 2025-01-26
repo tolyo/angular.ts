@@ -154,7 +154,7 @@
  * Compile function for an AngularJS directive.
  *
  * @callback DirectiveCompileFn
- * @param {TElement} templateElement - The template element.
+ * @param {Element} templateElement - The template element.
  * @param {TAttributes} templateAttributes - The template attributes.
  * @param {TranscludeFunction} transclude - @deprecated The transclude function. Note: The transclude function that is passed to the compile function is deprecated,
  * as it e.g. does not know about the right outer scope. Please use the transclude function

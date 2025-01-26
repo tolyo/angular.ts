@@ -615,7 +615,7 @@ describe("jqLite", () => {
       const element = JQLite("<div><span>x</span></div>");
       element.find("span").on("$destroy", () => log.push("destroyed"));
 
-      element.empty();
+      emptyElement(element);
 
       expect(element.innerHTML).toBe("");
       expect(log).toEqual(["destroyed"]);
@@ -955,7 +955,7 @@ describe("jqLite", () => {
     it("should write a value", () => {
       const element = JQLite("<div>abc</div>");
       expect(element.length).toEqual(1);
-      expect(element.empty() === element).toBeTruthy();
+      expect(emptyElement(element) === element).toBeTruthy();
       expect(element.innerHTML).toEqual("");
     });
   });
