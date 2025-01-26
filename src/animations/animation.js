@@ -5,7 +5,6 @@ import {
   PREPARE_CLASS_SUFFIX,
   applyAnimationClassesFactory,
   applyAnimationStyles,
-  getDomNode,
   prepareAnimationOptions,
 } from "./shared";
 
@@ -239,7 +238,7 @@ export function AnimationProvider() {
 
             toBeSortedAnimations.push({
               element,
-              domNode: getDomNode(element),
+              domNode: element,
               fn: function triggerAnimationStart() {
                 let startAnimationFn;
                 const closeFn = animationEntry.close;
@@ -340,7 +339,7 @@ export function AnimationProvider() {
           const refLookup = {};
           animations.forEach((animation, index) => {
             const { element } = animation;
-            const node = getDomNode(element);
+            const node = element;
             const { event } = animation;
             const enterOrMove = ["enter", "move"].indexOf(event) >= 0;
             const anchorNodes = animation.structural

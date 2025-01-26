@@ -13,7 +13,6 @@ import {
   applyAnimationClassesFactory,
   pendClasses,
   prepareAnimationOptions,
-  getDomNode,
   packageStyles,
   EVENT_CLASS_PREFIX,
   ADD_CLASS_SUFFIX,
@@ -277,7 +276,7 @@ export function AnimateCssProvider() {
         }
 
         const restoreStyles = {};
-        const node = /** @type {HTMLElement} */ (getDomNode(element));
+        const node = /** @type {HTMLElement} */ (element);
         if (!node || !node.parentNode || !$$animateQueue.enabled()) {
           return closeAndReturnNoopAnimator();
         }

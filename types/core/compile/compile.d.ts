@@ -99,12 +99,11 @@ export class CompileProvider {
      * @returns {object} `this` for chaining
      */
     addPropertySecurityContext: (elementName: string, propertyName: string, ctx: string) => object;
-    $get: (string | (($injector: import("../../core/di/internal-injector").InjectorService, $interpolate: any, $exceptionHandler: import("../exception-handler").ErrorHandler, $templateRequest: any, $parse: import("../parse/parse").ParseService, $controller: any, $rootScope: import("../scope/scope").Scope, $sce: any, $animate: any) => ($compileNodes: string | NodeList, transcludeFn: any, maxPriority: any, ignoreDirective: any, previousCompileContext: any) => (scope: any, cloneConnectFn: any, options: any) => any[] | Element))[];
+    $get: (string | (($injector: import("../../core/di/internal-injector").InjectorService, $interpolate: any, $exceptionHandler: import("../exception-handler").ErrorHandler, $templateRequest: any, $parse: import("../parse/parse").ParseService, $controller: any, $rootScope: import("../scope/scope").Scope, $sce: any, $animate: any) => ($compileNodes: string | Element | NodeList, transcludeFn?: any, maxPriority?: number, ignoreDirective?: string, previousCompileContext?: any) => PublicLinkFn | null))[];
 }
 export namespace CompileProvider {
     let $inject: string[];
 }
-/**
- * Function that aggregates all linking fns for a compilation root (nodeList)
- */
-export type CompositeLinkFn = Function;
+export type CompositeLinkFn = () => any;
+export type PublicLinkFn = () => any;
+export type CompileFn = ($compileNodes: string | Element | NodeList, transcludeFn?: any, maxPriority?: number, ignoreDirective?: string, previousCompileContext?: any) => PublicLinkFn | null;

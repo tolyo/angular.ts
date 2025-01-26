@@ -1,6 +1,6 @@
 import { JQLite } from "../shared/jqlite/jqlite.js";
 import { isString } from "../shared/utils";
-import { concatWithSpace, getDomNode } from "./shared";
+import { concatWithSpace } from "./shared";
 
 const NG_ANIMATE_SHIM_CLASS_NAME = "ng-animate-shim";
 const NG_ANIMATE_ANCHOR_CLASS_NAME = "ng-anchor";
@@ -54,7 +54,7 @@ export function AnimateCssDriverProvider($$animationProvider) {
       };
 
       function prepareAnchoredAnimation(outAnchor, inAnchor) {
-        const clone = JQLite(getDomNode(outAnchor).cloneNode(true));
+        const clone = JQLite(outAnchor.cloneNode(true));
         const startingClasses = filterCssClasses(getClassVal(clone));
 
         outAnchor[0].classList.add(NG_ANIMATE_SHIM_CLASS_NAME);
@@ -122,7 +122,7 @@ export function AnimateCssDriverProvider($$animationProvider) {
         function calculateAnchorStyles(anchor) {
           const styles = {};
 
-          const coords = getDomNode(anchor).getBoundingClientRect();
+          const coords = anchor.getBoundingClientRect();
 
           // we iterate directly since safari messes up and doesn't return
           // all the keys for the coords object when iterated

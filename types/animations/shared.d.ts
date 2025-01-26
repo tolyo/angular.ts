@@ -27,12 +27,6 @@ export function resolveElementClasses(existing: any, toAdd: any, toRemove: any):
     addClass: string;
     removeClass: string;
 };
-/**
- *
- * @param {JQLite|Element} element
- * @returns {Element}
- */
-export function getDomNode(element: JQLite | Element): Element;
 export function applyGeneratedPreparationClasses(element: any, event: any, options: any): void;
 export function clearGeneratedClasses(element: any, options: any): void;
 export function blockKeyframeAnimations(node: any, applyBlock: any): string[];

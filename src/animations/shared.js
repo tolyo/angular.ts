@@ -314,15 +314,6 @@ export function resolveElementClasses(existing, toAdd, toRemove) {
   return classes;
 }
 
-/**
- *
- * @param {JQLite|Element} element
- * @returns {Element}
- */
-export function getDomNode(element) {
-  return element instanceof JQLite ? element : element;
-}
-
 export function applyGeneratedPreparationClasses(element, event, options) {
   let classes = "";
   if (event) {

@@ -24,7 +24,7 @@
  *   Controller constructor function or name of a registered controller.
  *   Use array form for dependencies (necessary with strictDi).
  * @property {string | undefined} [controllerAs]
- *   Identifier name for the controller published to its scope (default: '$ctrl').
+ *   Identifier name for the controller published to its scope (default: '$ctrl.js').
  * @property {string |Injectable<(...args: any[]) => string> | undefined} [template]
  *   HTML template string or function returning an HTML template.
  *   If a function, injects $element and $attrs.
@@ -127,11 +127,11 @@
  */
 
 /**
- * @typedef {import('./core/scope/scope').Scope} TScope
+ * @typedef {import('./core/scope/scope.js').Scope} TScope
  */
 
 /**
- * @typedef {import('./shared/jqlite/jqlite').JQLite} TElement
+ * @typedef {import('./shared/jqlite/jqlite.js').JQLite} TElement
  */
 
 /**
@@ -176,8 +176,8 @@
 
 /**
  * @callback CloneAttachFunction
- * @param {import('./shared/jqlite/jqlite').JQLite} [clonedElement]
- * @param {import('./core/scope/scope').Scope} [scope] // Let's hint but not force cloneAttachFn's signature
+ * @param {import('./shared/jqlite/jqlite.js').JQLite} [clonedElement]
+ * @param {import('./core/scope/scope.js').Scope} [scope] // Let's hint but not force cloneAttachFn's signature
  * @returns {any}
  */
 
@@ -187,23 +187,23 @@
  * http://teropa.info/blog/2015/06/09/transclusion.html
  *
  * @typedef {Object} TranscludeFunctionObject
- * @property {function(TScope, CloneAttachFunction, import('./shared/jqlite/jqlite').JQLite=, string=): import('./shared/jqlite/jqlite').JQLite} transcludeWithScope
- * @property {function(CloneAttachFunction=, import('./shared/jqlite/jqlite').JQLite=, string=): import('./shared/jqlite/jqlite').JQLite} transcludeWithoutScope
+ * @property {function(TScope, CloneAttachFunction, import('./shared/jqlite/jqlite.js').JQLite=, string=): import('./shared/jqlite/jqlite.js').JQLite} transcludeWithScope
+ * @property {function(CloneAttachFunction=, import('./shared/jqlite/jqlite.js').JQLite=, string=): import('./shared/jqlite/jqlite.js').JQLite} transcludeWithoutScope
  * @property {function(string): boolean} isSlotFilled - Returns true if the specified slot contains content (i.e., one or more DOM nodes)
  */
 
 /**
 
  *
- * @typedef {function(TScope|Function, CloneAttachFunction=, import('./shared/jqlite/jqlite').JQLite=, string=): import('./shared/jqlite/jqlite').JQLite} TranscludeFunction
+ * @typedef {function(TScope|Function, CloneAttachFunction=, import('./shared/jqlite/jqlite.js').JQLite=, string=): import('./shared/jqlite/jqlite.js').JQLite} TranscludeFunction
  */
 
 /**
- * @typedef {function(TScope, CloneAttachFunction, import('./shared/jqlite/jqlite').JQLite=, string=): import('./shared/jqlite/jqlite').JQLite} transcludeWithScope
+ * @typedef {function(TScope, CloneAttachFunction, import('./shared/jqlite/jqlite.js').JQLite=, string=): import('./shared/jqlite/jqlite.js').JQLite} transcludeWithScope
  */
 
 /**
- * @typedef {function(CloneAttachFunction=, import('./shared/jqlite/jqlite').JQLite=, string=): import('./shared/jqlite/jqlite').JQLite} transcludeWithoutScope
+ * @typedef {function(CloneAttachFunction=, import('./shared/jqlite/jqlite.js').JQLite=, string=): import('./shared/jqlite/jqlite.js').JQLite} transcludeWithoutScope
  */
 
 /**

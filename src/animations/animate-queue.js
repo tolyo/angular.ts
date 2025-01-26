@@ -15,7 +15,6 @@ import {
   assertArg,
   clearGeneratedClasses,
   extractElementNode,
-  getDomNode,
   mergeAnimationDetails,
   prepareAnimationOptions,
   stripCommentsFromElement,
@@ -372,7 +371,7 @@ export function AnimateQueueProvider($animateProvider) {
               // (bool) - Global setter
               bool = animationsEnabled = !!element;
             } else {
-              const node = getDomNode(element);
+              const node = element;
 
               if (argCount === 1) {
                 // (element) - Element getter
@@ -409,7 +408,7 @@ export function AnimateQueueProvider($animateProvider) {
         let element = Array.isArray(originalElement)
           ? originalElement.filter((x) => x.nodeName !== "#comment")[0]
           : originalElement;
-        const node = getDomNode(element);
+        const node = element;
         const parentNode = node && node.parentNode;
 
         options = prepareAnimationOptions(options);
@@ -753,7 +752,7 @@ export function AnimateQueueProvider($animateProvider) {
        */
       function areAnimationsAllowed(node, parentNode) {
         const bodyNode = document.body;
-        const rootNode = getDomNode($injector.get("$rootElement"));
+        const rootNode = $injector.get("$rootElement");
 
         let bodyNodeDetected = node === bodyNode || node.nodeName === "HTML";
         let rootNodeDetected = node === rootNode;
@@ -763,7 +762,7 @@ export function AnimateQueueProvider($animateProvider) {
 
         let parentHost = getOrSetCacheData(node, NG_ANIMATE_PIN_DATA);
         if (parentHost) {
-          parentNode = getDomNode(parentHost);
+          parentNode = parentHost;
         }
 
         while (parentNode) {
@@ -827,7 +826,7 @@ export function AnimateQueueProvider($animateProvider) {
             parentHost = getOrSetCacheData(parentNode, NG_ANIMATE_PIN_DATA);
             if (parentHost) {
               // The pin target element becomes the next parent element
-              parentNode = getDomNode(parentHost);
+              parentNode = parentHost;
               continue;
             }
           }
