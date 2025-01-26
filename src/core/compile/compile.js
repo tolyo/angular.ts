@@ -28,7 +28,6 @@ import {
   trim,
   isBoolean,
   equals,
-  sliceArgs,
   simpleCompare,
   isError,
   directiveNormalize,
@@ -41,8 +40,28 @@ import { Attributes } from "./attributes.js";
 import { ngObserveDirective } from "../../directive/observe/observe.js";
 
 /**
- * Function that aggregates all linking fns for a compilation root (nodeList)
- * @typedef {Function} CompositeLinkFn
+ * @description Function that aggregates all linking fns for a compilation root (nodeList)
+ * @callback CompositeLinkFn
+ */
+
+/**
+ * @description A function returned by the '$compile' service that links a compiled template to a scope.
+ *
+ * @callback PublicLinkFn
+ *
+ */
+
+/**
+ * @description Entry point for the '$compile' service.
+ *
+ * @callback CompileFn
+ * @param {string|Element|NodeList} $compileNodes - The nodes to be compiled.
+ * @param {*} [transcludeFn] - An optional transclusion function to be used during compilation. TODO
+ * @param {number} [maxPriority] - An optional maximum priority for directives.
+ * @param {string} [ignoreDirective] - An optional directive to ignore during compilation.
+ * @param {*} [previousCompileContext] - An optional context from a previous compilation. TODO
+ *
+ * @returns {PublicLinkFn|null} A public link function or null.
  */
 
 const $compileMinErr = minErr("$compile");
@@ -576,13 +595,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
       //= ===============================
 
       /**
-       * Entry poin for the '$compile' service
-       * @param {string|NodeList} $compileNodes
-       * @param {*} transcludeFn
-       * @param {*} maxPriority
-       * @param {*} ignoreDirective
-       * @param {*} previousCompileContext
-       * @returns
+       * @type {CompileFn}
        */
       function compile(
         $compileNodes,
@@ -594,8 +607,6 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
         let jqCompileNodes = isString($compileNodes)
           ? [createElementFromHTML($compileNodes)]
           : [$compileNodes];
-
-        debugger;
         /**
          * @type {CompositeLinkFn}
          */
@@ -689,6 +700,10 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
 
           if (!cloneConnectFn) {
             jqCompileNodes = compositeLinkFn = null;
+          }
+
+          if (Array.isArray($linkNode)) {
+            return $linkNode[0];
           }
           return $linkNode;
         };
@@ -807,6 +822,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
           $rootElement,
           parentBoundTranscludeFn,
         ) {
+          /** @type {NodeLinkFn} */
           let nodeLinkFn;
           let childLinkFn;
           let node;
@@ -863,13 +879,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                 childBoundTranscludeFn = null;
               }
 
-              nodeLinkFn(
-                childLinkFn,
-                childScope,
-                node,
-                $rootElement,
-                childBoundTranscludeFn,
-              );
+              nodeLinkFn(childLinkFn, childScope, node, childBoundTranscludeFn);
             } else if (childLinkFn) {
               childLinkFn(
                 scope,
@@ -1245,22 +1255,18 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
         let mightHaveMultipleTransclusionError = false;
         let directiveValue;
 
-        /** @type {any} */
+        /** @type {NodeLinkFn} */
         let nodeLinkFn = function (
           childLinkFn,
           scope,
           linkNode,
-          _,
           boundTranscludeFn,
         ) {
           let i;
           let ii;
-          /** @type {import("../../types").Directive|any} */
-          let linkFn;
           let isolateScope;
           let controllerScope;
           let elementControllers;
-          /** @type {import("../../types").TranscludeFunctionObject|any} */
           let transcludeFn;
           let $element;
           let attrs;
@@ -1408,18 +1414,18 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
 
           // PRELINKING
           for (i = 0, ii = preLinkFns.length; i < ii; i++) {
-            linkFn = preLinkFns[i];
+            let preLinkFn = preLinkFns[i];
             const controllers =
-              linkFn.require &&
+              preLinkFn.require &&
               getControllers(
-                linkFn.directiveName,
-                linkFn.require,
+                preLinkFn.directiveName,
+                preLinkFn.require,
                 $element,
                 elementControllers,
               );
             invokeLinkFn(
-              linkFn,
-              linkFn.isolateScope ? isolateScope : scope,
+              preLinkFn,
+              preLinkFn.isolateScope ? isolateScope : scope,
               $element,
               attrs,
               controllers,
@@ -1449,19 +1455,19 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
 
           // POSTLINKING
           for (i = postLinkFns.length - 1; i >= 0; i--) {
-            linkFn = postLinkFns[i];
+            let postLinkFn = postLinkFns[i];
             const controllers =
-              linkFn.require &&
+              postLinkFn.require &&
               getControllers(
-                linkFn.directiveName,
-                linkFn.require,
+                postLinkFn.directiveName,
+                postLinkFn.require,
                 $element,
                 elementControllers,
               );
 
             invokeLinkFn(
-              linkFn,
-              linkFn.isolateScope ? isolateScope : scope,
+              postLinkFn,
+              postLinkFn.isolateScope ? isolateScope : scope,
               $element,
               attrs,
               controllers,

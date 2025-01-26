@@ -71,7 +71,7 @@ describe("ngController", () => {
       $rootScope,
     );
     await wait();
-    expect(element.text()).toBe("Hello Misko!");
+    expect(element.innerText).toBe("Hello Misko!");
   });
 
   it("should instantiate bound constructor functions", async () => {
@@ -79,7 +79,7 @@ describe("ngController", () => {
       $rootScope,
     );
     await wait();
-    expect(element.text()).toBe("foo");
+    expect(element.innerText).toBe("foo");
   });
 
   it("should publish controller into scope", async () => {
@@ -87,7 +87,7 @@ describe("ngController", () => {
       $rootScope,
     );
     await wait();
-    expect(element.text()).toBe("works");
+    expect(element.innerText).toBe("works");
   });
 
   it("should publish controller into scope from module", async () => {
@@ -95,7 +95,7 @@ describe("ngController", () => {
       '<div ng-controller="PublicModule as p">{{p.mark}}</div>',
     )($rootScope);
     await wait();
-    expect(element.text()).toBe("works");
+    expect(element.innerText).toBe("works");
   });
 
   it("should allow nested controllers", async () => {
@@ -103,14 +103,14 @@ describe("ngController", () => {
       '<div ng-controller="Greeter"><div ng-controller="Child">{{greet(name)}}</div></div>',
     )($rootScope);
     await wait();
-    expect(element.text()).toBe("Hello Adam!");
+    expect(element.innerText).toBe("Hello Adam!");
     dealoc(element);
 
     element = $compile(
       '<div ng-controller="Greeter"><div ng-controller="Child">{{protoGreet(name)}}</div></div>',
     )($rootScope);
     await wait();
-    expect(element.text()).toBe("Hello Adam!");
+    expect(element.innerText).toBe("Hello Adam!");
   });
 
   it("should work with ngInclude on the same element", (done) => {
@@ -135,7 +135,7 @@ describe("ngController", () => {
   it("should only instantiate the controller once with ngInclude on the same element", async () => {
     let count = 0;
 
-    element = JQLite(
+    element = createElement(
       '<div><div ng-controller="Count" ng-include="\'/mock/interpolation\'"></div></div>',
     );
     window.angular
@@ -157,7 +157,7 @@ describe("ngController", () => {
   it("when ngInclude is on the same element, the content included content should get a child scope of the controller", async () => {
     let controllerScope;
 
-    element = JQLite(
+    element = createElement(
       '<div><div ng-controller="ExposeScope" ng-include="\'/mock/scopeinit\'"></div></div>',
     );
 

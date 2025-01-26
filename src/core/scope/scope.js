@@ -646,7 +646,7 @@ export class Scope {
       case ASTType.CallExpression: {
         let keys = [];
         get.decoratedNode.body[0].expression.toWatch.forEach((x) => {
-          if (isDefined(x.name)) {
+          if (isDefined(x)) {
             keys.push(x.name);
           } else {
             // Promise.resolve().then(() => {
