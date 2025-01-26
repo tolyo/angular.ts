@@ -1,9 +1,6 @@
+import { removeElement, startingTag } from "../../shared/jqlite/jqlite.js";
 import {
-  JQLite,
-  removeElement,
-  startingTag,
-} from "../../shared/jqlite/jqlite.js";
-import {
+  assertArg,
   equals,
   hashKey,
   includes,
@@ -29,6 +26,12 @@ const NG_OPTIONS_REGEXP =
 export const ngOptionsDirective = [
   "$compile",
   "$parse",
+  /**
+   *
+   * @param {import("../../core/compile/compile.js").CompileFn} $compile
+   * @param {import("../../core/parse/parse.js").ParseService} $parse
+   * @returns
+   */
   function ($compile, $parse) {
     function parseOptionsExpression(optionsExp, selectElement, scope) {
       const match = optionsExp.match(NG_OPTIONS_REGEXP);
@@ -239,8 +242,9 @@ export const ngOptionsDirective = [
 
       const providedEmptyOption = !!selectCtrl.emptyOption;
 
-      const unknownOption = JQLite(optionTemplate.cloneNode(false));
-      unknownOption.value = "?";
+      const unknownOption = optionTemplate.cloneNode(false);
+      // TODO double check
+      unknownOption.nodeValue = "?";
 
       let options;
       const ngOptions = parseOptionsExpression(
@@ -360,7 +364,9 @@ export const ngOptionsDirective = [
 
       if (providedEmptyOption) {
         // compile the element since there might be bindings in it
-        $compile(selectCtrl.emptyOption)(scope);
+        const linkFn = $compile(selectCtrl.emptyOption);
+        assertArg(linkFn, "LinkFn required");
+        linkFn(scope);
 
         selectElement.prepend(selectCtrl.emptyOption);
 

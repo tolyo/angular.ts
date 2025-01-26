@@ -48,6 +48,7 @@ import { ngObserveDirective } from "../../directive/observe/observe.js";
  * @description A function returned by the '$compile' service that links a compiled template to a scope.
  *
  * @callback PublicLinkFn
+ * @param {import('../scope/scope.js').Scope} scope - The scope to be linked to the template
  *
  */
 
