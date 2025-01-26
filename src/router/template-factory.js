@@ -3,6 +3,7 @@ import { tail, unnestR } from "../shared/common.js";
 import { Resolvable } from "./resolve/resolvable.js";
 import { kebobString } from "../shared/strings.js";
 import { annotate } from "../core/di/injector.js";
+import { DirectiveSuffix } from "../core/compile/compile.js";
 
 /**
  * @typedef BindingTuple
@@ -223,7 +224,7 @@ export class TemplateFactoryProvider {
  * Gets all the directive(s)' inputs ('@', '=', and '<') and outputs ('&')
  */
 function getComponentBindings($injector, name) {
-  const cmpDefs = $injector.get(name + "Directive"); // could be multiple
+  const cmpDefs = $injector.get(name + DirectiveSuffix); // could be multiple
   if (!cmpDefs || !cmpDefs.length)
     throw new Error(`Unable to find component named '${name}'`);
   return cmpDefs.map(getBindings).reduce(unnestR, []);

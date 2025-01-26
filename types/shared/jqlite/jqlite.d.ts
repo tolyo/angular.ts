@@ -255,4 +255,9 @@ export function createElementFromHTML(htmlString: string): Element;
  * @param {Node | Node[] | string} nodes - Nodes or HTML string to append.
  */
 export function appendNodesToElement(element: Element, nodes: Node | Node[] | string): void;
+/**
+ * Remove element from the DOM and clear CACHE data, associated with the node.
+ * @param {Element} element
+ */
+export function emptyElement(element: Element): void;
 export const BOOLEAN_ATTR: {};

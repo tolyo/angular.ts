@@ -78,11 +78,12 @@ import { ngObserveDirective } from "../../directive/observe/observe.js";
 const $compileMinErr = minErr("$compile");
 
 const EXCLUDED_DIRECTIVES = ["ngIf", "ngRepeat"];
+export const DirectiveSuffix = "Directive";
 
 CompileProvider.$inject = ["$provide", "$$sanitizeUriProvider"];
 export function CompileProvider($provide, $$sanitizeUriProvider) {
   const hasDirectives = {};
-  const Suffix = "Directive";
+
   const ALL_OR_NOTHING_ATTRS = {
     ngSrc: true,
     ngSrcset: true,
@@ -224,7 +225,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
       assertArg(directiveFactory, "directiveFactory");
       if (!Object.prototype.hasOwnProperty.call(hasDirectives, name)) {
         hasDirectives[name] = [];
-        $provide.factory(name + Suffix, [
+        $provide.factory(name + DirectiveSuffix, [
           "$injector",
           "$exceptionHandler",
           /**
@@ -552,7 +553,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
     "$sce",
     "$animate",
     /**
-     * @param {import("../../core/di/internal-injector").InjectorService} $injector
+     * @param {import("../../core/di/internal-injector.js").InjectorService} $injector
      * @param {*} $interpolate
      * @param {import("../exception-handler").ErrorHandler} $exceptionHandler
      * @param {*} $templateRequest
@@ -624,7 +625,6 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
         let compositeLinkFn = compileNodes(
           jqCompileNodes,
           transcludeFn,
-          jqCompileNodes,
           maxPriority,
           ignoreDirective,
           previousCompileContext,
@@ -702,12 +702,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
           }
           if (cloneConnectFn) cloneConnectFn($linkNode, scope);
           if (compositeLinkFn)
-            compositeLinkFn(
-              scope,
-              $linkNode,
-              $linkNode,
-              parentBoundTranscludeFn,
-            );
+            compositeLinkFn(scope, $linkNode, parentBoundTranscludeFn);
 
           if (!cloneConnectFn) {
             jqCompileNodes = compositeLinkFn = null;
@@ -752,7 +747,6 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
       function compileNodes(
         nodeList,
         transcludeFn,
-        $rootElement,
         maxPriority,
         ignoreDirective,
         previousCompileContext,
@@ -787,7 +781,6 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
               nodeList[i],
               attrs,
               transcludeFn,
-              $rootElement,
               null,
               [],
               [],
@@ -827,12 +820,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
         // return a linking function if we have found anything, null otherwise
         return linkFnFound ? compositeLinkFn : null;
 
-        function compositeLinkFn(
-          scope,
-          nodeList,
-          $rootElement,
-          parentBoundTranscludeFn,
-        ) {
+        function compositeLinkFn(scope, nodeList, parentBoundTranscludeFn) {
           /** @type {NodeLinkFn} */
           let nodeLinkFn;
           let childLinkFn;
@@ -954,7 +942,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
        * @param {Element} node Node to search.
        * @param directives An array to which the directives are added to. This array is sorted before
        *        the function returns.
-       * @param {Attributes|import("./attributes").AttributeLike} attrs The shared attrs object which is used to populate the normalized attributes.
+       * @param {Attributes|import("./attributes").Attributes} attrs The shared attrs object which is used to populate the normalized attributes.
        * @param {number=} maxPriority Max directive priority.
        * @param {boolean=} ignoreDirective
        */
@@ -1221,9 +1209,6 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
        * @param {function(import('../../core/scope/scope').Scope, Function=):any} transcludeFn A linking function, where the
        *                                                  scope argument is auto-generated to the new
        *                                                  child of the transcluded parent scope.
-       * @param {JQLite} jqCollection If we are working on the root of the compile tree then this
-       *                              argument has the root JQLite array so that we can replace nodes
-       *                              on it.
        * @param {Object=} originalReplaceDirective An optional directive that will be ignored when
        *                                           compiling the transclusion.
        * @param {Array.<Function>} [preLinkFns]
@@ -1237,7 +1222,6 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
         compileNode,
         templateAttrs,
         transcludeFn,
-        jqCollection,
         originalReplaceDirective,
         preLinkFns,
         postLinkFns,
@@ -1684,7 +1668,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
               $compileNode = templateAttrs.$$element =
                 document.createComment("");
               compileNode = $compileNode;
-              replaceWith(jqCollection, [$template], compileNode);
+              replaceWith(compileNode, [$template], compileNode);
 
               childTranscludeFn = compilationGenerator(
                 mightHaveMultipleTransclusionError,
@@ -1838,7 +1822,6 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
 
               replaceWith(jqCollection, $compileNode, compileNode);
 
-              /** @type {import("./attributes").AttributeLike} */
               const newTemplateAttrs = { $attr: {} };
 
               // combine directives from the original node and from the template:
@@ -2146,7 +2129,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
         if (Object.prototype.hasOwnProperty.call(hasDirectives, name)) {
           for (
             let directive,
-              directives = $injector.get(name + Suffix),
+              directives = $injector.get(name + DirectiveSuffix),
               i = 0,
               ii = directives.length;
             i < ii;
@@ -2192,7 +2175,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
         if (Object.prototype.hasOwnProperty.call(hasDirectives, name)) {
           for (
             let directive,
-              directives = $injector.get(name + Suffix),
+              directives = $injector.get(name + DirectiveSuffix),
               i = 0,
               ii = directives.length;
             i < ii;
@@ -2772,17 +2755,18 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
       }
 
       /**
+       * TODO this is broken for now
        * This is a special JQLite.replaceWith, which can replace items which
        * have no parents, provided that the containing JQLite collection is provided.
        *
-       * @param {JQLite} $rootElement The root of the compile tree. Used so that we can replace nodes
+       * @param {Element} $rootElement The root of the compile tree. Used so that we can replace nodes
        *                               in the root of the tree.
-       * @param {JQLite} elementsToRemove The JQLite element which we are going to replace. We keep
+       * @param {Element} elementsToRemove The JQLite element which we are going to replace. We keep
        *                                  the shell, but replace its DOM node reference.
        * @param {Node} newNode The new DOM node.
        */
       function replaceWith($rootElement, elementsToRemove, newNode) {
-        const firstElementToRemove = elementsToRemove[0];
+        const firstElementToRemove = elementsToRemove;
         const removeCount = elementsToRemove.length;
         const parent = firstElementToRemove.parentNode;
         let i;

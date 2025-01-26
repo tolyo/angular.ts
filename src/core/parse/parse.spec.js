@@ -1,14 +1,5 @@
-import { AST } from "./ast/ast.js";
-import { Lexer } from "./lexer/lexer.js";
-import {
-  isFunction,
-  sliceArgs,
-  csp,
-  valueFn,
-  extend,
-} from "../../shared/utils.js";
+import { isFunction, csp } from "../../shared/utils.js";
 import { createInjector } from "../di/injector.js";
-import { ASTType } from "./ast-type.js";
 import { Angular } from "../../loader.js";
 import { wait } from "../../shared/test-utils.js";
 
@@ -796,7 +787,7 @@ describe("parser", () => {
           return element;
         };
         expect(scope.$eval('fn()[0] = "lucas"')).toBe("lucas");
-        expect(element).toBe("lucas");
+        expect(element[0]).toBe("lucas");
         expect(count).toBe(1);
       });
 
@@ -842,7 +833,7 @@ describe("parser", () => {
           return 0;
         };
         expect(scope.$eval('element[fn()].name = "lucas"')).toBe("lucas");
-        expect(scope.element.name).toBe("lucas");
+        expect(scope.element.$target[0].name).toBe("lucas");
         expect(count).toBe(1);
       });
     });

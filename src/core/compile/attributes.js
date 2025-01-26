@@ -14,14 +14,6 @@ const $compileMinErr = minErr("$compile");
 const SIMPLE_ATTR_NAME = /^\w/;
 const specialAttrHolder = document.createElement("div");
 
-/**
- * @typedef {Object} AttributeLike
- * @property {Object} $attr
- */
-
-/**
- * @extends {AttributeLike}
- */
 export class Attributes {
   /**
    * @param {import('../scope/scope').Scope} $rootScope

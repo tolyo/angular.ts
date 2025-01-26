@@ -16,7 +16,7 @@ class NgModelOptionsController {
 
   /**
    * @param {import('../../types.js').Attributes} $attrs
-   * @param {import('../../types.js').TScope} $scope
+   * @param {import('../../core/scope/scope.js').Scope} $scope
    */
   constructor($attrs, $scope) {
     this.$$attrs = $attrs;

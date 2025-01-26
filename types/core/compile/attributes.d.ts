@@ -1,10 +1,3 @@
-/**
- * @typedef {Object} AttributeLike
- * @property {Object} $attr
- */
-/**
- * @extends {AttributeLike}
- */
 export class Attributes {
     /**
      * @param {import('../scope/scope').Scope} $rootScope
@@ -84,7 +77,4 @@ export class Attributes {
     sanitizeSrcset(value: any, invokeType: any): any;
     srcset: any;
 }
-export type AttributeLike = {
-    $attr: any;
-};
 import { directiveNormalize } from "../../shared/utils";

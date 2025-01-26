@@ -11,8 +11,8 @@ import {
   lowercase,
   getNodeName,
   shallowCopy,
-} from "../utils";
-import { CACHE, EXPANDO } from "../../core/cache/cache";
+} from "../utils.js";
+import { CACHE, EXPANDO } from "../../core/cache/cache.js";
 
 /** @type {number} */
 let jqId = 1;
@@ -986,55 +986,6 @@ function onReady(fn) {
     // We can not use JQLite since we are not done loading.
     document.addEventListener("DOMContentLoaded", trigger);
   }
-}
-
-function createEventHandler(element, events) {
-  const eventHandler = function (event, type) {
-    let eventFns = events[type || event.type];
-    const eventFnsLength = eventFns ? eventFns.length : 0;
-
-    if (!eventFnsLength) return;
-
-    if (isUndefined(event.immediatePropagationStopped)) {
-      const originalStopImmediatePropagation = event.stopImmediatePropagation;
-      event.stopImmediatePropagation = function () {
-        event.immediatePropagationStopped = true;
-
-        if (event.stopPropagation) {
-          event.stopPropagation();
-        }
-
-        if (originalStopImmediatePropagation) {
-          originalStopImmediatePropagation.call(event);
-        }
-      };
-    }
-
-    event.isImmediatePropagationStopped = function () {
-      return event.immediatePropagationStopped === true;
-    };
-
-    // Some events have special handlers that wrap the real handler
-    const handlerWrapper =
-      eventFns.specialHandlerWrapper || defaultHandlerWrapper;
-
-    // Copy event handlers in case event handlers array is modified during execution.
-    if (eventFnsLength > 1) {
-      eventFns = shallowCopy(eventFns);
-    }
-
-    for (let i = 0; i < eventFnsLength; i++) {
-      if (!event.isImmediatePropagationStopped()) {
-        handlerWrapper(element, event, eventFns[i]);
-      }
-    }
-  };
-
-  return eventHandler;
-}
-
-function defaultHandlerWrapper(element, event, handler) {
-  handler.call(element, event);
 }
 
 /**
