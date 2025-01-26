@@ -43,6 +43,9 @@ import { ngObserveDirective } from "../../directive/observe/observe.js";
 /**
  * @description Function that aggregates all linking fns for a compilation root (nodeList)
  * @callback CompositeLinkFn
+ * @param {import('../scope/scope.js').Scope} scope - The scope to be linked to the template
+ * @param {Element[]} $linkNode - nodeList
+ * @param {Function} parentBoundTranscludeFn
  */
 
 /**
@@ -359,11 +362,6 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
       return ddo;
     }
 
-    // TODO(pete) remove the following `forEach` before we release 1.6.0
-    // The component-router@0.2.0 looks for the annotations on the controller constructor
-    // Nothing in AngularJS looks for annotations on the factory function but we can't remove
-    // it from 1.5.x yet.
-
     // Copy any annotation properties (starting with $) over to the factory and controller constructor functions
     // These could be used by libraries such as the new component router
     Object.entries(options).forEach(([key, val]) => {
@@ -617,8 +615,9 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
         previousCompileContext,
       ) {
         let jqCompileNodes = isString($compileNodes)
-          ? [createElementFromHTML($compileNodes)]
+          ? [createElementFromHTML(/** @type {string} */ ($compileNodes))]
           : [$compileNodes];
+
         /**
          * @type {CompositeLinkFn}
          */
@@ -683,8 +682,9 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
             );
             $linkNode = createElementFromHTML(wrappedTemplate);
           } else if (cloneConnectFn) {
-            let elements = jqCompileNodes.map((element) =>
-              element.cloneNode(true),
+            let elements = jqCompileNodes.map(
+              /** @param {Element} element */
+              (element) => element.cloneNode(true),
             );
             $linkNode = elements;
           } else {
@@ -700,9 +700,17 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
               );
             }
           }
-          if (cloneConnectFn) cloneConnectFn($linkNode, scope);
-          if (compositeLinkFn)
-            compositeLinkFn(scope, $linkNode, parentBoundTranscludeFn);
+          if (cloneConnectFn) {
+            cloneConnectFn($linkNode, scope);
+          }
+
+          if (compositeLinkFn) {
+            compositeLinkFn(
+              scope,
+              /** @type {Element[]} */ ($linkNode),
+              parentBoundTranscludeFn,
+            );
+          }
 
           if (!cloneConnectFn) {
             jqCompileNodes = compositeLinkFn = null;
@@ -733,7 +741,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
        * functions return values - the linking functions - are combined into a composite linking
        * function, which is the a linking function for the node.
        *
-       * @param {NodeList|JQLite} nodeList an array of nodes or NodeList to compile
+       * @param {NodeList} nodeList an array of nodes or NodeList to compile
        * @param {*} transcludeFn A linking function, where the
        *        scope argument is auto-generated to the new child of the transcluded parent scope.
        * @param {Element} [$rootElement] If the nodeList is the root of the compilation tree then
@@ -742,7 +750,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
        * @param {number=} [maxPriority] Max directive priority.
        * @param {*} [ignoreDirective]
        * @param {*} [previousCompileContext]
-       * @returns {Function} A composite linking function of all of the matched directives or null.
+       * @returns {CompositeLinkFn} A composite linking function of all of the matched directives or null.
        */
       function compileNodes(
         nodeList,
@@ -1125,7 +1133,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
           nodes.push(node);
         }
 
-        return JQLite(nodes);
+        return nodes;
       }
 
       /**
@@ -2363,7 +2371,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                 }
                 replaceWith(
                   linkRootElement,
-                  JQLite(beforeTemplateLinkNode),
+                  beforeTemplateLinkNode,
                   linkNode,
                 );
 
@@ -2816,7 +2824,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
           );
 
           // Remove $destroy event listeners from `firstElementToRemove`
-          JQLite(firstElementToRemove).off("$destroy");
+          // JQLite(firstElementToRemove).off("$destroy");
         }
 
         // Cleanup any data/listeners on the elements and children.
