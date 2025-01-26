@@ -1253,7 +1253,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
         let replaceDirective = originalReplaceDirective;
         /** @type {any} */
         let childTranscludeFn = transcludeFn;
-        let linkFn;
+
         let didScanForMultipleTransclusion = false;
         let mightHaveMultipleTransclusionError = false;
         let directiveValue;
@@ -1902,7 +1902,8 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
             ii = directives.length;
           } else if (directive.compile) {
             try {
-              linkFn = directive.compile(
+              /** @type {PublicLinkFn} */
+              const linkFn = directive.compile(
                 $compileNode,
                 templateAttrs,
                 childTranscludeFn,
@@ -2369,11 +2370,7 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
                   // it was cloned therefore we have to clone as well.
                   linkNode = compileNode.cloneNode(true);
                 }
-                replaceWith(
-                  linkRootElement,
-                  beforeTemplateLinkNode,
-                  linkNode,
-                );
+                replaceWith(linkRootElement, beforeTemplateLinkNode, linkNode);
 
                 // Copy in CSS classes from original node
                 try {
