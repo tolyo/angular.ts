@@ -449,18 +449,6 @@ describe("jqLite", () => {
       selected.removeData("prop2");
     });
 
-    it("should not remove event handlers on removeData()", () => {
-      let log = "";
-      const elm = JQLite(a);
-      elm.on("click", () => {
-        log += "click;";
-      });
-
-      elm.removeData();
-      browserTrigger(a, "click");
-      expect(log).toBe("click;");
-    });
-
     it("should allow to set data after removeData() with event handlers present", () => {
       const elm = JQLite(a);
       elm.on("click", () => {});

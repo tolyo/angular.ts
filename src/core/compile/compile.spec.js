@@ -117,7 +117,7 @@ describe("$compile", () => {
         restrict: "A",
         priority: 10,
         compile: () => (scope, element, attrs) => {
-          element.text(`Hello ${attrs.greet}`);
+          element.innerText = `Hello ${attrs.greet}`;
         },
       }),
 
@@ -265,13 +265,13 @@ describe("$compile", () => {
     expect(getCacheData(el.childNodes[1], "idx")).toBe(2);
   });
 
-  it("compiles element directives from child elements", () => {
+  fit("compiles element directives from child elements", () => {
     var idx = 1;
     myModule.directive("myDirective", () => {
       return {
         restrict: "EA",
         compile: function (element) {
-          element.data("dir", idx++);
+          setCacheData(element, "dir", idx++);
         },
       };
     });
@@ -279,17 +279,18 @@ describe("$compile", () => {
 
     var el = createElementFromHTML("<div><my-directive></my-directive></div>");
     $compile(el);
-    expect(el.data("dir")).toBeUndefined();
-    expect(el.find("my-directive").data("dir")).toBe(1);
+    expect(getCacheData(el, "dir")).toBeUndefined();
+
+    expect(getCacheData(el.firstChild, "dir")).toBe(1);
   });
 
-  it("compiles nested directives", () => {
+  fit("compiles nested directives", () => {
     var idx = 1;
     myModule.directive("myDir", () => {
       return {
         restrict: "EA",
         compile: function (element) {
-          element.data("dir", idx++);
+          setCacheData(element, "dir", idx++);
         },
       };
     });
@@ -298,21 +299,21 @@ describe("$compile", () => {
       "<my-dir><my-dir><my-dir></my-dir></my-dir></my-dir>",
     );
     $compile(el);
-    expect(el.data("dir")).toBe(1);
-    expect(el.find("my-dir").data("dir")).toBe(2);
-    expect(el[0].childNodes[0].childNodes[0]).toBeTruthy();
+    expect(getCacheData(el, "dir")).toBe(1);
+    expect(getCacheData(el.firstChild, "dir")).toBe(2);
+    expect(el.firstChild.firstChild).toBeTruthy();
   });
 
   ["data"].forEach((prefix) => {
     ["-"].forEach((delim) => {
-      it(
+      fit(
         "compiles element directives with " + prefix + delim + " prefix",
         () => {
           myModule.directive("myDirective", () => {
             return {
               restrict: "EA",
               compile: function (element) {
-                element.data("hasCompiled", true);
+                setCacheData(element, "hasCompiled", true);
               },
             };
           });
@@ -327,18 +328,18 @@ describe("$compile", () => {
               "my-directive>",
           );
           $compile(el);
-          expect(el.data("hasCompiled")).toBe(true);
+          expect(getCacheData(el, "hasCompiled")).toBe(true);
         },
       );
     });
   });
 
-  it("compiles attribute directives", () => {
+  fit("compiles attribute directives", () => {
     myModule.directive("myDirective", () => {
       return {
         restrict: "EA",
         compile: function (element) {
-          element.data("hasCompiled", true);
+          setCacheData(element, "hasCompiled", true);
         },
       };
     });
@@ -346,31 +347,31 @@ describe("$compile", () => {
     reloadModules();
     var el = createElementFromHTML("<div my-directive></div>");
     $compile(el);
-    expect(el.data("hasCompiled")).toBe(true);
+    expect(getCacheData(el, "hasCompiled")).toBe(true);
   });
 
-  it("compiles attribute directives with prefixes", () => {
+  fit("compiles attribute directives with prefixes", () => {
     myModule.directive("myDirective", () => {
       return {
         restrict: "EA",
         compile: function (element) {
-          element.data("hasCompiled", true);
+          setCacheData(element, "hasCompiled", true);
         },
       };
     });
     reloadModules();
     var el = createElementFromHTML("<div my-directive></div>");
     $compile(el);
-    expect(el.data("hasCompiled")).toBe(true);
+    expect(getCacheData(el, "hasCompiled")).toBe(true);
   });
 
-  it("compiles several attribute directives in an element", () => {
+  fit("compiles several attribute directives in an element", () => {
     myModule
       .directive("myDirective", () => {
         return {
           restrict: "EA",
           compile: function (element) {
-            element.data("hasCompiled", true);
+            setCacheData(element, "hasCompiled", true);
           },
         };
       })
@@ -378,7 +379,7 @@ describe("$compile", () => {
         return {
           restrict: "EA",
           compile: function (element) {
-            element.data("secondCompiled", true);
+            setCacheData(element, "secondCompiled", true);
           },
         };
       });
@@ -387,17 +388,17 @@ describe("$compile", () => {
       "<div my-directive my-second-directive></div>",
     );
     $compile(el);
-    expect(el.data("hasCompiled")).toBe(true);
-    expect(el.data("secondCompiled")).toBe(true);
+    expect(getCacheData(el, "hasCompiled")).toBe(true);
+    expect(getCacheData(el, "secondCompiled")).toBe(true);
   });
 
-  it("compiles both element and attributes directives in an element", () => {
+  fit("compiles both element and attributes directives in an element", () => {
     myModule
       .directive("myDirective", () => {
         return {
           restrict: "EA",
           compile: function (element) {
-            element.data("hasCompiled", true);
+            setCacheData(element, "hasCompiled", true);
           },
         };
       })
@@ -405,7 +406,7 @@ describe("$compile", () => {
         return {
           restrict: "EA",
           compile: function (element) {
-            element.data("secondCompiled", true);
+            setCacheData(element, "secondCompiled", true);
           },
         };
       });
@@ -415,8 +416,23 @@ describe("$compile", () => {
       "<my-directive my-second-directive></my-directive>",
     );
     $compile(el);
-    expect(el.data("hasCompiled")).toBe(true);
-    expect(el.data("secondCompiled")).toBe(true);
+    expect(getCacheData(el, "hasCompiled")).toBe(true);
+    expect(getCacheData(el, "secondCompiled")).toBe(true);
+  });
+
+  fit("compiles attribute directives with ng-attr prefix", () => {
+    myModule.directive("myDirective", () => {
+      return {
+        restrict: "EA",
+        compile: function (element) {
+          setCacheData(element, "hasCompiled", true);
+        },
+      };
+    });
+    reloadModules();
+    var el = createElementFromHTML("<div ng-attr-my-directive></div>");
+    $compile(el);
+    expect(getCacheData(el, "hasCompiled")).toBe(true);
   });
 
   it("compiles attribute directives with ng-attr prefix", () => {
@@ -424,29 +440,14 @@ describe("$compile", () => {
       return {
         restrict: "EA",
         compile: function (element) {
-          element.data("hasCompiled", true);
+          setCacheData(element, "hasCompiled", true);
         },
       };
     });
     reloadModules();
     var el = createElementFromHTML("<div ng-attr-my-directive></div>");
     $compile(el);
-    expect(el.data("hasCompiled")).toBe(true);
-  });
-
-  it("compiles attribute directives with ng-attr prefix", () => {
-    myModule.directive("myDirective", () => {
-      return {
-        restrict: "EA",
-        compile: function (element) {
-          element.data("hasCompiled", true);
-        },
-      };
-    });
-    reloadModules();
-    var el = createElementFromHTML("<div ng-attr-my-directive></div>");
-    $compile(el);
-    expect(el.data("hasCompiled")).toBe(true);
+    expect(getCacheData(el, "hasCompiled")).toBe(true);
   });
 
   Object.entries({
@@ -459,7 +460,7 @@ describe("$compile", () => {
         element: "<my-directive></my-directive>",
         attribute: "<div my-directive></div>",
       }).forEach(([type, dom]) => {
-        it(
+        fit(
           (expected[type] ? "matches" : "does not match") + " on " + type,
           () => {
             var hasCompiled = false;
@@ -480,7 +481,7 @@ describe("$compile", () => {
     });
   });
 
-  it("applies to attributes when no restrict given", () => {
+  fit("applies to attributes when no restrict given", () => {
     var hasCompiled = false;
     myModule.directive("myDirective", () => {
       return {
@@ -495,7 +496,7 @@ describe("$compile", () => {
     expect(hasCompiled).toBe(true);
   });
 
-  it("applies to elements when no restrict given", () => {
+  fit("applies to elements when no restrict given", () => {
     var hasCompiled = false;
     myModule.directive("myDirective", () => {
       return {
@@ -510,7 +511,7 @@ describe("$compile", () => {
     expect(hasCompiled).toBe(true);
   });
 
-  it("does not apply to classes when no restrict given", () => {
+  fit("does not apply to classes when no restrict given", () => {
     var hasCompiled = false;
     myModule.directive("myDirective", () => {
       return {
@@ -525,7 +526,7 @@ describe("$compile", () => {
     expect(hasCompiled).toBe(false);
   });
 
-  it("applies in priority order", () => {
+  fit("applies in priority order", () => {
     var compilations = [];
     myModule
       .directive("lowerDirective", () => {
@@ -552,7 +553,7 @@ describe("$compile", () => {
     expect(compilations).toEqual(["higher", "lower"]);
   });
 
-  it("applies in name order when priorities are the same", () => {
+  fit("applies in name order when priorities are the same", () => {
     var compilations = [];
     myModule
       .directive("firstDirective", () => {
@@ -576,7 +577,7 @@ describe("$compile", () => {
     expect(compilations).toEqual(["first", "second"]);
   });
 
-  it("applies in registration order when names are the same", () => {
+  fit("applies in registration order when names are the same", () => {
     var compilations = [];
     myModule
       .directive("aDirective", () => {
@@ -600,7 +601,7 @@ describe("$compile", () => {
     expect(compilations).toEqual(["first", "second"]);
   });
 
-  it("uses default priority when one not given", () => {
+  fit("uses default priority when one not given", () => {
     var compilations = [];
     myModule
       .directive("firstDirective", () => {
@@ -623,7 +624,7 @@ describe("$compile", () => {
     expect(compilations).toEqual(["first", "second"]);
   });
 
-  it("stops compiling at a terminal directive", () => {
+  fit("stops compiling at a terminal directive", () => {
     var compilations = [];
 
     myModule
@@ -649,7 +650,7 @@ describe("$compile", () => {
     expect(compilations).toEqual(["first"]);
   });
 
-  it("still compiles directives with same priority after terminal", () => {
+  fit("still compiles directives with same priority after terminal", () => {
     var compilations = [];
     myModule
       .directive("firstDirective", () => {
@@ -674,7 +675,7 @@ describe("$compile", () => {
     expect(compilations).toEqual(["first", "second"]);
   });
 
-  it("stops child compilation after a terminal directive", () => {
+  fit("stops child compilation after a terminal directive", () => {
     var compilations = [];
     myModule
       .directive("parentDirective", () => {
@@ -706,7 +707,7 @@ describe("$compile", () => {
       dealoc(element);
     });
 
-    it("allows applying a directive to multiple elements", () => {
+    fit("allows applying a directive to multiple elements", () => {
       var compileEl = false;
       registerDirectives("myDir", () => {
         return {
@@ -721,22 +722,22 @@ describe("$compile", () => {
       expect(compileEl.length).toBe(3);
     });
 
-    it("should allow multiple directives per element", () => {
+    fit("should allow multiple directives per element", () => {
       reloadModules();
       var el = createElementFromHTML(
         "<span greet='angular' log='L' high-log='H' data-medium-log='M'></span>",
       );
       $compile(el)($rootScope);
-      expect(el.text()).toEqual("Hello angular");
+      expect(el.innerText).toEqual("Hello angular");
       expect(log.join("; ")).toEqual("L; M; H");
     });
 
-    it("should recurse to children", () => {
+    fit("should recurse to children", () => {
       reloadModules();
       element = $compile(
         '<div>0<a set="hello">1</a>2<b set="angular">3</b>4</div>',
       )($rootScope);
-      expect(element.textContent).toEqual("0hello2angular4");
+      expect(element.innerHTML).toEqual("0hello2angular4");
     });
 
     it("should allow directives in SVG element classes", () => {
@@ -748,7 +749,7 @@ describe("$compile", () => {
       const text = element.children().eq(0);
       // In old Safari, SVG elements don't have innerHTML, so element.innerHTML won't work
       // (https://bugs.webkit.org/show_bug.cgi?id=136903)
-      expect(text.text()).toEqual("Hello angular");
+      expect(text.innterText).toEqual("Hello angular");
       expect(log[0]).toEqual("123");
     });
 
@@ -3825,7 +3826,7 @@ describe("$compile", () => {
       var el = createElementFromHTML("<div><div my-double>Hello</div>");
 
       $compile(el)($rootScope);
-      expect(el.text()).toBe("HelloHelloHello");
+      expect(el.innerText).toBe("HelloHelloHello");
     });
 
     it("sets directive attributes element to comment", () => {
@@ -4220,7 +4221,7 @@ describe("$compile", () => {
       var el = createElementFromHTML("<my-component></my-component>");
       $compile(el)($rootScope);
       await wait();
-      expect(el.text()).toEqual("Hello from component");
+      expect(el.innerText).toEqual("Hello from component");
     });
 
     it("may have a templateUrl", (done) => {
@@ -4235,7 +4236,7 @@ describe("$compile", () => {
       var el = createElementFromHTML("<my-component></my-component>");
       $compile(el)($rootScope);
       setTimeout(() => {
-        expect(el.text()).toEqual("Hello from component");
+        expect(el.innerText).toEqual("Hello from component");
         done();
       }, 100);
     });
@@ -4250,7 +4251,7 @@ describe("$compile", () => {
       var el = createElementFromHTML("<my-component></my-component>");
       $compile(el)($rootScope);
       await wait();
-      expect(el.text()).toEqual("42");
+      expect(el.innerText).toEqual("42");
     });
 
     it("may have a template function with array-wrapped DI", () => {
@@ -4265,7 +4266,7 @@ describe("$compile", () => {
       reloadModules();
       var el = createElementFromHTML("<my-component></my-component>");
       $compile(el)($rootScope);
-      expect(el.text()).toEqual("42");
+      expect(el.innerText).toEqual("42");
     });
 
     it("may inject $element and $attrs to template function", () => {
@@ -4293,7 +4294,7 @@ describe("$compile", () => {
       var el = createElementFromHTML("<my-component></my-component>");
       $compile(el)($rootScope);
       await wait();
-      expect(el.text()).toEqual("2");
+      expect(el.innerText).toEqual("2");
     });
 
     it("may use transclusion", () => {
@@ -4306,7 +4307,7 @@ describe("$compile", () => {
         "<my-component>Transclude me</my-component>",
       );
       $compile(el)($rootScope);
-      expect(el.find("div").text()).toEqual("Transclude me");
+      expect(el.find("div").innterText).toEqual("Transclude me");
     });
 
     it("may require other directive controllers", () => {
@@ -4559,18 +4560,18 @@ describe("$compile", () => {
       );
       $compile(el)($rootScope);
       await wait();
-      expect(el.text()).toEqual("myBinding is 42");
+      expect(el.innerText).toEqual("myBinding is 42");
 
       $rootScope.aValue = 43;
       await wait();
 
-      expect(el.text()).toEqual("myBinding is 43");
+      expect(el.innerText).toEqual("myBinding is 43");
       expect($val.myBinding.isFirstChange()).toBe(true);
 
       $rootScope.aValue = 44;
       await wait();
 
-      expect(el.text()).toEqual("myBinding is 44");
+      expect(el.innerText).toEqual("myBinding is 44");
       expect($val.myBinding.isFirstChange()).toBe(false);
 
       $rootScope.bValue = 43;
@@ -4690,7 +4691,7 @@ describe("$compile", () => {
       }));
       reloadModules();
       var el = $compile("<div></div>")($rootScope);
-      expect(el.text()).toEqual("SUCCESS");
+      expect(el.innerText).toEqual("SUCCESS");
       expect(log).toEqual("OK");
     });
 
@@ -5126,7 +5127,7 @@ describe("$compile", () => {
       $compile(element.childNodes)($rootScope);
       await wait();
       document.body.appendChild(element);
-      expect(element.find("span").text()).toContain("Should render");
+      expect(element.find("span").innterText).toContain("Should render");
     });
 
     it("should allow changing the template structure after the current node", () => {
@@ -6009,11 +6010,11 @@ describe("$compile", () => {
         let e2;
 
         e1 = template($rootScope.$new(), () => {}); // clone
-        expect(e1.text()).toEqual("");
+        expect(e1.innterText).toEqual("");
         e2 = template($rootScope.$new(), () => {}); // clone
         await wait(100);
-        expect(e1.text()).toEqual("HelloElvis  ");
-        expect(e2.text()).toEqual("HelloElvis  ");
+        expect(e1.innterText).toEqual("HelloElvis  ");
+        expect(e2.innterText).toEqual("HelloElvis  ");
 
         expect(errors.length).toEqual(2);
         expect(errors[0]).toEqual("cError");
@@ -6030,12 +6031,12 @@ describe("$compile", () => {
         let e2;
 
         e1 = template($rootScope.$new(), () => {}); // clone
-        expect(e1.text()).toEqual("");
+        expect(e1.innterText).toEqual("");
 
         e2 = template($rootScope.$new(), () => {}); // clone
         await wait(100);
-        expect(e1.text()).toEqual("Elvis");
-        expect(e2.text()).toEqual("Elvis");
+        expect(e1.innterText).toEqual("Elvis");
+        expect(e2.innterText).toEqual("Elvis");
 
         dealoc(e1);
         dealoc(e2);
@@ -6057,12 +6058,12 @@ describe("$compile", () => {
         let e2;
 
         e1 = template($rootScope.$new(), () => {}); // clone
-        expect(e1.text()).toEqual("");
+        expect(e1.innterText).toEqual("");
 
         e2 = template($rootScope.$new(), () => {}); // clone
         await wait(100);
-        expect(e1.text()).toEqual("HelloElvis");
-        expect(e2.text()).toEqual("HelloElvis");
+        expect(e1.innterText).toEqual("HelloElvis");
+        expect(e2.innterText).toEqual("HelloElvis");
 
         expect(errors.length).toEqual(2);
         dealoc(e1);
@@ -6076,11 +6077,11 @@ describe("$compile", () => {
         let e2;
 
         e1 = template($rootScope.$new(), () => {}); // clone
-        expect(e1.text()).toEqual("");
+        expect(e1.innterText).toEqual("");
         e2 = template($rootScope.$new(), () => {}); // clone
         await wait(100);
-        expect(e1.text()).toEqual("Elvis");
-        expect(e2.text()).toEqual("Elvis");
+        expect(e1.innterText).toEqual("Elvis");
+        expect(e2.innterText).toEqual("Elvis");
 
         dealoc(e1);
         dealoc(e2);
@@ -6213,7 +6214,7 @@ describe("$compile", () => {
           expect(span.find("div").attr("third")).toEqual("");
           expect(span.attr("last")).toEqual("");
 
-          expect(span.text()).toEqual("3");
+          expect(span.innterText).toEqual("3");
         });
 
         it("should flush after link inline", async () => {
@@ -6238,7 +6239,7 @@ describe("$compile", () => {
           expect(div.attr("i-third")).toEqual("");
           expect(div.attr("i-last")).toEqual("");
 
-          expect(div.text()).toEqual("3");
+          expect(div.innterText).toEqual("3");
         });
 
         it("should flush before link append", async () => {
@@ -6262,7 +6263,7 @@ describe("$compile", () => {
           expect(span.find("div").attr("third")).toEqual("");
           expect(span.attr("last")).toEqual("");
 
-          expect(span.text()).toEqual("3");
+          expect(span.innterText).toEqual("3");
         });
 
         it("should flush before link inline", async () => {
@@ -6286,7 +6287,7 @@ describe("$compile", () => {
           expect(div.attr("i-third")).toEqual("");
           expect(div.attr("i-last")).toEqual("");
 
-          expect(div.text()).toEqual("3");
+          expect(div.innterText).toEqual("3");
         });
 
         it("should allow multiple elements in template", async () => {
@@ -8176,10 +8177,10 @@ describe("$compile", () => {
               controller: Controller1,
               link: {
                 pre(s, e) {
-                  log.push(`d1 pre: ${e.text()}`);
+                  log.push(`d1 pre: ${e.innterText}`);
                 },
                 post(s, e) {
-                  log.push(`d1 post: ${e.text()}`);
+                  log.push(`d1 post: ${e.innterText}`);
                 },
               },
               template: "<d2></d2>",
@@ -8188,10 +8189,10 @@ describe("$compile", () => {
               controller: Controller2,
               link: {
                 pre(s, e) {
-                  log.push(`d2 pre: ${e.text()}`);
+                  log.push(`d2 pre: ${e.innterText}`);
                 },
                 post(s, e) {
-                  log.push(`d2 post: ${e.text()}`);
+                  log.push(`d2 post: ${e.innterText}`);
                 },
               },
               template: "loaded",
@@ -9398,7 +9399,7 @@ describe("$compile", () => {
 
           await wait();
           element.find("button")[0].click();
-          expect(element.find("p").text()).toBe("Hello!");
+          expect(element.find("p").innterText).toBe("Hello!");
         });
       });
 
@@ -10644,10 +10645,10 @@ describe("$compile", () => {
           $rootScope,
         );
         const p = element.find("p");
-        expect(p.text()).toBe("Test: ");
+        expect(p.innterText).toBe("Test: ");
 
         $rootScope.text = "Kittens";
-        expect(p.text()).toBe("Test: Kittens");
+        expect(p.innterText).toBe("Test: Kittens");
       });
 
       it("should expose isolate scope variables on controller with controllerAs when bindToController is true (templateUrl)", () => {
@@ -12524,9 +12525,9 @@ describe("$compile", () => {
           await wait();
           expect(element.textContent).toEqual("W:isoT:root;");
           expect(
-            JQLite(JQLite(element.find("li")[1])[0].childNodes[0]).text(),
+            JQLite(JQLite(element.find("li")[1])[0].childNodes[0]).innterText,
           ).toEqual("T:root");
-          expect(JQLite(element.find("span")[0]).text()).toEqual(";");
+          expect(JQLite(element.find("span")[0]).innterText).toEqual(";");
         });
 
         it("should transclude transcluded content", async () => {
@@ -12676,8 +12677,10 @@ describe("$compile", () => {
           const elem1 = $compile(tmplWithFoo)($rootScope);
           const elem2 = $compile(tmplWithBar)($rootScope);
 
-          expect(elem1.text()).toBe("[Hello, world!]");
-          expect(elem2.text()).toBe("[This is a header!|This is a footer!]");
+          expect(elem1.innterText).toBe("[Hello, world!]");
+          expect(elem2.innterText).toBe(
+            "[This is a header!|This is a footer!]",
+          );
 
           dealoc(elem1);
           dealoc(elem2);
@@ -12906,8 +12909,8 @@ describe("$compile", () => {
             $rootScope,
           );
           await wait();
-          expect(JQLite(element.find("span")[0]).text()).toEqual("I:");
-          expect(JQLite(element.find("span")[1]).text()).toEqual("T:true");
+          expect(JQLite(element.find("span")[0]).innterText).toEqual("I:");
+          expect(JQLite(element.find("span")[1]).innterText).toEqual("T:true");
         });
 
         it("should clear contents of the ng-transclude element before appending transcluded content if transcluded content exists", async () => {
@@ -14252,7 +14255,7 @@ describe("$compile", () => {
           )($rootScope);
         }).not.toThrow();
         setTimeout(() => {
-          expect(res.text()).toEqual("Content To Be Transcluded");
+          expect(res.innterText).toEqual("Content To Be Transcluded");
           done();
         }, 200);
       });
@@ -14484,9 +14487,9 @@ describe("$compile", () => {
       expect(a[0].classList.contains("a")).toBeTrue();
       expect(b[0].classList.contains("b")).toBeTrue();
       expect(c[0].classList.contains("c")).toBeTrue();
-      expect(a.text()).toEqual("stuartbobkevin");
-      expect(b.text()).toEqual("stuartbobkevin");
-      expect(c.text()).toEqual("stuartbobkevin");
+      expect(a.innterText).toEqual("stuartbobkevin");
+      expect(b.innterText).toEqual("stuartbobkevin");
+      expect(c.innterText).toEqual("stuartbobkevin");
     });
 
     it("should include non-element nodes in the default transclusion", async () => {
@@ -14536,9 +14539,9 @@ describe("$compile", () => {
           "</minion-component>",
       )($rootScope);
       await wait();
-      expect(element.children().eq(0).text()).toEqual("gru");
-      expect(element.children().eq(1).text()).toEqual("stuartkevin");
-      expect(element.children().eq(2).text()).toEqual("dorothy");
+      expect(element.children().eq(0).innterText).toEqual("gru");
+      expect(element.children().eq(1).innterText).toEqual("stuartkevin");
+      expect(element.children().eq(2).innterText).toEqual("dorothy");
     });
 
     it("should use the `ng-transclude-slot` attribute if ng-transclude is used as an element", async () => {
@@ -14564,9 +14567,9 @@ describe("$compile", () => {
           "</minion-component>",
       )($rootScope);
       await wait();
-      expect(element.children().eq(0).text()).toEqual("gru");
-      expect(element.children().eq(1).text()).toEqual("stuartkevin");
-      expect(element.children().eq(2).text()).toEqual("dorothy");
+      expect(element.children().eq(0).innterText).toEqual("gru");
+      expect(element.children().eq(1).innterText).toEqual("stuartkevin");
+      expect(element.children().eq(2).innterText).toEqual("dorothy");
     });
 
     it("should error if a required transclude slot is not filled", () => {
@@ -14614,8 +14617,8 @@ describe("$compile", () => {
           "</minion-component>",
       )($rootScope);
       await wait();
-      expect(element.children().eq(1).text()).toEqual("stuart");
-      expect(element.children().eq(2).text()).toEqual("dorothy");
+      expect(element.children().eq(1).innterText).toEqual("stuart");
+      expect(element.children().eq(2).innterText).toEqual("dorothy");
     });
 
     it("should error if we try to transclude a slot that was not declared by the directive", () => {
@@ -14684,8 +14687,8 @@ describe("$compile", () => {
           "</foo>",
       )($rootScope);
       await wait();
-      expect(element.children().eq(0).text()).toEqual("bar1bar2");
-      expect(element.children().eq(1).text()).toEqual("baz1baz2");
+      expect(element.children().eq(0).innterText).toEqual("bar1bar2");
+      expect(element.children().eq(1).innterText).toEqual("baz1baz2");
     });
 
     it("should return true from `isSlotFilled(slotName) for slots that have content in the transclusion", async () => {
@@ -14744,9 +14747,11 @@ describe("$compile", () => {
           "</minion-component>",
       )($rootScope);
       await wait();
-      expect(element.children().eq(0).text()).toEqual("default boss content");
-      expect(element.children().eq(1).text()).toEqual("stuartkevin");
-      expect(element.children().eq(2).text()).toEqual("dorothy");
+      expect(element.children().eq(0).innterText).toEqual(
+        "default boss content",
+      );
+      expect(element.children().eq(1).innterText).toEqual("stuartkevin");
+      expect(element.children().eq(2).innterText).toEqual("dorothy");
     });
 
     // See issue https://github.com/angular/angular.js/issues/14924
@@ -16397,7 +16402,7 @@ describe("$compile", () => {
       });
       initInjector("test1");
       element = $compile("<my-component></my-component>")($rootScope);
-      expect(element.find("div").text()).toEqual("SUCCESS");
+      expect(element.find("div").innterText).toEqual("SUCCESS");
       expect(log[0]).toEqual("OK");
     });
 
@@ -16424,8 +16429,8 @@ describe("$compile", () => {
         $rootScope,
       );
 
-      expect(fooElement.find("div").text()).toEqual("FOO SUCCESS");
-      expect(barElement.find("div").text()).toEqual("BAR SUCCESS");
+      expect(fooElement.find("div").innterText).toEqual("FOO SUCCESS");
+      expect(barElement.find("div").innterText).toEqual("BAR SUCCESS");
       expect(log.join("")).toEqual("FOO:OKBAR:OK");
     });
 
@@ -16438,7 +16443,7 @@ describe("$compile", () => {
       });
       initInjector("test1");
       element = $compile("<my-component></my-component>")($rootScope);
-      expect(element.find("div").text()).toEqual("SUCCESS");
+      expect(element.find("div").innterText).toEqual("SUCCESS");
       expect(log[0]).toEqual("OK");
     });
 

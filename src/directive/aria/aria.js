@@ -137,7 +137,7 @@ export function ngClickAriaDirective($aria, $parse) {
             !attr.ngKeypress &&
             !attr.ngKeyup
           ) {
-            elem.on("keydown", (event) => {
+            elem.addEventListerer("keydown", (event) => {
               const keyCode = event.which || event.keyCode;
 
               if (keyCode === 13 || keyCode === 32) {

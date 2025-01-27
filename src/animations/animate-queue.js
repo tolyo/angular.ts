@@ -303,7 +303,7 @@ export function AnimateQueueProvider($animateProvider) {
           });
 
           // Remove the callback when the element is removed from the DOM
-          JQLite(container).on("$destroy", () => {
+          container.addEventListener("$destroy", () => {
             const animationDetails = activeAnimationsLookup.get(node);
 
             if (!animationDetails) {
@@ -381,7 +381,7 @@ export function AnimateQueueProvider($animateProvider) {
                 if (!disabledElementsLookup.has(node)) {
                   // The element is added to the map for the first time.
                   // Create a listener to remove it on `$destroy` (to avoid memory leak).
-                  JQLite(element).on(
+                  element.addEventListener(
                     "$destroy",
                     removeFromDisabledElementsLookup,
                   );

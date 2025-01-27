@@ -297,7 +297,7 @@ function ngMessageDirectiveFactory(isDefault) {
                   // in the event that the element or a parent element is destroyed
                   // by another structural directive then it's time
                   // to deregister the message from the controller
-                  currentElement.on("$destroy", () => {
+                  currentElement.addEventListerer("$destroy", () => {
                     // If the message element was removed via a call to `detach` then `currentElement` will be null
                     // So this handler only handles cases where something else removed the message element.
                     if (
