@@ -240,11 +240,13 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
             hasDirectives[name].forEach((directiveFactory, index) => {
               try {
                 let directive = $injector.invoke(directiveFactory);
+                const valueFn = (value) => () => value;
                 if (isFunction(directive)) {
-                  directive = { compile: () => directive };
+                  directive = { compile: valueFn(directive) };
                 } else if (!directive.compile && directive.link) {
-                  directive.compile = () => directive.link;
+                  directive.compile = valueFn(directive.link);
                 }
+
                 directive.priority = directive.priority || 0;
                 directive.index = index;
                 directive.name = directive.name || name;

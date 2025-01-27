@@ -46,14 +46,6 @@ export class JQLite {
      */
     injector(): import("../../core/di/internal-injector").InjectorService;
     /**
-     * Removes an event listener to each element in JQLite collection.
-     *
-     * @param {string} type - The event type(s) to remove listener from
-     * @param {Function} [fn] - The function to remove from event type.
-     * @returns {JQLite}
-     */
-    off(type: string, fn?: Function): JQLite;
-    /**
      * Remove data  by name from cache associated with each element in JQLite collection.
      * @param {string} name - The key of the data associated with element
      * @returns {JQLite}

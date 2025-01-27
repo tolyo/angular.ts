@@ -107,6 +107,6 @@ export namespace CompileProvider {
 export const DirectiveSuffix: "Directive";
 export type CompositeLinkFn = (scope: import("../scope/scope.js").Scope, $linkNode: Element[], parentBoundTranscludeFn: Function) => any;
 export type TranscludeFn = Function;
-export type PublicLinkFn = (scope: import("../scope/scope.js").Scope, transcludeFn?: TranscludeFn) => any;
+export type PublicLinkFn = any | ((scope: import("../scope/scope.js").Scope, transcludeFn: TranscludeFn) => string);
 export type CompileFn = ($compileNodes: string | Element | NodeList, transcludeFn?: any, maxPriority?: number, ignoreDirective?: string, previousCompileContext?: any) => PublicLinkFn | null;
 export type NodeLinkFn = Function;

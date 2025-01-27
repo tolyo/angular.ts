@@ -121,7 +121,9 @@ describe("$compile", () => {
         },
       }),
 
-      set: () => (scope, element, attrs) => element.text(attrs.set),
+      set: () => (scope, element, attrs) => {
+        element.innerText = attrs.set;
+      },
 
       mediumStop: () => ({
         priority: 2,
@@ -147,7 +149,7 @@ describe("$compile", () => {
         template: '<svg width="400" height="400"></svg>',
         transclude: true,
         link(scope, element, attr, ctrls, $transclude) {
-          const futureParent = element.children().eq(0);
+          const futureParent = element.firstChild;
           $transclude((clone) => {
             futureParent.append(clone);
           }, futureParent);
@@ -737,23 +739,24 @@ describe("$compile", () => {
       element = $compile(
         '<div>0<a set="hello">1</a>2<b set="angular">3</b>4</div>',
       )($rootScope);
-      expect(element.innerHTML).toEqual("0hello2angular4");
+      debugger;
+      expect(element.innerText).toEqual("0hello2angular4");
     });
 
-    it("should allow directives in SVG element classes", () => {
+    fit("should allow directives in SVG element classes", () => {
       reloadModules();
       if (!window.SVGElement) return;
       element = $compile('<svg><text greet="angular" log="123"></text></svg>')(
         $rootScope,
       );
-      const text = element.children().eq(0);
+      const text = element.firstChild;
       // In old Safari, SVG elements don't have innerHTML, so element.innerHTML won't work
       // (https://bugs.webkit.org/show_bug.cgi?id=136903)
-      expect(text.innterText).toEqual("Hello angular");
+      expect(text.innerText).toEqual("Hello angular");
       expect(log[0]).toEqual("123");
     });
 
-    it("should ignore not set CSS classes on SVG elements", async () => {
+    fit("should ignore not set CSS classes on SVG elements", async () => {
       reloadModules();
       if (!window.SVGElement) return;
       // According to spec SVG element className property is readonly, but only FF
@@ -763,7 +766,7 @@ describe("$compile", () => {
       expect(element.textContent).toEqual("1");
     });
 
-    it("should receive scope, element, and attributes", () => {
+    fit("should receive scope, element, and attributes", () => {
       let injectableInjector;
       myModule.directive("log", ($rootScope, $injector) => {
         injectableInjector = $injector;
@@ -782,7 +785,7 @@ describe("$compile", () => {
               expect(element.textContent).toEqual("unlinked");
               expect(attr).toBe(templateAttr);
               expect(scope).toEqual($rootScope);
-              element.text("worked");
+              element.innerText = "worked";
             };
           },
         };
@@ -4307,7 +4310,7 @@ describe("$compile", () => {
         "<my-component>Transclude me</my-component>",
       );
       $compile(el)($rootScope);
-      expect(el.find("div").innterText).toEqual("Transclude me");
+      expect(el.find("div").innerText).toEqual("Transclude me");
     });
 
     it("may require other directive controllers", () => {
@@ -4686,7 +4689,7 @@ describe("$compile", () => {
         restrict: "EA",
         link(scope, element) {
           log = "OK";
-          element.text("SUCCESS");
+          element.innerText = "SUCCESS";
         },
       }));
       reloadModules();
@@ -5127,7 +5130,7 @@ describe("$compile", () => {
       $compile(element.childNodes)($rootScope);
       await wait();
       document.body.appendChild(element);
-      expect(element.find("span").innterText).toContain("Should render");
+      expect(element.find("span").innerText).toContain("Should render");
     });
 
     it("should allow changing the template structure after the current node", () => {
@@ -5673,7 +5676,7 @@ describe("$compile", () => {
           '<svg><g svg-anchor="/foo/bar" text="foo/bar!"></g></svg>',
         )($rootScope);
         await wait();
-        const child = element.children().eq(0);
+        const child = element.firstChild;
         expect(getNodeName(child)).toMatch(/a/i);
         expect(isSVGElement(child[0])).toBe(true);
         expect(child[0].href.baseVal).toBe("/foo/bar");
@@ -5699,7 +5702,7 @@ describe("$compile", () => {
           $rootScope,
         );
         await wait();
-        const child = element.children().eq(0);
+        const child = element.firstChild;
         expect(getNodeName(child)).toMatch(/msup/i);
         expect(isUnknownElement(child[0])).toBe(false);
         expect(isHTMLElement(child[0])).toBe(false);
@@ -6010,11 +6013,11 @@ describe("$compile", () => {
         let e2;
 
         e1 = template($rootScope.$new(), () => {}); // clone
-        expect(e1.innterText).toEqual("");
+        expect(e1.innerText).toEqual("");
         e2 = template($rootScope.$new(), () => {}); // clone
         await wait(100);
-        expect(e1.innterText).toEqual("HelloElvis  ");
-        expect(e2.innterText).toEqual("HelloElvis  ");
+        expect(e1.innerText).toEqual("HelloElvis  ");
+        expect(e2.innerText).toEqual("HelloElvis  ");
 
         expect(errors.length).toEqual(2);
         expect(errors[0]).toEqual("cError");
@@ -6031,12 +6034,12 @@ describe("$compile", () => {
         let e2;
 
         e1 = template($rootScope.$new(), () => {}); // clone
-        expect(e1.innterText).toEqual("");
+        expect(e1.innerText).toEqual("");
 
         e2 = template($rootScope.$new(), () => {}); // clone
         await wait(100);
-        expect(e1.innterText).toEqual("Elvis");
-        expect(e2.innterText).toEqual("Elvis");
+        expect(e1.innerText).toEqual("Elvis");
+        expect(e2.innerText).toEqual("Elvis");
 
         dealoc(e1);
         dealoc(e2);
@@ -6058,12 +6061,12 @@ describe("$compile", () => {
         let e2;
 
         e1 = template($rootScope.$new(), () => {}); // clone
-        expect(e1.innterText).toEqual("");
+        expect(e1.innerText).toEqual("");
 
         e2 = template($rootScope.$new(), () => {}); // clone
         await wait(100);
-        expect(e1.innterText).toEqual("HelloElvis");
-        expect(e2.innterText).toEqual("HelloElvis");
+        expect(e1.innerText).toEqual("HelloElvis");
+        expect(e2.innerText).toEqual("HelloElvis");
 
         expect(errors.length).toEqual(2);
         dealoc(e1);
@@ -6077,11 +6080,11 @@ describe("$compile", () => {
         let e2;
 
         e1 = template($rootScope.$new(), () => {}); // clone
-        expect(e1.innterText).toEqual("");
+        expect(e1.innerText).toEqual("");
         e2 = template($rootScope.$new(), () => {}); // clone
         await wait(100);
-        expect(e1.innterText).toEqual("Elvis");
-        expect(e2.innterText).toEqual("Elvis");
+        expect(e1.innerText).toEqual("Elvis");
+        expect(e2.innerText).toEqual("Elvis");
 
         dealoc(e1);
         dealoc(e2);
@@ -6214,7 +6217,7 @@ describe("$compile", () => {
           expect(span.find("div").attr("third")).toEqual("");
           expect(span.attr("last")).toEqual("");
 
-          expect(span.innterText).toEqual("3");
+          expect(span.innerText).toEqual("3");
         });
 
         it("should flush after link inline", async () => {
@@ -6239,7 +6242,7 @@ describe("$compile", () => {
           expect(div.attr("i-third")).toEqual("");
           expect(div.attr("i-last")).toEqual("");
 
-          expect(div.innterText).toEqual("3");
+          expect(div.innerText).toEqual("3");
         });
 
         it("should flush before link append", async () => {
@@ -6263,7 +6266,7 @@ describe("$compile", () => {
           expect(span.find("div").attr("third")).toEqual("");
           expect(span.attr("last")).toEqual("");
 
-          expect(span.innterText).toEqual("3");
+          expect(span.innerText).toEqual("3");
         });
 
         it("should flush before link inline", async () => {
@@ -6287,7 +6290,7 @@ describe("$compile", () => {
           expect(div.attr("i-third")).toEqual("");
           expect(div.attr("i-last")).toEqual("");
 
-          expect(div.innterText).toEqual("3");
+          expect(div.innerText).toEqual("3");
         });
 
         it("should allow multiple elements in template", async () => {
@@ -6540,7 +6543,7 @@ describe("$compile", () => {
               '<svg><g svg-anchor="/foo/bar" text="foo/bar!"></g></svg>',
             )($rootScope);
             await wait();
-            const child = element.children().eq(0);
+            const child = element.firstChild;
             expect(getNodeName(child)).toMatch(/a/i);
             expect(isSVGElement(child[0])).toBe(true);
             expect(child[0].href.baseVal).toBe("/foo/bar");
@@ -6573,7 +6576,7 @@ describe("$compile", () => {
               $rootScope,
             );
             await wait();
-            const child = element.children().eq(0);
+            const child = element.firstChild;
             expect(getNodeName(child)).toMatch(/msup/i);
             expect(isUnknownElement(child[0])).toBe(false);
             expect(isHTMLElement(child[0])).toBe(false);
@@ -8177,10 +8180,10 @@ describe("$compile", () => {
               controller: Controller1,
               link: {
                 pre(s, e) {
-                  log.push(`d1 pre: ${e.innterText}`);
+                  log.push(`d1 pre: ${e.innerText}`);
                 },
                 post(s, e) {
-                  log.push(`d1 post: ${e.innterText}`);
+                  log.push(`d1 post: ${e.innerText}`);
                 },
               },
               template: "<d2></d2>",
@@ -8189,10 +8192,10 @@ describe("$compile", () => {
               controller: Controller2,
               link: {
                 pre(s, e) {
-                  log.push(`d2 pre: ${e.innterText}`);
+                  log.push(`d2 pre: ${e.innerText}`);
                 },
                 post(s, e) {
-                  log.push(`d2 post: ${e.innterText}`);
+                  log.push(`d2 post: ${e.innerText}`);
                 },
               },
               template: "loaded",
@@ -9399,7 +9402,7 @@ describe("$compile", () => {
 
           await wait();
           element.find("button")[0].click();
-          expect(element.find("p").innterText).toBe("Hello!");
+          expect(element.find("p").innerText).toBe("Hello!");
         });
       });
 
@@ -10645,10 +10648,10 @@ describe("$compile", () => {
           $rootScope,
         );
         const p = element.find("p");
-        expect(p.innterText).toBe("Test: ");
+        expect(p.innerText).toBe("Test: ");
 
         $rootScope.text = "Kittens";
-        expect(p.innterText).toBe("Test: Kittens");
+        expect(p.innerText).toBe("Test: Kittens");
       });
 
       it("should expose isolate scope variables on controller with controllerAs when bindToController is true (templateUrl)", () => {
@@ -11938,7 +11941,7 @@ describe("$compile", () => {
           $rootScope,
         );
 
-        element = element.children().eq(0);
+        element = element.firstChild;
         expect(element.checked).toBe(false);
         $rootScope.$children[0].model = true;
         expect(element.checked).toBe(true);
@@ -12525,9 +12528,9 @@ describe("$compile", () => {
           await wait();
           expect(element.textContent).toEqual("W:isoT:root;");
           expect(
-            JQLite(JQLite(element.find("li")[1])[0].childNodes[0]).innterText,
+            JQLite(JQLite(element.find("li")[1])[0].childNodes[0]).innerText,
           ).toEqual("T:root");
-          expect(JQLite(element.find("span")[0]).innterText).toEqual(";");
+          expect(JQLite(element.find("span")[0]).innerText).toEqual(";");
         });
 
         it("should transclude transcluded content", async () => {
@@ -12604,7 +12607,7 @@ describe("$compile", () => {
             transclude: "content",
             template: "<div>This is before {{before}}. </div>",
             link(scope, element, attr, ctrls, $transclude) {
-              const futureParent = element.children().eq(0);
+              const futureParent = element.firstChild;
               $transclude((clone) => {
                 futureParent.append(clone);
               }, futureParent);
@@ -12677,10 +12680,8 @@ describe("$compile", () => {
           const elem1 = $compile(tmplWithFoo)($rootScope);
           const elem2 = $compile(tmplWithBar)($rootScope);
 
-          expect(elem1.innterText).toBe("[Hello, world!]");
-          expect(elem2.innterText).toBe(
-            "[This is a header!|This is a footer!]",
-          );
+          expect(elem1.innerText).toBe("[Hello, world!]");
+          expect(elem2.innerText).toBe("[This is a header!|This is a footer!]");
 
           dealoc(elem1);
           dealoc(elem2);
@@ -12909,8 +12910,8 @@ describe("$compile", () => {
             $rootScope,
           );
           await wait();
-          expect(JQLite(element.find("span")[0]).innterText).toEqual("I:");
-          expect(JQLite(element.find("span")[1]).innterText).toEqual("T:true");
+          expect(JQLite(element.find("span")[0]).innerText).toEqual("I:");
+          expect(JQLite(element.find("span")[1]).innerText).toEqual("T:true");
         });
 
         it("should clear contents of the ng-transclude element before appending transcluded content if transcluded content exists", async () => {
@@ -14255,7 +14256,7 @@ describe("$compile", () => {
           )($rootScope);
         }).not.toThrow();
         setTimeout(() => {
-          expect(res.innterText).toEqual("Content To Be Transcluded");
+          expect(res.innerText).toEqual("Content To Be Transcluded");
           done();
         }, 200);
       });
@@ -14481,15 +14482,15 @@ describe("$compile", () => {
           "</minion-component>",
       )($rootScope);
       await wait();
-      const a = element.children().eq(0);
+      const a = element.firstChild;
       const b = element.children().eq(1);
       const c = element.children().eq(2);
       expect(a[0].classList.contains("a")).toBeTrue();
       expect(b[0].classList.contains("b")).toBeTrue();
       expect(c[0].classList.contains("c")).toBeTrue();
-      expect(a.innterText).toEqual("stuartbobkevin");
-      expect(b.innterText).toEqual("stuartbobkevin");
-      expect(c.innterText).toEqual("stuartbobkevin");
+      expect(a.innerText).toEqual("stuartbobkevin");
+      expect(b.innerText).toEqual("stuartbobkevin");
+      expect(c.innerText).toEqual("stuartbobkevin");
     });
 
     it("should include non-element nodes in the default transclusion", async () => {
@@ -14539,9 +14540,9 @@ describe("$compile", () => {
           "</minion-component>",
       )($rootScope);
       await wait();
-      expect(element.children().eq(0).innterText).toEqual("gru");
-      expect(element.children().eq(1).innterText).toEqual("stuartkevin");
-      expect(element.children().eq(2).innterText).toEqual("dorothy");
+      expect(element.firstChild.innerText).toEqual("gru");
+      expect(element.children().eq(1).innerText).toEqual("stuartkevin");
+      expect(element.children().eq(2).innerText).toEqual("dorothy");
     });
 
     it("should use the `ng-transclude-slot` attribute if ng-transclude is used as an element", async () => {
@@ -14567,9 +14568,9 @@ describe("$compile", () => {
           "</minion-component>",
       )($rootScope);
       await wait();
-      expect(element.children().eq(0).innterText).toEqual("gru");
-      expect(element.children().eq(1).innterText).toEqual("stuartkevin");
-      expect(element.children().eq(2).innterText).toEqual("dorothy");
+      expect(element.firstChild.innerText).toEqual("gru");
+      expect(element.children().eq(1).innerText).toEqual("stuartkevin");
+      expect(element.children().eq(2).innerText).toEqual("dorothy");
     });
 
     it("should error if a required transclude slot is not filled", () => {
@@ -14617,8 +14618,8 @@ describe("$compile", () => {
           "</minion-component>",
       )($rootScope);
       await wait();
-      expect(element.children().eq(1).innterText).toEqual("stuart");
-      expect(element.children().eq(2).innterText).toEqual("dorothy");
+      expect(element.children().eq(1).innerText).toEqual("stuart");
+      expect(element.children().eq(2).innerText).toEqual("dorothy");
     });
 
     it("should error if we try to transclude a slot that was not declared by the directive", () => {
@@ -14687,8 +14688,8 @@ describe("$compile", () => {
           "</foo>",
       )($rootScope);
       await wait();
-      expect(element.children().eq(0).innterText).toEqual("bar1bar2");
-      expect(element.children().eq(1).innterText).toEqual("baz1baz2");
+      expect(element.firstChild.innerText).toEqual("bar1bar2");
+      expect(element.children().eq(1).innerText).toEqual("baz1baz2");
     });
 
     it("should return true from `isSlotFilled(slotName) for slots that have content in the transclusion", async () => {
@@ -14747,11 +14748,9 @@ describe("$compile", () => {
           "</minion-component>",
       )($rootScope);
       await wait();
-      expect(element.children().eq(0).innterText).toEqual(
-        "default boss content",
-      );
-      expect(element.children().eq(1).innterText).toEqual("stuartkevin");
-      expect(element.children().eq(2).innterText).toEqual("dorothy");
+      expect(element.firstChild.innerText).toEqual("default boss content");
+      expect(element.children().eq(1).innerText).toEqual("stuartkevin");
+      expect(element.children().eq(2).innerText).toEqual("dorothy");
     });
 
     // See issue https://github.com/angular/angular.js/issues/14924
@@ -16402,7 +16401,7 @@ describe("$compile", () => {
       });
       initInjector("test1");
       element = $compile("<my-component></my-component>")($rootScope);
-      expect(element.find("div").innterText).toEqual("SUCCESS");
+      expect(element.find("div").innerText).toEqual("SUCCESS");
       expect(log[0]).toEqual("OK");
     });
 
@@ -16429,8 +16428,8 @@ describe("$compile", () => {
         $rootScope,
       );
 
-      expect(fooElement.find("div").innterText).toEqual("FOO SUCCESS");
-      expect(barElement.find("div").innterText).toEqual("BAR SUCCESS");
+      expect(fooElement.find("div").innerText).toEqual("FOO SUCCESS");
+      expect(barElement.find("div").innerText).toEqual("BAR SUCCESS");
       expect(log.join("")).toEqual("FOO:OKBAR:OK");
     });
 
@@ -16443,7 +16442,7 @@ describe("$compile", () => {
       });
       initInjector("test1");
       element = $compile("<my-component></my-component>")($rootScope);
-      expect(element.find("div").innterText).toEqual("SUCCESS");
+      expect(element.find("div").innerText).toEqual("SUCCESS");
       expect(log[0]).toEqual("OK");
     });
 
