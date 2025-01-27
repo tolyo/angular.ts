@@ -189,51 +189,6 @@ JQLite.prototype.injector = function () {
 };
 
 /**
- * Removes an event listener to each element in JQLite collection.
- *
- * @param {string} type - The event type(s) to remove listener from
- * @param {Function} [fn] - The function to remove from event type.
- * @returns {JQLite}
- */
-JQLite.prototype.off = function (type, fn) {
-  for (let i = 0; i < this.length; i++) {
-    const element = this[i];
-    const expandoStore = getExpando(element);
-    const events = expandoStore && expandoStore.events;
-    const handle = expandoStore && expandoStore.handle;
-
-    if (!handle) return; // no listeners registered
-
-    if (!type) {
-      for (type in events) {
-        if (type !== "$destroy") {
-          element.removeEventListener(type, handle);
-        }
-        delete events[type];
-      }
-    } else {
-      const removeHandler = function (type) {
-        const listenerFns = events[type];
-        if (isDefined(fn) && Array.isArray(listenerFns)) {
-          arrayRemove(listenerFns, fn);
-        }
-        if (!(isDefined(fn) && listenerFns && listenerFns.length > 0)) {
-          element.removeEventListener(type, handle);
-          delete events[type];
-        }
-      };
-
-      type.split(" ").forEach((type) => {
-        removeHandler(type);
-      });
-    }
-
-    removeIfEmptyData(element);
-  }
-  return this;
-};
-
-/**
  * Remove data  by name from cache associated with each element in JQLite collection.
  * @param {string} name - The key of the data associated with element
  * @returns {JQLite}
@@ -1076,7 +1031,6 @@ export function cleanElementData(nodes) {
       JQLite(nodes[i]).triggerHandler("$destroy");
     }
     removeElementData(nodes[i]);
-    JQLite.prototype.off.call(JQLite(nodes[i]));
   }
 }
 

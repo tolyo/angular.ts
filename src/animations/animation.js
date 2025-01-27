@@ -489,7 +489,6 @@ export function AnimationProvider() {
         }
 
         function close(rejected) {
-          element.off("$destroy", handleDestroyedElement);
           removeRunner(element);
 
           applyAnimationClasses(element, options);

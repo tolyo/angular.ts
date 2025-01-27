@@ -2962,9 +2962,6 @@ export function CompileProvider($provide, $$sanitizeUriProvider) {
             /** @type {Element} */ (newNode),
             getOrSetCacheData(firstElementToRemove),
           );
-
-          // Remove $destroy event listeners from `firstElementToRemove`
-          // JQLite(firstElementToRemove).off("$destroy");
         }
 
         // Cleanup any data/listeners on the elements and children.
